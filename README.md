@@ -1,29 +1,20 @@
-# README #
+# Important
 
-This README would normally document whatever steps are necessary to get your application up and running.
+Issues of this repository are tracked on https://github.com/aspnetboilerplate/aspnetboilerplate. Please create your issues on https://github.com/aspnetboilerplate/aspnetboilerplate/issues.
 
-### What is this repository for? ###
+# ASP.NET Core & EntityFramework Core Based Startup Template
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+This template is a simple startup project to start with ABP
+using ASP.NET Core and EntityFramework Core.
 
-### How do I get set up? ###
+## Prerequirements
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+* Visual Studio 2017
+* .NET Core SDK
+* SQL Server
 
-### Contribution guidelines ###
+## How To Run
 
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
+* Open solution in Visual Studio 2017
+* Set .Web project as Startup Project and build the project.
+* Run the application.

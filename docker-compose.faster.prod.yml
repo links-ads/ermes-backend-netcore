@@ -1,0 +1,23 @@
+#docker-compose.prod.yml (Extended config for Prod env.)
+version: '3.4'
+
+services:
+  faster.web:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    ports:
+      - '${FASTER_WEB_PORT_PROD}:80'
+    container_name: 'faster-web-${ENVTYPE_PROD}'
+    env_file: 
+      - ./proxy.env
+      - ./.env
+
+  faster-pgsql:
+    container_name: 'faster-pgsql-${ENVTYPE_PROD}'
+    environment:
+      POSTGRES_PASSWORD: ${FASTER_PASSWORD_PROD}
+      FASTER_PASSWORD: ${FASTER_PASSWORD_PROD}
+      FASTER_DB: ${FASTER_DB_PROD}
+      FASTER_USER: ${FASTER_USER_PROD}
+    ports:
+      - '${PGSQL_PORT_PROD}:5432'

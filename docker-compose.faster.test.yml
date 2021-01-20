@@ -1,0 +1,32 @@
+#docker-compose.test.yml (Extended config for TEST env.)
+version: '3.5'
+
+services:
+  faster.web:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Test
+      - GOOGLE_APPLICATION_CREDENTIALS=firebasekey-dev.json
+    ports:
+      - '${FASTER_WEB_PORT_TEST}:80'
+    container_name: 'faster-web-${ENVTYPE_TEST}'
+    networks:
+      - faster-net
+    env_file:
+      - ./proxy.env
+      - ./.env
+
+  faster-pgsql:
+    container_name: 'faster-pgsql-${ENVTYPE_TEST}'
+    networks:
+      - faster-net
+    environment:
+      POSTGRES_PASSWORD: ${FASTER_PASSWORD_TEST}
+      FASTER_PASSWORD: ${FASTER_PASSWORD_TEST}
+      FASTER_DB: ${FASTER_DB_TEST}
+      FASTER_USER: ${FASTER_USER_TEST}
+    ports:
+      - '${PGSQL_PORT_TEST}:5432'
+
+networks:
+  faster-net:
+    name: faster-net-${ENVTYPE_TEST}

@@ -1,0 +1,18 @@
+version: '3.5'
+
+services:
+  faster.web:
+    depends_on:
+      - faster-pgsql
+    image: 'faster.web'
+    build:
+      context: .
+      dockerfile: src/Faster.Web/Dockerfile
+    restart: unless-stopped
+
+  faster-pgsql:
+    image: 'faster-pgsql'
+    build:
+      context: .
+      dockerfile: src/containers/postgresql/Dockerfile
+    restart: unless-stopped

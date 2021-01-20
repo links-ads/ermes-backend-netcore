@@ -1,0 +1,22 @@
+#docker-compose.override.yml (Extended config for Local env.)
+version: '3.4'
+
+services:
+  faster.web:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Local
+    ports:
+      - '${FASTER_WEB_PORT_LOCAL}:80'
+    container_name: 'faster-web-${ENVTYPE_LOCAL}'
+    env_file: 
+      - ./.env
+
+  faster-pgsql:
+    container_name: 'faster-pgsql-${ENVTYPE_LOCAL}'
+    environment:
+      POSTGRES_PASSWORD: ${FASTER_PASSWORD_LOCAL}
+      FASTER_PASSWORD: ${FASTER_PASSWORD_LOCAL}
+      FASTER_DB: ${FASTER_DB_LOCAL}
+      FASTER_USER: ${FASTER_USER_LOCAL}
+    ports:
+      - '${PGSQL_PORT_LOCAL}:5432'

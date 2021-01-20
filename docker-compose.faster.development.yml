@@ -1,0 +1,33 @@
+#docker-compose.development.yml (Extended config for DEVELOPMENT env.)
+version: '3.5'
+
+services:
+  faster.web:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - GOOGLE_APPLICATION_CREDENTIALS=firebasekey-dev.json
+    ports:
+      - '${FASTER_WEB_PORT_DEV}:80'
+    container_name: 'faster-web-${ENVTYPE_DEV}'
+    networks:
+      - faster-net
+    env_file:
+      - ./proxy.env
+      - ./.env    
+
+  faster-pgsql:
+    container_name: 'faster-pgsql-${ENVTYPE_DEV}'
+    networks:
+      - faster-net    
+    environment:
+      POSTGRES_PASSWORD: ${FASTER_PASSWORD_DEV}
+      FASTER_PASSWORD: ${FASTER_PASSWORD_DEV}
+      FASTER_DB: ${FASTER_DB_DEV}
+      FASTER_USER: ${FASTER_USER_DEV}
+    ports:
+      - '${PGSQL_PORT_DEV}:5432'
+
+networks:
+  faster-net:
+    name: faster-net-${ENVTYPE_DEV}
+

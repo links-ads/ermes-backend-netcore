@@ -1,0 +1,22 @@
+#docker-compose.shelter-local.yml (Extended config for Local env.)
+version: '3.5'
+
+services:
+  shelter.web:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=ShelterLocal
+    ports:
+      - '${SHELTER_WEB_PORT_LOCAL}:80'
+    container_name: 'shelter-web-${ENVTYPE_SHELTER_LOCAL}'
+    env_file: 
+      - ./.env
+
+  shelter-pgsql:
+    container_name: 'shelter-pgsql-${ENVTYPE_SHELTER_LOCAL}'
+    environment:
+      POSTGRES_PASSWORD: ${SHELTER_PASSWORD_LOCAL}
+      DB_PASSWORD: ${SHELTER_PASSWORD_LOCAL}
+      DB_NAME: ${SHELTER_DB_LOCAL}
+      DB_USER: ${SHELTER_USER_LOCAL}
+    ports:
+      - '${PGSQL_PORT_SHELTER_LOCAL}:5432'

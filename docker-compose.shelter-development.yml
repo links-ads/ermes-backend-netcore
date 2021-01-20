@@ -1,0 +1,32 @@
+#docker-compose.shelter.development.yml (Extended config for shelter DEVELOPMENT env.)
+version: '3.5'
+
+services:
+  shelter.web:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=ShelterDevelopment
+      - GOOGLE_APPLICATION_CREDENTIALS=firebasekey-shelter-dev.json
+    ports:
+      - '${SHELTER_WEB_PORT_DEV}:80'
+    container_name: 'shelter-web-${ENVTYPE_SHELTER_DEV}'
+    networks:
+      - shelter-net
+    env_file:
+      - ./.env    
+
+  shelter-pgsql:
+    container_name: 'shelter-pgsql-${ENVTYPE_SHELTER_DEV}'
+    networks:
+      - shelter-net    
+    environment:
+      POSTGRES_PASSWORD: ${SHELTER_PASSWORD_DEV}
+      FASTER_PASSWORD: ${SHELTER_PASSWORD_DEV}
+      FASTER_DB: ${SHELTER_DB_DEV}
+      FASTER_USER: ${SHELTER_USER_DEV}
+    ports:
+      - '${PGSQL_PORT_SHELTER_DEV}:5432'
+
+networks:
+  shelter-net:
+    name: shelter-net-${ENVTYPE_SHELTER_DEV}
+

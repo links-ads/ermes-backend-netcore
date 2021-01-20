@@ -1,0 +1,18 @@
+version: '3.5'
+
+services:
+  shelter.web:
+    depends_on:
+      - shelter-pgsql
+    image: 'shelter.web'
+    build:
+      context: .
+      dockerfile: src/Ermes.Web/Dockerfile
+    restart: unless-stopped
+
+  shelter-pgsql:
+    image: 'shelter-pgsql'
+    build:
+      context: .
+      dockerfile: src/containers/postgresql/Dockerfile
+    restart: unless-stopped
