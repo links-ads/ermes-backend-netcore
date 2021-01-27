@@ -1,0 +1,219 @@
+﻿using Abp.Domain.Repositories;
+using Abp.Domain.Services;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Ermes.Linq.Extensions;
+using System.Threading.Tasks;
+using Ermes.Roles;
+using Abp.Linq.Extensions;
+using Abp.UI;
+
+namespace Ermes.Persons
+{
+    public class PersonManager : DomainService
+    {
+        protected IRepository<Person, long> PersonRepository { get; set; }
+        protected IRepository<PersonAction> PersonActionsRepository { get; set; }
+        protected IRepository<PersonRole> PersonRoleRepository { get; set; }
+        protected IRepository<Role> RolesRepository { get; set; }
+
+        public IQueryable<Person> Persons { get { return PersonRepository.GetAll(); } }
+        public IQueryable<Role> Roles { get { return RolesRepository.GetAll(); } }
+        public IQueryable<PersonAction> PersonActions { get { return PersonActionsRepository.GetAll(); } }
+
+        public PersonManager(IRepository<Person, long> personRepository, 
+                                IRepository<PersonAction> personActionsRepository,
+                                IRepository<PersonRole> personRoleRepository,
+                                IRepository<Role> rolesRepository)
+        {
+            PersonRepository = personRepository;
+            PersonActionsRepository = personActionsRepository;
+            PersonRoleRepository = personRoleRepository;
+            RolesRepository = rolesRepository;
+        }
+
+        public async Task<Person> GetPersonByIdAsync(long personId)
+        {
+            return await Persons.Include(p => p.Organization).Include(p => p.Team).SingleOrDefaultAsync(p => p.Id == personId);
+        }
+
+        public async Task<Person> GetPersonByFusionAuthUserGuidAsync(Guid userId, string username)
+        {
+            var person = await PersonRepository.GetAll().Include(a => a.Organization).Include(p => p.Team).FirstOrDefaultAsync(a => a.FusionAuthUserGuid == userId);
+            if (person == null)
+            {
+                if (userId.CompareTo(Guid.Empty) == 0)
+                    throw new UserFriendlyException(L("InvalidGuid"));
+                person = new Person()
+                {
+                    FusionAuthUserGuid = userId,
+                    Username = username
+                };
+                person.Id = PersonRepository.InsertAndGetId(person);
+            }
+
+            return person;
+        }
+
+
+        //See issue #48
+        //By managing in this way the unit of work, the ErmesDbContex is not disposed
+        // and we can retrieve the person correctly
+        public async Task<Person> GetPersonByFusionAuthUserGuidAsync(Guid userId)
+        {
+            using (var uow = UnitOfWorkManager.Begin())
+            {
+                var person = await Persons.Include(a => a.Organization).Include(p => p.Team).FirstOrDefaultAsync(a => a.FusionAuthUserGuid == userId);
+                if (person == null)
+                {
+                    if (userId.CompareTo(Guid.Empty) == 0)
+                        throw new UserFriendlyException(L("InvalidGuid"));
+                    person = new Person()
+                    {
+                        FusionAuthUserGuid = userId
+                    };
+                    person.Id = PersonRepository.InsertAndGetId(person);
+                }
+                uow.Complete();
+
+                return person;
+            }
+        }
+
+        public Person GetPersonByFusionAuthUserGuid(Guid userId)
+        {
+            var person = Persons.Include(a => a.Organization).Include(p => p.Team).FirstOrDefault(a => a.FusionAuthUserGuid == userId);
+            if (person == null)
+            {
+                if (userId.CompareTo(Guid.Empty) == 0)
+                    throw new UserFriendlyException(L("InvalidGuid"));
+                person = new Person()
+                {
+                    FusionAuthUserGuid = userId
+                };
+                person.Id = PersonRepository.InsertAndGetId(person);
+            }
+
+            return person;
+        }
+
+        public async Task InsertPersonActionTrackingAsync(PersonActionTracking item)
+        {
+            await PersonActionsRepository.InsertAsync(item);
+        }
+        public async Task InsertPersonActionStatusAsync(PersonActionStatus item)
+        {
+            await PersonActionsRepository.InsertAsync(item);
+        }
+        public async Task InsertPersonActionActivityAsync(PersonActionActivity item)
+        {
+            await PersonActionsRepository.InsertAsync(item);
+        }
+
+        public async Task<List<PersonActionTracking>> GetPersonsActionTracking(IPersonBase person, int organizationId, DateTime start, DateTime end)
+        {
+            var orgList = organizationId > 0 ? new List<int>() { organizationId } : null;
+
+            return await PersonActions
+                            .DataOwnership(orgList, person)
+                            .Where(a => a.Timestamp >= start && a.Timestamp <= end)
+                            .OfType<PersonActionTracking>()
+                            .Include(a => a.Person.Team)
+                            .ToListAsync();
+        }
+        public async Task<List<PersonActionStatus>> GetPersonsActionStatus(IPersonBase person, int organizationId, DateTime start, DateTime end)
+        {
+            var orgList = organizationId > 0 ? new List<int>() { organizationId } : null;
+
+            return await PersonActions
+                    .DataOwnership(orgList, person)
+                    .Where(a => a.Timestamp >= start && a.Timestamp <= end)
+                    .OfType<PersonActionStatus>()
+                    .Include(a => a.Person.Team)
+                    .ToListAsync();
+        }
+        public async Task<List<PersonActionActivity>> GetPersonsActionActivity(IPersonBase person, int organizationId, DateTime start, DateTime end)
+        {
+            var orgList = organizationId > 0 ? new List<int>() { organizationId } : null;
+
+            return await PersonActions
+                    .DataOwnership(orgList, person)
+                    .Where(a => a.Timestamp >= start && a.Timestamp <= end)
+                    .OfType<PersonActionActivity>()
+                    .Include(a => a.Person.Team)
+                    .Include(a => a.Activity.Translations)
+                    .ToListAsync();
+        }
+
+        public async Task<long> InsertPerson(Person item)
+        {
+            return await PersonRepository.InsertAndGetIdAsync(item);
+        }
+
+        public async Task InsertPersonRoleAsync(PersonRole item)
+        {
+            await PersonRoleRepository.InsertAsync(item);
+        }
+
+        public async Task<bool> CheckPersonIdAsync(long personId)
+        {
+            return await Persons.CountAsync(p => p.Id == personId) > 0;
+        }
+
+        public async Task<bool> CheckRoleIdAsync(long roleId)
+        {
+            return await Roles.CountAsync(r => r.Id == roleId) > 0;
+        }
+
+        public async Task<PersonAction> GetLastPersonActionAsync(long personId)
+        {
+            return await PersonActions
+                        .Where(a => a.PersonId == personId)
+                        .OrderBy(a => a.Timestamp)
+                        .LastOrDefaultAsync();
+        }
+
+        public async Task<int> GetLastPersonActivityAsync(long personId)
+        {
+            return await PersonActions
+                        .OfType<PersonActionActivity>()
+                        .Where(a => a.PersonId == personId)
+                        .OrderBy(a => a.Timestamp)
+                        .Select(a => a.ActivityId)
+                        .LastOrDefaultAsync();
+        }
+
+        public async Task DeletePersonRolesAsync(long personId)
+        {
+            await PersonRoleRepository.DeleteAsync(p => (p.PersonId == personId));
+        }
+
+        public async Task<int> CountMembersOfOrganizationAsync(int organizationId)
+        {
+            return await Persons.CountAsync(p => p.OrganizationId == organizationId);
+        }
+
+        public async Task<bool> CheckIfRoleExists(string role)
+        {
+            return await Roles.AnyAsync(r => r.Name == role);
+        }
+
+        public async Task<List<Person>> GetRegistrationTokensByOrganizationIdAsync(int orgId, long creatorId)
+        {
+            return await Persons
+                            .Where(p => p.Id != creatorId)
+                            .Where(p => p.OrganizationId.HasValue && p.OrganizationId.Value == orgId)
+                            .ToListAsync();
+        }
+
+        public async Task<List<Person>> GetPersonsByOrganizationIdAsync(int orgId, bool excludeMe = true, long myId = 0)
+        {
+            return await Persons
+                            .Where(p => p.OrganizationId.HasValue && p.OrganizationId.Value == orgId)
+                            .WhereIf(excludeMe, p => p.Id != myId)
+                            .ToListAsync();
+        }
+    }
+}

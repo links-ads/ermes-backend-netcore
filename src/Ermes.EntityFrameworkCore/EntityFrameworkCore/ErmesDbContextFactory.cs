@@ -19,7 +19,7 @@ namespace Ermes.EntityFrameworkCore
                 configuration.GetConnectionString(ErmesConsts.ConnectionStringName)
             );
 
-            return new ErmesDbContext(builder.Options);
+            return new ErmesDbContext(builder.Options, null);
         }
     }
 }

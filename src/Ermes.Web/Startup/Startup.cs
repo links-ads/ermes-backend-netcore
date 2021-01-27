@@ -49,7 +49,7 @@ namespace Ermes.Web.Startup
 
             services.AddControllersWithViews(options =>
             {
-                options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+                //options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
                 options.Conventions.Add(new ApiExplorerGroupPerVersionConvention());
             }).AddNewtonsoftJson(options =>
             {
