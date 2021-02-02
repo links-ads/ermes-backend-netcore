@@ -5,7 +5,7 @@ services:
   shelter.web:
     environment:
       - ASPNETCORE_ENVIRONMENT=ShelterDevelopment
-      - GOOGLE_APPLICATION_CREDENTIALS=firebasekey-shelter-dev.json
+      - GOOGLE_APPLICATION_CREDENTIALS=firebasekey-dev.json
     ports:
       - '${SHELTER_WEB_PORT_DEV}:80'
     container_name: 'shelter-web-${ENVTYPE_SHELTER_DEV}'
