@@ -1,11 +1,24 @@
-﻿using Abp.IO;
+﻿using Abp.Azure;
+using Abp.Bus;
+using Abp.Chatbot;
+using Abp.ErmesSocialNetCore;
+using Abp.Firebase;
+using Abp.IO;
 using Abp.Modules;
 using Abp.Reflection.Extensions;
+using Ermes.Configuration;
 using Ermes.Localization;
 using System.IO;
 
 namespace Ermes
 {
+    [DependsOn(
+        typeof(AbpAzureModule),
+        typeof(AbpFirebaseModule),
+        typeof(AbpChatbotModule),
+        typeof(AbpSocialModule),
+        typeof(ErmesBusModule)
+    )]
     public class ErmesCoreModule : AbpModule
     {
         public override void PreInitialize()
@@ -13,6 +26,9 @@ namespace Ermes
             Configuration.Auditing.IsEnabledForAnonymousUsers = true;
 
             ErmesLocalizationConfigurer.Configure(Configuration.Localization);
+
+            //Adding setting providers
+            Configuration.Settings.Providers.Add<AppSettingProvider>();
         }
 
         public override void Initialize()

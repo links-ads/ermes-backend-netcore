@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Ermes.GeoJson
 {
-    public interface IGeoJsonBulkRepository: IRepository
+    public interface IGeoJsonBulkRepository : IRepository
     {
         public IQueryable<Communication> GetCommunications(DateTime startDate, DateTime endDate, Geometry boundingBox);
         public IQueryable<Mission> GetMissions(DateTime startDate, DateTime endDate, Geometry boundingBox);
@@ -24,7 +24,7 @@ namespace Ermes.GeoJson
         public IQueryable<PersonActionStatus> GetPersonActionStatuses(DateTime startDate, DateTime endDate, Geometry boundingBox);
         public IQueryable<PersonActionActivity> GetPersonActionActivities(DateTime startDate, DateTime endDate, Geometry boundingBox);
         //public IQueryable<PersonAction> GetPersonActions(DateTime startDate, DateTime endDate, Geometry boundingBox);
-        public string GetPersonActions(DateTime StartDate, DateTime EndDate, int[] organizationIdList, List<ActionStatusType> statusTypes, int[] activityIds, string language = "it");
+        public string GetPersonActions(DateTime StartDate, DateTime EndDate, int[] organizationIdList, List<ActionStatusType> statusTypes, int[] activityIds, Geometry boundingBox, string search = "", string language = "it");
         public string GetGeoJsonCollection(DateTime StartDate, DateTime EndDate, Geometry BoundingBox, List<EntityType> entityTypes, int[] organizationIdList, List<ActionStatusType> statusTypes, int[] activityIds, string language = "it");
 
     }

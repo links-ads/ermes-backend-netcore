@@ -22,6 +22,10 @@ using NSwag.AspNetCore;
 using Abp.Extensions;
 using io.fusionauth;
 using FusionAuthNetCore;
+using Abp;
+using Abp.Chatbot;
+using Abp.ErmesSocialNetCore;
+using Abp.Bus;
 
 namespace Ermes.Web.Startup
 {
@@ -61,6 +65,19 @@ namespace Ermes.Web.Startup
             services.Configure<FusionAuthSettings>(
                 _appConfiguration.GetSection("FusionAuth")
             );
+            services.Configure<AbpAzureSettings>(
+                _appConfiguration.GetSection("Azure")
+            );
+            services.Configure<AbpChatbotSettings>(
+                _appConfiguration.GetSection("Chatbot")
+            );
+            services.Configure<AbpSocialSettings>(
+                _appConfiguration.GetSection("Social")
+            );
+            services.Configure<ErmesBusSettings>(
+                _appConfiguration.GetSection("Bus")
+            );
+
 
             services.AddCors(options =>
             {

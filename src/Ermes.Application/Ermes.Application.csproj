@@ -11,12 +11,17 @@
     <RootNamespace>Ermes</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Abp.ErmesSocialNetCore\Abp.ErmesSocialNetCore.csproj" />
     <ProjectReference Include="..\Ermes.Core\Ermes.Core.csproj" />
+    <ProjectReference Include="..\Ermes.EntityFrameworkCore\Ermes.EntityFrameworkCore.csproj" />
+    <ProjectReference Include="..\FusionAuthNetCore\FusionAuthNetCore.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Abp.EntityFrameworkCore" Version="5.13.0" />
     <PackageReference Include="Abp.AutoMapper" Version="5.13.0" />
+    <PackageReference Include="EPPlus" Version="4.5.3.3" />
     <PackageReference Include="NetTopologySuite.Features" Version="2.1.0" />
     <PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="2.0.3" />
+    <PackageReference Include="NSwag.Annotations" Version="13.10.1" />
   </ItemGroup>
 </Project>
