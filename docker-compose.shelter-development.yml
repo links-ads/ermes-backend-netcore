@@ -20,9 +20,9 @@ services:
       - shelter-net    
     environment:
       POSTGRES_PASSWORD: ${SHELTER_PASSWORD_DEV}
-      FASTER_PASSWORD: ${SHELTER_PASSWORD_DEV}
-      FASTER_DB: ${SHELTER_DB_DEV}
-      FASTER_USER: ${SHELTER_USER_DEV}
+      DB_PASSWORD: ${SHELTER_PASSWORD_DEV}
+      DB_NAME: ${SHELTER_DB_DEV}
+      DB_USER: ${SHELTER_USER_DEV}
     ports:
       - '${PGSQL_PORT_SHELTER_DEV}:5432'
 
