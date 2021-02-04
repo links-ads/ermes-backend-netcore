@@ -1,2 +1,3 @@
-Ver.
+Ver. 1.0.0 - 2021-02-04
 ----------------------------
+- Initial deploy of the solution
