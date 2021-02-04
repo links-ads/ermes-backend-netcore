@@ -1,5 +1,6 @@
 ﻿using Abp.Domain.Entities;
 using Abp.Domain.Entities.Auditing;
+using Ermes.Activities;
 using Ermes.Enums;
 using Ermes.Helpers;
 using Ermes.Interfaces;
@@ -43,5 +44,12 @@ namespace Ermes.Persons
         public long PersonId { get; set; }
 
         public VisibilityType Visibility { get; set; }
+
+        [ForeignKey("CurrentActivityId")]
+        public virtual Activity CurrentActivity { get; set; }
+        public virtual int? CurrentActivityId { get; set; }
+
+        [Column(TypeName = "jsonb")]
+        public string CurrentExtensionData { get; set; }
     }
 }

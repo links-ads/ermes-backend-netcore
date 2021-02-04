@@ -23,7 +23,7 @@ namespace Ermes.Persons
         public IQueryable<Role> Roles { get { return RolesRepository.GetAll(); } }
         public IQueryable<PersonAction> PersonActions { get { return PersonActionsRepository.GetAll(); } }
 
-        public PersonManager(IRepository<Person, long> personRepository, 
+        public PersonManager(IRepository<Person, long> personRepository,
                                 IRepository<PersonAction> personActionsRepository,
                                 IRepository<PersonRole> personRoleRepository,
                                 IRepository<Role> rolesRepository)
@@ -99,17 +99,22 @@ namespace Ermes.Persons
             return person;
         }
 
-        public async Task InsertPersonActionTrackingAsync(PersonActionTracking item)
+        public async Task<int> InsertPersonActionSharingPositionAsync(PersonActionSharingPosition item)
         {
-            await PersonActionsRepository.InsertAsync(item);
+            return await PersonActionsRepository.InsertAndGetIdAsync(item);
         }
-        public async Task InsertPersonActionStatusAsync(PersonActionStatus item)
+
+        public async Task<int> InsertPersonActionTrackingAsync(PersonActionTracking item)
         {
-            await PersonActionsRepository.InsertAsync(item);
+            return await PersonActionsRepository.InsertAndGetIdAsync(item);
         }
-        public async Task InsertPersonActionActivityAsync(PersonActionActivity item)
+        public async Task<int> InsertPersonActionStatusAsync(PersonActionStatus item)
         {
-            await PersonActionsRepository.InsertAsync(item);
+            return await PersonActionsRepository.InsertAndGetIdAsync(item);
+        }
+        public async Task<int> InsertPersonActionActivityAsync(PersonActionActivity item)
+        {
+            return await PersonActionsRepository.InsertAndGetIdAsync(item);
         }
 
         public async Task<List<PersonActionTracking>> GetPersonsActionTracking(IPersonBase person, int organizationId, DateTime start, DateTime end)

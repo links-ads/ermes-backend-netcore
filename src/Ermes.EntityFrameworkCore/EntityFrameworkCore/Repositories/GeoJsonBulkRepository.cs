@@ -1,11 +1,13 @@
 ﻿using Abp.EntityFrameworkCore;
 using Ermes.Communications;
 using Ermes.Enums;
+using Ermes.GeoJson;
 using Ermes.Missions;
 using Ermes.Persons;
 using Ermes.ReportRequests;
 using Ermes.Reports;
 using Ermes.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
 using Npgsql;
@@ -14,6 +16,8 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Ermes.GeoJson
 {
@@ -176,8 +180,8 @@ namespace Ermes.GeoJson
                     join public.persons p on p.""Id"" = r2.""CreatorUserId""
                     join public.organizations o on o.""Id"" = p.""OrganizationId""
                     union
-                    (SELECT DISTINCT ON (pa.""PersonId"")
-                        pa.""Id"" as ""id"", 
+                    SELECT 
+                        pa.""Id"" as ""id"",
                         at2.""Name"" as ""details"",
                         to_char(pa.""Timestamp"", 'YYYY-MM-DD""T""HH24:MI:SSZ') as ""startDate"", 
                         to_char(pa.""Timestamp"", 'YYYY-MM-DD""T""HH24:MI:SSZ') as ""endDate"", 
@@ -188,23 +192,21 @@ namespace Ermes.GeoJson
 	                    pa.""CurrentStatus"" as ""status"", 
 	                    o.""Id"" as ""organizationId"",
 	                    o.""Name"" as ""organizationName"",
-	                    (
-                            select pa2.""ExtensionData""
-                            from public.person_actions pa2
-                            where pa2.""Discriminator"" = 'PersonActionTracking' and pa2.""PersonId"" = pa.""PersonId""
-                            order by pa2.""Timestamp"" desc
-                            limit 1
-	                    )::text as ""extensionData"",
+                        pa.""CurrentExtensionData""::text as ""extensionData"",
 	                    p.""Username"" as ""creator"",
                         pa.""CurrentStatus"" as ""statusFilter"",
                         coalesce(a.""ParentId"", a.""Id"") as ""activityFilter""
-                    from public.person_actions pa
+                        FROM (
+	                        SELECT pa2.""PersonId"", MAX(pa2.""Timestamp"") as ""MaxTime""
+                            FROM person_actions pa2
+                            GROUP BY pa2.""PersonId""
+                        ) r
+                    INNER JOIN person_actions pa ON pa.""PersonId"" = r.""PersonId"" and r.""MaxTime"" = pa.""Timestamp""
                     join public.persons p on p.""Id"" = pa.""PersonId""
                     join public.organizations o on o.""Id"" = p.""OrganizationId""
-                    left join public.activities a on a.""Id"" = pa.""ActivityId""
-                    left join public.activity_translations at2 on at2.""CoreId"" = a.""Id""
-                    where(at2.""Language"" = @language or at2.""Language"" is null) and pa.""Discriminator"" != 'PersonActionTracking'
-                    order by pa.""PersonId"", pa.""Timestamp"" desc)
+                    left join public.activities a on a.""Id"" = pa.""CurrentActivityId""
+                    left join public.activity_translations at2 on at2.""CoreId"" = pa.""CurrentActivityId""
+                    where (at2.""Language"" = @language or at2.""Language"" is null)
                 ) tmp 
                 where 
                     ST_INTERSECTS(tmp.""location"", @boundingBox) and 
@@ -280,53 +282,50 @@ namespace Ermes.GeoJson
                     'PersonActions', json_agg(tmp.*)
                 ) as collection
                 from (
-                    SELECT DISTINCT ON (pa.""PersonId"")
-                        pa.""Id"" as ""Id"",
-                        pa.""DeviceId"",
-                        pa.""DeviceName"",
-                        ST_Y((pa.""Location"")::geometry) as ""Latitude"",
-                        ST_X((pa.""Location"")::geometry) as ""Longitude"",
-                        pa.""Location"",
-                        pa.""ActivityId"" as ""ActivityId"",
-                        at2.""Name"" as ""ActivityName"",
-	                    pa.""Timestamp"", 
-	                    pa.""CurrentStatus"" as ""Status"", 
-	                    o.""Id"" as ""OrganizationId"",
-	                    o.""Name"" as ""OrganizationName"",
-	                    (
-                            select pa2.""ExtensionData""
-                            from public.person_actions pa2
-                            where pa2.""Discriminator"" = 'PersonActionTracking' and pa2.""PersonId"" = pa.""PersonId""
-                            order by pa2.""Timestamp"" desc
-                            limit 1
-	                    )::text as ""ExtensionData"",
-	                    p.""Username"",
-                        null as ""type"",
-                        coalesce(a.""ParentId"", a.""Id"") as ""activityFilter""
-                    from public.person_actions pa
+                    SELECT pa.""Id"",
+                    pa.""DeviceId"",
+                    pa.""DeviceName"",
+                    ST_Y((pa.""Location"")::geometry) as ""Latitude"",
+                    ST_X((pa.""Location"")::geometry) as ""Longitude"",
+                    pa.""CurrentExtensionData""::text as ""ExtensionData"",
+                    pa.""Location"",
+                    pa.""CurrentActivityId"" as ""ActivityId"",
+                    at2.""Name"" as ""ActivityName"",
+	                pa.""Timestamp"", 
+	                pa.""CurrentStatus"" as ""Status"",
+	                o.""Id"" as ""OrganizationId"",
+	                o.""Name"" as ""OrganizationName"",
+	                p.""Username"",
+                    null as ""Type"",
+                    coalesce(a.""ParentId"", a.""Id"") as ""activityFilter""
+                    FROM (
+	                    SELECT pa2.""PersonId"", MAX(pa2.""Timestamp"") as ""MaxTime""
+                        FROM person_actions pa2
+                        GROUP BY pa2.""PersonId""
+                    ) r
+                    INNER JOIN person_actions pa ON pa.""PersonId"" = r.""PersonId"" and r.""MaxTime"" = pa.""Timestamp""
                     join public.persons p on p.""Id"" = pa.""PersonId""
                     join public.organizations o on o.""Id"" = p.""OrganizationId""
-                    left join public.activities a on a.""Id"" = pa.""ActivityId""
-                    left join public.activity_translations at2 on at2.""CoreId"" = a.""Id""
-                    where
-                        o.""Id"" = any(array[@organizations]) and
-                        (at2.""Language"" = @language or at2.""Language"" is null) and
-                        pa.""Discriminator"" != 'PersonActionTracking' and
-                        (tsrange(@startDate, @endDate, '[]') &&
-                            tsrange(pa.""Timestamp"", pa.""Timestamp"", '[]'))
-                    order by pa.""PersonId"", pa.""Timestamp"" desc
+                    left join public.activities a on a.""Id"" = pa.""CurrentActivityId""
+                    left join public.activity_translations at2 on at2.""CoreId"" = pa.""CurrentActivityId""
+                    where (at2.""Language"" = @language or at2.""Language"" is null)
                 ) as ""tmp""
-                where 1=1
+                where (tmp.""Timestamp"" >= @startDate and tmp.""Timestamp"" <= @endDate)
                 ";
 
                 command.CommandType = CommandType.Text;
                 command.Parameters.Add(new NpgsqlParameter("@startDate", startDate));
                 command.Parameters.Add(new NpgsqlParameter("@endDate", endDate));
                 command.Parameters.Add(new NpgsqlParameter("@language", language));
-                command.Parameters.Add(new NpgsqlParameter("@organizations", NpgsqlDbType.Array | NpgsqlDbType.Integer)
+                if (organizationIdList != null)
                 {
-                    Value = organizationIdList
-                });
+                    command.CommandText += @" and tmp.""OrganizationId"" = any(array[@organizations])";
+                    var p = new NpgsqlParameter("@organizations", NpgsqlDbType.Array | NpgsqlDbType.Integer)
+                    {
+                        Value = organizationIdList
+                    };
+                    command.Parameters.Add(p);
+                }
 
                 if (boundingBox != null)
                 {

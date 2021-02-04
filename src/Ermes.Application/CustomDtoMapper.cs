@@ -87,17 +87,17 @@ namespace Ermes
                             .AfterMap((src, dest) => dest.Duration.UpperBound = dest.Duration.UpperBound.ToUniversalTime());
             configuration.CreateMap<Mission, FullMissionDto>()
                             .ReverseMap();
-            Func<string,int, MediaURIDto> MediaURIMapper = ((fname, reportid) =>
-                             {
-                                 MediaURIDto m = new MediaURIDto
-                                 {
-                                     MediaType = ErmesCommon.GetMediaTypeFromFilename(fname),
-                                     MediaURI = ResourceManager.Reports.GetMediaPath(reportid, fname)
-                                 };
-                                 if (m.MediaType == MediaType.Image)
-                                     m.ThumbnailURI = ResourceManager.Thumbnails.GetMediaPath(reportid, fname);
-                                 return m;
-                             });
+            Func<string, int, MediaURIDto> MediaURIMapper = ((fname, reportid) =>
+            {
+                MediaURIDto m = new MediaURIDto
+                {
+                    MediaType = ErmesCommon.GetMediaTypeFromFilename(fname),
+                    MediaURI = ResourceManager.Reports.GetMediaPath(reportid, fname)
+                };
+                if (m.MediaType == MediaType.Image)
+                    m.ThumbnailURI = ResourceManager.Thumbnails.GetMediaPath(reportid, fname);
+                return m;
+            });
             configuration.CreateMap<Report, ReportDto>()
                             .ForMember(dto => dto.Location, options => options.MapFrom(a => new PointPosition(a.Location.X, a.Location.Y)))
                             .ForMember(dto => dto.Timestamp, options => options.MapFrom(a => a.Timestamp.ToUniversalTime()))
@@ -157,24 +157,39 @@ namespace Ermes
                             .ForMember(r => r.TeamName, options => options.MapFrom(a => a.TeamId.HasValue ? a.Team.Name : string.Empty))
                             .ForMember(r => r.OrganizationName, options => options.MapFrom(a => a.OrganizationId.HasValue ? a.Organization.Name : string.Empty))
                             .ReverseMap();
-            configuration.CreateMap<PersonActionTracking, PersonActionDto>()
+            configuration.CreateMap<PersonActionSharingPosition, PersonActionDto>()
+                            .ForMember(dto => dto.Type, options => options.MapFrom(a => PersonActionType.PersonActionSharingPosition))
                             .ForMember(dto => dto.Timestamp, options => options.MapFrom(a => a.Timestamp.ToUniversalTime()))
                             .ForMember(dto => dto.Latitude, options => options.MapFrom(a => a.Location != null ? (double?)a.Location.Coordinate.Y : null))
                             .ForMember(dto => dto.Longitude, options => options.MapFrom(a => a.Location != null ? (double?)a.Location.Coordinate.X : null))
                             .ReverseMap()
+                            .ForMember(entity => entity.Location, options => options.MapFrom(l => l.Latitude.HasValue && l.Longitude.HasValue ? new Point(l.Longitude.Value, l.Latitude.Value) : null))
+                            .ForMember(entity => entity.CurrentExtensionData, options => options.MapFrom(l => l.ExtensionData));
+            configuration.CreateMap<PersonActionTracking, PersonActionDto>()
+                            .ForMember(dto => dto.Type, options => options.MapFrom(a => PersonActionType.PersonActionTracking))
+                            .ForMember(dto => dto.Timestamp, options => options.MapFrom(a => a.Timestamp.ToUniversalTime()))
+                            .ForMember(dto => dto.Latitude, options => options.MapFrom(a => a.Location != null ? (double?)a.Location.Coordinate.Y : null))
+                            .ForMember(dto => dto.Longitude, options => options.MapFrom(a => a.Location != null ? (double?)a.Location.Coordinate.X : null))
+                            .ReverseMap()
+                            .ForMember(entity => entity.CurrentExtensionData, options => options.MapFrom(l => l.ExtensionData))
                             .ForMember(entity => entity.Location, options => options.MapFrom(l => l.Latitude.HasValue && l.Longitude.HasValue ? new Point(l.Longitude.Value, l.Latitude.Value) : null));
             configuration.CreateMap<PersonActionStatus, PersonActionDto>()
-                           .ForMember(dto => dto.Timestamp, options => options.MapFrom(a => a.Timestamp.ToUniversalTime()))
-                           .ForMember(dto => dto.Latitude, options => options.MapFrom(a => a.Location != null ? (double?)a.Location.Coordinate.Y : null))
-                           .ForMember(dto => dto.Longitude, options => options.MapFrom(a => a.Location != null ? (double?)a.Location.Coordinate.X : null))
-                           .ReverseMap()
-                           .ForMember(entity => entity.Location, options => options.MapFrom(l => l.Latitude.HasValue && l.Longitude.HasValue ? new Point(l.Longitude.Value, l.Latitude.Value) : null));
+                            .ForMember(dto => dto.Type, options => options.MapFrom(a => PersonActionType.PersonActionStatus))
+                            .ForMember(dto => dto.Timestamp, options => options.MapFrom(a => a.Timestamp.ToUniversalTime()))
+                            .ForMember(dto => dto.Latitude, options => options.MapFrom(a => a.Location != null ? (double?)a.Location.Coordinate.Y : null))
+                            .ForMember(dto => dto.Longitude, options => options.MapFrom(a => a.Location != null ? (double?)a.Location.Coordinate.X : null))
+                            .ReverseMap()
+                            .ForMember(entity => entity.Location, options => options.MapFrom(l => l.Latitude.HasValue && l.Longitude.HasValue ? new Point(l.Longitude.Value, l.Latitude.Value) : null))
+                            .ForMember(entity => entity.CurrentStatus, options => options.MapFrom(l => l.Status));
             configuration.CreateMap<PersonActionActivity, PersonActionDto>()
+                           .ForMember(dto => dto.Type, options => options.MapFrom(a => PersonActionType.PersonActionActivity))
+                           .ForMember(dto => dto.Status, options => options.MapFrom(a => a.CurrentStatus))
                            .ForMember(dto => dto.Timestamp, options => options.MapFrom(a => a.Timestamp.ToUniversalTime()))
                            .ForMember(dto => dto.Latitude, options => options.MapFrom(a => a.Location != null ? (double?)a.Location.Coordinate.Y : null))
                            .ForMember(dto => dto.Longitude, options => options.MapFrom(a => a.Location != null ? (double?)a.Location.Coordinate.X : null))
                            .ReverseMap()
-                           .ForMember(entity => entity.Location, options => options.MapFrom(l => l.Latitude.HasValue && l.Longitude.HasValue ? new Point(l.Longitude.Value, l.Latitude.Value) : null));
+                           .ForMember(entity => entity.Location, options => options.MapFrom(l => l.Latitude.HasValue && l.Longitude.HasValue ? new Point(l.Longitude.Value, l.Latitude.Value) : null))
+                           .ForMember(entity => entity.CurrentActivityId, options => options.MapFrom(l => l.ActivityId));
 
             #region GeoJsons
             configuration.CreateMap<Communication, FeatureDto<GeoJsonItem>>()
@@ -213,6 +228,7 @@ namespace Ermes
                            .ForPath(fd => fd.Properties.EndDate, options => options.MapFrom(c => c.Timestamp))
                            //.ForPath(fd => fd.Properties.Type, options => options.MapFrom(c => EntityType.PersonAction))
                            .ForPath(fd => fd.Properties.Status, options => options.MapFrom(c => c.CurrentStatusString));
+            configuration.CreateMap<PersonAction, PersonActionDto>();
             #endregion
 
 

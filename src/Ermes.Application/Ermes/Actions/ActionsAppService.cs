@@ -25,22 +25,19 @@ namespace Ermes.Actions
         private readonly ErmesAppSession _session;
         private readonly PersonManager _personManager;
         private readonly ActivityManager _activityManager;
-        private readonly ErmesPermissionChecker _permissionChecker;
         private readonly IGeoJsonBulkRepository _geoJsonBulkRepository;
         private readonly ILanguageManager _languageManager;
 
         public ActionsAppService(
-            PersonManager personManager, 
-            ErmesAppSession session, 
-            ActivityManager activityManager, 
-            ErmesPermissionChecker permissionChecker,
+            PersonManager personManager,
+            ErmesAppSession session,
+            ActivityManager activityManager,
             IGeoJsonBulkRepository geoJsonBulkRepository,
             ILanguageManager languageManager)
         {
             _personManager = personManager;
             _session = session;
             _activityManager = activityManager;
-            _permissionChecker = permissionChecker;
             _geoJsonBulkRepository = geoJsonBulkRepository;
             _languageManager = languageManager;
         }
@@ -94,13 +91,15 @@ namespace Ermes.Actions
 
         [OpenApiOperation("Create Person Action",
             @"
-                There are three types of actions a person can perform:
+                There are four types of actions a person can perform:
+                    - PersonActionSharingPosition: allows a person to share his live position with the control room;
                     - PersonActionTracking: useful to track person position together with biometrical parameters (heart-rate, etc..).
                         Tracking is enabled only when the person is in Active/Movement status
                     - PersonActionStatus: allows a person to edit his current status. Possible values are: 
                             1) Off: the person is not at work
                             2) Moving: the person is moving toward a certain destination
                             3) Active: the person is working on a certain activity
+                    - PersonActionActivity: allows a person to specify the activity he's performing
                 Input: the action that has to be created
                 Output: the actions that has been created
             "
@@ -109,62 +108,65 @@ namespace Ermes.Actions
         {
             var res = new CreatePersonActionOutput();
             long personId = _session.UserId.Value;
-            
+            var lastAction = await _personManager.GetLastPersonActionAsync(personId);
+
             switch (input.PersonAction.Type)
             {
-                case PersonActionType.PersonActionTracking:
-                    var item = ObjectMapper.Map<PersonActionTracking>(input.PersonAction);
-                    item.PersonId = personId;
-                    var lastAction = await _personManager.GetLastPersonActionAsync(personId);
-                    item.CurrentStatus = lastAction != null ? lastAction.CurrentStatus : ActionStatusType.Off;
-                    await _personManager.InsertPersonActionTrackingAsync(item);
-                    res.PersonAction = ObjectMapper.Map<PersonActionDto>(item);
-                    res.PersonAction.Type = PersonActionType.PersonActionTracking;
-                    break;
-                case PersonActionType.PersonActionStatus:
-                    var item2 = ObjectMapper.Map<PersonActionStatus>(input.PersonAction);
-                    item2.PersonId = personId;
-                    item2.CurrentStatus = input.PersonAction.Status;
-                    await _personManager.InsertPersonActionStatusAsync(ObjectMapper.Map<PersonActionStatus>(item2));
-                    res.PersonAction = ObjectMapper.Map<PersonActionDto>(item2);
-                    res.PersonAction.Type = PersonActionType.PersonActionStatus;
-                    break;
-                case PersonActionType.PersonActionActivity:
-                    if (!(await _activityManager.CheckIfActivityExists(input.PersonAction.ActivityId)))
-                        throw new UserFriendlyException(400, L("InvalidActivityId"));
-                    var item3 = ObjectMapper.Map<PersonActionActivity>(input.PersonAction);
-                    item3.PersonId = personId;
-                    item3.CurrentStatus = ActionStatusType.Active;
-                    await _personManager.InsertPersonActionActivityAsync(ObjectMapper.Map<PersonActionActivity>(item3));
-                    res.PersonAction = ObjectMapper.Map<PersonActionDto>(item3);
-                    res.PersonAction.Type = PersonActionType.PersonActionActivity;
-                    break;
-                //update the position of the last action of the current logged user
-                //do not track if user is in Off status
+                //do not track if user is in Off status or new position is not valid
                 case PersonActionType.PersonActionSharingPosition:
-                    var lastAction2 = await _personManager.GetLastPersonActionAsync(personId);
-                    if (lastAction2 != null &&
+                    if (
                          input.PersonAction.Latitude.HasValue &&
                          input.PersonAction.Longitude.HasValue &&
-                        input.PersonAction.Timestamp > lastAction2.Timestamp &&
-                        lastAction2.CurrentStatus != ActionStatusType.Off
+                         input.PersonAction.Timestamp > lastAction.Timestamp &&
+                         lastAction.CurrentStatus != ActionStatusType.Off
                     )
                     {
-                        lastAction2.Location = new Point(input.PersonAction.Longitude.Value, input.PersonAction.Latitude.Value);
-                        res.PersonAction = new PersonActionDto()
-                        {
-                            Type = PersonActionType.PersonActionSharingPosition,
-                            Latitude = input.PersonAction.Latitude,
-                            Longitude = input.PersonAction.Longitude
-                        };
+                        var p_sharPosition = ObjectMapper.Map<PersonActionSharingPosition>(input.PersonAction);
+                        p_sharPosition.PersonId = personId;
+                        p_sharPosition.CurrentExtensionData = lastAction?.CurrentExtensionData;
+                        p_sharPosition.CurrentStatus = lastAction != null ? lastAction.CurrentStatus : ActionStatusType.Off;
+                        p_sharPosition.CurrentActivityId = lastAction?.CurrentActivityId;
+                        p_sharPosition.Id = await _personManager.InsertPersonActionSharingPositionAsync(p_sharPosition);
+                        res.PersonAction = ObjectMapper.Map<PersonActionDto>(p_sharPosition);
                     }
                     else
                         res.PersonAction = new PersonActionDto();
-
+                    break;
+                case PersonActionType.PersonActionTracking:
+                    var p_tracking = ObjectMapper.Map<PersonActionTracking>(input.PersonAction);
+                    p_tracking.PersonId = personId;
+                    p_tracking.CurrentStatus = lastAction != null ? lastAction.CurrentStatus : ActionStatusType.Off;
+                    p_tracking.CurrentActivityId = lastAction?.CurrentActivityId;
+                    p_tracking.Id = await _personManager.InsertPersonActionTrackingAsync(p_tracking);
+                    res.PersonAction = ObjectMapper.Map<PersonActionDto>(p_tracking);
+                    break;
+                case PersonActionType.PersonActionStatus:
+                    var p_status = ObjectMapper.Map<PersonActionStatus>(input.PersonAction);
+                    p_status.PersonId = personId;
+                    //Status can Be Moving or Off, so I need to cancel ActivityId value
+                    p_status.CurrentActivityId = null;
+                    p_status.CurrentExtensionData = lastAction?.CurrentExtensionData;
+                    p_status.Id = await _personManager.InsertPersonActionStatusAsync(ObjectMapper.Map<PersonActionStatus>(p_status));
+                    res.PersonAction = ObjectMapper.Map<PersonActionDto>(p_status);
+                    break;
+                case PersonActionType.PersonActionActivity:
+                    var activity = await _activityManager.getActivityTranslationByCoreIdAndLangAsync(input.PersonAction.ActivityId, _languageManager.CurrentLanguage.Name);
+                    if (activity == null)
+                        throw new UserFriendlyException(400, L("InvalidActivityId"));
+                    var p_activity = ObjectMapper.Map<PersonActionActivity>(input.PersonAction);
+                    p_activity.PersonId = personId;
+                    p_activity.CurrentStatus = ActionStatusType.Active;
+                    p_activity.CurrentExtensionData = lastAction?.CurrentExtensionData;
+                    p_activity.Id = await _personManager.InsertPersonActionActivityAsync(ObjectMapper.Map<PersonActionActivity>(p_activity));
+                    res.PersonAction = ObjectMapper.Map<PersonActionDto>(p_activity);
+                    res.PersonAction.ActivityName = activity.Name;
                     break;
                 default:
                     throw new UserFriendlyException(L("InvalidPersonActionType"));
             }
+
+            res.PersonAction.Username = _session.LoggedUserPerson.Username;
+            res.PersonAction.OrganizationId = _session.LoggedUserPerson.OrganizationId.HasValue ? _session.LoggedUserPerson.OrganizationId.Value : 0;
             Logger.Info("Ermes: InsertPersonAction executed by person: " + personId);
             return res;
         }
