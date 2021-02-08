@@ -11,7 +11,7 @@ services:
       dockerfile: src/Ermes.Web/Dockerfile
     restart: unless-stopped
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=FasterDevelopment
       - GOOGLE_APPLICATION_CREDENTIALS=firebasekey-dev.json
     ports:
       - '${FASTER_WEB_PORT_DEV}:80'
@@ -19,7 +19,6 @@ services:
     networks:
       - faster-net
     env_file:
-      - ./proxy.env
       - ./.env    
 
   faster-pgsql:
