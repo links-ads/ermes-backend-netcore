@@ -1,6 +1,7 @@
 ﻿using Ermes.Interfaces;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.Extensions.Logging;
+using Namotion.Reflection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,15 +18,10 @@ namespace Ermes.Web.Startup
             {
                 foreach (var attr in controller.Attributes)
                 {
-                    //var property = attr.GetType().GetProperty("ErmesConsts.IgnoreApi");
-                    //if (property != null)
-                    //    return;
-
-                    //if (attr.HasProperty(ErmesConsts.IgnoreApi))
-                    //    return;
+                    if (attr.HasProperty(ErmesConsts.IgnoreApi))
+                        return;
                 }
             }
-
 
             if (typeof(IBackofficeApi).IsAssignableFrom(controller.ControllerType))
                 controller.ApiExplorer.GroupName = ErmesConsts.SwaggerBackofficeDocumentName;
