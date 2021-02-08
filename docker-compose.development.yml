@@ -3,6 +3,13 @@ version: '3.5'
 
 services:
   faster.web:
+    depends_on:
+      - faster-pgsql
+    image: 'faster.web'
+    build:
+      context: .
+      dockerfile: src/Faster.Web/Dockerfile
+    restart: unless-stopped
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - GOOGLE_APPLICATION_CREDENTIALS=firebasekey-dev.json
@@ -16,6 +23,11 @@ services:
       - ./.env    
 
   faster-pgsql:
+    image: 'faster-pgsql'
+    build:
+      context: .
+      dockerfile: src/containers/postgresql/Dockerfile
+    restart: unless-stopped
     container_name: 'faster-pgsql-${ENVTYPE_DEV}'
     networks:
       - faster-net    
