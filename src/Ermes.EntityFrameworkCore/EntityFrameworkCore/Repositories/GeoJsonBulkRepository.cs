@@ -209,16 +209,26 @@ namespace Ermes.GeoJson
                     where (at2.""Language"" = @language or at2.""Language"" is null)
                 ) tmp 
                 where 
-                    ST_INTERSECTS(tmp.""location"", @boundingBox) and 
                     tsrange(@startDate, @endDate, '[]') &&
                     tsrange(tmp.""startDateFilter"", tmp.""endDateFilter"", '[]')";
 
 
                 command.CommandType = CommandType.Text;
-                command.Parameters.Add(new NpgsqlParameter("@boundingBox", BoundingBox));
+                //command.Parameters.Add(new NpgsqlParameter("@boundingBox", BoundingBox));
                 command.Parameters.Add(new NpgsqlParameter("@startDate", StartDate));
                 command.Parameters.Add(new NpgsqlParameter("@endDate", EndDate));
                 command.Parameters.Add(new NpgsqlParameter("@language", Language));
+
+                if(BoundingBox != null)
+                {
+                    command.CommandText += @" and ST_INTERSECTS(tmp.""location"", @boundingBox)";
+                    var p = new NpgsqlParameter("@boundingBox", NpgsqlDbType.Geography)
+                    {
+                        Value = BoundingBox
+                    };
+                    command.Parameters.Add(p);
+                }
+
                 if (entityTypes != null)
                 {
                     command.CommandText += @" and tmp.""type"" = any(array[@entities])";
