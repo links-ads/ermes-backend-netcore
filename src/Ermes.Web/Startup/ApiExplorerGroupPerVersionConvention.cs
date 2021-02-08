@@ -17,9 +17,9 @@ namespace Ermes.Web.Startup
             {
                 foreach (var attr in controller.Attributes)
                 {
-                    var property = attr.GetType().GetProperty("ErmesConsts.IgnoreApi");
-                    if (property != null)
-                        return;
+                    //var property = attr.GetType().GetProperty("ErmesConsts.IgnoreApi");
+                    //if (property != null)
+                    //    return;
 
                     //if (attr.HasProperty(ErmesConsts.IgnoreApi))
                     //    return;

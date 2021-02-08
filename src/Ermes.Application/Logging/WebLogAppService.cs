@@ -13,7 +13,7 @@ using System.Linq;
 
 namespace Ermes.Logging
 {
-    [ErmesAuthorize]
+    //[ErmesAuthorize]
     public class WebLogAppService : ErmesAppServiceBase, IWebLogAppService
     {
         private readonly IAppFolders _appFolders;

@@ -33,9 +33,9 @@ services:
       - faster-net    
     environment:
       POSTGRES_PASSWORD: ${FASTER_PASSWORD_DEV}
-      FASTER_PASSWORD: ${FASTER_PASSWORD_DEV}
-      FASTER_DB: ${FASTER_DB_DEV}
-      FASTER_USER: ${FASTER_USER_DEV}
+      DB_PASSWORD: ${FASTER_PASSWORD_DEV}
+      DB_NAME: ${FASTER_DB_DEV}
+      DB_USER: ${FASTER_USER_DEV}
     ports:
       - '${PGSQL_PORT_DEV}:5432'
 
