@@ -1,3 +1,103 @@
-Ver. 1.0.0 - 2021-02-04
+Ver. 1.4.6 - 2021-02-08
 ----------------------------
-- Initial deploy of the solution
+- Bugfix - Fix PersonAction file class name
+- Feature - PersonActionSharingPosition now is recorded as a new row (#72)
+- Bugfix - Change CurrentStatus prop name in MissionNotificationDto (#71)
+- Feature - Add BBox filter for Get APIs (#68)
+
+Ver. 1.4.5 - 2021-01-26 (see https://bitbucket.org/mobilesolutionsismb/faster-backend-aspnetcore/src/master/ for full history)
+----------------------------
+- Bugfix - Add startDateFilter and endDateFilter in GetFeatureCollection api (#69)
+
+Ver. 1.4.4 - 2021-01-21
+----------------------------
+- Feature - Bus notification for UpdateReportStatus event added (#67)
+
+Ver. 1.4.3 - 2021-01-21
+----------------------------
+- Bugfix - Timestamp management in UpdateReport Api
+- Bugfix - MimeType update for mp4 and mp3 files
+
+Ver. 1.4.2 - 2021-01-20
+----------------------------
+- Bugfix - PersonActions full management (#64)
+- Feature - Update Report status API added (#65)
+
+
+Ver. 1.4.1 - 2021-01-15
+-----------------------------
+- Feature - GetLeafActivity function added (#63)
+- Bugfix - Mission update before notification sending (#61)
+- Feature - SelectedLocation prop deleted (migration) (#59)
+
+Ver. 1.4.0 - 2021-01-11
+-----------------------------
+- Feature - Filter Reports by Creator (#56)
+- Feature - Thumbnails for reports media (#53)
+- Bugfix - GetFeatureCollection api update and SharingPosition action management (#58)
+
+Ver. 1.3.8 - 2020-12-16
+-----------------------------
+- Feature - OrganizationName in addition to OrganizationId in GetFeatureCollection (#54)
+
+Ver. 1.3.7 - 2020-12-16
+-----------------------------
+- Feature - Added multilanguage categories with relative import API (#44)
+- Feature - Notifications are now managed with EventBus (#46)
+
+Ver. 1.3.6 - 2020-12-04
+-----------------------------
+- Bugfix - Fix GetFeatureCollection function
+
+Ver. 1.3.5 - 2020-11-26
+-----------------------------
+- Feature - Update of GetFeatureCollection function (#51)
+
+Ver. 1.3.4 - 2020-11-24
+------------------------------
+- Bugfix - CreateOrUpdateReport removed from swagger definition
+
+Ver. 1.3.3 - 2020-11-20
+------------------------------
+- Bugfix - Fix CreateOrUpdateMission api, either CoordinatorPersonId or CoordinatorTeamId can be set (#50)
+
+Ver. 1.3.2 - 2020-11-17
+-------------------------------
+- Feature - Added RelativeMissionId property to ReportDto (#47)
+- Feature - Get members of current logged user organization (#49)
+- Bugfix  - FasterDbContex disposed exception when CreateOrUpdateReport is called (#48)
+
+Ver. 1.3.1 - 2020-11-12
+-------------------------------
+- Bugfix - General SQL exception management
+
+Ver. 1.3.0 - 2020-11-12
+-------------------------------
+- Feature - Added Bus Module, broadcasting events to the bus, notifications overhaul (#43)
+- Bugfix - Genaral bugfix and improvements
+
+Ver 1.2.0 - 2020-10-13
+-------------------------------
+- Feature - Social Module added to the solution (#41)
+- Feature - Team integration: Missions have a Coordinator Person or a Coordinator Team, Notifications of missions are sent to the coordinators, 
+			Current Missions and Team information are listed in the profile (#38)
+- Feature - Integrated entity versioning (history), removed legacy mission history (#39)
+- Feature - Added API to query the entity versioning (#39)
+- Feature - Add GeoJsonAppService APIs to get all entities within given Time/Space coordinates (#40)
+
+Ver 1.1.0 - 2020-08-05
+--------------------------------
+- Feature - Add Preference entity (#15)
+- Feature - Create categories for random data generation (#25)
+- Feature - Add Teams entity (#28)
+- Bugfix - Set globally UTC as Clock Provider for server-side logging
+- Feature - Add Link/FK from reports to missions, fetch related reports in MissionsAppService (#32)
+- Bugfix - Load correct value of UserId in session
+- Refactor - Use AbpAuditing instead of explicit Creator/Creation time setting.
+- Refactor - Legacy 'UserId' relabelled 'FusionAuthUserGuid'
+- Refactor - Whenever possible, used directly UserId or cached Person instead of loading the entity from the database
+- Feature - Add possibility of setting an user role (#36)
+- Feature - Store locally user roles (#36)
+- Enhancement - Add user-friendly for SQL unique constraint violation
+- Feature - Added Activities (with translations) import APIs (#37)
+- Refactor - Unified all import APIs (Competence Area, Category, Activity) under the same group
