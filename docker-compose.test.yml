@@ -3,8 +3,15 @@ version: '3.5'
 
 services:
   faster.web:
+    depends_on:
+      - faster-pgsql
+    image: 'faster.web'
+    build:
+      context: .
+      dockerfile: src/Ermes.Web/Dockerfile
+    restart: unless-stopped  
     environment:
-      - ASPNETCORE_ENVIRONMENT=Test
+      - ASPNETCORE_ENVIRONMENT=FasterTest
       - GOOGLE_APPLICATION_CREDENTIALS=firebasekey-dev.json
     ports:
       - '${FASTER_WEB_PORT_TEST}:80'
@@ -12,18 +19,22 @@ services:
     networks:
       - faster-net
     env_file:
-      - ./proxy.env
       - ./.env
 
   faster-pgsql:
+    image: 'faster-pgsql'
+    build:
+      context: .
+      dockerfile: src/containers/postgresql/Dockerfile
+    restart: unless-stopped  
     container_name: 'faster-pgsql-${ENVTYPE_TEST}'
     networks:
       - faster-net
     environment:
       POSTGRES_PASSWORD: ${FASTER_PASSWORD_TEST}
-      FASTER_PASSWORD: ${FASTER_PASSWORD_TEST}
-      FASTER_DB: ${FASTER_DB_TEST}
-      FASTER_USER: ${FASTER_USER_TEST}
+      DB_PASSWORD: ${FASTER_PASSWORD_TEST}
+      DB_NAME: ${FASTER_DB_TEST}
+      DB_USER: ${FASTER_USER_TEST}
     ports:
       - '${PGSQL_PORT_TEST}:5432'
 
