@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 namespace Ermes.Social
 {
     [ErmesAuthorize]
+    [ErmesIgnoreApi(true)]
     public class SocialAppService : ErmesAppServiceBase, ISocialAppService
     {
         private readonly SocialManager _socialManager;
