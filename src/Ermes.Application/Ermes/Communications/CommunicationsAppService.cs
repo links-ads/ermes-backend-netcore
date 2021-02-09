@@ -115,7 +115,7 @@ namespace Ermes.Communications
             newCommunication.Id = await _communicationManager.CreateOrUpdateCommunicationAsync(newCommunication);
 
             await CurrentUnitOfWork.SaveChangesAsync();
-
+            
             NotificationEvent<CommunicationNotificationDto> notification = new NotificationEvent<CommunicationNotificationDto>(newCommunication.Id,
                 _session.UserId.Value,
                 ObjectMapper.Map<CommunicationNotificationDto>(newCommunication),

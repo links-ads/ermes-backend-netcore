@@ -22,6 +22,7 @@ namespace Ermes.Reports.Dto
         public List<ReportTarget> Targets { get; set; }
         public string Username { get; set; }
         public string OrganizationName { get; set; }
+        public int? OrganizationId { get; set; }
         public SourceDeviceType Source { get; set; }
         public bool IsEditable { get; set; }
     }

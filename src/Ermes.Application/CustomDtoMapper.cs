@@ -83,6 +83,7 @@ namespace Ermes
             configuration.CreateMap<Mission, MissionNotificationDto>()
                             .ForMember(dto => dto.Centroid, options => options.MapFrom(b => new PointPosition(b.AreaOfInterest.Centroid.X, b.AreaOfInterest.Centroid.Y)))
                             .ForMember(dto => dto.Status, options => options.MapFrom(b => b.CurrentStatus))
+                            .ForMember(dto => dto.OrganizationId, options => options.MapFrom(b => b.OrganizationId))
                             .AfterMap((src, dest) => dest.Duration.LowerBound = dest.Duration.LowerBound.ToUniversalTime())
                             .AfterMap((src, dest) => dest.Duration.UpperBound = dest.Duration.UpperBound.ToUniversalTime());
             configuration.CreateMap<Mission, FullMissionDto>()
@@ -112,6 +113,7 @@ namespace Ermes
             configuration.CreateMap<Report, ReportNotificationDto>()
                             .ForMember(dto => dto.Location, options => options.MapFrom(a => new PointPosition(a.Location.X, a.Location.Y)))
                             .ForMember(dto => dto.Timestamp, options => options.MapFrom(a => a.Timestamp.ToUniversalTime()))
+                            .ForMember(dto => dto.OrganizationId, options => options.MapFrom(a => a.Creator.OrganizationId))
                             .ForMember(dto => dto.OrganizationName, options => options.MapFrom(a => a.Creator.OrganizationId.HasValue ? a.Creator.Organization.Name : null))
                             .ForMember(dto => dto.Username, options => options.MapFrom(a => a.CreatorUserId.HasValue ? a.Creator.Username : null))
                             .AfterMap((src, dest) => dest.MediaURIs = dest.MediaURIs.Select(a => ResourceManager.Reports.GetMediaPath(dest.Id, a)).ToList());
@@ -135,6 +137,7 @@ namespace Ermes
                             .ForMember(entity => entity.Creator, options => options.Ignore());
             configuration.CreateMap<Communication, CommunicationNotificationDto>()
                             .ForMember(dto => dto.Centroid, options => options.MapFrom(b => new PointPosition(b.AreaOfInterest.Centroid.X, b.AreaOfInterest.Centroid.Y)))
+                            .ForMember(dto => dto.OrganizationId, options => options.MapFrom(b => b.Creator.OrganizationId))
                             .AfterMap((src, dest) => dest.Duration.LowerBound = dest.Duration.LowerBound.ToUniversalTime())
                             .AfterMap((src, dest) => dest.Duration.UpperBound = dest.Duration.UpperBound.ToUniversalTime());
             configuration.CreateMap<Notification, NotificationDto>()
