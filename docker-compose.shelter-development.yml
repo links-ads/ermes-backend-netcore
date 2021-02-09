@@ -4,8 +4,8 @@ version: '3.5'
 services:
   shelter.web:
     depends_on:
-      - faster-pgsql
-    image: 'faster.web'
+      - shelter-pgsql
+    image: 'shelter.web'
     build:
       context: .
       dockerfile: src/Ermes.Web/Dockerfile
@@ -22,7 +22,7 @@ services:
       - ./.env    
 
   shelter-pgsql:
-    image: 'faster-pgsql'
+    image: 'shelter-pgsql'
     build:
       context: .
       dockerfile: src/containers/postgresql/Dockerfile
