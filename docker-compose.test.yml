@@ -12,7 +12,7 @@ services:
     restart: unless-stopped  
     environment:
       - ASPNETCORE_ENVIRONMENT=FasterTest
-      - GOOGLE_APPLICATION_CREDENTIALS=firebasekey-dev.json
+      - GOOGLE_APPLICATION_CREDENTIALS=firebasekey-faster.json
     ports:
       - '${FASTER_WEB_PORT_TEST}:80'
     container_name: 'faster-web-${ENVTYPE_TEST}'
