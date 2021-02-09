@@ -1,11 +1,18 @@
-#docker-compose.shelter.development.yml (Extended config for shelter DEVELOPMENT env.)
+#docker-compose.shelter.development.yml (Extended config for Shelter DEVELOPMENT env.)
 version: '3.5'
 
 services:
   shelter.web:
+    depends_on:
+      - faster-pgsql
+    image: 'faster.web'
+    build:
+      context: .
+      dockerfile: src/Ermes.Web/Dockerfile
+    restart: unless-stopped  
     environment:
       - ASPNETCORE_ENVIRONMENT=ShelterDevelopment
-      - GOOGLE_APPLICATION_CREDENTIALS=firebasekey-dev.json
+      - GOOGLE_APPLICATION_CREDENTIALS=firebasekey-shelter.json
     ports:
       - '${SHELTER_WEB_PORT_DEV}:80'
     container_name: 'shelter-web-${ENVTYPE_SHELTER_DEV}'
@@ -15,6 +22,11 @@ services:
       - ./.env    
 
   shelter-pgsql:
+    image: 'faster-pgsql'
+    build:
+      context: .
+      dockerfile: src/containers/postgresql/Dockerfile
+    restart: unless-stopped  
     container_name: 'shelter-pgsql-${ENVTYPE_SHELTER_DEV}'
     networks:
       - shelter-net    

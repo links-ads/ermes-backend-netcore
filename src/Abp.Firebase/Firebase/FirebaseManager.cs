@@ -25,8 +25,8 @@ namespace Abp.Firebase
             return FirebaseApp.Create(new AppOptions()
             {
                 //By default, credentials are taken from firebasekey.json file in Web project
-                //Env variable is set in web.config file, key GOOGLE_APPLICATION_CREDENTIALS
-                //and in docker-compose files
+                //Env variable is set in web.config file, key GOOGLE_APPLICATION_CREDENTIALS (for DEBUG purpose)
+                //Variable set in docker-compose files overwrites this value
                 Credential = GoogleCredential.GetApplicationDefault()
             });
         }
