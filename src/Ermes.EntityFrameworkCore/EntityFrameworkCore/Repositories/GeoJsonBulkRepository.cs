@@ -207,6 +207,7 @@ namespace Ermes.GeoJson
                     left join public.activities a on a.""Id"" = pa.""CurrentActivityId""
                     left join public.activity_translations at2 on at2.""CoreId"" = pa.""CurrentActivityId""
                     where (at2.""Language"" = @language or at2.""Language"" is null)
+                    and pa.""Location"" is not null
                 ) tmp 
                 where 
                     tsrange(@startDate, @endDate, '[]') &&

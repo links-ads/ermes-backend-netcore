@@ -111,6 +111,7 @@ namespace Ermes.Actions
             var lastAction = await _personManager.GetLastPersonActionAsync(personId);
 
             switch (input.PersonAction.Type)
+                //Use last valid location if new input location is null or is equals to (0,0)
             {
                 //do not track if user is in Off status or new position is not valid
                 case PersonActionType.PersonActionSharingPosition:
@@ -126,6 +127,8 @@ namespace Ermes.Actions
                         p_sharPosition.CurrentExtensionData = lastAction?.CurrentExtensionData;
                         p_sharPosition.CurrentStatus = lastAction != null ? lastAction.CurrentStatus : ActionStatusType.Off;
                         p_sharPosition.CurrentActivityId = lastAction?.CurrentActivityId;
+                        if ((p_sharPosition.Location == null || (p_sharPosition.Location.X == 0 && p_sharPosition.Location.Y == 0)) && lastAction != null)
+                            p_sharPosition.Location = lastAction.Location;
                         p_sharPosition.Id = await _personManager.InsertPersonActionSharingPositionAsync(p_sharPosition);
                         res.PersonAction = ObjectMapper.Map<PersonActionDto>(p_sharPosition);
                     }
@@ -137,6 +140,8 @@ namespace Ermes.Actions
                     p_tracking.PersonId = personId;
                     p_tracking.CurrentStatus = lastAction != null ? lastAction.CurrentStatus : ActionStatusType.Off;
                     p_tracking.CurrentActivityId = lastAction?.CurrentActivityId;
+                    if ((p_tracking.Location == null || (p_tracking.Location.X == 0 && p_tracking.Location.Y == 0)) && lastAction != null)
+                        p_tracking.Location = lastAction.Location;
                     p_tracking.Id = await _personManager.InsertPersonActionTrackingAsync(p_tracking);
                     res.PersonAction = ObjectMapper.Map<PersonActionDto>(p_tracking);
                     break;
@@ -146,6 +151,8 @@ namespace Ermes.Actions
                     //Status can Be Moving or Off, so I need to cancel ActivityId value
                     p_status.CurrentActivityId = null;
                     p_status.CurrentExtensionData = lastAction?.CurrentExtensionData;
+                    if ((p_status.Location == null || (p_status.Location.X == 0 && p_status.Location.Y == 0)) && lastAction != null)
+                        p_status.Location = lastAction.Location;
                     p_status.Id = await _personManager.InsertPersonActionStatusAsync(ObjectMapper.Map<PersonActionStatus>(p_status));
                     res.PersonAction = ObjectMapper.Map<PersonActionDto>(p_status);
                     break;
@@ -157,6 +164,8 @@ namespace Ermes.Actions
                     p_activity.PersonId = personId;
                     p_activity.CurrentStatus = ActionStatusType.Active;
                     p_activity.CurrentExtensionData = lastAction?.CurrentExtensionData;
+                    if ((p_activity.Location == null || (p_activity.Location.X == 0 && p_activity.Location.Y == 0)) && lastAction != null)
+                        p_activity.Location = lastAction.Location;
                     p_activity.Id = await _personManager.InsertPersonActionActivityAsync(ObjectMapper.Map<PersonActionActivity>(p_activity));
                     res.PersonAction = ObjectMapper.Map<PersonActionDto>(p_activity);
                     res.PersonAction.ActivityName = activity.Name;
