@@ -18,6 +18,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Abp;
 
 namespace Ermes.GeoJson
 {
@@ -89,7 +90,7 @@ namespace Ermes.GeoJson
         //}
 
 
-        public string GetGeoJsonCollection(DateTime StartDate, DateTime EndDate, Geometry BoundingBox, List<EntityType> entityTypes, int[] organizationIdList, List<ActionStatusType> statusTypes, int[] activityIds, string Language = "it")
+        public string GetGeoJsonCollection(DateTime StartDate, DateTime EndDate, Geometry BoundingBox, List<EntityType> entityTypes, int[] organizationIdList, List<ActionStatusType> statusTypes, int[] activityIds, int srid, string Language = "it")
         {
             ErmesDbContext context = _dbContextProvider.GetDbContext();
             using (var command = context.Database.GetDbConnection().CreateCommand())
@@ -207,7 +208,7 @@ namespace Ermes.GeoJson
                     left join public.activities a on a.""Id"" = pa.""CurrentActivityId""
                     left join public.activity_translations at2 on at2.""CoreId"" = pa.""CurrentActivityId""
                     where (at2.""Language"" = @language or at2.""Language"" is null)
-                    and pa.""Location"" is not null
+                    and (pa.""Location"" is not null || ST_Equals(pa.""Location""::geometry, st_geomfromtext('POINT(0 0)', @srid))
                 ) tmp 
                 where 
                     tsrange(@startDate, @endDate, '[]') &&
@@ -219,6 +220,7 @@ namespace Ermes.GeoJson
                 command.Parameters.Add(new NpgsqlParameter("@startDate", StartDate));
                 command.Parameters.Add(new NpgsqlParameter("@endDate", EndDate));
                 command.Parameters.Add(new NpgsqlParameter("@language", Language));
+                command.Parameters.Add(new NpgsqlParameter("@srid", srid));
 
                 if(BoundingBox != null)
                 {
