@@ -14,6 +14,7 @@ namespace Ermes.Localization
             localizationConfiguration.Languages.Add(new LanguageInfo("en", "English", "famfamfam-flags england", isDefault: true));
             localizationConfiguration.Languages.Add(new LanguageInfo("tr", "Türkçe", "famfamfam-flags tr"));
             localizationConfiguration.Languages.Add(new LanguageInfo("it", "Italiano", "famfamfam-flags it"));
+            localizationConfiguration.Languages.Add(new LanguageInfo("fi", "Suomalainen", "famfamfam-flags fi"));
 
             localizationConfiguration.Sources.Add(
                 new DictionaryBasedLocalizationSource(ErmesConsts.LocalizationSourceName,
