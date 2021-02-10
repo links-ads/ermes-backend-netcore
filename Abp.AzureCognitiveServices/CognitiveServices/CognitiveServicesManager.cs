@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Abp.AzureCognitiveServices.CognitiveServices
 {
-    public class CognitiveServicesManager : ICognitiveServicesManager
+    public class CognitiveServicesManager : ICognitiveServicesManager, IComputerVisionManager
     {
         public static ComputerVisionManager _cvManager;
 
