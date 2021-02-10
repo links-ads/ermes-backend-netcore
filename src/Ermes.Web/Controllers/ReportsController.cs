@@ -280,8 +280,9 @@ namespace Ermes.Web.Controllers
                                 }).ToList());
                             }
                         }
-                        catch (Exception)
+                        catch (Exception e)
                         {
+                            Logger.Error("Error during image analisys phase: " + e.Message);
                         }
                         string thumbnailName = ResourceManager.Thumbnails.GetJpegThumbnailFilename(uploadedFileName);
                         string thumbnailPath = ResourceManager.Thumbnails.GetRelativeMediaPath(report.Id, thumbnailName);
@@ -292,14 +293,20 @@ namespace Ermes.Web.Controllers
                         catch (Exception e)
                         {
                             Logger.Error(e.Message);
-                            //Use Cognitive service to create Image thumbnail
+                            //Use Cognitive services to create image thumbnail
                             if (imageStream != null) {
                                 var newFileBytes = await _cognitiveServicesManager.GetImageThumbnail(AppConsts.ThumbnailSize, AppConsts.ThumbnailSize, imageStream);
                                 if (newFileBytes != null)
+                                {
                                     await _azureThumbnailStorageManager.UploadFile(thumbnailPath, newFileBytes, MimeTypeNames.ImageJpeg);
+                                    Logger.InfoFormat("Thumbnail {0} obtained using Azure Cognitive Services", thumbnailPath);
+                                }
                                 else
+                                {
                                     //upload original image
                                     await _azureThumbnailStorageManager.UploadFile(thumbnailPath, fileBytes, MimeTypeNames.ImageJpeg);
+                                    Logger.WarnFormat("Azure Cognitive Services failed in creating the thumbnail {0}", thumbnailPath);
+                                }
                             }
                             else
                                 await _azureThumbnailStorageManager.UploadFile(thumbnailPath, fileBytes, MimeTypeNames.ImageJpeg);
