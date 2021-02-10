@@ -26,6 +26,7 @@ using Abp;
 using Abp.Chatbot;
 using Abp.ErmesSocialNetCore;
 using Abp.Bus;
+using Abp.AzureCognitiveServices;
 
 namespace Ermes.Web.Startup
 {
@@ -76,6 +77,9 @@ namespace Ermes.Web.Startup
             );
             services.Configure<ErmesBusSettings>(
                 _appConfiguration.GetSection("Bus")
+            );
+            services.Configure<AbpAzureCognitiveServicesSettings>(
+                _appConfiguration.GetSection("AzureCognitiveServices")
             );
 
 

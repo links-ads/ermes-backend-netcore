@@ -70,11 +70,13 @@ namespace Ermes.Reports
         public Mission RelativeMission { get; set; }
         public int? RelativeMissionId { get; set; }
 
+        [Column(TypeName = "jsonb")]
+        public List<ReportTag> Tags { get; set; }
+
         [NotMapped]
         public SourceDeviceType Source { get; set; }
         [NotMapped]
-        public bool IsEditable { get; set; }
- 
+        public bool IsEditable { get; set; } 
     }
 
     public class ReportExtensionData
@@ -88,5 +90,12 @@ namespace Ermes.Reports
     {
         public TargetType Target { get; set; }
         public GeneralStatus Status { get; set; }
+    }
+
+    public class ReportTag
+    {
+        public string MediaURI { get; set; }
+        public double Confidence { get; set; }
+        public string Name { get; set; }
     }
 }

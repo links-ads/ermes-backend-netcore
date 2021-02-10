@@ -7,7 +7,7 @@ services:
     image: 'faster.web'
     build:
       context: .
-      dockerfile: src/Faster.Web/Dockerfile
+      dockerfile: src/Ermes.Web/Dockerfile
     restart: unless-stopped
 
   faster-pgsql:

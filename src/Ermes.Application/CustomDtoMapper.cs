@@ -109,6 +109,7 @@ namespace Ermes
                             .ForMember(entity => entity.Location, options => options.MapFrom(a => new Point(a.Location.Longitude, a.Location.Latitude)))
                             .ForMember(entity => entity.Timestamp, options => options.Ignore())
                             .ForMember(entity => entity.MediaURIs, options => options.Ignore())
+                            .ForMember(entity => entity.Tags, options => options.Ignore())
                             .ForMember(entity => entity.Creator, options => options.Ignore());
             configuration.CreateMap<Report, ReportNotificationDto>()
                             .ForMember(dto => dto.Location, options => options.MapFrom(a => new PointPosition(a.Location.X, a.Location.Y)))

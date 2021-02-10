@@ -24,6 +24,8 @@
     <Compile Include="Migrations\20210127164359_Initial_migration.Designer.cs" />
     <Compile Include="Migrations\20210204105945_PersonAction_CurrentActivity_CurrentExtensionData.cs" />
     <Compile Include="Migrations\20210204105945_PersonAction_CurrentActivity_CurrentExtensionData.Designer.cs" />
+    <Compile Include="Migrations\20210210115103_Report_Tags_Added.cs" />
+    <Compile Include="Migrations\20210210115103_Report_Tags_Added.Designer.cs" />
     <Compile Include="Migrations\ErmesDbContextModelSnapshot.cs" />
     <Compile Include="Migrations\Seed\ModelBuilderExtensions.cs" />
   </ItemGroup>

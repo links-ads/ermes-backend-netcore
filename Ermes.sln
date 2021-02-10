@@ -36,6 +36,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Abp.ErmesBus", "src\Abp.ErmesBus\Abp.ErmesBus.csproj", "{F418A35E-DFAF-4485-AA3D-6694328FDF96}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abp.AzureCognitiveServices", "Abp.AzureCognitiveServices\Abp.AzureCognitiveServices.csproj", "{02E7877B-3F31-4168-9DB7-FB2A69A17BF6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -90,6 +92,10 @@ Global
 		{F418A35E-DFAF-4485-AA3D-6694328FDF96}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F418A35E-DFAF-4485-AA3D-6694328FDF96}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F418A35E-DFAF-4485-AA3D-6694328FDF96}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02E7877B-3F31-4168-9DB7-FB2A69A17BF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02E7877B-3F31-4168-9DB7-FB2A69A17BF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02E7877B-3F31-4168-9DB7-FB2A69A17BF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02E7877B-3F31-4168-9DB7-FB2A69A17BF6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -107,6 +113,7 @@ Global
 		{9BBEBA4C-CBAA-4016-99AF-7DE6E009753B} = {AFAA0841-BD93-466F-B8F4-FB4EEC86F1FC}
 		{AB36BD80-E96F-4149-9203-4DDE38D80A23} = {AFAA0841-BD93-466F-B8F4-FB4EEC86F1FC}
 		{F418A35E-DFAF-4485-AA3D-6694328FDF96} = {AFAA0841-BD93-466F-B8F4-FB4EEC86F1FC}
+		{02E7877B-3F31-4168-9DB7-FB2A69A17BF6} = {AFAA0841-BD93-466F-B8F4-FB4EEC86F1FC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B516B1E8-1CEC-4BCC-BA92-93CB32845E37}

@@ -26,6 +26,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Abp.AzureCognitiveServices\Abp.AzureCognitiveServices.csproj" />
     <ProjectReference Include="..\Ermes.Application\Ermes.Application.csproj" />
     <ProjectReference Include="..\Ermes.EntityFrameworkCore\Ermes.EntityFrameworkCore.csproj" />
     <ProjectReference Include="..\FusionAuthNetCore\FusionAuthNetCore.csproj" />

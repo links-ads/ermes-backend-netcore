@@ -27,5 +27,6 @@ namespace Ermes.Reports.Dto
         [JsonIgnore]
         public long CreatorId { get; set; }
         public int? RelativeMissionId { get; set; }
+        public List<ReportTag> Tags { get; set; }
     }
 }

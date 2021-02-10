@@ -1,4 +1,6 @@
 ﻿using Abp.Azure;
+using Abp.AzureCognitiveServices.CognitiveServices;
+using Abp.AzureCognitiveServices.CognitiveServices.ComputerVision;
 using Abp.BackgroundJobs;
 using Abp.Extensions;
 using Abp.IO.Extensions;
@@ -21,6 +23,7 @@ using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -38,6 +41,7 @@ namespace Ermes.Web.Controllers
         private readonly ErmesAppSession _session;
         private readonly MissionManager _missionManager;
         private readonly IAzureManager _azureManager;
+        private readonly ICognitiveServicesManager _cognitiveServicesManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IBackgroundJobManager _backgroundJobManager;
 
@@ -48,6 +52,7 @@ namespace Ermes.Web.Controllers
                         MissionManager missionManager,
                         IHttpContextAccessor httpContextAccessor,
                         IAzureManager azureManager,
+                        ICognitiveServicesManager cognitiveServicesManager,
                         IBackgroundJobManager backgroundJobManager
                     )
         {
@@ -58,6 +63,7 @@ namespace Ermes.Web.Controllers
             _missionManager = missionManager;
             _azureManager = azureManager;
             _backgroundJobManager = backgroundJobManager;
+            _cognitiveServicesManager = cognitiveServicesManager;
         }
 
         [Route("api/services/app/Reports/CreateOrUpdateReport")]
@@ -252,12 +258,31 @@ namespace Ermes.Web.Controllers
                     string uploadedFileName = string.Concat(Guid.NewGuid().ToString(), ".", fileExtension);
 
                     var fileNameWithFolder = ResourceManager.Reports.GetRelativeMediaPath(report.Id, uploadedFileName);
-                    await _azureReportStorageManager.UploadFile(fileNameWithFolder, fileBytes, mimeType);
-
+                    await _azureReportStorageManager.UploadFile(fileNameWithFolder, fileBytes, mimeType);                    
                     MediaType mediaType = ErmesCommon.GetMediaTypeFromMimeType(mimeType);
 
                     if (mediaType == MediaType.Image)
                     {
+                        Stream imageStream = null;
+                        try
+                        {
+                            imageStream = new MemoryStream(fileBytes);
+                            var imageAnalysis = await _cognitiveServicesManager.AnalyzeImage(imageStream);
+                            if (imageAnalysis != null && imageAnalysis.Tags != null && imageAnalysis.Tags.Count > 0)
+                            {
+                                if (report.Tags == null)
+                                    report.Tags = new List<ReportTag>();
+                                report.Tags.AddRange(imageAnalysis.Tags.Select(t => new ReportTag()
+                                {
+                                    MediaURI = uploadedFileName,
+                                    Name = t.Name,
+                                    Confidence = t.Confidence
+                                }).ToList());
+                            }
+                        }
+                        catch (Exception)
+                        {
+                        }
                         string thumbnailName = ResourceManager.Thumbnails.GetJpegThumbnailFilename(uploadedFileName);
                         string thumbnailPath = ResourceManager.Thumbnails.GetRelativeMediaPath(report.Id, thumbnailName);
                         try
@@ -267,9 +292,17 @@ namespace Ermes.Web.Controllers
                         catch (Exception e)
                         {
                             Logger.Error(e.Message);
-                            //TODO: improve management in case of error
-                            //upload original image
-                            await _azureThumbnailStorageManager.UploadFile(thumbnailPath, fileBytes, MimeTypeNames.ImageJpeg);
+                            //Use Cognitive service to create Image thumbnail
+                            if (imageStream != null) {
+                                var newFileBytes = await _cognitiveServicesManager.GetImageThumbnail(AppConsts.ThumbnailSize, AppConsts.ThumbnailSize, imageStream);
+                                if (newFileBytes != null)
+                                    await _azureThumbnailStorageManager.UploadFile(thumbnailPath, newFileBytes, MimeTypeNames.ImageJpeg);
+                                else
+                                    //upload original image
+                                    await _azureThumbnailStorageManager.UploadFile(thumbnailPath, fileBytes, MimeTypeNames.ImageJpeg);
+                            }
+                            else
+                                await _azureThumbnailStorageManager.UploadFile(thumbnailPath, fileBytes, MimeTypeNames.ImageJpeg);
                         }
                     }
 
@@ -292,6 +325,9 @@ namespace Ermes.Web.Controllers
                             await _azureThumbnailStorageManager.DeleteBlobAsync(ResourceManager.Thumbnails.GetRelativeMediaPath(report.Id, thumbnailName));
                         }
                         catch (Exception e) { Logger.Error(e.Message); }
+
+                        //Delete Tags
+                        report.Tags = report.Tags.Where(t => t.MediaURI != item).ToList();
                     }
                 }
             }
