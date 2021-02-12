@@ -1,6 +1,6 @@
 ﻿using Abp.Azure;
-using Abp.Bus;
 using Abp.Chatbot;
+using Abp.BusProducer;
 using Abp.ErmesSocialNetCore;
 using Abp.Firebase;
 using Abp.IO;
@@ -17,7 +17,7 @@ namespace Ermes
         typeof(AbpFirebaseModule),
         typeof(AbpChatbotModule),
         typeof(AbpSocialModule),
-        typeof(ErmesBusModule)
+        typeof(BusProducerModule)
     )]
     public class ErmesCoreModule : AbpModule
     {

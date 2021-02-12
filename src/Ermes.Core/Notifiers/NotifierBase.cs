@@ -1,4 +1,4 @@
-﻿using Abp.Bus;
+﻿using Abp.BusProducer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,12 +10,12 @@ namespace Ermes.Notifiers
     {
         private readonly IPushNotificationNotifier _pushNotificationNotifier;
         private readonly IWebApiNotifier _webApiNotifier;
-        private readonly IErmesBusManager _busManager;
+        private readonly IBusProducer _busManager;
 
         public NotifierBase(
             IPushNotificationNotifier pushNotificationNotifier,
             IWebApiNotifier webApiNotifier,
-            IErmesBusManager busManager
+            IBusProducer busManager
             )
         {
             _pushNotificationNotifier = pushNotificationNotifier;

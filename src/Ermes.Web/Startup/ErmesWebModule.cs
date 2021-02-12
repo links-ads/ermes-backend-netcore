@@ -1,5 +1,6 @@
 ﻿using Abp.AspNetCore;
 using Abp.AspNetCore.Configuration;
+using Abp.BusConsumer;
 using Abp.Modules;
 using Abp.Reflection.Extensions;
 using Ermes.Configuration;
@@ -13,7 +14,9 @@ namespace Ermes.Web.Startup
     [DependsOn(
         typeof(ErmesApplicationModule), 
         typeof(ErmesEntityFrameworkCoreModule), 
-        typeof(AbpAspNetCoreModule))]
+        typeof(AbpAspNetCoreModule),
+        typeof(BusConsumerModule)
+    )]
     public class ErmesWebModule : AbpModule
     {
         private readonly IConfigurationRoot _appConfiguration;
