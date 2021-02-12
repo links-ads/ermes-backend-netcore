@@ -6,7 +6,6 @@ using Ermes.EntityFrameworkCore;
 using Castle.Facilities.Logging;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -25,6 +24,10 @@ using FusionAuthNetCore;
 using Abp;
 using Abp.Chatbot;
 using Abp.ErmesSocialNetCore;
+using Abp.BusProducer;
+using Abp.BusConsumer;
+using Abp.BusConsumer.Kafka;
+using Abp.BusConsumer.RabbitMq;
 using Abp.Bus;
 using Abp.AzureCognitiveServices;
 
@@ -75,7 +78,10 @@ namespace Ermes.Web.Startup
             services.Configure<AbpSocialSettings>(
                 _appConfiguration.GetSection("Social")
             );
-            services.Configure<ErmesBusSettings>(
+            services.Configure<BusProducerSettings>(
+                _appConfiguration.GetSection("Bus")
+            );
+            services.Configure<BusConsumerSettings>(
                 _appConfiguration.GetSection("Bus")
             );
             services.Configure<AbpAzureCognitiveServicesSettings>(
@@ -137,6 +143,21 @@ namespace Ermes.Web.Startup
                 options.OperationProcessors.Add(
                     new AspNetCoreOperationSecurityScopeProcessor("JWT"));
             });
+
+            switch (_appConfiguration["App:ErmesProject"])
+            {
+                case "FASTER":
+                case "SAFERS":
+                    services.AddHostedService<KafkaConsumer>();
+                    break;
+                case "SHELTER":
+                    services.AddHostedService<RabbitMqManager>();
+                    break;
+                default:
+                    break;
+            }
+
+
 
             //Configure Abp and Dependency Injection
             return services.AddAbp<ErmesWebModule>(options =>

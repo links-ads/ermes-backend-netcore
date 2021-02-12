@@ -1,5 +1,6 @@
 ﻿using Abp.AspNetCore;
 using Abp.AspNetCore.Configuration;
+using Abp.BusConsumer;
 using Abp.AzureCognitiveServices;
 using Abp.Modules;
 using Abp.Reflection.Extensions;
@@ -14,8 +15,10 @@ namespace Ermes.Web.Startup
     [DependsOn(
         typeof(ErmesApplicationModule), 
         typeof(ErmesEntityFrameworkCoreModule), 
-        typeof(AbpAzureCognitiveServicesModule), 
-        typeof(AbpAspNetCoreModule))]
+        typeof(AbpAspNetCoreModule),
+        typeof(BusConsumerModule),
+        typeof(AbpAzureCognitiveServicesModule)
+    )]
     public class ErmesWebModule : AbpModule
     {
         private readonly IConfigurationRoot _appConfiguration;

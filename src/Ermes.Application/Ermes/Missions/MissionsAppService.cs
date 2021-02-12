@@ -29,6 +29,7 @@ using Abp.BackgroundJobs;
 using Ermes.EventHandlers;
 using NetTopologySuite.Geometries;
 using Ermes.GeoJson;
+using System.Net;
 
 namespace Ermes.Missions
 {
@@ -237,17 +238,6 @@ namespace Ermes.Missions
 
             return mission;
         }
-
-        private bool CheckNewStatus(MissionStatusType currentStatus, MissionStatusType newStatus)
-        {
-            return currentStatus switch
-            {
-                MissionStatusType.Created => newStatus == MissionStatusType.TakenInCharge || newStatus == MissionStatusType.Deleted,
-                MissionStatusType.TakenInCharge => newStatus == MissionStatusType.Created || newStatus == MissionStatusType.Deleted || newStatus == MissionStatusType.Completed,
-                _ => false,
-            };
-        }
-
         #endregion
 
         [OpenApiOperation("Create or Update a Mission", 
@@ -348,7 +338,7 @@ namespace Ermes.Missions
             if(mission.CoordinatorTeamId.HasValue && mission.CoordinatorTeamId.Value != _session.LoggedUserPerson.TeamId)
                 throw new UserFriendlyException(L("Forbidden_InsufficientRoleOrUnassociatedEntity"));
 
-            if (CheckNewStatus(mission.CurrentStatus, input.Status))
+            if (_missionManager.CheckNewStatus(mission.CurrentStatus, input.Status))
             {
                 mission.CurrentStatus = input.Status;
 
@@ -364,7 +354,7 @@ namespace Ermes.Missions
                 return true;
             }
             else
-                throw new UserFriendlyException(L("InvalidMissionUpdateStatus", input.Status));
+                throw new UserFriendlyException((int)HttpStatusCode.BadRequest, L("InvalidMissionUpdateStatus", input.Status));
         }
 
         [OpenApiOperation("Delete a Mission",
