@@ -1,6 +1,7 @@
 ﻿using Abp.Domain.Repositories;
 using Abp.Domain.Services;
 using Abp.UI;
+using Ermes.Enums;
 using Ermes.Persons;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -26,9 +27,23 @@ namespace Ermes.Missions
             PersonRepository = personRepository;
         }
 
+        public bool CheckNewStatus(MissionStatusType currentStatus, MissionStatusType newStatus)
+        {
+            return currentStatus switch
+            {
+                MissionStatusType.Created => newStatus == MissionStatusType.TakenInCharge || newStatus == MissionStatusType.Deleted,
+                MissionStatusType.TakenInCharge => newStatus == MissionStatusType.Created || newStatus == MissionStatusType.Deleted || newStatus == MissionStatusType.Completed,
+                _ => false,
+            };
+        }
+
         public async Task<Mission> GetMissionByIdAsync(int missionId)
         {
             return await Missions.SingleOrDefaultAsync(m => m.Id == missionId);
+        }
+        public Mission GetMissionById(int missionId)
+        {
+            return Missions.SingleOrDefault(m => m.Id == missionId);
         }
 
         public async Task<int> InsertMissionAsync(Mission mission)

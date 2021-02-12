@@ -220,5 +220,10 @@ namespace Ermes.Persons
                             .WhereIf(excludeMe, p => p.Id != myId)
                             .ToListAsync();
         }
+
+        public Person GetPersonByUsername(string username)
+        {
+            return Persons.SingleOrDefault(p => p.Username == username);
+        }
     }
 }

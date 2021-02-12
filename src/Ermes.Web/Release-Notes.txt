@@ -1,7 +1,7 @@
 Ver.
 ----------------------------
 - Feature - Abp.AzureCognitiveServices module added (migration, column Tags in Report) (appsettings to be updated) (#2)
-
+- Feature - Bus Producer and Bus Consumer modules added (changes in appsettings.json) (#8)
 
 Ver. 1.4.6 - 2021-02-08
 ----------------------------

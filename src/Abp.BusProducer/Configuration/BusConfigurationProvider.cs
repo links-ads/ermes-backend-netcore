@@ -2,12 +2,12 @@
 using System;
 using System.Configuration;
 
-namespace Abp.Bus.Configuration
+namespace Abp.BusProducer.Configuration
 {
-    public class ErmesBusConfigurationProvider : IErmesBusConfigurationProvider
+    public class BusConfigurationProvider : IBusConfigurationProvider
     {
-        private readonly IOptions<ErmesBusSettings> _busSettings;
-        public ErmesBusConfigurationProvider(IOptions<ErmesBusSettings> busSettings)
+        private readonly IOptions<BusProducerSettings> _busSettings;
+        public BusConfigurationProvider(IOptions<BusProducerSettings> busSettings)
         {
             _busSettings = busSettings;
         }

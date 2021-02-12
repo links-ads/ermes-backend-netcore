@@ -24,7 +24,10 @@ using FusionAuthNetCore;
 using Abp;
 using Abp.Chatbot;
 using Abp.ErmesSocialNetCore;
-using Abp.Bus;
+using Abp.BusProducer;
+using Abp.BusConsumer;
+using Abp.BusConsumer.Kafka;
+using Abp.BusConsumer.RabbitMq;
 using Abp.AzureCognitiveServices;
 
 namespace Ermes.Web.Startup
@@ -74,7 +77,10 @@ namespace Ermes.Web.Startup
             services.Configure<AbpSocialSettings>(
                 _appConfiguration.GetSection("Social")
             );
-            services.Configure<ErmesBusSettings>(
+            services.Configure<BusProducerSettings>(
+                _appConfiguration.GetSection("Bus")
+            );
+            services.Configure<BusConsumerSettings>(
                 _appConfiguration.GetSection("Bus")
             );
             services.Configure<AbpAzureCognitiveServicesSettings>(
@@ -136,6 +142,21 @@ namespace Ermes.Web.Startup
                 options.OperationProcessors.Add(
                     new AspNetCoreOperationSecurityScopeProcessor("JWT"));
             });
+
+            switch (_appConfiguration["App:ErmesProject"])
+            {
+                case "FASTER":
+                case "SAFERS":
+                    services.AddHostedService<KafkaConsumer>();
+                    break;
+                case "SHELTER":
+                    services.AddHostedService<RabbitMqManager>();
+                    break;
+                default:
+                    break;
+            }
+
+
 
             //Configure Abp and Dependency Injection
             return services.AddAbp<ErmesWebModule>(options =>

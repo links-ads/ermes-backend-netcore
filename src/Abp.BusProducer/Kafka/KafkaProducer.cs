@@ -1,22 +1,18 @@
 ﻿using Confluent.Kafka;
-using Abp.Bus;
-using Abp.Bus.Configuration;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Text;
-using System.Text.Json;
+using Abp.BusProducer.Configuration;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Abp.Bus.Kafka
+namespace Abp.BusProducer.Kafka
 {
-    public class ErmesKafkaManager: IErmesBusManager
+    public class KafkaProducer: IBusProducer
     {
-        private readonly IErmesBusConfigurationProvider _busConfigurationProvider;
+        private readonly IBusConfigurationProvider _busConfigurationProvider;
         IProducer<Null, string> _producer;
 
-        public ErmesKafkaManager(IErmesBusConfigurationProvider busConfigurationProvider)
+        public KafkaProducer(
+                IBusConfigurationProvider busConfigurationProvider
+            )
         {
             _busConfigurationProvider = busConfigurationProvider;
             _producer = new ProducerBuilder<Null, string>(new ProducerConfig { BootstrapServers = _busConfigurationProvider.GetConnectionString() }).Build();
@@ -24,10 +20,10 @@ namespace Abp.Bus.Kafka
 
         public async Task<bool> Publish(string topic, string message)
         {
-            using (CancellationTokenSource tokenSource = new CancellationTokenSource(2000))
+            using (CancellationTokenSource tokenSource = new CancellationTokenSource(4000))
             {
                 return (await _producer.ProduceAsync(topic, new Message<Null, string> { Value = message }, tokenSource.Token)).Status != PersistenceStatus.NotPersisted;
             }
-        }        
+        }   
     }
 }

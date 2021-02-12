@@ -4,7 +4,6 @@ using Ermes.Enums;
 using Ermes.Notifications;
 using Ermes.Notifiers;
 using Ermes.Persons;
-using Abp.Bus;
 using Ermes.Helpers;
 using System;
 using System.Collections.Generic;
@@ -21,13 +20,6 @@ namespace Ermes.Notifiers
         private readonly INotifierBase _notifierBase;
         private readonly PersonManager _personManager;
         private readonly NotificationManager _notificationManager;
-
-        private class BusDto<T>
-        {
-            public EntityType EntityType { get; set; }
-            public EntityWriteAction EntityWriteAction { get; set; }
-            public T Content { get; set; }
-        }
 
         public NotifierService(
                 INotifierBase notifierBase,

@@ -1,11 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Abp" Version="5.10.1" />
+    <PackageReference Include="Abp" Version="5.13.0" />
     <PackageReference Include="Confluent.Kafka" Version="1.5.1" />
   </ItemGroup>
 
