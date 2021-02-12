@@ -122,7 +122,7 @@ namespace Ermes.Consumers
                                 //Need to update status before sending the notification
                                 CurrentUnitOfWork.SaveChanges();
 
-                                //AsyncHelper.RunSync(() => _notifierService.SendBusNotification(person.Id, eventData.Content.Id, eventData.Content, eventData.EntityWriteAction, eventData.EntityType));
+                                AsyncHelper.RunSync(() => _notifierService.SendBusNotification(person.Id, eventData.Content.Id, eventData.Content, eventData.EntityWriteAction, eventData.EntityType));
                             }
                             else
                                 Logger.ErrorFormat("Invalid new status ({0}) for mission {1}", eventData.Content.Status, eventData.Content.Id);

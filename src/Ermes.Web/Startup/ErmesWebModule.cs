@@ -16,8 +16,8 @@ namespace Ermes.Web.Startup
         typeof(ErmesApplicationModule), 
         typeof(ErmesEntityFrameworkCoreModule), 
         typeof(AbpAspNetCoreModule),
-        typeof(BusConsumerModule),
-        typeof(AbpAzureCognitiveServicesModule)
+        typeof(AbpAzureCognitiveServicesModule),
+        typeof(BusConsumerModule)
     )]
     public class ErmesWebModule : AbpModule
     {
