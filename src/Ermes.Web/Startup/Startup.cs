@@ -28,7 +28,6 @@ using Abp.BusProducer;
 using Abp.BusConsumer;
 using Abp.BusConsumer.Kafka;
 using Abp.BusConsumer.RabbitMq;
-using Abp.Bus;
 using Abp.AzureCognitiveServices;
 
 namespace Ermes.Web.Startup
