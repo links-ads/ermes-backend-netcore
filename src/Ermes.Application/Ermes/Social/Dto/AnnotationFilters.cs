@@ -6,15 +6,14 @@ using System.Text;
 
 namespace Ermes.Social.Dto
 {
-    public class AnnotationFilters
+    public class AnnotationFilters : SocialPaginationInput
     {
-        public int? Limit { get; set; }
-        public int? Page { get; set; }
-        public SocialModuleLanguageType Language { get; set; }
+        public List<SocialModuleLanguageType> Languages { get; set; }
         public bool? Informative { get; set; }
         public DateTime? Start { get; set; }
         public DateTime? End { get; set; }
-        public List<string> Labels { get; set; }
+        public List<int> Infotypes { get; set; }
+        public List<int> Hazards { get; set; }
 
         [MaxLength(2), MinLength(2)]
         public List<float> SouthWest { get; set; }

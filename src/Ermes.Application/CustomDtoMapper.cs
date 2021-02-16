@@ -44,9 +44,9 @@ using Ermes.GeoJson.Dto;
 using NetTopologySuite.IO;
 using Ermes.Enums;
 using Ermes.Social.Dto;
-using Abp.ErmesSocialNetCore.Model;
 using Ermes.Categories;
 using Ermes.Helpers;
+using Abp.SocialMedia.Model;
 
 namespace Ermes
 {
@@ -152,10 +152,9 @@ namespace Ermes
                             .ForMember(r => r.Default, options => options.MapFrom(ar => ar.isDefault))
                             .ForMember(r => r.SuperRole, options => options.MapFrom(ar => ar.isSuperRole));
             configuration.CreateMap<AnnotationFilters, AnnotationQuery>()
-                            .ForMember(r => r.Language, options => options.MapFrom(a => a.Language == SocialModuleLanguageType.none ? null : a.Language.ToString().ToLower()))
+                            .ForMember(r => r.Languages, options => options.MapFrom(a => a.Languages.Select(l => l.ToString()).ToList()))
                             .ReverseMap();
-            configuration.CreateMap<LabelFilters, LabelQuery>()
-                            .ForMember(r => r.Task, options => options.MapFrom(a => a.Task == SocialModuleTaskType.none ? null : a.Task.ToString().ToLower()))
+            configuration.CreateMap<EventFilters, EventQuery>()
                             .ReverseMap();
             configuration.CreateMap<Person, PersonDto>()
                             .ForMember(r => r.TeamName, options => options.MapFrom(a => a.TeamId.HasValue ? a.Team.Name : string.Empty))

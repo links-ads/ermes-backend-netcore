@@ -1,5 +1,5 @@
-﻿using Abp.ErmesSocialNetCore.Model;
-using Abp.ErmesSocialNetCore.Social;
+﻿using Abp.SocialMedia;
+using Abp.SocialMedia.Model;
 using Abp.UI;
 using Ermes.Attributes;
 using Ermes.Dto;
@@ -11,11 +11,10 @@ using System.Threading.Tasks;
 namespace Ermes.Social
 {
     [ErmesAuthorize]
-    [ErmesIgnoreApi(true)]
     public class SocialAppService : ErmesAppServiceBase, ISocialAppService
     {
-        private readonly SocialManager _socialManager;
-        public SocialAppService(SocialManager socialManager)
+        private readonly SocialMediaManager _socialManager;
+        public SocialAppService(SocialMediaManager socialManager)
         {
             _socialManager = socialManager;
         }
@@ -23,17 +22,18 @@ namespace Ermes.Social
         #region Annotations
         [OpenApiOperation("Get Annotations",
             @"
-                Retrieves a paged list of annotated tweets and associated media and authors
+                Retrieves a paged list of tweets, with their respective author, media and annotations (classifications, entities)
                 Input: use the following properties to filter result list:
-                    -Page: which page to retrieve (optional)
-                    -Limit: how many instances per page (optional)
-                    -Start: date and time lower bound (optional) (default: today - 2d) (max time window: 4 days)
-                    -End: date and time upper bound (optional) (default: now) (max time window: 4 days)
-                    -Language: language of the tweet (optional)
-                    -Informative: retrieve only informative (or not informative) tweets (optional)
-                    -Labels: retrieve only a specific set of comma-separated labels. Refer to the 'name' field in /app/Social/GetLabels for the complete list. The labels allow to filter for hazard type and information type. (optional)
-                    -SouthWest: bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional) (to be filled together with NorthEast property)
-                    -NorthEast: top-right corner of the bounding box for a spatial query, in (lon, lat) format. (optional) (to be filled together with SouthWest property)
+                    - Page: which page to retrieve (optional)
+                    - Limit: how many instances per page (optional)
+                    - Start: date and time lower bound (optional) (default: end - 24h)
+                    - End: date and time upper bound (optional) (default: now)
+                    - Languages: list of languages in BCP47 format (optional)
+                    - Informative: retrieve only informative (or not informative) tweets (optional)
+                    - Hazards: retrieve only a specific set of comma-separated hazard types. Refer to the 'id' field in 'GetLabels' api for the complete list, filtering by task=hazard_type (optional)
+                    - Infotypes : retrieve only a specific set of comma-separated information types. Refer to the 'id' field in 'GetLabels' api for the complete list, filtering by task=information_type (optional)
+                    - SouthWest: bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional) (to be filled together with NorthEast property)
+                    - NorthEast: top-right corner of the bounding box for a spatial query, in (lon, lat) format. (optional) (to be filled together with SouthWest property)
                 Exception: thrown when fails to make API call
                 Output: Pagination Dto with list of Items
             "
@@ -54,12 +54,12 @@ namespace Ermes.Social
         #endregion
 
         #region Authors
-        [OpenApiOperation("Get auhtors",
+        [OpenApiOperation("Get authors",
             @"
                 Gets a paged list of authors
                 Input: use the following properties to filter result list:
-                    -Page: which page to retrieve (optional)
-                    -Limit: how many instances per page (optional)
+                    - Page: which page to retrieve (optional)
+                    - Limit: how many instances per page (optional)
                 Exception: thrown when fails to make API call
                 Output: Pagination Dto with list of Items
             "
@@ -99,13 +99,66 @@ namespace Ermes.Social
         }
         #endregion
 
+        #region Events
+        [OpenApiOperation("Get Events",
+            @"
+                Gets a list of events
+                Input: use the following properties to filter result list:
+                    - Page: which page to retrieve (optional)
+                    - Limit: how many instances per page (optional)
+                    - Start: date and time lower bound (optional) (default: end - 24h)
+                    - End: date and time upper bound (optional) (default: now)
+                    - Verified: filter for verified tweets (optional)
+                    - Hazards: retrieve only a specific set of comma-separated hazard types. Refer to the 'id' field in 'GetLabels' api for the complete list, filtering by task=hazard_type (optional)
+                    - SouthWest: bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional) (to be filled together with NorthEast property)
+                    - NorthEast: top-right corner of the bounding box for a spatial query, in (lon, lat) format. (optional) (to be filled together with SouthWest property)
+                Exception: thrown when fails to make API call
+                Output: Pagination Dto with list of Items
+            "
+        )]
+        public virtual async Task<Pagination> GetEvents(GetEventsInput input)
+        {
+            try
+            {
+                EventQuery evQuery = ObjectMapper.Map<EventQuery>(input.Filters);
+                return await _socialManager.GetEvents(evQuery);
+            }
+            catch (System.Exception e)
+            {
+                throw new UserFriendlyException(e.Message);
+            }
+        }
+
+        [OpenApiOperation("Get Event by Id",
+            @"
+                Gets a single event
+                Input: the id of the event
+                Output: SocialItemOutput Dto with Event item
+            "
+        )]
+        public virtual async Task<SocialItemOutput<EventDetails>> GetEventById(IdInput<int> input)
+        {
+            try
+            {
+                return new SocialItemOutput<EventDetails>()
+                {
+                    Item = await _socialManager.GetEventById(input.Id)
+                };
+            }
+            catch (System.Exception e)
+            {
+                throw new UserFriendlyException(e.Message);
+            }
+        }
+        #endregion
+
         #region Labels
         [OpenApiOperation("Get labels",
             @"
                 Gets a paged list of labels entities.
                 Input: use the following properties to filter result list:
-                    -Task: Classification type (optional)
-                    -Operational: retrieve only operational labels (optional)
+                    - Task: Classification type (optional)
+                    - Operational: retrieve only operational labels (optional)
                 Exception: thrown when fails to make API call
                 Output: SocialPaginationOutput Dto with list of Items
             "
@@ -114,10 +167,12 @@ namespace Ermes.Social
         {
             try
             {
-                LabelQuery labelQuery = ObjectMapper.Map<LabelQuery>(input.Filters);
+                //Cannot use LabelQuery in GetLabels function.
+                //Wrong defifinition of Task property, there's no sync between enum member and enum type
+                //Deserialization in SMM throws an exception
                 return new GetLabelsOutput()
                 {
-                    Labels = await _socialManager.GetLabels(labelQuery)
+                    Labels = await _socialManager.GetLabels(input.Filters.Operational, input.Filters.Task == Enums.SocialModuleTaskType.none ? null : input.Filters.Task.ToString())
                 };
             }
             catch (System.Exception e)
@@ -153,8 +208,8 @@ namespace Ermes.Social
             @"
                 Gets a paged list of media entities.
                 Input: use the following properties to filter result list:
-                    -Page: which page to retrieve (optional)
-                    -Limit: how many instances per page (optional)
+                    - Page: which page to retrieve (optional)
+                    - Limit: how many instances per page (optional)
                 Exception: thrown when fails to make API call
                 Output: Pagination Dto with list of Items
             "
@@ -199,8 +254,8 @@ namespace Ermes.Social
             @"
                 Gets a paged list of tweets.
                 Input: use the following properties to filter result list:
-                    -Page: which page to retrieve (optional)
-                    -Limit: how many instances per page (optional)
+                    - Page: which page to retrieve (optional)
+                    - Limit: how many instances per page (optional)
                 Exception: thrown when fails to make API call
                 Output: Pagination Dto with list of Items
             "
@@ -231,6 +286,23 @@ namespace Ermes.Social
                 return new SocialItemOutput<Tweet>()
                 {
                     Item = await _socialManager.GetTweetById(input.Id)
+                };
+            }
+            catch (System.Exception e)
+            {
+                throw new UserFriendlyException(e.Message);
+            }
+        }
+        #endregion
+
+        #region Statistics
+        public virtual async Task<SocialItemOutput<Statistics>> GetStatistics(GetStatisticsInput input)
+        {
+            try
+            {
+                return new SocialItemOutput<Statistics>()
+                {
+                    Item = await _socialManager.GetStatistics(input.Start, input.End)
                 };
             }
             catch (System.Exception e)

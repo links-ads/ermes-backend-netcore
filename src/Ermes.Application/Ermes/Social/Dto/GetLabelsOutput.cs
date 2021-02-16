@@ -1,4 +1,4 @@
-﻿using Abp.ErmesSocialNetCore.Model;
+﻿using Abp.SocialMedia.Model;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
