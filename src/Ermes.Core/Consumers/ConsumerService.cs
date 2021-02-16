@@ -1,5 +1,6 @@
 ﻿using Abp.Domain.Uow;
 using Abp.Threading;
+using Ermes.Enums;
 using Ermes.Missions;
 using Ermes.Notifiers;
 using Ermes.Persons;
@@ -32,16 +33,16 @@ namespace Ermes.Consumers
             {
                 switch (eventData.EntityType)
                 {
-                    case Enums.EntityType.Communication:
+                    case EntityType.Communication:
                         break;
-                    case Enums.EntityType.Mission:
+                    case EntityType.Mission:
                         HandleMissionMessage(eventData);
                         break;
-                    case Enums.EntityType.ReportRequest:
+                    case EntityType.ReportRequest:
                         break;
-                    case Enums.EntityType.Report:
+                    case EntityType.Report:
                         break;
-                    case Enums.EntityType.Person:
+                    case EntityType.Person:
                         break;
                     default:
                         break;
@@ -55,13 +56,13 @@ namespace Ermes.Consumers
         {
             switch (eventData.EntityWriteAction)
             {
-                case Enums.EntityWriteAction.Create:
+                case EntityWriteAction.Create:
                     break;
-                case Enums.EntityWriteAction.Update:
+                case EntityWriteAction.Update:
                     break;
-                case Enums.EntityWriteAction.Delete:
+                case EntityWriteAction.Delete:
                     break;
-                case Enums.EntityWriteAction.StatusChange:
+                case EntityWriteAction.StatusChange:
                     var content = JsonConvert.DeserializeObject<MissionChangeStatusDto>(eventData.Content.ToString());
                     var data = new BusDto<MissionChangeStatusDto>()
                     {
@@ -98,34 +99,45 @@ namespace Ermes.Consumers
                     var mission = _missionManager.GetMissionById(eventData.Content.Id);
                     if (mission == null)
                     {
-                        Logger.ErrorFormat("ReadBusNotification: Mission with Id {0} not found", eventData.Content.Id);
+                        Logger.ErrorFormat("HandleMissionStatusChangeMessage: Mission with Id {0} not found", eventData.Content.Id);
                         return;
                     }
 
                     var person = _personManager.GetPersonByUsername(eventData.Content.Username);
                     if (person == null)
                     {
-                        Logger.ErrorFormat("ReadBusNotification: person with username {0} not found", eventData.Content.Username);
+                        Logger.ErrorFormat("HandleMissionStatusChangeMessage: person with username {0} not found", eventData.Content.Username);
                         return;
                     }
                     switch (eventData.EntityWriteAction)
                     {
-                        case Enums.EntityWriteAction.Create:
-                        case Enums.EntityWriteAction.Update:
-                        case Enums.EntityWriteAction.Delete:
+                        case EntityWriteAction.Create:
+                        case EntityWriteAction.Update:
+                        case EntityWriteAction.Delete:
                             break;
-                        case Enums.EntityWriteAction.StatusChange:
-                            if (_missionManager.CheckNewStatus(mission.CurrentStatus, eventData.Content.Status))
+                        case EntityWriteAction.StatusChange:
+                            if (_missionManager.CheckNewStatus(MissionStatusType.Created, eventData.Content.Status))
                             {
+                                Console.WriteLine(mission.CurrentStatus);
+                                Console.WriteLine(eventData.Content.Status);
                                 mission.CurrentStatus = eventData.Content.Status;
 
                                 //Need to update status before sending the notification
                                 CurrentUnitOfWork.SaveChanges();
-
+                                Logger.InfoFormat("Consumer Service is sending bus notification: {0} - {1} - {2}", eventData.EntityType, eventData.EntityWriteAction, eventData.Content.Id);
                                 AsyncHelper.RunSync(() => _notifierService.SendBusNotification(person.Id, eventData.Content.Id, eventData.Content, eventData.EntityWriteAction, eventData.EntityType));
+
+                                //Send notification to the chatbot
+                                string titleKey = "Notification_Mission_Update_Title";
+                                string bodyKey = "Notification_Mission_Update_Status_Body";
+                                string[] bodyParams = new string[] { mission.Title, eventData.Content.Status.ToString() };
+
+                                var receivers = _missionManager.GetMissionCoordinators(mission.CoordinatorPersonId, mission.CoordinatorTeamId, mission.OrganizationId);
+                                AsyncHelper.RunSync(() => _notifierService.SendUserNotification(mission.CreatorUserId.Value, receivers, mission.Id, (bodyKey, bodyParams), (titleKey, null), EntityWriteAction.StatusChange, EntityType.Mission));
+                                CurrentUnitOfWork.SaveChanges();
                             }
                             else
-                                Logger.ErrorFormat("Invalid new status ({0}) for mission {1}", eventData.Content.Status, eventData.Content.Id);
+                                Logger.ErrorFormat("Consumer Service: invalid new status ({0}) for mission {1}", eventData.Content.Status, eventData.Content.Id);
                             break;
                         default:
                             break;
@@ -133,7 +145,7 @@ namespace Ermes.Consumers
                 }
                 catch (Exception e)
                 {
-                    Logger.ErrorFormat("HandleMissionStatusChangeMessage exceptio: {0}", e.Message);
+                    Logger.ErrorFormat("HandleMissionStatusChangeMessage exception: {0}", e.Message);
                 }
 
                 unitOfWork.Complete();

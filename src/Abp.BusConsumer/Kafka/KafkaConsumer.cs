@@ -47,6 +47,8 @@ namespace Abp.BusConsumer.Kafka
                 try
                 {
                     var cr = kafkaConsumer.Consume(cancellationToken);
+                    Logger.LogInformation("------------------------- Bus Consumer Message Received-----------------------------");
+                    Logger.LogInformation("Message: {0}", cr.Message.Value);
                     _consumerService.ConsumeBusNotification(cr.Message.Value);
                 }
                 catch (OperationCanceledException e)
