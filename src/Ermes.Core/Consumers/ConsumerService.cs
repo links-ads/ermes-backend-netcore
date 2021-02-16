@@ -98,14 +98,14 @@ namespace Ermes.Consumers
                     var mission = _missionManager.GetMissionById(eventData.Content.Id);
                     if (mission == null)
                     {
-                        Logger.ErrorFormat("ReadBusNotification: Mission with Id {0} not found", eventData.Content.Id);
+                        Logger.ErrorFormat("HandleMissionStatusChangeMessage: Mission with Id {0} not found", eventData.Content.Id);
                         return;
                     }
 
                     var person = _personManager.GetPersonByUsername(eventData.Content.Username);
                     if (person == null)
                     {
-                        Logger.ErrorFormat("ReadBusNotification: person with username {0} not found", eventData.Content.Username);
+                        Logger.ErrorFormat("HandleMissionStatusChangeMessage: person with username {0} not found", eventData.Content.Username);
                         return;
                     }
                     switch (eventData.EntityWriteAction)
@@ -121,11 +121,11 @@ namespace Ermes.Consumers
 
                                 //Need to update status before sending the notification
                                 CurrentUnitOfWork.SaveChanges();
-
+                                Logger.InfoFormat("Consumer Service is sending bus notification: {0} - {1} - {2}", eventData.EntityType, eventData.EntityWriteAction, eventData.Content.Id);
                                 AsyncHelper.RunSync(() => _notifierService.SendBusNotification(person.Id, eventData.Content.Id, eventData.Content, eventData.EntityWriteAction, eventData.EntityType));
                             }
                             else
-                                Logger.ErrorFormat("Invalid new status ({0}) for mission {1}", eventData.Content.Status, eventData.Content.Id);
+                                Logger.ErrorFormat("Consumer Service: invalid new status ({0}) for mission {1}", eventData.Content.Status, eventData.Content.Id);
                             break;
                         default:
                             break;
@@ -133,7 +133,7 @@ namespace Ermes.Consumers
                 }
                 catch (Exception e)
                 {
-                    Logger.ErrorFormat("HandleMissionStatusChangeMessage exceptio: {0}", e.Message);
+                    Logger.ErrorFormat("HandleMissionStatusChangeMessage exception: {0}", e.Message);
                 }
 
                 unitOfWork.Complete();
