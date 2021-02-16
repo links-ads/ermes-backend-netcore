@@ -23,12 +23,12 @@ using io.fusionauth;
 using FusionAuthNetCore;
 using Abp;
 using Abp.Chatbot;
-using Abp.ErmesSocialNetCore;
 using Abp.BusProducer;
 using Abp.BusConsumer;
 using Abp.BusConsumer.Kafka;
 using Abp.BusConsumer.RabbitMq;
 using Abp.AzureCognitiveServices;
+using Abp.SocialMedia;
 
 namespace Ermes.Web.Startup
 {
@@ -74,7 +74,7 @@ namespace Ermes.Web.Startup
             services.Configure<AbpChatbotSettings>(
                 _appConfiguration.GetSection("Chatbot")
             );
-            services.Configure<AbpSocialSettings>(
+            services.Configure<AbpSocialMediaSettings>(
                 _appConfiguration.GetSection("Social")
             );
             services.Configure<BusProducerSettings>(

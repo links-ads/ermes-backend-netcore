@@ -1,5 +1,6 @@
 Ver.
 ----------------------------
+- Feature - Update of Social Media Module (#7)
 
 
 Ver. 1.4.7 - 2021-02-12
