@@ -123,6 +123,8 @@ namespace Ermes.Consumers
                                 CurrentUnitOfWork.SaveChanges();
                                 Logger.InfoFormat("Consumer Service is sending bus notification: {0} - {1} - {2}", eventData.EntityType, eventData.EntityWriteAction, eventData.Content.Id);
                                 AsyncHelper.RunSync(() => _notifierService.SendBusNotification(person.Id, eventData.Content.Id, eventData.Content, eventData.EntityWriteAction, eventData.EntityType));
+
+                                CurrentUnitOfWork.SaveChanges();
                             }
                             else
                                 Logger.ErrorFormat("Consumer Service: invalid new status ({0}) for mission {1}", eventData.Content.Status, eventData.Content.Id);
