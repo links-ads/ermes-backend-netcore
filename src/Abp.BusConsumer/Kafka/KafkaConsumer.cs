@@ -67,9 +67,9 @@ namespace Abp.BusConsumer.Kafka
                         break;
                     }
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    Logger.LogError($"Bus Consumer general Exception, BusConsumer shut down");
+                    Logger.LogError($"Bus Consumer general Exception: {e.Message}");
                     break;
                 }
             }
