@@ -5,6 +5,7 @@ namespace Abp.BusConsumer.Configuration
     {
         string GetConnectionString();        
         string GetGroupId();        
-        string[] GetTopicList();        
+        string[] GetTopicList();
+        bool IsEnabled();
     }
 }

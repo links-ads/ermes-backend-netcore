@@ -143,20 +143,21 @@ namespace Ermes.Web.Startup
                     new AspNetCoreOperationSecurityScopeProcessor("JWT"));
             });
 
-            switch (_appConfiguration["App:ErmesProject"])
+            if (bool.Parse(_appConfiguration["Bus:IsEnabled"]))
             {
-                case "FASTER":
-                case "SAFERS":
-                    services.AddHostedService<KafkaConsumer>();
-                    break;
-                case "SHELTER":
-                    services.AddHostedService<RabbitMqManager>();
-                    break;
-                default:
-                    break;
+                switch (_appConfiguration["App:ErmesProject"])
+                {
+                    case "FASTER":
+                    case "SAFERS":
+                        services.AddHostedService<KafkaConsumer>();
+                        break;
+                    case "SHELTER":
+                        services.AddHostedService<RabbitMqManager>();
+                        break;
+                    default:
+                        break;
+                }
             }
-
-
 
             //Configure Abp and Dependency Injection
             return services.AddAbp<ErmesWebModule>(options =>
