@@ -12,5 +12,6 @@
                 return Topics.Split(',');
             }
         }
+        public bool IsEnabled { get; set; }
     }
 }

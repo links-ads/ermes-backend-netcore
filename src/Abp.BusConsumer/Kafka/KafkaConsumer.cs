@@ -39,6 +39,12 @@ namespace Abp.BusConsumer.Kafka
 
         private void StartConsumerLoop(CancellationToken cancellationToken)
         {
+            if (!_busConfigurationProvider.IsEnabled())
+            {
+                Logger.LogInformation("------------------------- Bus Consumer Disabled-----------------------------");
+                return;
+            }
+
             Logger.LogInformation("------------------------- Start Bus Consumer -----------------------------");
             kafkaConsumer.Subscribe(topicList);
 

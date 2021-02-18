@@ -35,5 +35,13 @@ namespace Abp.BusConsumer.Configuration
 
             return _busSettings.Value.TopicList;
         }
+
+        public bool IsEnabled()
+        {
+            if (_busSettings == null || _busSettings.Value == null)
+                throw new ConfigurationErrorsException("Bus configuration errror");
+
+            return _busSettings.Value.IsEnabled;
+        }
     }
 }
