@@ -4,10 +4,14 @@ using System.Configuration;
 using Abp.BusConsumer.Kafka;
 using Abp.BusConsumer.RabbitMq;
 using Abp.BusConsumer.Configuration;
+using Ermes;
 
 namespace Abp.BusConsumer
 {
-    [DependsOn(typeof(AbpKernelModule))]
+    [DependsOn(
+        typeof(AbpKernelModule),
+        typeof(ErmesCoreModule)
+    )]
     public class BusConsumerModule : AbpModule
     {
         public override void PreInitialize()

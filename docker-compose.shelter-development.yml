@@ -18,6 +18,8 @@ services:
     container_name: 'shelter-web-${ENVTYPE_SHELTER_DEV}'
     networks:
       - shelter-net
+    volumes:
+      - shelterlogsdev:/app/App_Data/Logs/      
     env_file:
       - ./.env    
 
@@ -41,4 +43,7 @@ services:
 networks:
   shelter-net:
     name: shelter-net-${ENVTYPE_SHELTER_DEV}
+
+volumes:
+  shelterlogsdev:
 

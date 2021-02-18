@@ -28,25 +28,32 @@ namespace Ermes.Consumers
 
         public void ConsumeBusNotification(string message)
         {
-            var eventData = JsonConvert.DeserializeObject<BusDto<object>>(message);
-            if(eventData != null)
+            try
             {
-                switch (eventData.EntityType)
+                var eventData = JsonConvert.DeserializeObject<BusDto<object>>(message);
+                if (eventData != null)
                 {
-                    case EntityType.Communication:
-                        break;
-                    case EntityType.Mission:
-                        HandleMissionMessage(eventData);
-                        break;
-                    case EntityType.ReportRequest:
-                        break;
-                    case EntityType.Report:
-                        break;
-                    case EntityType.Person:
-                        break;
-                    default:
-                        break;
+                    switch (eventData.EntityType)
+                    {
+                        case EntityType.Communication:
+                            break;
+                        case EntityType.Mission:
+                            HandleMissionMessage(eventData);
+                            break;
+                        case EntityType.ReportRequest:
+                            break;
+                        case EntityType.Report:
+                            break;
+                        case EntityType.Person:
+                            break;
+                        default:
+                            break;
+                    }
                 }
+            }
+            catch(Exception e)
+            {
+                Logger.ErrorFormat("ConsumeBusNotification Exception: {0}", e.Message);
             }
 
             return;
@@ -54,27 +61,34 @@ namespace Ermes.Consumers
 
         private void HandleMissionMessage(BusDto<object> eventData)
         {
-            switch (eventData.EntityWriteAction)
+            try
             {
-                case EntityWriteAction.Create:
-                    break;
-                case EntityWriteAction.Update:
-                    break;
-                case EntityWriteAction.Delete:
-                    break;
-                case EntityWriteAction.StatusChange:
-                    var content = JsonConvert.DeserializeObject<MissionChangeStatusDto>(eventData.Content.ToString());
-                    var data = new BusDto<MissionChangeStatusDto>()
-                    {
-                        EntityType = eventData.EntityType,
-                        EntityWriteAction = eventData.EntityWriteAction,
-                        Content = content
-                    };
-                    
-                    HandleMissionStatusChangeMessage(data);
-                    break;
-                default:
-                    break;
+                switch (eventData.EntityWriteAction)
+                {
+                    case EntityWriteAction.Create:
+                        break;
+                    case EntityWriteAction.Update:
+                        break;
+                    case EntityWriteAction.Delete:
+                        break;
+                    case EntityWriteAction.StatusChange:
+                        var content = JsonConvert.DeserializeObject<MissionChangeStatusDto>(eventData.Content.ToString());
+                        var data = new BusDto<MissionChangeStatusDto>()
+                        {
+                            EntityType = eventData.EntityType,
+                            EntityWriteAction = eventData.EntityWriteAction,
+                            Content = content
+                        };
+
+                        HandleMissionStatusChangeMessage(data);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.ErrorFormat("HandleMissionMessage Exception: {0}", e.Message);
             }
 
         }
