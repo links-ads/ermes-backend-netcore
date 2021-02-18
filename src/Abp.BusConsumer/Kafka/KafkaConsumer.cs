@@ -53,23 +53,18 @@ namespace Abp.BusConsumer.Kafka
                 }
                 catch (OperationCanceledException e)
                 {
-                    Logger.LogError($"Bus Consumer OperationCanceledException: {e.Message}");
+                    Logger.LogError($"-----------------Bus Consumer OperationCanceledException: {e.Message}");
+                    break;
                 }
                 catch (ConsumeException e)
                 {
                     // Consumer errors should generally be ignored (or logged) unless fatal.
-                    Logger.LogError($"Bus Consumer ConsumeException error: {e.Error.Reason}");
-
-                    if (e.Error.IsFatal)
-                    {
-                        Logger.LogError($"Bus Consumer ConsumeException error is Fatal, BusConsumer shut down");
-                        // https://github.com/edenhill/librdkafka/blob/master/INTRODUCTION.md#fatal-consumer-errors
-                        break;
-                    }
+                    Logger.LogError($"-----------------Bus Consumer ConsumeException error: {e.Error.Reason}");
+                    break;
                 }
                 catch (Exception e)
                 {
-                    Logger.LogError($"Bus Consumer general Exception: {e.Message}");
+                    Logger.LogError($"-----------------Bus Consumer general Exception: {e.Message}");
                     break;
                 }
             }

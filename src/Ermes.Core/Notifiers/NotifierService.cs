@@ -72,6 +72,28 @@ namespace Ermes.Notifiers
             not.Id = await _notificationManager.CreateNotificationAsync(not);
         }
 
+        public async Task SendTestBusNotification<T>(long creatorId, int entityId, T content, EntityWriteAction action, EntityType entityType, string topicName)
+        {
+            BusDto<T> busPayload = new BusDto<T>
+            {
+                Content = content,
+                EntityType = entityType,
+                EntityWriteAction = action
+            };
+            var options = new JsonSerializerOptions();
+            options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+
+            string serializedPayload = JsonSerializer.Serialize(busPayload, options);
+
+            try
+            {
+                await _notifierBase.SendBusNotificationAsync(topicName, serializedPayload);
+            }
+            catch (Exception ex)
+            {
+                Logger.ErrorFormat("Ermes: Failure to send bus message for {1} {2} due exception {3}. EntityId: {0}", entityId, action.ToString(), entityType.ToString(), ex.Message);
+            }
+        }
 
         public async Task SendUserNotification(long creatorId, IEnumerable<Person> receivers, int entityId, (string Key, string[] Params) body, (string Key, string[] Params) title, EntityWriteAction action, EntityType entityType)
         {

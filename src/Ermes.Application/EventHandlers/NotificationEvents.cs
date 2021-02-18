@@ -105,7 +105,7 @@ namespace Ermes.EventHandlers
         }
     }
 
-    public class MissionNotificationEventHandler : IAsyncEventHandler<NotificationEvent<MissionNotificationDto>>, ITransientDependency
+    public class MissionNotificationEventHandler : IAsyncEventHandler<NotificationEvent<MissionNotificationDto>>, IAsyncEventHandler<NotificationEvent<MissionNotificationTestDto>>, ITransientDependency
     {
         private readonly NotifierService _notifierService;
         private readonly MissionManager _missionManager;
@@ -150,6 +150,12 @@ namespace Ermes.EventHandlers
 
             var receivers = _missionManager.GetMissionCoordinators(eventData.Content.CoordinatorPersonId, eventData.Content.CoordinatorTeamId, eventData.Content.OrganizationId);
             await _notifierService.SendUserNotification(eventData.CreatorId, receivers, eventData.EntityId, (bodyKey, bodyParams), (titleKey, null), eventData.Action, EntityType.Mission);
+        }
+
+        [UnitOfWork]
+        public virtual async Task HandleEventAsync(NotificationEvent<MissionNotificationTestDto> eventData)
+        {
+            await _notifierService.SendTestBusNotification(eventData.CreatorId, eventData.EntityId, eventData.Content, eventData.Action, EntityType.Mission, eventData.Content.TopicName);
         }
     }
 

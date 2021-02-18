@@ -130,14 +130,26 @@ namespace Ermes.Consumers
                         case EntityWriteAction.Delete:
                             break;
                         case EntityWriteAction.StatusChange:
-                            if (_missionManager.CheckNewStatus(MissionStatusType.Created, eventData.Content.Status))
+                            if (_missionManager.CheckNewStatus(mission.CurrentStatus, eventData.Content.Status))
                             {
                                 mission.CurrentStatus = eventData.Content.Status;
 
                                 //Need to update status before sending the notification
                                 CurrentUnitOfWork.SaveChanges();
+                                MissionNotification content = new MissionNotification
+                                {
+                                    CoordinatorPersonId = mission.CoordinatorPersonId,
+                                    CoordinatorTeamId = mission.CoordinatorTeamId,
+                                    Description = mission.Description, 
+                                    Id = mission.Id,
+                                    Notes = mission.Notes,
+                                    OrganizationId = mission.OrganizationId,
+                                    Status = mission.CurrentStatus,
+                                    Title = mission.Title,
+                                    Duration = mission.Duration
+                                };
                                 Logger.InfoFormat("Consumer Service is sending bus notification: {0} - {1} - {2}", eventData.EntityType, eventData.EntityWriteAction, eventData.Content.Id);
-                                AsyncHelper.RunSync(() => _notifierService.SendBusNotification(person.Id, eventData.Content.Id, eventData.Content, eventData.EntityWriteAction, eventData.EntityType));
+                                AsyncHelper.RunSync(() => _notifierService.SendBusNotification(person.Id, eventData.Content.Id, content, eventData.EntityWriteAction, eventData.EntityType));
 
                                 //Send notification to the chatbot
                                 string titleKey = "Notification_Mission_Update_Title";
