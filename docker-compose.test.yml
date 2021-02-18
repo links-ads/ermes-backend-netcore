@@ -18,6 +18,8 @@ services:
     container_name: 'faster-web-${ENVTYPE_TEST}'
     networks:
       - faster-net
+    volumes:
+      - fasterlogstest:/app/App_Data/Logs/
     env_file:
       - ./.env
 
@@ -41,3 +43,6 @@ services:
 networks:
   faster-net:
     name: faster-net-${ENVTYPE_TEST}
+
+volumes:
+  fasterlogstest:

@@ -18,6 +18,8 @@ services:
     container_name: 'faster-web-${ENVTYPE_DEV}'
     networks:
       - faster-net
+    volumes:
+      - fasterlogsdev:/app/App_Data/Logs/
     env_file:
       - ./.env    
 
@@ -41,4 +43,7 @@ services:
 networks:
   faster-net:
     name: faster-net-${ENVTYPE_DEV}
+
+volumes:
+  fasterlogsdev:
 
