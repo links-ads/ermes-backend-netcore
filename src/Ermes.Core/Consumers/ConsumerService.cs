@@ -132,8 +132,6 @@ namespace Ermes.Consumers
                         case EntityWriteAction.StatusChange:
                             if (_missionManager.CheckNewStatus(MissionStatusType.Created, eventData.Content.Status))
                             {
-                                Console.WriteLine(mission.CurrentStatus);
-                                Console.WriteLine(eventData.Content.Status);
                                 mission.CurrentStatus = eventData.Content.Status;
 
                                 //Need to update status before sending the notification
