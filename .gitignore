@@ -117,6 +117,7 @@ src/.vs/config/applicationhost.config
 
 #Ermes ignore
 src/Ermes.Web/appsettings.*
+src/Ermes.Web/app.config
 src/Ermes.Web/firebasekey*
 src/Ermes.Web/wwwroot/Temp/Downloads/*
 *.env
