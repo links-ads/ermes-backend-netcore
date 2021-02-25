@@ -7,7 +7,6 @@ using Ermes.Dto.Datatable;
 using Ermes.Dto.Spatial;
 using Ermes.Helpers;
 using Ermes.Linq.Extensions;
-using Ermes.Persons;
 using Ermes.ReportRequests;
 using Ermes.Reports.Dto;
 using NpgsqlTypes;
@@ -19,7 +18,6 @@ using Ermes.Dto;
 using NetTopologySuite.IO;
 using Microsoft.EntityFrameworkCore;
 using NSwag.Annotations;
-using Ermes.Notifiers;
 using Ermes.Enums;
 using Ermes.EventHandlers;
 using Abp.BackgroundJobs;
@@ -36,7 +34,6 @@ namespace Ermes.Reports
         private readonly ReportManager _reportManager;
         private readonly ReportRequestManager _reportRequestManager;
         private readonly ErmesAppSession _session;
-        private readonly IReportBulkRepository _reportBulkRepository;
         private readonly IGeoJsonBulkRepository _geoJsonBulkRepository;
         private readonly IBackgroundJobManager _backgroundJobManager;
 
@@ -44,7 +41,6 @@ namespace Ermes.Reports
             CategoryManager categoryManager, 
             ReportManager reportManager, 
             ReportRequestManager reportRequestManager,
-            IReportBulkRepository reportBulkRepository,
             IGeoJsonBulkRepository geoJsonBulkRepository,
             ErmesAppSession session,
             IBackgroundJobManager backgroundJobManager
@@ -54,7 +50,6 @@ namespace Ermes.Reports
             _reportManager = reportManager;
             _session = session;
             _reportRequestManager = reportRequestManager;
-            _reportBulkRepository = reportBulkRepository;
             _backgroundJobManager = backgroundJobManager;
             _geoJsonBulkRepository = geoJsonBulkRepository;
         }
@@ -69,7 +64,7 @@ namespace Ermes.Reports
             return rr;
         }
 
-        private async Task<PagedResultDto<ReportDto>> InternalGetReports(GetReportsInput input, bool filterByOrganization = true)
+        private async Task<PagedResultDto<ReportDto>> InternalGetReports(GetReportsInput input)
         {
             PagedResultDto<ReportDto> result = new PagedResultDto<ReportDto>();
             IQueryable<Report> query;
@@ -114,9 +109,7 @@ namespace Ermes.Reports
             query = query.DTFilterBy(input);
 
             var person = _session.LoggedUserPerson;
-
-            if (filterByOrganization && person.OrganizationId.HasValue)
-                query = query.DataOwnership(new List<int>() { person.OrganizationId.Value });
+            query = query.DataOwnership(person.OrganizationId.HasValue ? new List<int>() { person.OrganizationId.Value } : null);
 
             if (input.FilterByCreator)
                 query = query.Where(r => r.CreatorUserId.HasValue && r.CreatorUserId.Value == person.Id);
@@ -142,7 +135,7 @@ namespace Ermes.Reports
             return result;
         }
 
-        private async Task<PagedResultDto<ReportRequestDto>> InternalGetReportRequests(GetReportRequestsInput input, bool filterByOrganization = true)
+        private async Task<PagedResultDto<ReportRequestDto>> InternalGetReportRequests(GetReportRequestsInput input)
         {
             PagedResultDto<ReportRequestDto> result = new PagedResultDto<ReportRequestDto>();
             IQueryable<ReportRequest> query;
@@ -161,9 +154,7 @@ namespace Ermes.Reports
             query = query.DTFilterBy(input);
 
             var person = _session.LoggedUserPerson;
-
-            if (filterByOrganization && person.OrganizationId.HasValue)
-                query = query.DataOwnership(new List<int>() { person.OrganizationId.Value });
+            query = query.DataOwnership(person.OrganizationId.HasValue ? new List<int>() { person.OrganizationId.Value } : null);
 
             result.TotalCount = await query.CountAsync();
 

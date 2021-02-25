@@ -93,8 +93,11 @@ namespace Ermes.Missions
 
             var currentUserPerson = _session.LoggedUserPerson;
 
+            //List of Missions available only for pro users
             if (filterByOrganization && currentUserPerson.OrganizationId.HasValue)
                 query = query.DataOwnership(new List<int>() { currentUserPerson.OrganizationId.Value });
+            else
+                return result;
 
             result.TotalCount = await query.CountAsync();
 
