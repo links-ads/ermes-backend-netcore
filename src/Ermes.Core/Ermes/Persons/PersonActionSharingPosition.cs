@@ -10,7 +10,6 @@ namespace Ermes.Persons
     {
         public PersonActionSharingPosition()
         {
-            Visibility = VisibilityType.Private;
         }
     }
 }

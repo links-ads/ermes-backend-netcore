@@ -18,6 +18,5 @@ namespace Ermes.Reports.Dto
         public int? OrganizationId { get; set; }
         public List<int> SelectedCategories { get; set; }
         public PointPosition Centroid { get; set; }
-        public VisibilityType Visibility { get; set; }
     }
 }

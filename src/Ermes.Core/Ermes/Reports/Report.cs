@@ -16,14 +16,13 @@ using System.Text;
 namespace Ermes.Reports
 {
     [Table("reports")]
-    public class Report : AuditedEntity, IVisibility
+    public class Report : AuditedEntity
     {
         public const int MaxDescriptionLength = 1000;
         public const int MaxNotesLength = 1000;
 
         public Report()
         {
-            Visibility = VisibilityType.Private;
         }
 
         [Column("Hazard")]
@@ -58,7 +57,6 @@ namespace Ermes.Reports
         public List<ReportTarget> Targets { get; set; }
         [ForeignKey("CreatorUserId")]
         public Person Creator { get; set; }
-        public VisibilityType Visibility { get; set; }
 
         [Column("Source")]
         public string SourceString

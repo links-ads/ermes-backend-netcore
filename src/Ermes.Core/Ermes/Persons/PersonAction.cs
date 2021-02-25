@@ -13,7 +13,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Ermes.Persons
 {
     [Table("person_actions")]
-    public abstract class PersonAction : AuditedEntity, IVisibility
+    public abstract class PersonAction : AuditedEntity
     {
         public const int MaxDeviceIdLength = 100;
         public const int MaxDeviceNameLength = 255;
@@ -43,7 +43,6 @@ namespace Ermes.Persons
         public Person Person { get; set; }
         public long PersonId { get; set; }
 
-        public VisibilityType Visibility { get; set; }
 
         [ForeignKey("CurrentActivityId")]
         public virtual Activity CurrentActivity { get; set; }

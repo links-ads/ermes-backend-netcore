@@ -118,7 +118,7 @@ namespace Ermes.GeoJson
                         null as ""statusFilter"",
                         0 as ""activityFilter""
                     from public.missions m
-                    join public.organizations o on o.""Id"" = m.""OrganizationId""
+                    left join public.organizations o on o.""Id"" = m.""OrganizationId""
                     join public.persons p on p.""Id"" = m.""CreatorUserId""
                     union
                     select 
@@ -139,7 +139,7 @@ namespace Ermes.GeoJson
                         0 as ""activityFilter""
                     from public.communications c
                     join public.persons p on p.""Id"" = c.""CreatorUserId""
-                    join public.organizations o on o.""Id"" = p.""OrganizationId""
+                    left join public.organizations o on o.""Id"" = p.""OrganizationId""
                     union
                     select 
                         r.""Id"" as ""id"", 
@@ -159,7 +159,7 @@ namespace Ermes.GeoJson
                         0 as ""activityFilter""
                     from public.reports r 
                     join public.persons p on p.""Id"" = r.""CreatorUserId""
-                    join public.organizations o on o.""Id"" = p.""OrganizationId""
+                    left join public.organizations o on o.""Id"" = p.""OrganizationId""
                     union 
                     select 
                         r2.""Id"" as ""id"", 
@@ -179,7 +179,7 @@ namespace Ermes.GeoJson
                         0 as ""activityFilter""
                     from public.reportrequests r2 
                     join public.persons p on p.""Id"" = r2.""CreatorUserId""
-                    join public.organizations o on o.""Id"" = p.""OrganizationId""
+                    left join public.organizations o on o.""Id"" = p.""OrganizationId""
                     union
                     SELECT 
                         pa.""Id"" as ""id"",
@@ -204,7 +204,7 @@ namespace Ermes.GeoJson
                         ) r
                     INNER JOIN person_actions pa ON pa.""PersonId"" = r.""PersonId"" and r.""MaxTime"" = pa.""Timestamp""
                     join public.persons p on p.""Id"" = pa.""PersonId""
-                    join public.organizations o on o.""Id"" = p.""OrganizationId""
+                    left join public.organizations o on o.""Id"" = p.""OrganizationId""
                     left join public.activities a on a.""Id"" = pa.""CurrentActivityId""
                     left join public.activity_translations at2 on at2.""CoreId"" = pa.""CurrentActivityId""
                     where (at2.""Language"" = @language or at2.""Language"" is null)
@@ -244,13 +244,15 @@ namespace Ermes.GeoJson
 
                 if (organizationIdList != null)
                 {
-                    command.CommandText += @" and tmp.""organizationId"" = any(array[@organizations])";
+                    command.CommandText += @" and tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationId"" is null";
                     var p = new NpgsqlParameter("@organizations", NpgsqlDbType.Array | NpgsqlDbType.Integer)
                     {
                         Value = organizationIdList
                     };
                     command.Parameters.Add(p);
                 }
+                else
+                    command.CommandText += @" and tmp.""organizationId"" is null";
 
                 if (statusTypes != null && statusTypes.Count > 0)
                 {
@@ -318,7 +320,7 @@ namespace Ermes.GeoJson
                     ) r
                     INNER JOIN person_actions pa ON pa.""PersonId"" = r.""PersonId"" and r.""MaxTime"" = pa.""Timestamp""
                     join public.persons p on p.""Id"" = pa.""PersonId""
-                    join public.organizations o on o.""Id"" = p.""OrganizationId""
+                    left join public.organizations o on o.""Id"" = p.""OrganizationId""
                     left join public.activities a on a.""Id"" = pa.""CurrentActivityId""
                     left join public.activity_translations at2 on at2.""CoreId"" = pa.""CurrentActivityId""
                     where (at2.""Language"" = @language or at2.""Language"" is null)
@@ -332,12 +334,16 @@ namespace Ermes.GeoJson
                 command.Parameters.Add(new NpgsqlParameter("@language", language));
                 if (organizationIdList != null)
                 {
-                    command.CommandText += @" and tmp.""OrganizationId"" = any(array[@organizations])";
+                    command.CommandText += @" and (tmp.""OrganizationId"" = any(array[@organizations]) or tmp.""OrganizationId"" is null)";
                     var p = new NpgsqlParameter("@organizations", NpgsqlDbType.Array | NpgsqlDbType.Integer)
                     {
                         Value = organizationIdList
                     };
                     command.Parameters.Add(p);
+                }
+                else //Get only citizen actions
+                {
+                    command.CommandText += @" and tmp.""OrganizationId"" is null";
                 }
 
                 if (boundingBox != null)
