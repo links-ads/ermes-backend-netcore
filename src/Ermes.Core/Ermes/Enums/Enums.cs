@@ -10,14 +10,7 @@ namespace Ermes.Enums
         Moving = 20,
         Active = 30
     }
-    [JsonConverter(typeof(StringEnumConverter))]
-    public enum VisibilityType
-    {
-        Unknown = 0,
-        Public = 10,
-        Private = 20,
-        Shared = 30
-    }
+
     [JsonConverter(typeof(StringEnumConverter))]
     public enum PersonActionType
     {

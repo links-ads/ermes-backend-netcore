@@ -17,7 +17,7 @@ using System.Text;
 namespace Ermes.Missions
 {
     [Table("missions")]
-    public class Mission : AuditedEntity, IVisibility
+    public class Mission : AuditedEntity
     {
         public const int MaxTitleLength = 255;
         public const int MaxDescriptionLength = 1000;
@@ -25,7 +25,6 @@ namespace Ermes.Missions
 
         public Mission()
         {
-            Visibility = VisibilityType.Private;
         }
         [Required]
         [StringLength(MaxTitleLength)]
@@ -58,7 +57,6 @@ namespace Ermes.Missions
 
         [StringLength(MaxNotesLength)]
         public string Notes { get; set; }
-        public VisibilityType Visibility { get; set; }
 
         [ForeignKey("CreatorUserId")]
         public Person CreatorPerson { get; set; }

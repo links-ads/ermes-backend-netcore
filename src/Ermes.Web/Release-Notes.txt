@@ -1,6 +1,7 @@
 Ver.
 ---------------------------
 - Bugfix - Fix CreatePersonAction bug (#14)
+- Feature - Citizen visibility management (migration added, prop Visibility removed) (#10)
 
 Ver. 1.4.9 - 2021-02-19
 ----------------------------

@@ -11,7 +11,6 @@ namespace Ermes.Persons
     {
         public PersonActionStatus()
         {
-            Visibility = VisibilityType.Private;
         }
 
         [Column("Status")]

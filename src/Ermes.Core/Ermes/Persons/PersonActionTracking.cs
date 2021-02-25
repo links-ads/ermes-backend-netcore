@@ -10,7 +10,6 @@ namespace Ermes.Persons
     {
         public PersonActionTracking()
         {
-            Visibility = VisibilityType.Private;
         }
 
         [Column(TypeName = "jsonb")]

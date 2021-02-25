@@ -60,7 +60,7 @@ namespace Ermes.Communications
             return comm;
         }
 
-        private async Task<PagedResultDto<CommunicationDto>> InternalGetCommunications(GetCommunicationsInput input, bool filterByOrganization = true)
+        private async Task<PagedResultDto<CommunicationDto>> InternalGetCommunications(GetCommunicationsInput input)
         {
             PagedResultDto<CommunicationDto> result = new PagedResultDto<CommunicationDto>();
 
@@ -80,9 +80,7 @@ namespace Ermes.Communications
             query = query.DTFilterBy(input);
 
             var person = _session.LoggedUserPerson;
-
-            if (filterByOrganization && person.OrganizationId.HasValue)
-                query = query.DataOwnership(new List<int>() { person.OrganizationId.Value });
+            query = query.DataOwnership(person.OrganizationId.HasValue ? new List<int>() { person.OrganizationId.Value } : null);
 
             result.TotalCount = await query.CountAsync();
 

@@ -19,7 +19,6 @@ namespace Ermes.Communications
         public const int MaxMessageLength = 1000;
         public Communication()
         {
-            Visibility = VisibilityType.Private;
         }
 
         [Required]
@@ -31,6 +30,5 @@ namespace Ermes.Communications
         public Geometry AreaOfInterest { get; set; }
         [ForeignKey("CreatorUserId")]
         public Person Creator { get; set; }
-        public VisibilityType Visibility { get; set; }
     }
 }

@@ -27,7 +27,7 @@ namespace Ermes.Linq.Extensions
         {
 
             if (organizationIdList == null || organizationIdList.Count == 0)
-                return query;
+                organizationIdList = null;
 
             query = ResolveDataOwnership(query, organizationIdList, person);
 
@@ -69,7 +69,7 @@ namespace Ermes.Linq.Extensions
             public IQueryable<Person> Resolve(IQueryable<Person> query, List<int> organizationIdList, IPersonBase person)
             {
                 return query
-                    .Where(p => p.OrganizationId.HasValue && organizationIdList.Contains(p.OrganizationId.Value));
+                        .Where(p => p.OrganizationId.HasValue && organizationIdList.Contains(p.OrganizationId.Value));
             }
         }
 
@@ -86,8 +86,16 @@ namespace Ermes.Linq.Extensions
         {
             public IQueryable<Report> Resolve(IQueryable<Report> query, List<int> organizationIdList, IPersonBase person)
             {
-                return query
-                    .Where(r => r.Creator.OrganizationId.HasValue && organizationIdList.Contains(r.Creator.OrganizationId.Value));
+                return organizationIdList == null
+                    ? query
+                            .Where(r => !r.Creator.OrganizationId.HasValue)
+                    : query
+                    .Where(r =>
+                                //Organization visibility
+                                (r.Creator.OrganizationId.HasValue && organizationIdList.Contains(r.Creator.OrganizationId.Value)) ||
+                                //User contents
+                                !r.Creator.OrganizationId.HasValue
+                            );
             }
         }
 
@@ -95,8 +103,16 @@ namespace Ermes.Linq.Extensions
         {
             public IQueryable<ReportRequest> Resolve(IQueryable<ReportRequest> query, List<int> organizationIdList, IPersonBase person)
             {
-                return query
-                    .Where(r => r.Creator.OrganizationId.HasValue && organizationIdList.Contains(r.Creator.OrganizationId.Value));
+                return organizationIdList == null
+                    ? query
+                            .Where(r => !r.Creator.OrganizationId.HasValue)
+                    : query
+                    .Where(r =>
+                                //Organization visibility
+                                (r.Creator.OrganizationId.HasValue && organizationIdList.Contains(r.Creator.OrganizationId.Value)) ||
+                                //User contents
+                                !r.Creator.OrganizationId.HasValue
+                            );
             }
         }
 
@@ -123,8 +139,16 @@ namespace Ermes.Linq.Extensions
         {
             public IQueryable<Communication> Resolve(IQueryable<Communication> query, List<int> organizationIdList, IPersonBase person)
             {
-                return query
-                    .Where(c => c.Creator.OrganizationId.HasValue && organizationIdList.Contains(c.Creator.OrganizationId.Value));
+                return organizationIdList == null
+                        ? query
+                                .Where(r => !r.Creator.OrganizationId.HasValue)
+                        : query
+                        .Where(r =>
+                                    //Organization visibility
+                                    (r.Creator.OrganizationId.HasValue && organizationIdList.Contains(r.Creator.OrganizationId.Value)) ||
+                                    //User contents
+                                    !r.Creator.OrganizationId.HasValue
+                                );
             }
         }
         #endregion

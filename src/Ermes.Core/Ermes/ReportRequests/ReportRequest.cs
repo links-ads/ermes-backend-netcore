@@ -20,7 +20,6 @@ namespace Ermes.ReportRequests
 
         public ReportRequest()
         {
-            Visibility = VisibilityType.Private;
         }
 
         [Required]
@@ -35,6 +34,5 @@ namespace Ermes.ReportRequests
         public Person Creator { get; set; }
         [Required]
         public List<int> SelectedCategories { get; set; } 
-        public VisibilityType Visibility { get; set; }
     }
 }

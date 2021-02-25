@@ -11,7 +11,6 @@ namespace Ermes.Persons
     {
         public PersonActionActivity()
         {
-            Visibility = VisibilityType.Private;
         }
 
         [ForeignKey("ActivityId")]
