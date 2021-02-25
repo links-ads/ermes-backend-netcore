@@ -1,3 +1,7 @@
+Ver.
+---------------------------
+- Bugfix - Fix CreatePersonAction bug (#14)
+
 Ver. 1.4.9 - 2021-02-19
 ----------------------------
 - Feature - Docker volume mapping for Logs (#11)

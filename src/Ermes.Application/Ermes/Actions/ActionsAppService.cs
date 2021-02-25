@@ -114,10 +114,12 @@ namespace Ermes.Actions
                 //Use last valid location if new input location is null or is equals to (0,0)
             {
                 //do not track if user is in Off status or new position is not valid
+                //lastAction == null means status == Off, so do not track
                 case PersonActionType.PersonActionSharingPosition:
                     if (
                          input.PersonAction.Latitude.HasValue &&
                          input.PersonAction.Longitude.HasValue &&
+                         lastAction != null &&
                          input.PersonAction.Timestamp > lastAction.Timestamp &&
                          lastAction.CurrentStatus != ActionStatusType.Off
                     )
