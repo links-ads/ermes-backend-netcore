@@ -37,7 +37,7 @@ namespace Abp.AzureCognitiveServices.CognitiveServices.ComputerVision
                 // Creating a list that defines the features to be extracted from the image. 
                 List<VisualFeatureTypes?> features = new List<VisualFeatureTypes?>()
                 {
-                    VisualFeatureTypes.Tags
+                    VisualFeatureTypes.Tags, VisualFeatureTypes.Adult
                 };
 
                 // Analyze the URL image 
@@ -59,7 +59,7 @@ namespace Abp.AzureCognitiveServices.CognitiveServices.ComputerVision
                 // Creating a list that defines the features to be extracted from the image. 
                 List<VisualFeatureTypes?> features = new List<VisualFeatureTypes?>()
                 {
-                    VisualFeatureTypes.Tags
+                    VisualFeatureTypes.Tags, VisualFeatureTypes.Adult
                 };
 
                 // Analyze the URL image 

@@ -279,6 +279,22 @@ namespace Ermes.Web.Controllers
                                     Confidence = t.Confidence
                                 }).ToList());
                             }
+                            if(imageAnalysis != null && imageAnalysis.Adult != null)
+                            {
+                                if (report.AdultInfo == null)
+                                    report.AdultInfo = new List<ReportAdultInfo>();
+
+                                var info = new ReportAdultInfo() { 
+                                    IsAdultContent = imageAnalysis.Adult.IsAdultContent,
+                                    IsGoryContent = imageAnalysis.Adult.IsGoryContent,
+                                    IsRacyContent = imageAnalysis.Adult.IsRacyContent,
+                                    AdultScore = imageAnalysis.Adult.AdultScore,
+                                    GoreScore = imageAnalysis.Adult.GoreScore,
+                                    RacyScore = imageAnalysis.Adult.RacyScore,
+                                    MediaURI = uploadedFileName
+                                };
+                                report.AdultInfo.Add(info);
+                            }
                         }
                         catch (Exception e)
                         {
@@ -335,6 +351,9 @@ namespace Ermes.Web.Controllers
 
                         //Delete Tags
                         report.Tags = report.Tags.Where(t => t.MediaURI != item).ToList();
+
+                        //Delete Adult Info
+                        report.AdultInfo= report.AdultInfo.Where(t => t.MediaURI != item).ToList();
                     }
                 }
             }

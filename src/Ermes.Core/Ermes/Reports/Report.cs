@@ -71,6 +71,9 @@ namespace Ermes.Reports
         [Column(TypeName = "jsonb")]
         public List<ReportTag> Tags { get; set; }
 
+        [Column(TypeName = "jsonb")]
+        public List<ReportAdultInfo> AdultInfo { get; set; }
+
         [NotMapped]
         public SourceDeviceType Source { get; set; }
         [NotMapped]
@@ -95,5 +98,16 @@ namespace Ermes.Reports
         public string MediaURI { get; set; }
         public double Confidence { get; set; }
         public string Name { get; set; }
+    }
+
+    public class ReportAdultInfo
+    {
+        public string MediaURI { get; set; }
+        public bool IsAdultContent { get; set; }
+        public bool IsRacyContent { get; set; }
+        public bool IsGoryContent { get; set; }
+        public double AdultScore { get; set; }
+        public double RacyScore { get; set; }
+        public double GoreScore { get; set; }
     }
 }

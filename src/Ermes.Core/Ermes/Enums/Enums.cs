@@ -129,7 +129,8 @@ namespace Ermes.Enums
         Unknown = 0,
         Chatbot = 10,
         Frontend = 20,
-        Smartwatch = 30
+        Smartwatch = 30,
+        AugmentedReality = 40
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
