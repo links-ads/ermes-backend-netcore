@@ -7,6 +7,7 @@ namespace Ermes.Reports.Dto
     public class CategoryGroupDto
     {
         public string Group { get; set; }
+        public string GroupIcon { get; set; }
         public List<CategoryDto> Categories { get; set; }
     }
 }

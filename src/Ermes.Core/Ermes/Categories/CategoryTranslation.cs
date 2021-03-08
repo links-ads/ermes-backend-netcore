@@ -32,6 +32,7 @@ namespace Ermes.Categories
         public Category Core { get; set; }
         public int CoreId { get; set; }
         public string Language { get; set; }
+        public string UnitOfMeasure { get; set; }
 
     }
 }
