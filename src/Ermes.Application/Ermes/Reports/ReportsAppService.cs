@@ -252,8 +252,8 @@ namespace Ermes.Reports
             var list = await _categoryManager.GetCategoriesAsync();
 
             res.Categories = list.Select(cat => ObjectMapper.Map<CategoryDto>(cat))
-                                .GroupBy(cat => cat.Group)
-                                .Select(g => new CategoryGroupDto { Group = g.Key, Categories = g.ToList() })
+                                .GroupBy(cat => new { cat.Group, cat.GroupIcon })
+                                .Select(g => new CategoryGroupDto { Group = g.Key.Group, Categories = g.ToList(), GroupIcon = g.Key.GroupIcon })
                                 .ToList();
 
             return res;

@@ -23,5 +23,6 @@ namespace Ermes.Reports.Dto
         public int MaxValue { get; set; }
         public string[] Values { get; set; }
         public string[] StatusValues { get; set; }
+        public string GroupIcon { get; set; }
     }
 }

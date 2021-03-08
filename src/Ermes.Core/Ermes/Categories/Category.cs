@@ -42,7 +42,6 @@ namespace Ermes.Categories
         public ICollection<CategoryTranslation> Translations { get; set; }
 
         #region Numeric
-        public string UnitOfMeasure { get; set; }
         public int MinValue { get; set; }
         public int MaxValue { get; set; }
         #endregion
@@ -50,5 +49,7 @@ namespace Ermes.Categories
         #region Range
         public string[] StatusValues { get; set; }
         #endregion
+
+        public string GroupIcon { get; set; }
     }
 }

@@ -116,14 +116,14 @@ namespace Ermes.Import
         #endregion
         public static async Task<ImportResultDto> ImportCategoriesAsync(string filename, string contentType, CategoryManager categoryManager, ErmesLocalizationHelper localizer, IActiveUnitOfWork context)
         {
-            IMultilanguageCategoryTable activities;
+            IMultilanguageCategoryTable categories;
             ImportResultDto result = new ImportResultDto();
             if (contentType == MimeTypeNames.ApplicationVndMsExcel || contentType == MimeTypeNames.ApplicationVndOpenxmlformatsOfficedocumentSpreadsheetmlSheet)
             {
                 FileInfo finfo = new FileInfo(filename);
                 ExcelPackage epack = new ExcelPackage(finfo);
                 epack.Compatibility.IsWorksheets1Based = false;
-                activities = new ExcelMultilanguageCategoryTable(epack.Workbook.Worksheets);
+                categories = new ExcelMultilanguageCategoryTable(epack.Workbook.Worksheets);
             }
             else
             {
@@ -131,7 +131,7 @@ namespace Ermes.Import
             }
 
             bool isFirstSheet = true;
-            foreach(ICategorySheet sheet in activities.Sheets)
+            foreach(ICategorySheet sheet in categories.Sheets)
             {
                 if(sheet.Language == IndexSheetName)
                 {
@@ -174,7 +174,7 @@ namespace Ermes.Import
                         cat.MinValue = row.GetInt("Min Value");
                         cat.Type = row.GetEnum<CategoryType>("Type");
                         cat.StatusValues = row.GetStringArray("Status Values");
-                        cat.UnitOfMeasure = row.GetString("Unit of Measure");                     
+                        cat.GroupIcon = row.GetString("Group Icon");
 
                         await categoryManager.InsertOrUpdateCategoryAsync(cat);
                         context.SaveChanges();
@@ -210,6 +210,7 @@ namespace Ermes.Import
                         catTrans.Language = sheet.Language.ToLower();
                         catTrans.Name = row.GetString("Name");
                         catTrans.Values = row.GetStringArray("Values");
+                        catTrans.UnitOfMeasure = row.GetString("Unit of Measure");
                         catTrans.CoreId = parentCat.Id;
 
                         // Check if other entities in this language have the same groupcode but a different translation for group, in that case update it
