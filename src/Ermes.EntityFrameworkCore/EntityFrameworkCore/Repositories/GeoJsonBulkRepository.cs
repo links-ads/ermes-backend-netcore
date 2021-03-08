@@ -244,7 +244,7 @@ namespace Ermes.GeoJson
 
                 if (organizationIdList != null)
                 {
-                    command.CommandText += @" and tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationId"" is null";
+                    command.CommandText += @" and (tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationId"" is null)";
                     var p = new NpgsqlParameter("@organizations", NpgsqlDbType.Array | NpgsqlDbType.Integer)
                     {
                         Value = organizationIdList
