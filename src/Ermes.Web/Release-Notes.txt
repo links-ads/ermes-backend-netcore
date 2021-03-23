@@ -1,5 +1,9 @@
 Ver.
 ---------------------------
+
+
+Ver. 1.5.1 - 2021-03-23
+---------------------------
 - Feature - Add AdultInfo prop to Report, but NOT in ReportDto (migration added) (#15)
 - Feature - Update of SocialAppService and SocialMedia SDK (#18)
 
