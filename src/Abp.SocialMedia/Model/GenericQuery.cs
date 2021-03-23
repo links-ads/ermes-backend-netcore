@@ -25,38 +25,100 @@ using OpenAPIDateConverter = Abp.SocialMedia.Client.OpenAPIDateConverter;
 namespace Abp.SocialMedia.Model
 {
     /// <summary>
-    /// EventQuery
+    /// GenericQuery
     /// </summary>
-    [DataContract(Name = "EventQuery")]
-    public partial class EventQuery : IEquatable<EventQuery>, IValidatableObject
+    [DataContract(Name = "GenericQuery")]
+    public partial class GenericQuery : IEquatable<GenericQuery>, IValidatableObject
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="EventQuery" /> class.
+        /// Defines Languages
+        /// </summary>
+        [JsonConverter(typeof(StringEnumConverter))]
+        public enum LanguagesEnum
+        {
+            /// <summary>
+            /// Enum En for value: en
+            /// </summary>
+            [EnumMember(Value = "en")]
+            En = 1,
+
+            /// <summary>
+            /// Enum It for value: it
+            /// </summary>
+            [EnumMember(Value = "it")]
+            It = 2,
+
+            /// <summary>
+            /// Enum Es for value: es
+            /// </summary>
+            [EnumMember(Value = "es")]
+            Es = 3,
+
+            /// <summary>
+            /// Enum Tr for value: tr
+            /// </summary>
+            [EnumMember(Value = "tr")]
+            Tr = 4,
+
+            /// <summary>
+            /// Enum Hr for value: hr
+            /// </summary>
+            [EnumMember(Value = "hr")]
+            Hr = 5,
+
+            /// <summary>
+            /// Enum Nl for value: nl
+            /// </summary>
+            [EnumMember(Value = "nl")]
+            Nl = 6,
+
+            /// <summary>
+            /// Enum Fi for value: fi
+            /// </summary>
+            [EnumMember(Value = "fi")]
+            Fi = 7,
+
+            /// <summary>
+            /// Enum El for value: el
+            /// </summary>
+            [EnumMember(Value = "el")]
+            El = 8,
+
+            /// <summary>
+            /// Enum Fr for value: fr
+            /// </summary>
+            [EnumMember(Value = "fr")]
+            Fr = 9
+
+        }
+
+
+        /// <summary>
+        /// Gets or Sets Languages
+        /// </summary>
+        [DataMember(Name = "languages", EmitDefaultValue = true)]
+        public List<LanguagesEnum> Languages { get; set; }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GenericQuery" /> class.
         /// </summary>
         /// <param name="end">end.</param>
         /// <param name="hazards">hazards.</param>
+        /// <param name="informative">informative.</param>
         /// <param name="infotypes">infotypes.</param>
         /// <param name="languages">languages.</param>
-        /// <param name="limit">limit.</param>
         /// <param name="northEast">northEast.</param>
-        /// <param name="page">page.</param>
         /// <param name="southWest">southWest.</param>
         /// <param name="start">start.</param>
-        /// <param name="trackingStoppedAt">trackingStoppedAt.</param>
-        /// <param name="verified">verified.</param>
-        public EventQuery(DateTime? end = default(DateTime?), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<string> languages = default(List<string>), int? limit = default(int?), List<float> northEast = default(List<float>), int? page = default(int?), List<float> southWest = default(List<float>), DateTime? start = default(DateTime?), DateTime? trackingStoppedAt = default(DateTime?), bool? verified = default(bool?))
+        public GenericQuery(DateTime? end = default(DateTime?), List<int> hazards = default(List<int>), bool? informative = default(bool?), List<int> infotypes = default(List<int>), List<LanguagesEnum> languages = default(List<LanguagesEnum>), List<float> northEast = default(List<float>), List<float> southWest = default(List<float>), DateTime? start = default(DateTime?))
         {
             this.End = end;
             this.Hazards = hazards;
+            this.Informative = informative;
             this.Infotypes = infotypes;
             this.Languages = languages;
-            this.Limit = limit;
             this.NorthEast = northEast;
-            this.Page = page;
             this.SouthWest = southWest;
             this.Start = start;
-            this.TrackingStoppedAt = trackingStoppedAt;
-            this.Verified = verified;
         }
 
         /// <summary>
@@ -72,34 +134,22 @@ namespace Abp.SocialMedia.Model
         public List<int> Hazards { get; set; }
 
         /// <summary>
+        /// Gets or Sets Informative
+        /// </summary>
+        [DataMember(Name = "informative", EmitDefaultValue = true)]
+        public bool? Informative { get; set; }
+
+        /// <summary>
         /// Gets or Sets Infotypes
         /// </summary>
         [DataMember(Name = "infotypes", EmitDefaultValue = true)]
         public List<int> Infotypes { get; set; }
 
         /// <summary>
-        /// Gets or Sets Languages
-        /// </summary>
-        [DataMember(Name = "languages", EmitDefaultValue = true)]
-        public List<string> Languages { get; set; }
-
-        /// <summary>
-        /// Gets or Sets Limit
-        /// </summary>
-        [DataMember(Name = "limit", EmitDefaultValue = true)]
-        public int? Limit { get; set; }
-
-        /// <summary>
         /// Gets or Sets NorthEast
         /// </summary>
         [DataMember(Name = "north_east", EmitDefaultValue = true)]
         public List<float> NorthEast { get; set; }
-
-        /// <summary>
-        /// Gets or Sets Page
-        /// </summary>
-        [DataMember(Name = "page", EmitDefaultValue = true)]
-        public int? Page { get; set; }
 
         /// <summary>
         /// Gets or Sets SouthWest
@@ -114,36 +164,21 @@ namespace Abp.SocialMedia.Model
         public DateTime? Start { get; set; }
 
         /// <summary>
-        /// Gets or Sets TrackingStoppedAt
-        /// </summary>
-        [DataMember(Name = "tracking_stopped_at", EmitDefaultValue = true)]
-        public DateTime? TrackingStoppedAt { get; set; }
-
-        /// <summary>
-        /// Gets or Sets Verified
-        /// </summary>
-        [DataMember(Name = "verified", EmitDefaultValue = true)]
-        public bool? Verified { get; set; }
-
-        /// <summary>
         /// Returns the string presentation of the object
         /// </summary>
         /// <returns>String presentation of the object</returns>
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.Append("class EventQuery {\n");
+            sb.Append("class GenericQuery {\n");
             sb.Append("  End: ").Append(End).Append("\n");
             sb.Append("  Hazards: ").Append(Hazards).Append("\n");
+            sb.Append("  Informative: ").Append(Informative).Append("\n");
             sb.Append("  Infotypes: ").Append(Infotypes).Append("\n");
             sb.Append("  Languages: ").Append(Languages).Append("\n");
-            sb.Append("  Limit: ").Append(Limit).Append("\n");
             sb.Append("  NorthEast: ").Append(NorthEast).Append("\n");
-            sb.Append("  Page: ").Append(Page).Append("\n");
             sb.Append("  SouthWest: ").Append(SouthWest).Append("\n");
             sb.Append("  Start: ").Append(Start).Append("\n");
-            sb.Append("  TrackingStoppedAt: ").Append(TrackingStoppedAt).Append("\n");
-            sb.Append("  Verified: ").Append(Verified).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
         }
@@ -164,15 +199,15 @@ namespace Abp.SocialMedia.Model
         /// <returns>Boolean</returns>
         public override bool Equals(object input)
         {
-            return this.Equals(input as EventQuery);
+            return this.Equals(input as GenericQuery);
         }
 
         /// <summary>
-        /// Returns true if EventQuery instances are equal
+        /// Returns true if GenericQuery instances are equal
         /// </summary>
-        /// <param name="input">Instance of EventQuery to be compared</param>
+        /// <param name="input">Instance of GenericQuery to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(EventQuery input)
+        public bool Equals(GenericQuery input)
         {
             if (input == null)
                 return false;
@@ -190,6 +225,11 @@ namespace Abp.SocialMedia.Model
                     this.Hazards.SequenceEqual(input.Hazards)
                 ) && 
                 (
+                    this.Informative == input.Informative ||
+                    (this.Informative != null &&
+                    this.Informative.Equals(input.Informative))
+                ) && 
+                (
                     this.Infotypes == input.Infotypes ||
                     this.Infotypes != null &&
                     input.Infotypes != null &&
@@ -197,25 +237,13 @@ namespace Abp.SocialMedia.Model
                 ) && 
                 (
                     this.Languages == input.Languages ||
-                    this.Languages != null &&
-                    input.Languages != null &&
                     this.Languages.SequenceEqual(input.Languages)
-                ) && 
-                (
-                    this.Limit == input.Limit ||
-                    (this.Limit != null &&
-                    this.Limit.Equals(input.Limit))
                 ) && 
                 (
                     this.NorthEast == input.NorthEast ||
                     this.NorthEast != null &&
                     input.NorthEast != null &&
                     this.NorthEast.SequenceEqual(input.NorthEast)
-                ) && 
-                (
-                    this.Page == input.Page ||
-                    (this.Page != null &&
-                    this.Page.Equals(input.Page))
                 ) && 
                 (
                     this.SouthWest == input.SouthWest ||
@@ -227,16 +255,6 @@ namespace Abp.SocialMedia.Model
                     this.Start == input.Start ||
                     (this.Start != null &&
                     this.Start.Equals(input.Start))
-                ) && 
-                (
-                    this.TrackingStoppedAt == input.TrackingStoppedAt ||
-                    (this.TrackingStoppedAt != null &&
-                    this.TrackingStoppedAt.Equals(input.TrackingStoppedAt))
-                ) && 
-                (
-                    this.Verified == input.Verified ||
-                    (this.Verified != null &&
-                    this.Verified.Equals(input.Verified))
                 );
         }
 
@@ -253,24 +271,17 @@ namespace Abp.SocialMedia.Model
                     hashCode = hashCode * 59 + this.End.GetHashCode();
                 if (this.Hazards != null)
                     hashCode = hashCode * 59 + this.Hazards.GetHashCode();
+                if (this.Informative != null)
+                    hashCode = hashCode * 59 + this.Informative.GetHashCode();
                 if (this.Infotypes != null)
                     hashCode = hashCode * 59 + this.Infotypes.GetHashCode();
-                if (this.Languages != null)
-                    hashCode = hashCode * 59 + this.Languages.GetHashCode();
-                if (this.Limit != null)
-                    hashCode = hashCode * 59 + this.Limit.GetHashCode();
+                hashCode = hashCode * 59 + this.Languages.GetHashCode();
                 if (this.NorthEast != null)
                     hashCode = hashCode * 59 + this.NorthEast.GetHashCode();
-                if (this.Page != null)
-                    hashCode = hashCode * 59 + this.Page.GetHashCode();
                 if (this.SouthWest != null)
                     hashCode = hashCode * 59 + this.SouthWest.GetHashCode();
                 if (this.Start != null)
                     hashCode = hashCode * 59 + this.Start.GetHashCode();
-                if (this.TrackingStoppedAt != null)
-                    hashCode = hashCode * 59 + this.TrackingStoppedAt.GetHashCode();
-                if (this.Verified != null)
-                    hashCode = hashCode * 59 + this.Verified.GetHashCode();
                 return hashCode;
             }
         }

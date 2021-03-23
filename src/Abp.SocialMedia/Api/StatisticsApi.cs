@@ -30,13 +30,52 @@ namespace Abp.SocialMedia.Api
         /// Retrieves a summary of statistics info
         /// </summary>
         /// <remarks>
+        /// Retrieves a summary of statistic info: total number of events, event count for language, hazard, infotypes and validate.
+        /// </remarks>
+        /// <exception cref="Abp.SocialMedia.Client.ApiException">Thrown when fails to make API call</exception>
+        /// <param name="start">Date and time lower bound, defaults to _end - 24 hours_ (UTC) (optional)</param>
+        /// <param name="end">Date and time upper bound, defaults to _now_ (UTC) (optional)</param>
+        /// <param name="languages">List of tweet languages in BCP47 format (optional)</param>
+        /// <param name="hazards">Retrieve only a specific set of comma-separated hazard types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;hazard_type. (optional)</param>
+        /// <param name="infotypes">Retrieve only a specific set of comma-separated information types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;information_type. (optional)</param>
+        /// <param name="southWest">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
+        /// <param name="northEast">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
+        /// <returns>StatisticsEvent</returns>
+        StatisticsEvent ApiV1StatsEventsGet(DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>));
+
+        /// <summary>
+        /// Retrieves a summary of statistics info
+        /// </summary>
+        /// <remarks>
+        /// Retrieves a summary of statistic info: total number of events, event count for language, hazard, infotypes and validate.
+        /// </remarks>
+        /// <exception cref="Abp.SocialMedia.Client.ApiException">Thrown when fails to make API call</exception>
+        /// <param name="start">Date and time lower bound, defaults to _end - 24 hours_ (UTC) (optional)</param>
+        /// <param name="end">Date and time upper bound, defaults to _now_ (UTC) (optional)</param>
+        /// <param name="languages">List of tweet languages in BCP47 format (optional)</param>
+        /// <param name="hazards">Retrieve only a specific set of comma-separated hazard types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;hazard_type. (optional)</param>
+        /// <param name="infotypes">Retrieve only a specific set of comma-separated information types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;information_type. (optional)</param>
+        /// <param name="southWest">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
+        /// <param name="northEast">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
+        /// <returns>ApiResponse of StatisticsEvent</returns>
+        ApiResponse<StatisticsEvent> ApiV1StatsEventsGetWithHttpInfo(DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>));
+        /// <summary>
+        /// Retrieves a summary of statistics info
+        /// </summary>
+        /// <remarks>
         /// Retrieves a summary of statistic info: total number of tweets, informativeness ratio, tweet count for language, hazard and infotypes, event count for hazard type.
         /// </remarks>
         /// <exception cref="Abp.SocialMedia.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="start">Date and time lower bound, defaults to _end - 24 hours_ (UTC) (optional)</param>
         /// <param name="end">Date and time upper bound, defaults to _now_ (UTC) (optional)</param>
-        /// <returns>Statistics</returns>
-        Statistics ApiV1StatsGet(DateTime? start = default(DateTime?), DateTime? end = default(DateTime?));
+        /// <param name="languages">List of tweet languages in BCP47 format (optional)</param>
+        /// <param name="informative">Retrieve only informative (or not informative) tweets (optional)</param>
+        /// <param name="hazards">Retrieve only a specific set of comma-separated hazard types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;hazard_type. (optional)</param>
+        /// <param name="infotypes">Retrieve only a specific set of comma-separated information types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;information_type. (optional)</param>
+        /// <param name="southWest">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
+        /// <param name="northEast">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
+        /// <returns>StatisticsTweet</returns>
+        StatisticsTweet ApiV1StatsTweetsGet(DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), bool? informative = default(bool?), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>));
 
         /// <summary>
         /// Retrieves a summary of statistics info
@@ -47,8 +86,14 @@ namespace Abp.SocialMedia.Api
         /// <exception cref="Abp.SocialMedia.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="start">Date and time lower bound, defaults to _end - 24 hours_ (UTC) (optional)</param>
         /// <param name="end">Date and time upper bound, defaults to _now_ (UTC) (optional)</param>
-        /// <returns>ApiResponse of Statistics</returns>
-        ApiResponse<Statistics> ApiV1StatsGetWithHttpInfo(DateTime? start = default(DateTime?), DateTime? end = default(DateTime?));
+        /// <param name="languages">List of tweet languages in BCP47 format (optional)</param>
+        /// <param name="informative">Retrieve only informative (or not informative) tweets (optional)</param>
+        /// <param name="hazards">Retrieve only a specific set of comma-separated hazard types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;hazard_type. (optional)</param>
+        /// <param name="infotypes">Retrieve only a specific set of comma-separated information types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;information_type. (optional)</param>
+        /// <param name="southWest">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
+        /// <param name="northEast">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
+        /// <returns>ApiResponse of StatisticsTweet</returns>
+        ApiResponse<StatisticsTweet> ApiV1StatsTweetsGetWithHttpInfo(DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), bool? informative = default(bool?), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>));
         #endregion Synchronous Operations
     }
 
@@ -62,14 +107,55 @@ namespace Abp.SocialMedia.Api
         /// Retrieves a summary of statistics info
         /// </summary>
         /// <remarks>
+        /// Retrieves a summary of statistic info: total number of events, event count for language, hazard, infotypes and validate.
+        /// </remarks>
+        /// <exception cref="Abp.SocialMedia.Client.ApiException">Thrown when fails to make API call</exception>
+        /// <param name="start">Date and time lower bound, defaults to _end - 24 hours_ (UTC) (optional)</param>
+        /// <param name="end">Date and time upper bound, defaults to _now_ (UTC) (optional)</param>
+        /// <param name="languages">List of tweet languages in BCP47 format (optional)</param>
+        /// <param name="hazards">Retrieve only a specific set of comma-separated hazard types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;hazard_type. (optional)</param>
+        /// <param name="infotypes">Retrieve only a specific set of comma-separated information types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;information_type. (optional)</param>
+        /// <param name="southWest">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
+        /// <param name="northEast">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
+        /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
+        /// <returns>Task of StatisticsEvent</returns>
+        System.Threading.Tasks.Task<StatisticsEvent> ApiV1StatsEventsGetAsync(DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <summary>
+        /// Retrieves a summary of statistics info
+        /// </summary>
+        /// <remarks>
+        /// Retrieves a summary of statistic info: total number of events, event count for language, hazard, infotypes and validate.
+        /// </remarks>
+        /// <exception cref="Abp.SocialMedia.Client.ApiException">Thrown when fails to make API call</exception>
+        /// <param name="start">Date and time lower bound, defaults to _end - 24 hours_ (UTC) (optional)</param>
+        /// <param name="end">Date and time upper bound, defaults to _now_ (UTC) (optional)</param>
+        /// <param name="languages">List of tweet languages in BCP47 format (optional)</param>
+        /// <param name="hazards">Retrieve only a specific set of comma-separated hazard types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;hazard_type. (optional)</param>
+        /// <param name="infotypes">Retrieve only a specific set of comma-separated information types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;information_type. (optional)</param>
+        /// <param name="southWest">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
+        /// <param name="northEast">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
+        /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
+        /// <returns>Task of ApiResponse (StatisticsEvent)</returns>
+        System.Threading.Tasks.Task<ApiResponse<StatisticsEvent>> ApiV1StatsEventsGetWithHttpInfoAsync(DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        /// <summary>
+        /// Retrieves a summary of statistics info
+        /// </summary>
+        /// <remarks>
         /// Retrieves a summary of statistic info: total number of tweets, informativeness ratio, tweet count for language, hazard and infotypes, event count for hazard type.
         /// </remarks>
         /// <exception cref="Abp.SocialMedia.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="start">Date and time lower bound, defaults to _end - 24 hours_ (UTC) (optional)</param>
         /// <param name="end">Date and time upper bound, defaults to _now_ (UTC) (optional)</param>
+        /// <param name="languages">List of tweet languages in BCP47 format (optional)</param>
+        /// <param name="informative">Retrieve only informative (or not informative) tweets (optional)</param>
+        /// <param name="hazards">Retrieve only a specific set of comma-separated hazard types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;hazard_type. (optional)</param>
+        /// <param name="infotypes">Retrieve only a specific set of comma-separated information types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;information_type. (optional)</param>
+        /// <param name="southWest">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
+        /// <param name="northEast">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
-        /// <returns>Task of Statistics</returns>
-        System.Threading.Tasks.Task<Statistics> ApiV1StatsGetAsync(DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        /// <returns>Task of StatisticsTweet</returns>
+        System.Threading.Tasks.Task<StatisticsTweet> ApiV1StatsTweetsGetAsync(DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), bool? informative = default(bool?), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <summary>
         /// Retrieves a summary of statistics info
@@ -80,9 +166,15 @@ namespace Abp.SocialMedia.Api
         /// <exception cref="Abp.SocialMedia.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="start">Date and time lower bound, defaults to _end - 24 hours_ (UTC) (optional)</param>
         /// <param name="end">Date and time upper bound, defaults to _now_ (UTC) (optional)</param>
+        /// <param name="languages">List of tweet languages in BCP47 format (optional)</param>
+        /// <param name="informative">Retrieve only informative (or not informative) tweets (optional)</param>
+        /// <param name="hazards">Retrieve only a specific set of comma-separated hazard types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;hazard_type. (optional)</param>
+        /// <param name="infotypes">Retrieve only a specific set of comma-separated information types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;information_type. (optional)</param>
+        /// <param name="southWest">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
+        /// <param name="northEast">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
-        /// <returns>Task of ApiResponse (Statistics)</returns>
-        System.Threading.Tasks.Task<ApiResponse<Statistics>> ApiV1StatsGetWithHttpInfoAsync(DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        /// <returns>Task of ApiResponse (StatisticsTweet)</returns>
+        System.Threading.Tasks.Task<ApiResponse<StatisticsTweet>> ApiV1StatsTweetsGetWithHttpInfoAsync(DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), bool? informative = default(bool?), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
         #endregion Asynchronous Operations
     }
 
@@ -204,26 +296,36 @@ namespace Abp.SocialMedia.Api
         }
 
         /// <summary>
-        /// Retrieves a summary of statistics info Retrieves a summary of statistic info: total number of tweets, informativeness ratio, tweet count for language, hazard and infotypes, event count for hazard type.
+        /// Retrieves a summary of statistics info Retrieves a summary of statistic info: total number of events, event count for language, hazard, infotypes and validate.
         /// </summary>
         /// <exception cref="Abp.SocialMedia.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="start">Date and time lower bound, defaults to _end - 24 hours_ (UTC) (optional)</param>
         /// <param name="end">Date and time upper bound, defaults to _now_ (UTC) (optional)</param>
-        /// <returns>Statistics</returns>
-        public Statistics ApiV1StatsGet(DateTime? start = default(DateTime?), DateTime? end = default(DateTime?))
+        /// <param name="languages">List of tweet languages in BCP47 format (optional)</param>
+        /// <param name="hazards">Retrieve only a specific set of comma-separated hazard types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;hazard_type. (optional)</param>
+        /// <param name="infotypes">Retrieve only a specific set of comma-separated information types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;information_type. (optional)</param>
+        /// <param name="southWest">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
+        /// <param name="northEast">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
+        /// <returns>StatisticsEvent</returns>
+        public StatisticsEvent ApiV1StatsEventsGet(DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>))
         {
-            Abp.SocialMedia.Client.ApiResponse<Statistics> localVarResponse = ApiV1StatsGetWithHttpInfo(start, end);
+            Abp.SocialMedia.Client.ApiResponse<StatisticsEvent> localVarResponse = ApiV1StatsEventsGetWithHttpInfo(start, end, languages, hazards, infotypes, southWest, northEast);
             return localVarResponse.Data;
         }
 
         /// <summary>
-        /// Retrieves a summary of statistics info Retrieves a summary of statistic info: total number of tweets, informativeness ratio, tweet count for language, hazard and infotypes, event count for hazard type.
+        /// Retrieves a summary of statistics info Retrieves a summary of statistic info: total number of events, event count for language, hazard, infotypes and validate.
         /// </summary>
         /// <exception cref="Abp.SocialMedia.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="start">Date and time lower bound, defaults to _end - 24 hours_ (UTC) (optional)</param>
         /// <param name="end">Date and time upper bound, defaults to _now_ (UTC) (optional)</param>
-        /// <returns>ApiResponse of Statistics</returns>
-        public Abp.SocialMedia.Client.ApiResponse<Statistics> ApiV1StatsGetWithHttpInfo(DateTime? start = default(DateTime?), DateTime? end = default(DateTime?))
+        /// <param name="languages">List of tweet languages in BCP47 format (optional)</param>
+        /// <param name="hazards">Retrieve only a specific set of comma-separated hazard types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;hazard_type. (optional)</param>
+        /// <param name="infotypes">Retrieve only a specific set of comma-separated information types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;information_type. (optional)</param>
+        /// <param name="southWest">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
+        /// <param name="northEast">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
+        /// <returns>ApiResponse of StatisticsEvent</returns>
+        public Abp.SocialMedia.Client.ApiResponse<StatisticsEvent> ApiV1StatsEventsGetWithHttpInfo(DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>))
         {
             Abp.SocialMedia.Client.RequestOptions localVarRequestOptions = new Abp.SocialMedia.Client.RequestOptions();
 
@@ -249,6 +351,26 @@ namespace Abp.SocialMedia.Api
             {
                 localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("", "end", end));
             }
+            if (languages != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("csv", "languages", languages));
+            }
+            if (hazards != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("csv", "hazards", hazards));
+            }
+            if (infotypes != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("csv", "infotypes", infotypes));
+            }
+            if (southWest != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("csv", "south_west", southWest));
+            }
+            if (northEast != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("csv", "north_east", northEast));
+            }
 
             // authentication (api_key) required
             if (!String.IsNullOrEmpty(this.Configuration.GetApiKeyWithPrefix("X-API-Key")))
@@ -262,11 +384,116 @@ namespace Abp.SocialMedia.Api
             }
 
             // make the HTTP request
-            var localVarResponse = this.Client.Get<Statistics>("/api/v1/stats", localVarRequestOptions, this.Configuration);
+            var localVarResponse = this.Client.Get<StatisticsEvent>("/api/v1/stats_events", localVarRequestOptions, this.Configuration);
 
             if (this.ExceptionFactory != null)
             {
-                Exception _exception = this.ExceptionFactory("ApiV1StatsGet", localVarResponse);
+                Exception _exception = this.ExceptionFactory("ApiV1StatsEventsGet", localVarResponse);
+                if (_exception != null) throw _exception;
+            }
+
+            return localVarResponse;
+        }
+
+        /// <summary>
+        /// Retrieves a summary of statistics info Retrieves a summary of statistic info: total number of events, event count for language, hazard, infotypes and validate.
+        /// </summary>
+        /// <exception cref="Abp.SocialMedia.Client.ApiException">Thrown when fails to make API call</exception>
+        /// <param name="start">Date and time lower bound, defaults to _end - 24 hours_ (UTC) (optional)</param>
+        /// <param name="end">Date and time upper bound, defaults to _now_ (UTC) (optional)</param>
+        /// <param name="languages">List of tweet languages in BCP47 format (optional)</param>
+        /// <param name="hazards">Retrieve only a specific set of comma-separated hazard types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;hazard_type. (optional)</param>
+        /// <param name="infotypes">Retrieve only a specific set of comma-separated information types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;information_type. (optional)</param>
+        /// <param name="southWest">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
+        /// <param name="northEast">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
+        /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
+        /// <returns>Task of StatisticsEvent</returns>
+        public async System.Threading.Tasks.Task<StatisticsEvent> ApiV1StatsEventsGetAsync(DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            Abp.SocialMedia.Client.ApiResponse<StatisticsEvent> localVarResponse = await ApiV1StatsEventsGetWithHttpInfoAsync(start, end, languages, hazards, infotypes, southWest, northEast, cancellationToken).ConfigureAwait(false);
+            return localVarResponse.Data;
+        }
+
+        /// <summary>
+        /// Retrieves a summary of statistics info Retrieves a summary of statistic info: total number of events, event count for language, hazard, infotypes and validate.
+        /// </summary>
+        /// <exception cref="Abp.SocialMedia.Client.ApiException">Thrown when fails to make API call</exception>
+        /// <param name="start">Date and time lower bound, defaults to _end - 24 hours_ (UTC) (optional)</param>
+        /// <param name="end">Date and time upper bound, defaults to _now_ (UTC) (optional)</param>
+        /// <param name="languages">List of tweet languages in BCP47 format (optional)</param>
+        /// <param name="hazards">Retrieve only a specific set of comma-separated hazard types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;hazard_type. (optional)</param>
+        /// <param name="infotypes">Retrieve only a specific set of comma-separated information types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;information_type. (optional)</param>
+        /// <param name="southWest">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
+        /// <param name="northEast">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
+        /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
+        /// <returns>Task of ApiResponse (StatisticsEvent)</returns>
+        public async System.Threading.Tasks.Task<Abp.SocialMedia.Client.ApiResponse<StatisticsEvent>> ApiV1StatsEventsGetWithHttpInfoAsync(DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+
+            Abp.SocialMedia.Client.RequestOptions localVarRequestOptions = new Abp.SocialMedia.Client.RequestOptions();
+
+            String[] _contentTypes = new String[] {
+            };
+
+            // to determine the Accept header
+            String[] _accepts = new String[] {
+                "application/json"
+            };
+
+
+            var localVarContentType = Abp.SocialMedia.Client.ClientUtils.SelectHeaderContentType(_contentTypes);
+            if (localVarContentType != null) localVarRequestOptions.HeaderParameters.Add("Content-Type", localVarContentType);
+
+            var localVarAccept = Abp.SocialMedia.Client.ClientUtils.SelectHeaderAccept(_accepts);
+            if (localVarAccept != null) localVarRequestOptions.HeaderParameters.Add("Accept", localVarAccept);
+
+            if (start != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("", "start", start));
+            }
+            if (end != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("", "end", end));
+            }
+            if (languages != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("csv", "languages", languages));
+            }
+            if (hazards != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("csv", "hazards", hazards));
+            }
+            if (infotypes != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("csv", "infotypes", infotypes));
+            }
+            if (southWest != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("csv", "south_west", southWest));
+            }
+            if (northEast != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("csv", "north_east", northEast));
+            }
+
+            // authentication (api_key) required
+            if (!String.IsNullOrEmpty(this.Configuration.GetApiKeyWithPrefix("X-API-Key")))
+            {
+                localVarRequestOptions.HeaderParameters.Add("X-API-Key", this.Configuration.GetApiKeyWithPrefix("X-API-Key"));
+            }
+            // authentication (api_secret) required
+            if (!String.IsNullOrEmpty(this.Configuration.GetApiKeyWithPrefix("X-API-Secret")))
+            {
+                localVarRequestOptions.HeaderParameters.Add("X-API-Secret", this.Configuration.GetApiKeyWithPrefix("X-API-Secret"));
+            }
+
+            // make the HTTP request
+
+            var localVarResponse = await this.AsynchronousClient.GetAsync<StatisticsEvent>("/api/v1/stats_events", localVarRequestOptions, this.Configuration, cancellationToken).ConfigureAwait(false);
+
+            if (this.ExceptionFactory != null)
+            {
+                Exception _exception = this.ExceptionFactory("ApiV1StatsEventsGet", localVarResponse);
                 if (_exception != null) throw _exception;
             }
 
@@ -279,11 +506,16 @@ namespace Abp.SocialMedia.Api
         /// <exception cref="Abp.SocialMedia.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="start">Date and time lower bound, defaults to _end - 24 hours_ (UTC) (optional)</param>
         /// <param name="end">Date and time upper bound, defaults to _now_ (UTC) (optional)</param>
-        /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
-        /// <returns>Task of Statistics</returns>
-        public async System.Threading.Tasks.Task<Statistics> ApiV1StatsGetAsync(DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        /// <param name="languages">List of tweet languages in BCP47 format (optional)</param>
+        /// <param name="informative">Retrieve only informative (or not informative) tweets (optional)</param>
+        /// <param name="hazards">Retrieve only a specific set of comma-separated hazard types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;hazard_type. (optional)</param>
+        /// <param name="infotypes">Retrieve only a specific set of comma-separated information types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;information_type. (optional)</param>
+        /// <param name="southWest">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
+        /// <param name="northEast">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
+        /// <returns>StatisticsTweet</returns>
+        public StatisticsTweet ApiV1StatsTweetsGet(DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), bool? informative = default(bool?), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>))
         {
-            Abp.SocialMedia.Client.ApiResponse<Statistics> localVarResponse = await ApiV1StatsGetWithHttpInfoAsync(start, end, cancellationToken).ConfigureAwait(false);
+            Abp.SocialMedia.Client.ApiResponse<StatisticsTweet> localVarResponse = ApiV1StatsTweetsGetWithHttpInfo(start, end, languages, informative, hazards, infotypes, southWest, northEast);
             return localVarResponse.Data;
         }
 
@@ -293,9 +525,122 @@ namespace Abp.SocialMedia.Api
         /// <exception cref="Abp.SocialMedia.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="start">Date and time lower bound, defaults to _end - 24 hours_ (UTC) (optional)</param>
         /// <param name="end">Date and time upper bound, defaults to _now_ (UTC) (optional)</param>
+        /// <param name="languages">List of tweet languages in BCP47 format (optional)</param>
+        /// <param name="informative">Retrieve only informative (or not informative) tweets (optional)</param>
+        /// <param name="hazards">Retrieve only a specific set of comma-separated hazard types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;hazard_type. (optional)</param>
+        /// <param name="infotypes">Retrieve only a specific set of comma-separated information types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;information_type. (optional)</param>
+        /// <param name="southWest">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
+        /// <param name="northEast">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
+        /// <returns>ApiResponse of StatisticsTweet</returns>
+        public Abp.SocialMedia.Client.ApiResponse<StatisticsTweet> ApiV1StatsTweetsGetWithHttpInfo(DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), bool? informative = default(bool?), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>))
+        {
+            Abp.SocialMedia.Client.RequestOptions localVarRequestOptions = new Abp.SocialMedia.Client.RequestOptions();
+
+            String[] _contentTypes = new String[] {
+            };
+
+            // to determine the Accept header
+            String[] _accepts = new String[] {
+                "application/json"
+            };
+
+            var localVarContentType = Abp.SocialMedia.Client.ClientUtils.SelectHeaderContentType(_contentTypes);
+            if (localVarContentType != null) localVarRequestOptions.HeaderParameters.Add("Content-Type", localVarContentType);
+
+            var localVarAccept = Abp.SocialMedia.Client.ClientUtils.SelectHeaderAccept(_accepts);
+            if (localVarAccept != null) localVarRequestOptions.HeaderParameters.Add("Accept", localVarAccept);
+
+            if (start != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("", "start", start));
+            }
+            if (end != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("", "end", end));
+            }
+            if (languages != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("csv", "languages", languages));
+            }
+            if (informative != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("", "informative", informative));
+            }
+            if (hazards != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("csv", "hazards", hazards));
+            }
+            if (infotypes != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("csv", "infotypes", infotypes));
+            }
+            if (southWest != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("csv", "south_west", southWest));
+            }
+            if (northEast != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("csv", "north_east", northEast));
+            }
+
+            // authentication (api_key) required
+            if (!String.IsNullOrEmpty(this.Configuration.GetApiKeyWithPrefix("X-API-Key")))
+            {
+                localVarRequestOptions.HeaderParameters.Add("X-API-Key", this.Configuration.GetApiKeyWithPrefix("X-API-Key"));
+            }
+            // authentication (api_secret) required
+            if (!String.IsNullOrEmpty(this.Configuration.GetApiKeyWithPrefix("X-API-Secret")))
+            {
+                localVarRequestOptions.HeaderParameters.Add("X-API-Secret", this.Configuration.GetApiKeyWithPrefix("X-API-Secret"));
+            }
+
+            // make the HTTP request
+            var localVarResponse = this.Client.Get<StatisticsTweet>("/api/v1/stats_tweets", localVarRequestOptions, this.Configuration);
+
+            if (this.ExceptionFactory != null)
+            {
+                Exception _exception = this.ExceptionFactory("ApiV1StatsTweetsGet", localVarResponse);
+                if (_exception != null) throw _exception;
+            }
+
+            return localVarResponse;
+        }
+
+        /// <summary>
+        /// Retrieves a summary of statistics info Retrieves a summary of statistic info: total number of tweets, informativeness ratio, tweet count for language, hazard and infotypes, event count for hazard type.
+        /// </summary>
+        /// <exception cref="Abp.SocialMedia.Client.ApiException">Thrown when fails to make API call</exception>
+        /// <param name="start">Date and time lower bound, defaults to _end - 24 hours_ (UTC) (optional)</param>
+        /// <param name="end">Date and time upper bound, defaults to _now_ (UTC) (optional)</param>
+        /// <param name="languages">List of tweet languages in BCP47 format (optional)</param>
+        /// <param name="informative">Retrieve only informative (or not informative) tweets (optional)</param>
+        /// <param name="hazards">Retrieve only a specific set of comma-separated hazard types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;hazard_type. (optional)</param>
+        /// <param name="infotypes">Retrieve only a specific set of comma-separated information types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;information_type. (optional)</param>
+        /// <param name="southWest">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
+        /// <param name="northEast">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
-        /// <returns>Task of ApiResponse (Statistics)</returns>
-        public async System.Threading.Tasks.Task<Abp.SocialMedia.Client.ApiResponse<Statistics>> ApiV1StatsGetWithHttpInfoAsync(DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        /// <returns>Task of StatisticsTweet</returns>
+        public async System.Threading.Tasks.Task<StatisticsTweet> ApiV1StatsTweetsGetAsync(DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), bool? informative = default(bool?), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            Abp.SocialMedia.Client.ApiResponse<StatisticsTweet> localVarResponse = await ApiV1StatsTweetsGetWithHttpInfoAsync(start, end, languages, informative, hazards, infotypes, southWest, northEast, cancellationToken).ConfigureAwait(false);
+            return localVarResponse.Data;
+        }
+
+        /// <summary>
+        /// Retrieves a summary of statistics info Retrieves a summary of statistic info: total number of tweets, informativeness ratio, tweet count for language, hazard and infotypes, event count for hazard type.
+        /// </summary>
+        /// <exception cref="Abp.SocialMedia.Client.ApiException">Thrown when fails to make API call</exception>
+        /// <param name="start">Date and time lower bound, defaults to _end - 24 hours_ (UTC) (optional)</param>
+        /// <param name="end">Date and time upper bound, defaults to _now_ (UTC) (optional)</param>
+        /// <param name="languages">List of tweet languages in BCP47 format (optional)</param>
+        /// <param name="informative">Retrieve only informative (or not informative) tweets (optional)</param>
+        /// <param name="hazards">Retrieve only a specific set of comma-separated hazard types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;hazard_type. (optional)</param>
+        /// <param name="infotypes">Retrieve only a specific set of comma-separated information types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;information_type. (optional)</param>
+        /// <param name="southWest">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
+        /// <param name="northEast">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
+        /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
+        /// <returns>Task of ApiResponse (StatisticsTweet)</returns>
+        public async System.Threading.Tasks.Task<Abp.SocialMedia.Client.ApiResponse<StatisticsTweet>> ApiV1StatsTweetsGetWithHttpInfoAsync(DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), bool? informative = default(bool?), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
 
             Abp.SocialMedia.Client.RequestOptions localVarRequestOptions = new Abp.SocialMedia.Client.RequestOptions();
@@ -323,6 +668,30 @@ namespace Abp.SocialMedia.Api
             {
                 localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("", "end", end));
             }
+            if (languages != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("csv", "languages", languages));
+            }
+            if (informative != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("", "informative", informative));
+            }
+            if (hazards != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("csv", "hazards", hazards));
+            }
+            if (infotypes != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("csv", "infotypes", infotypes));
+            }
+            if (southWest != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("csv", "south_west", southWest));
+            }
+            if (northEast != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("csv", "north_east", northEast));
+            }
 
             // authentication (api_key) required
             if (!String.IsNullOrEmpty(this.Configuration.GetApiKeyWithPrefix("X-API-Key")))
@@ -337,11 +706,11 @@ namespace Abp.SocialMedia.Api
 
             // make the HTTP request
 
-            var localVarResponse = await this.AsynchronousClient.GetAsync<Statistics>("/api/v1/stats", localVarRequestOptions, this.Configuration, cancellationToken).ConfigureAwait(false);
+            var localVarResponse = await this.AsynchronousClient.GetAsync<StatisticsTweet>("/api/v1/stats_tweets", localVarRequestOptions, this.Configuration, cancellationToken).ConfigureAwait(false);
 
             if (this.ExceptionFactory != null)
             {
-                Exception _exception = this.ExceptionFactory("ApiV1StatsGet", localVarResponse);
+                Exception _exception = this.ExceptionFactory("ApiV1StatsTweetsGet", localVarResponse);
                 if (_exception != null) throw _exception;
             }
 

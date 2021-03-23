@@ -1,4 +1,5 @@
-﻿using Abp.SocialMedia.Model;
+﻿using Abp.SocialMedia.Dto;
+using Abp.SocialMedia.Model;
 using Ermes.Dto;
 using Ermes.Interfaces;
 using Ermes.Social.Dto;
@@ -20,6 +21,7 @@ namespace Ermes.Social
         Task<SocialItemOutput<Media>> GetMediaById(IdInput<long> input);
         Task<Pagination> GetTweets(SocialPaginationInput input);
         Task<SocialItemOutput<Tweet>> GetTweetById(IdInput<long> input);
-        Task<SocialItemOutput<Statistics>> GetStatistics(GetStatisticsInput input);
+        Task<StatisticsTweet> GetTweetStatistics(GetTweetStatisticsInput input);
+        Task<StatisticsEvent> GetEventStatistics(GetEventStatisticsInput input);
     }
 }

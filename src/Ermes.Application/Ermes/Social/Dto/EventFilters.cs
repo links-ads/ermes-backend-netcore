@@ -1,15 +1,14 @@
-﻿using System;
+﻿using Ermes.Enums;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace Ermes.Social.Dto
 {
-    public class EventFilters : SocialPaginationInput
+    public class EventFilters : SocialBaseFilters, ISocialPaginationInput
     {
-        public DateTime? Start { get; set; }
-        public DateTime? End { get; set; }
-        public List<int> Hazards { get; set; }
-        public List<float> SouthWest { get; set; }
-        public List<float> NorthEast { get; set; }
+        public int? Page { get; set; }
+        public int? Limit { get; set; }
     }
 }

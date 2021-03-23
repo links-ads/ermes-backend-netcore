@@ -58,12 +58,13 @@ namespace Abp.SocialMedia.Api
         /// <param name="limit">how many instances per page (optional, default to 100)</param>
         /// <param name="start">Date and time lower bound, defaults to _end - one hour_ (optional)</param>
         /// <param name="end">Date and time upper bound, defaults to _now_ (optional)</param>
-        /// <param name="verified">Filter for verified events (optional)</param>
+        /// <param name="languages">Filter events for a specific language, specify more languages separating by comma (e.g en, it) (optional)</param>
         /// <param name="hazards">Filter for a specific list of hazard types ids, specify more ids separating by comma (e.g 12, 13) (optional)</param>
+        /// <param name="infotypes">Filter for a specific list of infotypes ids, specify more ids separating by comma (e.g 10, 13) (optional)</param>
         /// <param name="southWest">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
         /// <param name="northEast">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
         /// <returns>Pagination</returns>
-        Pagination ApiV1EventsGet(int? page = default(int?), int? limit = default(int?), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), bool? verified = default(bool?), List<int> hazards = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>));
+        Pagination ApiV1EventsGet(int? page = default(int?), int? limit = default(int?), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>));
 
         /// <summary>
         /// Retrieves a paged list of events
@@ -76,12 +77,13 @@ namespace Abp.SocialMedia.Api
         /// <param name="limit">how many instances per page (optional, default to 100)</param>
         /// <param name="start">Date and time lower bound, defaults to _end - one hour_ (optional)</param>
         /// <param name="end">Date and time upper bound, defaults to _now_ (optional)</param>
-        /// <param name="verified">Filter for verified events (optional)</param>
+        /// <param name="languages">Filter events for a specific language, specify more languages separating by comma (e.g en, it) (optional)</param>
         /// <param name="hazards">Filter for a specific list of hazard types ids, specify more ids separating by comma (e.g 12, 13) (optional)</param>
+        /// <param name="infotypes">Filter for a specific list of infotypes ids, specify more ids separating by comma (e.g 10, 13) (optional)</param>
         /// <param name="southWest">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
         /// <param name="northEast">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
         /// <returns>ApiResponse of Pagination</returns>
-        ApiResponse<Pagination> ApiV1EventsGetWithHttpInfo(int? page = default(int?), int? limit = default(int?), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), bool? verified = default(bool?), List<int> hazards = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>));
+        ApiResponse<Pagination> ApiV1EventsGetWithHttpInfo(int? page = default(int?), int? limit = default(int?), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>));
         #endregion Synchronous Operations
     }
 
@@ -125,13 +127,14 @@ namespace Abp.SocialMedia.Api
         /// <param name="limit">how many instances per page (optional, default to 100)</param>
         /// <param name="start">Date and time lower bound, defaults to _end - one hour_ (optional)</param>
         /// <param name="end">Date and time upper bound, defaults to _now_ (optional)</param>
-        /// <param name="verified">Filter for verified events (optional)</param>
+        /// <param name="languages">Filter events for a specific language, specify more languages separating by comma (e.g en, it) (optional)</param>
         /// <param name="hazards">Filter for a specific list of hazard types ids, specify more ids separating by comma (e.g 12, 13) (optional)</param>
+        /// <param name="infotypes">Filter for a specific list of infotypes ids, specify more ids separating by comma (e.g 10, 13) (optional)</param>
         /// <param name="southWest">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
         /// <param name="northEast">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of Pagination</returns>
-        System.Threading.Tasks.Task<Pagination> ApiV1EventsGetAsync(int? page = default(int?), int? limit = default(int?), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), bool? verified = default(bool?), List<int> hazards = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Pagination> ApiV1EventsGetAsync(int? page = default(int?), int? limit = default(int?), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <summary>
         /// Retrieves a paged list of events
@@ -144,13 +147,14 @@ namespace Abp.SocialMedia.Api
         /// <param name="limit">how many instances per page (optional, default to 100)</param>
         /// <param name="start">Date and time lower bound, defaults to _end - one hour_ (optional)</param>
         /// <param name="end">Date and time upper bound, defaults to _now_ (optional)</param>
-        /// <param name="verified">Filter for verified events (optional)</param>
+        /// <param name="languages">Filter events for a specific language, specify more languages separating by comma (e.g en, it) (optional)</param>
         /// <param name="hazards">Filter for a specific list of hazard types ids, specify more ids separating by comma (e.g 12, 13) (optional)</param>
+        /// <param name="infotypes">Filter for a specific list of infotypes ids, specify more ids separating by comma (e.g 10, 13) (optional)</param>
         /// <param name="southWest">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
         /// <param name="northEast">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of ApiResponse (Pagination)</returns>
-        System.Threading.Tasks.Task<ApiResponse<Pagination>> ApiV1EventsGetWithHttpInfoAsync(int? page = default(int?), int? limit = default(int?), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), bool? verified = default(bool?), List<int> hazards = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<ApiResponse<Pagination>> ApiV1EventsGetWithHttpInfoAsync(int? page = default(int?), int? limit = default(int?), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
         #endregion Asynchronous Operations
     }
 
@@ -406,14 +410,15 @@ namespace Abp.SocialMedia.Api
         /// <param name="limit">how many instances per page (optional, default to 100)</param>
         /// <param name="start">Date and time lower bound, defaults to _end - one hour_ (optional)</param>
         /// <param name="end">Date and time upper bound, defaults to _now_ (optional)</param>
-        /// <param name="verified">Filter for verified events (optional)</param>
+        /// <param name="languages">Filter events for a specific language, specify more languages separating by comma (e.g en, it) (optional)</param>
         /// <param name="hazards">Filter for a specific list of hazard types ids, specify more ids separating by comma (e.g 12, 13) (optional)</param>
+        /// <param name="infotypes">Filter for a specific list of infotypes ids, specify more ids separating by comma (e.g 10, 13) (optional)</param>
         /// <param name="southWest">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
         /// <param name="northEast">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
         /// <returns>Pagination</returns>
-        public Pagination ApiV1EventsGet(int? page = default(int?), int? limit = default(int?), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), bool? verified = default(bool?), List<int> hazards = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>))
+        public Pagination ApiV1EventsGet(int? page = default(int?), int? limit = default(int?), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>))
         {
-            Abp.SocialMedia.Client.ApiResponse<Pagination> localVarResponse = ApiV1EventsGetWithHttpInfo(page, limit, start, end, verified, hazards, southWest, northEast);
+            Abp.SocialMedia.Client.ApiResponse<Pagination> localVarResponse = ApiV1EventsGetWithHttpInfo(page, limit, start, end, languages, hazards, infotypes, southWest, northEast);
             return localVarResponse.Data;
         }
 
@@ -425,12 +430,13 @@ namespace Abp.SocialMedia.Api
         /// <param name="limit">how many instances per page (optional, default to 100)</param>
         /// <param name="start">Date and time lower bound, defaults to _end - one hour_ (optional)</param>
         /// <param name="end">Date and time upper bound, defaults to _now_ (optional)</param>
-        /// <param name="verified">Filter for verified events (optional)</param>
+        /// <param name="languages">Filter events for a specific language, specify more languages separating by comma (e.g en, it) (optional)</param>
         /// <param name="hazards">Filter for a specific list of hazard types ids, specify more ids separating by comma (e.g 12, 13) (optional)</param>
+        /// <param name="infotypes">Filter for a specific list of infotypes ids, specify more ids separating by comma (e.g 10, 13) (optional)</param>
         /// <param name="southWest">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
         /// <param name="northEast">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
         /// <returns>ApiResponse of Pagination</returns>
-        public Abp.SocialMedia.Client.ApiResponse<Pagination> ApiV1EventsGetWithHttpInfo(int? page = default(int?), int? limit = default(int?), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), bool? verified = default(bool?), List<int> hazards = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>))
+        public Abp.SocialMedia.Client.ApiResponse<Pagination> ApiV1EventsGetWithHttpInfo(int? page = default(int?), int? limit = default(int?), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>))
         {
             Abp.SocialMedia.Client.RequestOptions localVarRequestOptions = new Abp.SocialMedia.Client.RequestOptions();
 
@@ -464,13 +470,17 @@ namespace Abp.SocialMedia.Api
             {
                 localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("", "end", end));
             }
-            if (verified != null)
+            if (languages != null)
             {
-                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("", "verified", verified));
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("multi", "languages", languages));
             }
             if (hazards != null)
             {
                 localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("multi", "hazards", hazards));
+            }
+            if (infotypes != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("multi", "infotypes", infotypes));
             }
             if (southWest != null)
             {
@@ -512,15 +522,16 @@ namespace Abp.SocialMedia.Api
         /// <param name="limit">how many instances per page (optional, default to 100)</param>
         /// <param name="start">Date and time lower bound, defaults to _end - one hour_ (optional)</param>
         /// <param name="end">Date and time upper bound, defaults to _now_ (optional)</param>
-        /// <param name="verified">Filter for verified events (optional)</param>
+        /// <param name="languages">Filter events for a specific language, specify more languages separating by comma (e.g en, it) (optional)</param>
         /// <param name="hazards">Filter for a specific list of hazard types ids, specify more ids separating by comma (e.g 12, 13) (optional)</param>
+        /// <param name="infotypes">Filter for a specific list of infotypes ids, specify more ids separating by comma (e.g 10, 13) (optional)</param>
         /// <param name="southWest">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
         /// <param name="northEast">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of Pagination</returns>
-        public async System.Threading.Tasks.Task<Pagination> ApiV1EventsGetAsync(int? page = default(int?), int? limit = default(int?), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), bool? verified = default(bool?), List<int> hazards = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public async System.Threading.Tasks.Task<Pagination> ApiV1EventsGetAsync(int? page = default(int?), int? limit = default(int?), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
-            Abp.SocialMedia.Client.ApiResponse<Pagination> localVarResponse = await ApiV1EventsGetWithHttpInfoAsync(page, limit, start, end, verified, hazards, southWest, northEast, cancellationToken).ConfigureAwait(false);
+            Abp.SocialMedia.Client.ApiResponse<Pagination> localVarResponse = await ApiV1EventsGetWithHttpInfoAsync(page, limit, start, end, languages, hazards, infotypes, southWest, northEast, cancellationToken).ConfigureAwait(false);
             return localVarResponse.Data;
         }
 
@@ -532,13 +543,14 @@ namespace Abp.SocialMedia.Api
         /// <param name="limit">how many instances per page (optional, default to 100)</param>
         /// <param name="start">Date and time lower bound, defaults to _end - one hour_ (optional)</param>
         /// <param name="end">Date and time upper bound, defaults to _now_ (optional)</param>
-        /// <param name="verified">Filter for verified events (optional)</param>
+        /// <param name="languages">Filter events for a specific language, specify more languages separating by comma (e.g en, it) (optional)</param>
         /// <param name="hazards">Filter for a specific list of hazard types ids, specify more ids separating by comma (e.g 12, 13) (optional)</param>
+        /// <param name="infotypes">Filter for a specific list of infotypes ids, specify more ids separating by comma (e.g 10, 13) (optional)</param>
         /// <param name="southWest">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
         /// <param name="northEast">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of ApiResponse (Pagination)</returns>
-        public async System.Threading.Tasks.Task<Abp.SocialMedia.Client.ApiResponse<Pagination>> ApiV1EventsGetWithHttpInfoAsync(int? page = default(int?), int? limit = default(int?), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), bool? verified = default(bool?), List<int> hazards = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public async System.Threading.Tasks.Task<Abp.SocialMedia.Client.ApiResponse<Pagination>> ApiV1EventsGetWithHttpInfoAsync(int? page = default(int?), int? limit = default(int?), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
 
             Abp.SocialMedia.Client.RequestOptions localVarRequestOptions = new Abp.SocialMedia.Client.RequestOptions();
@@ -574,13 +586,17 @@ namespace Abp.SocialMedia.Api
             {
                 localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("", "end", end));
             }
-            if (verified != null)
+            if (languages != null)
             {
-                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("", "verified", verified));
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("multi", "languages", languages));
             }
             if (hazards != null)
             {
                 localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("multi", "hazards", hazards));
+            }
+            if (infotypes != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("multi", "infotypes", infotypes));
             }
             if (southWest != null)
             {
