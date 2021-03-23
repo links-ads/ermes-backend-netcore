@@ -47,6 +47,7 @@ using Ermes.Social.Dto;
 using Ermes.Categories;
 using Ermes.Helpers;
 using Abp.SocialMedia.Model;
+using Abp.SocialMedia.Dto;
 
 namespace Ermes
 {
@@ -152,11 +153,22 @@ namespace Ermes
                             .ForMember(r => r.Id, options => options.Ignore())
                             .ForMember(r => r.Default, options => options.MapFrom(ar => ar.isDefault))
                             .ForMember(r => r.SuperRole, options => options.MapFrom(ar => ar.isSuperRole));
-            configuration.CreateMap<AnnotationFilters, AnnotationQuery>()
-                            .ForMember(r => r.Languages, options => options.MapFrom(a => a.Languages.Select(l => l.ToString()).ToList()))
+            ////////////////
+            ///Social Module
+            configuration.CreateMap<AnnotationFilters, PagedGenericQuery>()
+                            .ForMember(r => r.Languages, options => options.MapFrom(a => a.Languages.Select(l => l.ToString()).Where(a => a != string.Empty).ToList()))
                             .ReverseMap();
-            configuration.CreateMap<EventFilters, EventQuery>()
+            configuration.CreateMap<EventFilters, GetEventsQuery>()
+                            .ForMember(r => r.Languages, options => options.MapFrom(a => a.Languages.Select(l => l.ToString()).Where(a => a != string.Empty).ToList()))
                             .ReverseMap();
+            configuration.CreateMap<TweetStatFilters, GenericQuery>()
+                            .ForMember(r => r.Languages, options => options.MapFrom(a => a.Languages.Select(l => l.ToString()).Where(a => a != string.Empty).ToList()))
+                            .ReverseMap();
+            configuration.CreateMap<SocialBaseFilters, EventStatsQuery>()
+                            .ForMember(r => r.Languages, options => options.MapFrom(a => a.Languages.Select(l => l.ToString()).Where(a => a != string.Empty).ToList()))
+                            .ReverseMap();
+            /////////////////
+
             configuration.CreateMap<Person, PersonDto>()
                             .ForMember(r => r.TeamName, options => options.MapFrom(a => a.TeamId.HasValue ? a.Team.Name : string.Empty))
                             .ForMember(r => r.OrganizationName, options => options.MapFrom(a => a.OrganizationId.HasValue ? a.Organization.Name : string.Empty))

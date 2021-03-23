@@ -1,4 +1,6 @@
-﻿namespace Ermes.Social.Dto
+﻿using Abp.SocialMedia.Model;
+
+namespace Ermes.Social.Dto
 {
     public class GetLabelsInput
     {
