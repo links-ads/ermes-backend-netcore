@@ -1,5 +1,9 @@
 Ver.
 ---------------------------
+
+
+Ver. 1.5.2 - 2021-03-26
+---------------------------
 - Feature - Add GroupIcon prop to Category, UnitOfMeasure moved to cat_translations (migration added) (#16)
 
 Ver. 1.5.1 - 2021-03-23
