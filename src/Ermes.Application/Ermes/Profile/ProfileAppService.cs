@@ -29,25 +29,21 @@ namespace Ermes.Profile
     {
         private readonly ErmesAppSession _session;
         private readonly PersonManager _personManager;
-        private readonly OrganizationManager _organizationManager;
         private readonly MissionManager _missionManager;
         private readonly IOptions<FusionAuthSettings> _fusionAuthSettings;
 
         public ProfileAppService(ErmesAppSession session,
                     PersonManager personManger,
-                    OrganizationManager organizationManager,
                     MissionManager missionManager,
                     IOptions<FusionAuthSettings> fusionAuthSettings)
         {
             _session = session;
             _personManager = personManger;
-            _organizationManager = organizationManager;
             _fusionAuthSettings = fusionAuthSettings;
             _missionManager = missionManager;
         }
 
         #region Private
-
         private async Task<PagedResultDto<PersonDto>> InternalGetOrganizationMemebers(GetOrganizationMembersInput input, bool filterByOrganization = true)
         {
             PagedResultDto<PersonDto> result = new PagedResultDto<PersonDto>();
@@ -80,48 +76,34 @@ namespace Ermes.Profile
 
             return result;
         }
-        private async Task<long> UpdateUserAsync(UpdateProfileInput input)
+        private async Task<bool> UpdateUserAsync(User user)
         {
             var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
-
-            Person person = await _personManager.GetPersonByIdAsync(input.PersonId ?? _session.UserId.Value);
-
-            // Validation
-            if (person == null)
-                throw new UserFriendlyException(L("InvalidPersonId", input.PersonId));
-            if (input.User.Timezone == null)
-                throw new UserFriendlyException(L("MissingRequiredField", "Timezone"));
-            if (input.OrganizationId != person.OrganizationId)
-                throw new UserFriendlyException(L("CannotChangeOrganization"));
-
-            // Security
-            if (_session.LoggedUserPerson.OrganizationId.HasValue && person.OrganizationId != _session.LoggedUserPerson.OrganizationId)
-                throw new UserFriendlyException(L("Forbidden_DifferentOrganizations"));
-            // TODO-Security: Add Check: Same User or Role allowing Other User Access
-            if (_session.UserId != person.Id) // for the moment allow only same user
-                throw new UserFriendlyException(L("Forbidden_InsufficientRole"));
-
-            // Update database fields
-            person.Username = input.User.Username;
-
-            // Update fusion auth fields
-            var userToUpdate = new UserRequest()
+            var request = new UserRequest()
             {
-                user = ObjectMapper.Map<User>(input.User),
-                sendSetPasswordEmail = input.SendSetPasswordEmail,
-                skipVerification = input.SkipVerification
+                user = user,
+                sendSetPasswordEmail = false,
+                skipVerification = true
             };
-            if (input.User.Password == null)
-                userToUpdate.user.passwordChangeRequired = false;
-            userToUpdate.user.id = person.FusionAuthUserGuid;
 
-            var response = await client.UpdateUserAsync(person.FusionAuthUserGuid, userToUpdate);
-
+            var response = await client.UpdateUserAsync(user.id, request);
             if (response.WasSuccessful())
             {
-                Logger.Info("Ermes: Update User: " + input.User.Username);
-                return person.Id;
+                Logger.Info("Ermes: Update User preferred languages: " + user.username);
+                return true;
             }
+            else
+            {
+                var fa_error = FusionAuth.ManageErrorResponse(response);
+                throw new UserFriendlyException(fa_error.ErrorCode, fa_error.HasTranslation ? L(fa_error.Message) : fa_error.Message);
+            }
+        }
+        private async Task<User> GetUserAsync(Guid userGuid)
+        {
+            var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
+            var response = await client.RetrieveUserAsync(userGuid);
+            if (response.WasSuccessful())
+                return response.successResponse.user;
             else
             {
                 var fa_error = FusionAuth.ManageErrorResponse(response);
@@ -177,10 +159,32 @@ namespace Ermes.Profile
             Output: UserId of updated profile
             "
         )]
-        //[FasterAuthorize(AppPermissions.Profile_Update)]
+        
         public virtual async Task<long> UpdateProfile(UpdateProfileInput input)
         {
-            return await UpdateUserAsync(input);
+            Person person = await _personManager.GetPersonByIdAsync(input.PersonId ?? _session.UserId.Value);
+            // Validation
+            if (person == null)
+                throw new UserFriendlyException(L("InvalidPersonId", input.PersonId));
+            if (input.User.Timezone == null)
+                throw new UserFriendlyException(L("MissingRequiredField", "Timezone"));
+            if (input.OrganizationId != person.OrganizationId)
+                throw new UserFriendlyException(L("CannotChangeOrganization"));
+
+            // Security
+            if (_session.LoggedUserPerson.OrganizationId.HasValue && person.OrganizationId != _session.LoggedUserPerson.OrganizationId)
+                throw new UserFriendlyException(L("Forbidden_DifferentOrganizations"));
+            // TODO-Security: Add Check: Same User or Role allowing Other User Access
+            if (_session.UserId != person.Id) // for the moment allow only same user
+                throw new UserFriendlyException(L("Forbidden_InsufficientRole"));
+
+            // Update database fields
+            person.Username = input.User.Username;
+            input.User.Id = person.FusionAuthUserGuid;
+            if (await UpdateUserAsync(ObjectMapper.Map<User>(input.User)))
+                return person.Id;
+
+            return -1;
         }
 
         [OpenApiOperation("Delete profile",
@@ -248,6 +252,29 @@ namespace Ermes.Profile
         {
             PagedResultDto<PersonDto> result = await InternalGetOrganizationMemebers(input);
             return new DTResult<PersonDto>(input.Draw, result.TotalCount, result.Items.Count, result.Items.ToList());
+        }
+
+        [OpenApiOperation("Update Person preferred languages",
+            @"
+                Update Person Preferred Languages
+                Input: UpdatePreferredLanguagesInput Dto object with the full list of preferred languages in Iso2Code format
+                Output: true if the operation has been excuted successfully
+            "
+        )]
+        public virtual async Task<bool> UpdatePreferredLanguages(UpdatePreferredLanguagesInput input)
+        {
+            Person person = await _personManager.GetPersonByIdAsync(_session.UserId.Value);
+
+            // Validation
+            if (person == null)
+                throw new UserFriendlyException(L("InvalidPersonId", _session.UserId.Value));
+
+            var userToUpdate = await GetUserAsync(person.FusionAuthUserGuid);
+            if (person.Username == null)
+                person.Username = userToUpdate.username;
+
+            userToUpdate.preferredLanguages = input.PreferredLanguages;
+            return await UpdateUserAsync(userToUpdate);
         }
     }
 }

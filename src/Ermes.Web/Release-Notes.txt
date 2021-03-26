@@ -1,6 +1,6 @@
 Ver.
 ---------------------------
-
+- Feature - Update preferred languages API added and UpdateProfile API updated (#20)
 
 Ver. 1.5.2 - 2021-03-26
 ---------------------------

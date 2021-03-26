@@ -48,6 +48,7 @@ using Ermes.Categories;
 using Ermes.Helpers;
 using Abp.SocialMedia.Model;
 using Abp.SocialMedia.Dto;
+using io.fusionauth.domain.api;
 
 namespace Ermes
 {
@@ -58,7 +59,11 @@ namespace Ermes
             configuration.CreateMultiLingualMap<Activity, ActivityTranslation, ActivityDto>(context);
             configuration.CreateMultiLingualMap<Activity, ActivityTranslation, LocalizedActivityNameDto>(context);
             configuration.CreateMultiLingualMap<Category, CategoryTranslation, LocalizedCategoryValuesDto>(context);
-            configuration.CreateMap<User, UserDto>().ReverseMap();
+            configuration.CreateMap<User, UserDto>()
+                            .ReverseMap()
+                            .ForMember(entity => entity.passwordChangeRequired, options => options.MapFrom(dto => false))
+                            .ForMember(entity => entity.verified, options => options.MapFrom(dto => true))
+                            .ForMember(entity => entity.active, options => options.MapFrom(dto => true));
             configuration.CreateMap<UserRegistration, UserRegistrationDto>().ReverseMap();
             configuration.CreateMap<Organization, OrganizationDto>().ReverseMap();
             configuration.CreateMap<Role, RoleDto>().ReverseMap();
