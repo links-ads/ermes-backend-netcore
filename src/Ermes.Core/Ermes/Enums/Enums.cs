@@ -159,7 +159,6 @@ namespace Ermes.Enums
     [JsonConverter(typeof(StringEnumConverter))]
     public enum SocialModuleLanguageType
     {
-        none,
         en,
         it,
         es,
@@ -167,7 +166,8 @@ namespace Ermes.Enums
         tr,
         fi,
         el,
-        fr
+        fr,
+        nl
     }
 
     [JsonConverter(typeof(StringEnumConverter))]

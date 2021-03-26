@@ -1,8 +1,10 @@
 ﻿using Abp.SocialMedia;
+using Abp.SocialMedia.Dto;
 using Abp.SocialMedia.Model;
 using Abp.UI;
 using Ermes.Attributes;
 using Ermes.Dto;
+using Ermes.Enums;
 using Ermes.Social.Dto;
 using NSwag.Annotations;
 using System.Collections.Generic;
@@ -19,6 +21,10 @@ namespace Ermes.Social
             _socialManager = socialManager;
         }
 
+        //N.B.: there's the necessity to wrap class coming from the SDK with Input class
+        //with a constructor that initialises Filters property,
+        //otherwise this module throws an exception when an API is called
+
         #region Annotations
         [OpenApiOperation("Get Annotations",
             @"
@@ -30,20 +36,23 @@ namespace Ermes.Social
                     - End: date and time upper bound (optional) (default: now)
                     - Languages: list of languages in BCP47 format (optional)
                     - Informative: retrieve only informative (or not informative) tweets (optional)
-                    - Hazards: retrieve only a specific set of comma-separated hazard types. Refer to the 'id' field in 'GetLabels' api for the complete list, filtering by task=hazard_type (optional)
-                    - Infotypes : retrieve only a specific set of comma-separated information types. Refer to the 'id' field in 'GetLabels' api for the complete list, filtering by task=information_type (optional)
+                    - Hazards: retrieve only a specific set of comma-separated hazard types. Refer to the 'id' field in 'GetLabels' api for the complete list, filtering 
+                      by task=hazard_type (optional)
+                    - Infotypes : retrieve only a specific set of comma-separated information types. Refer to the 'id' field in 'GetLabels' api for the complete list, filtering 
+                      by task=information_type (optional)
                     - SouthWest: bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional) (to be filled together with NorthEast property)
                     - NorthEast: top-right corner of the bounding box for a spatial query, in (lon, lat) format. (optional) (to be filled together with SouthWest property)
                 Exception: thrown when fails to make API call
                 Output: Pagination Dto with list of Items
             "
         )]
+        // PagedGenericQuery cannot be used directly, SMA throws exception
         public virtual async Task<Pagination> GetAnnotations(GetAnnotationsInput input)
         {
             try
             {
-                AnnotationQuery annQuery = ObjectMapper.Map<AnnotationQuery>(input.Filters);
-                return await _socialManager.GetAnnotations(annQuery);
+                var filters = ObjectMapper.Map<PagedGenericQuery>(input.Filters);
+                return await _socialManager.GetAnnotations(filters);
             }
             catch (System.Exception e)
             {
@@ -108,8 +117,11 @@ namespace Ermes.Social
                     - Limit: how many instances per page (optional)
                     - Start: date and time lower bound (optional) (default: end - 24h)
                     - End: date and time upper bound (optional) (default: now)
-                    - Verified: filter for verified tweets (optional)
-                    - Hazards: retrieve only a specific set of comma-separated hazard types. Refer to the 'id' field in 'GetLabels' api for the complete list, filtering by task=hazard_type (optional)
+                    - Languages: list of languages in BCP47 format (optional)
+                    - Hazards: retrieve only a specific set of comma-separated hazard types. Refer to the 'id' field in 'GetLabels' api for the complete list, filtering 
+                      by task=hazard_type (optional)
+                    - Infotypes : retrieve only a specific set of comma-separated information types. Refer to the 'id' field in 'GetLabels' api for the complete list, filtering 
+                      by task=information_type (optional)
                     - SouthWest: bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional) (to be filled together with NorthEast property)
                     - NorthEast: top-right corner of the bounding box for a spatial query, in (lon, lat) format. (optional) (to be filled together with SouthWest property)
                 Exception: thrown when fails to make API call
@@ -120,8 +132,8 @@ namespace Ermes.Social
         {
             try
             {
-                EventQuery evQuery = ObjectMapper.Map<EventQuery>(input.Filters);
-                return await _socialManager.GetEvents(evQuery);
+                var filters = ObjectMapper.Map<GetEventsQuery>(input.Filters);
+                return await _socialManager.GetEvents(filters);
             }
             catch (System.Exception e)
             {
@@ -172,7 +184,7 @@ namespace Ermes.Social
                 //Deserialization in SMM throws an exception
                 return new GetLabelsOutput()
                 {
-                    Labels = await _socialManager.GetLabels(input.Filters.Operational, input.Filters.Task == Enums.SocialModuleTaskType.none ? null : input.Filters.Task.ToString())
+                    Labels = await _socialManager.GetLabels(input.Filters.Operational, input.Filters.Task == SocialModuleTaskType.none ? null : input.Filters.Task.ToString())
                 };
             }
             catch (System.Exception e)
@@ -296,14 +308,25 @@ namespace Ermes.Social
         #endregion
 
         #region Statistics
-        public virtual async Task<SocialItemOutput<Statistics>> GetStatistics(GetStatisticsInput input)
+        public virtual async Task<StatisticsTweet> GetTweetStatistics(GetTweetStatisticsInput input)
         {
             try
             {
-                return new SocialItemOutput<Statistics>()
-                {
-                    Item = await _socialManager.GetStatistics(input.Start, input.End)
-                };
+                var filters = ObjectMapper.Map<GenericQuery>(input.Filters);
+                return await _socialManager.GetTweetStatistics(filters);
+            }
+            catch (System.Exception e)
+            {
+                throw new UserFriendlyException(e.Message);
+            }
+        }
+
+        public virtual async Task<StatisticsEvent> GetEventStatistics(GetEventStatisticsInput input)
+        {
+            try
+            {
+                var filters = ObjectMapper.Map<EventStatsQuery>(input.Filters);
+                return await _socialManager.GetEventStatistics(filters);
             }
             catch (System.Exception e)
             {

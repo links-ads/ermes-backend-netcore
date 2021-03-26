@@ -1,0 +1,49 @@
+#docker-compose.shelter.test.yml (Extended config for Shelter TEST env.)
+version: '3.5'
+
+services:
+  shelter.web:
+    depends_on:
+      - shelter-pgsql
+    image: 'shelter.web'
+    build:
+      context: .
+      dockerfile: src/Ermes.Web/Dockerfile
+    restart: unless-stopped  
+    environment:
+      - ASPNETCORE_ENVIRONMENT=ShelterTest
+      - GOOGLE_APPLICATION_CREDENTIALS=firebasekey-shelter.json
+    ports:
+      - '${SHELTER_WEB_PORT_TEST}:80'
+    container_name: 'shelter-web-${ENVTYPE_SHELTER_TEST}'
+    networks:
+      - shelter-net
+    volumes:
+      - shelterlogstest:/app/App_Data/Logs/      
+    env_file:
+      - ./.env    
+
+  shelter-pgsql:
+    image: 'shelter-pgsql'
+    build:
+      context: .
+      dockerfile: src/containers/postgresql/Dockerfile
+    restart: unless-stopped  
+    container_name: 'shelter-pgsql-${ENVTYPE_SHELTER_TEST}'
+    networks:
+      - shelter-net    
+    environment:
+      POSTGRES_PASSWORD: ${SHELTER_PASSWORD_TEST}
+      DB_PASSWORD: ${SHELTER_PASSWORD_TEST}
+      DB_NAME: ${SHELTER_DB_TEST}
+      DB_USER: ${SHELTER_USER_TEST}
+    ports:
+      - '${PGSQL_PORT_SHELTER_TEST}:5432'
+
+networks:
+  shelter-net:
+    name: shelter-net-${ENVTYPE_SHELTER_TEST}
+
+volumes:
+  shelterlogstest:
+

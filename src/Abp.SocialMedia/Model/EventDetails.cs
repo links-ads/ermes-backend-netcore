@@ -35,25 +35,29 @@ namespace Abp.SocialMedia.Model
         /// </summary>
         /// <param name="activatedAt">activatedAt.</param>
         /// <param name="endedAt">endedAt.</param>
-        /// <param name="hazard">hazard.</param>
+        /// <param name="hazardId">hazardId.</param>
         /// <param name="hotspots">hotspots.</param>
         /// <param name="id">id.</param>
+        /// <param name="lang">lang.</param>
         /// <param name="name">name.</param>
         /// <param name="startedAt">startedAt.</param>
         /// <param name="totalArea">totalArea.</param>
+        /// <param name="trackingStoppedAt">trackingStoppedAt.</param>
         /// <param name="tweets">tweets.</param>
         /// <param name="updatedAt">updatedAt.</param>
         /// <param name="verified">verified.</param>
-        public EventDetails(DateTime activatedAt = default(DateTime), DateTime endedAt = default(DateTime), ClassificationDetails hazard = default(ClassificationDetails), Object hotspots = default(Object), int id = default(int), string name = default(string), DateTime startedAt = default(DateTime), Object totalArea = default(Object), List<long> tweets = default(List<long>), DateTime updatedAt = default(DateTime), bool verified = default(bool))
+        public EventDetails(DateTime activatedAt = default(DateTime), DateTime endedAt = default(DateTime), int hazardId = default(int), Object hotspots = default(Object), int id = default(int), string lang = default(string), string name = default(string), DateTime startedAt = default(DateTime), Object totalArea = default(Object), DateTime trackingStoppedAt = default(DateTime), List<PartialTweet> tweets = default(List<PartialTweet>), DateTime updatedAt = default(DateTime), bool verified = default(bool))
         {
             this.ActivatedAt = activatedAt;
             this.EndedAt = endedAt;
-            this.Hazard = hazard;
+            this.HazardId = hazardId;
             this.Hotspots = hotspots;
             this.Id = id;
+            this.Lang = lang;
             this.Name = name;
             this.StartedAt = startedAt;
             this.TotalArea = totalArea;
+            this.TrackingStoppedAt = trackingStoppedAt;
             this.Tweets = tweets;
             this.UpdatedAt = updatedAt;
             this.Verified = verified;
@@ -72,10 +76,10 @@ namespace Abp.SocialMedia.Model
         public DateTime EndedAt { get; set; }
 
         /// <summary>
-        /// Gets or Sets Hazard
+        /// Gets or Sets HazardId
         /// </summary>
-        [DataMember(Name = "hazard", EmitDefaultValue = false)]
-        public ClassificationDetails Hazard { get; set; }
+        [DataMember(Name = "hazard_id", EmitDefaultValue = false)]
+        public int HazardId { get; set; }
 
         /// <summary>
         /// Gets or Sets Hotspots
@@ -88,6 +92,12 @@ namespace Abp.SocialMedia.Model
         /// </summary>
         [DataMember(Name = "id", EmitDefaultValue = false)]
         public int Id { get; set; }
+
+        /// <summary>
+        /// Gets or Sets Lang
+        /// </summary>
+        [DataMember(Name = "lang", EmitDefaultValue = false)]
+        public string Lang { get; set; }
 
         /// <summary>
         /// Gets or Sets Name
@@ -108,10 +118,16 @@ namespace Abp.SocialMedia.Model
         public Object TotalArea { get; set; }
 
         /// <summary>
+        /// Gets or Sets TrackingStoppedAt
+        /// </summary>
+        [DataMember(Name = "tracking_stopped_at", EmitDefaultValue = false)]
+        public DateTime TrackingStoppedAt { get; set; }
+
+        /// <summary>
         /// Gets or Sets Tweets
         /// </summary>
-        [DataMember(Name = "tweets", EmitDefaultValue = true)]
-        public List<long> Tweets { get; set; }
+        [DataMember(Name = "tweets", EmitDefaultValue = false)]
+        public List<PartialTweet> Tweets { get; set; }
 
         /// <summary>
         /// Gets or Sets UpdatedAt
@@ -135,12 +151,14 @@ namespace Abp.SocialMedia.Model
             sb.Append("class EventDetails {\n");
             sb.Append("  ActivatedAt: ").Append(ActivatedAt).Append("\n");
             sb.Append("  EndedAt: ").Append(EndedAt).Append("\n");
-            sb.Append("  Hazard: ").Append(Hazard).Append("\n");
+            sb.Append("  HazardId: ").Append(HazardId).Append("\n");
             sb.Append("  Hotspots: ").Append(Hotspots).Append("\n");
             sb.Append("  Id: ").Append(Id).Append("\n");
+            sb.Append("  Lang: ").Append(Lang).Append("\n");
             sb.Append("  Name: ").Append(Name).Append("\n");
             sb.Append("  StartedAt: ").Append(StartedAt).Append("\n");
             sb.Append("  TotalArea: ").Append(TotalArea).Append("\n");
+            sb.Append("  TrackingStoppedAt: ").Append(TrackingStoppedAt).Append("\n");
             sb.Append("  Tweets: ").Append(Tweets).Append("\n");
             sb.Append("  UpdatedAt: ").Append(UpdatedAt).Append("\n");
             sb.Append("  Verified: ").Append(Verified).Append("\n");
@@ -189,9 +207,8 @@ namespace Abp.SocialMedia.Model
                     this.EndedAt.Equals(input.EndedAt))
                 ) && 
                 (
-                    this.Hazard == input.Hazard ||
-                    (this.Hazard != null &&
-                    this.Hazard.Equals(input.Hazard))
+                    this.HazardId == input.HazardId ||
+                    this.HazardId.Equals(input.HazardId)
                 ) && 
                 (
                     this.Hotspots == input.Hotspots ||
@@ -201,6 +218,11 @@ namespace Abp.SocialMedia.Model
                 (
                     this.Id == input.Id ||
                     this.Id.Equals(input.Id)
+                ) && 
+                (
+                    this.Lang == input.Lang ||
+                    (this.Lang != null &&
+                    this.Lang.Equals(input.Lang))
                 ) && 
                 (
                     this.Name == input.Name ||
@@ -216,6 +238,11 @@ namespace Abp.SocialMedia.Model
                     this.TotalArea == input.TotalArea ||
                     (this.TotalArea != null &&
                     this.TotalArea.Equals(input.TotalArea))
+                ) && 
+                (
+                    this.TrackingStoppedAt == input.TrackingStoppedAt ||
+                    (this.TrackingStoppedAt != null &&
+                    this.TrackingStoppedAt.Equals(input.TrackingStoppedAt))
                 ) && 
                 (
                     this.Tweets == input.Tweets ||
@@ -247,17 +274,20 @@ namespace Abp.SocialMedia.Model
                     hashCode = hashCode * 59 + this.ActivatedAt.GetHashCode();
                 if (this.EndedAt != null)
                     hashCode = hashCode * 59 + this.EndedAt.GetHashCode();
-                if (this.Hazard != null)
-                    hashCode = hashCode * 59 + this.Hazard.GetHashCode();
+                hashCode = hashCode * 59 + this.HazardId.GetHashCode();
                 if (this.Hotspots != null)
                     hashCode = hashCode * 59 + this.Hotspots.GetHashCode();
                 hashCode = hashCode * 59 + this.Id.GetHashCode();
+                if (this.Lang != null)
+                    hashCode = hashCode * 59 + this.Lang.GetHashCode();
                 if (this.Name != null)
                     hashCode = hashCode * 59 + this.Name.GetHashCode();
                 if (this.StartedAt != null)
                     hashCode = hashCode * 59 + this.StartedAt.GetHashCode();
                 if (this.TotalArea != null)
                     hashCode = hashCode * 59 + this.TotalArea.GetHashCode();
+                if (this.TrackingStoppedAt != null)
+                    hashCode = hashCode * 59 + this.TrackingStoppedAt.GetHashCode();
                 if (this.Tweets != null)
                     hashCode = hashCode * 59 + this.Tweets.GetHashCode();
                 if (this.UpdatedAt != null)

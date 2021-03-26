@@ -25,13 +25,13 @@ using OpenAPIDateConverter = Abp.SocialMedia.Client.OpenAPIDateConverter;
 namespace Abp.SocialMedia.Model
 {
     /// <summary>
-    /// Statistics
+    /// StatisticsTweet
     /// </summary>
-    [DataContract(Name = "Statistics")]
-    public partial class Statistics : IEquatable<Statistics>, IValidatableObject
+    [DataContract(Name = "StatisticsTweet")]
+    public partial class StatisticsTweet : IEquatable<StatisticsTweet>, IValidatableObject
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="Statistics" /> class.
+        /// Initializes a new instance of the <see cref="StatisticsTweet" /> class.
         /// </summary>
         /// <param name="eventsCount">eventsCount.</param>
         /// <param name="hazardsCount">hazardsCount.</param>
@@ -39,7 +39,7 @@ namespace Abp.SocialMedia.Model
         /// <param name="infotypesCount">infotypesCount.</param>
         /// <param name="languagesCount">languagesCount.</param>
         /// <param name="tweetsCount">tweetsCount.</param>
-        public Statistics(Object eventsCount = default(Object), Object hazardsCount = default(Object), float informativenessRatio = default(float), Object infotypesCount = default(Object), Object languagesCount = default(Object), int tweetsCount = default(int))
+        public StatisticsTweet(Object eventsCount = default(Object), Object hazardsCount = default(Object), float informativenessRatio = default(float), Object infotypesCount = default(Object), Object languagesCount = default(Object), int tweetsCount = default(int))
         {
             this.EventsCount = eventsCount;
             this.HazardsCount = hazardsCount;
@@ -92,7 +92,7 @@ namespace Abp.SocialMedia.Model
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.Append("class Statistics {\n");
+            sb.Append("class StatisticsTweet {\n");
             sb.Append("  EventsCount: ").Append(EventsCount).Append("\n");
             sb.Append("  HazardsCount: ").Append(HazardsCount).Append("\n");
             sb.Append("  InformativenessRatio: ").Append(InformativenessRatio).Append("\n");
@@ -119,15 +119,15 @@ namespace Abp.SocialMedia.Model
         /// <returns>Boolean</returns>
         public override bool Equals(object input)
         {
-            return this.Equals(input as Statistics);
+            return this.Equals(input as StatisticsTweet);
         }
 
         /// <summary>
-        /// Returns true if Statistics instances are equal
+        /// Returns true if StatisticsTweet instances are equal
         /// </summary>
-        /// <param name="input">Instance of Statistics to be compared</param>
+        /// <param name="input">Instance of StatisticsTweet to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(Statistics input)
+        public bool Equals(StatisticsTweet input)
         {
             if (input == null)
                 return false;

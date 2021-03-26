@@ -11,6 +11,13 @@ services:
     container_name: 'shelter-web-${ENVTYPE_SHELTER_LOCAL}'
     env_file: 
       - ./.env
+    depends_on:
+      - shelter-pgsql
+    image: 'shelter.web'
+    build:
+      context: .
+      dockerfile: src/Ermes.Web/Dockerfile
+    restart: unless-stopped      
 
   shelter-pgsql:
     container_name: 'shelter-pgsql-${ENVTYPE_SHELTER_LOCAL}'
@@ -21,3 +28,8 @@ services:
       DB_USER: ${SHELTER_USER_LOCAL}
     ports:
       - '${PGSQL_PORT_SHELTER_LOCAL}:5432'
+    image: 'shelter-pgsql'
+    build:
+      context: .
+      dockerfile: src/containers/postgresql/Dockerfile
+    restart: unless-stopped      
