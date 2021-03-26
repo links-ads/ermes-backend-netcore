@@ -101,7 +101,7 @@ namespace Ermes.Users
                 input.User.Timezone = AppConsts.DefaultTimezone;
 
             //Check if Organization exists
-            var org = await _organizationManager.GetOrganizationByIdAsync(input.OrganizationId);
+            var org = await _organizationManager.GetOrganizationByIdAsync(input.OrganizationId.Value);
             if (org == null)
                 throw new UserFriendlyException(L("InvalidOrganizationId", input.OrganizationId));
 
@@ -111,10 +111,10 @@ namespace Ermes.Users
                 var team = await _teamManager.GetTeamByIdAsync(input.TeamId.Value);
                 if (team == null)
                     throw new UserFriendlyException(L("InvalidTeamId", input.TeamId.Value));
-                if(team.OrganizationId != org.Id)
+                if (team.OrganizationId != org.Id)
                     throw new UserFriendlyException(L("TeamNotInOrganization", input.TeamId, input.OrganizationId));
             }
- 
+
             List<Role> rolesToAssign = await GetRolesAndCheckOrganization(input.User.Roles, input.OrganizationId, _personManager, _organizationManager, _session);
 
             //Create user on FusionAuth
@@ -126,9 +126,9 @@ namespace Ermes.Users
                     applicationId = new Guid(_fusionAuthSettings.Value.ApplicationId),
                     roles = rolesToAssign.Select(r => r.Name).ToList()
                 },
-                sendSetPasswordEmail = input.SendSetPasswordEmail,
-                skipVerification = input.SkipVerification,
-                skipRegistrationVerification = input.SkipRegistrationVerification
+                sendSetPasswordEmail = false,// input.SendSetPasswordEmail,
+                skipVerification = true,// input.SkipVerification,
+                skipRegistrationVerification = true//input.SkipRegistrationVerification
             };
 
             var response = await client.RegisterAsync(null, newUser);

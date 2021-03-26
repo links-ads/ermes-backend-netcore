@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Ermes.Auth.Dto
 {
     public class UserDto
     {
+        public Guid Id { get; set; }
         public string BirthDate { get; set; }
         public string Email { get; set; }
         public string FirstName { get; set; }
@@ -14,9 +16,8 @@ namespace Ermes.Auth.Dto
         public string MobilePhone { get; set; }
         public List<string> PreferredLanguages { get; set; }
         public string Username { get; set; }
-        public string Password { get; set; }
+        //public string Password { get; set; }
         public string[] Roles { get; set; }
-
         public string Timezone { get; set; }
     }
 }

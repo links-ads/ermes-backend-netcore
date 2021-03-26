@@ -166,7 +166,8 @@ namespace Ermes.Enums
         tr,
         fi,
         el,
-        fr
+        fr,
+        nl
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
