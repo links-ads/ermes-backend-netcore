@@ -1,4 +1,6 @@
 ﻿using Abp.Domain.Entities;
+using Ermes.Enums;
+using Ermes.Helpers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -26,6 +28,15 @@ namespace Ermes.Activities
         [ForeignKey("ParentId")]
         public virtual Activity Parent { get; set; }
         public virtual int? ParentId { get; set; }
+
+        [Column("Hazard")]
+        public string HazardString
+        {
+            get { return Hazard.ToString(); }
+            private set { Hazard = value.ParseEnum<HazardType>(); }
+        }
+        [NotMapped]
+        public HazardType Hazard { get; set; }
 
     }
 }

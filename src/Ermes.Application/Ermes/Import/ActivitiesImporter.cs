@@ -12,6 +12,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Ermes.Enums;
+using Ermes.Helpers;
 
 namespace Ermes.Import
 {
@@ -29,10 +31,12 @@ namespace Ermes.Import
             String ShortName { get; }
             [StringLength(MAX_CODE_LENGTH)]
             String ParentShortName { get; }
+            String HazardString { get; }
+            HazardType Hazard { get; }
             IEnumerable<(String Translation, String Language)> Items { get; }
         }
         #region Excel
-        const int numberOfHeaderCols = 2;
+        const int numberOfHeaderCols = 3;
         const int numberOfHeaderRows = 1;
         const int excelIndexingStart = 1;
         private class ExcelActivityTranslationRow : IActivityTranslationRow
@@ -76,6 +80,17 @@ namespace Ermes.Import
                     return String.IsNullOrWhiteSpace(psn) ? null : psn;
                 }
             }
+
+            public string HazardString
+            {
+                get
+                {
+                    string hazard = _cells[_rowIndex + numberOfHeaderRows + excelIndexingStart, excelIndexingStart + 2].Text;
+                    return String.IsNullOrWhiteSpace(hazard) ? null : hazard;
+                }
+            }
+
+            public HazardType Hazard { get { return HazardString.ParseEnum<HazardType>();  } }
         }
         private class ExcelMultilanguageActivityTable : IMultilanguageActivityTable
         {
@@ -84,8 +99,8 @@ namespace Ermes.Import
             public ExcelMultilanguageActivityTable(ExcelRange cells, ErmesLocalizationHelper localizer)
             {
                 _cells = cells;
-                for (length = 2; !String.IsNullOrWhiteSpace(cells[excelIndexingStart, length + excelIndexingStart].Text); length++) ;
-                for (int i = 2; i < length; i++)
+                for (length = 3; !String.IsNullOrWhiteSpace(cells[excelIndexingStart, length + excelIndexingStart].Text); length++) ;
+                for (int i = 3; i < length; i++)
                 {
                     string lcode = cells[excelIndexingStart, excelIndexingStart + i].Text;
                     if (!CultureInfo.GetCultures(CultureTypes.AllCultures).Any(c => c.TwoLetterISOLanguageName == lcode))
@@ -143,7 +158,8 @@ namespace Ermes.Import
                     act = new Activity()
                     {
                         ShortName = activity.ShortName,
-                        ParentId = parentAct?.Id
+                        ParentId = parentAct?.Id,
+                        Hazard = activity.Hazard
                     };
                     act.Id = await activityManager.InsertActivityAsync(act);
                     result.ElementsAdded++;
@@ -151,6 +167,7 @@ namespace Ermes.Import
                 else
                 {
                     act.ParentId = parentAct?.Id;
+                    act.Hazard = activity.Hazard;
                     result.ElementsUpdated++;
                 }
 
