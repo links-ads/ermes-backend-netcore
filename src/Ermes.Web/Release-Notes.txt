@@ -1,5 +1,9 @@
 Ver.
 ---------------------------
+
+
+Ver. 1.5.3. - 2021-04-01
+---------------------------
 - Feature - Update preferred languages API added and UpdateProfile API updated (#20)
 - Feature - Added Hazard property to Activity (migration added) (#19)
 
