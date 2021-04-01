@@ -32,6 +32,8 @@
     <Compile Include="Migrations\20210304100757_Report_AdultInfo_Added.Designer.cs" />
     <Compile Include="Migrations\20210308085826_Category_GroupIcon_Added.cs" />
     <Compile Include="Migrations\20210308085826_Category_GroupIcon_Added.Designer.cs" />
+    <Compile Include="Migrations\20210401083518_Activity_Hazard_Column.cs" />
+    <Compile Include="Migrations\20210401083518_Activity_Hazard_Column.Designer.cs" />
     <Compile Include="Migrations\ErmesDbContextModelSnapshot.cs" />
     <Compile Include="Migrations\Seed\ModelBuilderExtensions.cs" />
   </ItemGroup>
