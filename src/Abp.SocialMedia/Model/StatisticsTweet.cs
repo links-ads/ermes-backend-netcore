@@ -33,15 +33,13 @@ namespace Abp.SocialMedia.Model
         /// <summary>
         /// Initializes a new instance of the <see cref="StatisticsTweet" /> class.
         /// </summary>
-        /// <param name="eventsCount">eventsCount.</param>
         /// <param name="hazardsCount">hazardsCount.</param>
         /// <param name="informativenessRatio">informativenessRatio.</param>
         /// <param name="infotypesCount">infotypesCount.</param>
         /// <param name="languagesCount">languagesCount.</param>
         /// <param name="tweetsCount">tweetsCount.</param>
-        public StatisticsTweet(Object eventsCount = default(Object), Object hazardsCount = default(Object), float informativenessRatio = default(float), Object infotypesCount = default(Object), Object languagesCount = default(Object), int tweetsCount = default(int))
+        public StatisticsTweet(Object hazardsCount = default(Object), float informativenessRatio = default(float), Object infotypesCount = default(Object), Object languagesCount = default(Object), int tweetsCount = default(int))
         {
-            this.EventsCount = eventsCount;
             this.HazardsCount = hazardsCount;
             this.InformativenessRatio = informativenessRatio;
             this.InfotypesCount = infotypesCount;
@@ -50,39 +48,33 @@ namespace Abp.SocialMedia.Model
         }
 
         /// <summary>
-        /// Gets or Sets EventsCount
-        /// </summary>
-        [DataMember(Name = "events_count", EmitDefaultValue = false)]
-        public Object EventsCount { get; set; }
-
-        /// <summary>
         /// Gets or Sets HazardsCount
         /// </summary>
-        [DataMember(Name = "hazards_count", EmitDefaultValue = false)]
+        [DataMember(Name = "hazards_count", EmitDefaultValue = true)]
         public Object HazardsCount { get; set; }
 
         /// <summary>
         /// Gets or Sets InformativenessRatio
         /// </summary>
-        [DataMember(Name = "informativeness_ratio", EmitDefaultValue = false)]
+        [DataMember(Name = "informativeness_ratio", EmitDefaultValue = true)]
         public float InformativenessRatio { get; set; }
 
         /// <summary>
         /// Gets or Sets InfotypesCount
         /// </summary>
-        [DataMember(Name = "infotypes_count", EmitDefaultValue = false)]
+        [DataMember(Name = "infotypes_count", EmitDefaultValue = true)]
         public Object InfotypesCount { get; set; }
 
         /// <summary>
         /// Gets or Sets LanguagesCount
         /// </summary>
-        [DataMember(Name = "languages_count", EmitDefaultValue = false)]
+        [DataMember(Name = "languages_count", EmitDefaultValue = true)]
         public Object LanguagesCount { get; set; }
 
         /// <summary>
         /// Gets or Sets TweetsCount
         /// </summary>
-        [DataMember(Name = "tweets_count", EmitDefaultValue = false)]
+        [DataMember(Name = "tweets_count", EmitDefaultValue = true)]
         public int TweetsCount { get; set; }
 
         /// <summary>
@@ -93,7 +85,6 @@ namespace Abp.SocialMedia.Model
         {
             var sb = new StringBuilder();
             sb.Append("class StatisticsTweet {\n");
-            sb.Append("  EventsCount: ").Append(EventsCount).Append("\n");
             sb.Append("  HazardsCount: ").Append(HazardsCount).Append("\n");
             sb.Append("  InformativenessRatio: ").Append(InformativenessRatio).Append("\n");
             sb.Append("  InfotypesCount: ").Append(InfotypesCount).Append("\n");
@@ -134,11 +125,6 @@ namespace Abp.SocialMedia.Model
 
             return 
                 (
-                    this.EventsCount == input.EventsCount ||
-                    (this.EventsCount != null &&
-                    this.EventsCount.Equals(input.EventsCount))
-                ) && 
-                (
                     this.HazardsCount == input.HazardsCount ||
                     (this.HazardsCount != null &&
                     this.HazardsCount.Equals(input.HazardsCount))
@@ -172,8 +158,6 @@ namespace Abp.SocialMedia.Model
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = 41;
-                if (this.EventsCount != null)
-                    hashCode = hashCode * 59 + this.EventsCount.GetHashCode();
                 if (this.HazardsCount != null)
                     hashCode = hashCode * 59 + this.HazardsCount.GetHashCode();
                 hashCode = hashCode * 59 + this.InformativenessRatio.GetHashCode();

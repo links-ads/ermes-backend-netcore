@@ -40,6 +40,7 @@ namespace Abp.SocialMedia.Model
         /// <param name="hashtags">hashtags.</param>
         /// <param name="hazardTypes">hazardTypes.</param>
         /// <param name="id">id.</param>
+        /// <param name="idStr">idStr.</param>
         /// <param name="informationTypes">informationTypes.</param>
         /// <param name="informative">informative.</param>
         /// <param name="lang">lang.</param>
@@ -50,7 +51,7 @@ namespace Abp.SocialMedia.Model
         /// <param name="retweeted">retweeted.</param>
         /// <param name="source">source.</param>
         /// <param name="text">text.</param>
-        public Annotation(PartialAuthor author = default(PartialAuthor), DateTime createdAt = default(DateTime), List<EntityDetails> entities = default(List<EntityDetails>), int favoriteCount = default(int), List<string> hashtags = default(List<string>), List<ClassificationDetails> hazardTypes = default(List<ClassificationDetails>), long id = default(long), List<ClassificationDetails> informationTypes = default(List<ClassificationDetails>), bool informative = default(bool), string lang = default(string), Object location = default(Object), List<PartialMedia> media = default(List<PartialMedia>), int quoted = default(int), int retweetCount = default(int), bool retweeted = default(bool), string source = default(string), string text = default(string))
+        public Annotation(Author author = default(Author), DateTime createdAt = default(DateTime), List<PartialEntity> entities = default(List<PartialEntity>), int favoriteCount = default(int), List<string> hashtags = default(List<string>), List<PartialClassification> hazardTypes = default(List<PartialClassification>), long id = default(long), string idStr = default(string), List<PartialClassification> informationTypes = default(List<PartialClassification>), bool informative = default(bool), string lang = default(string), Object location = default(Object), List<Media> media = default(List<Media>), int quoted = default(int), int retweetCount = default(int), bool retweeted = default(bool), string source = default(string), string text = default(string))
         {
             this.Author = author;
             this.CreatedAt = createdAt;
@@ -59,6 +60,7 @@ namespace Abp.SocialMedia.Model
             this.Hashtags = hashtags;
             this.HazardTypes = hazardTypes;
             this.Id = id;
+            this.IdStr = idStr;
             this.InformationTypes = informationTypes;
             this.Informative = informative;
             this.Lang = lang;
@@ -74,61 +76,67 @@ namespace Abp.SocialMedia.Model
         /// <summary>
         /// Gets or Sets Author
         /// </summary>
-        [DataMember(Name = "author", EmitDefaultValue = false)]
-        public PartialAuthor Author { get; set; }
+        [DataMember(Name = "author", EmitDefaultValue = true)]
+        public Author Author { get; set; }
 
         /// <summary>
         /// Gets or Sets CreatedAt
         /// </summary>
-        [DataMember(Name = "created_at", EmitDefaultValue = false)]
+        [DataMember(Name = "created_at", EmitDefaultValue = true)]
         public DateTime CreatedAt { get; set; }
 
         /// <summary>
         /// Gets or Sets Entities
         /// </summary>
-        [DataMember(Name = "entities", EmitDefaultValue = false)]
-        public List<EntityDetails> Entities { get; set; }
+        [DataMember(Name = "entities", EmitDefaultValue = true)]
+        public List<PartialEntity> Entities { get; set; }
 
         /// <summary>
         /// Gets or Sets FavoriteCount
         /// </summary>
-        [DataMember(Name = "favorite_count", EmitDefaultValue = false)]
+        [DataMember(Name = "favorite_count", EmitDefaultValue = true)]
         public int FavoriteCount { get; set; }
 
         /// <summary>
         /// Gets or Sets Hashtags
         /// </summary>
-        [DataMember(Name = "hashtags", EmitDefaultValue = false)]
+        [DataMember(Name = "hashtags", EmitDefaultValue = true)]
         public List<string> Hashtags { get; set; }
 
         /// <summary>
         /// Gets or Sets HazardTypes
         /// </summary>
-        [DataMember(Name = "hazard_types", EmitDefaultValue = false)]
-        public List<ClassificationDetails> HazardTypes { get; set; }
+        [DataMember(Name = "hazard_types", EmitDefaultValue = true)]
+        public List<PartialClassification> HazardTypes { get; set; }
 
         /// <summary>
         /// Gets or Sets Id
         /// </summary>
-        [DataMember(Name = "id", EmitDefaultValue = false)]
+        [DataMember(Name = "id", EmitDefaultValue = true)]
         public long Id { get; set; }
+
+        /// <summary>
+        /// Gets or Sets IdStr
+        /// </summary>
+        [DataMember(Name = "id_str", EmitDefaultValue = true)]
+        public string IdStr { get; set; }
 
         /// <summary>
         /// Gets or Sets InformationTypes
         /// </summary>
-        [DataMember(Name = "information_types", EmitDefaultValue = false)]
-        public List<ClassificationDetails> InformationTypes { get; set; }
+        [DataMember(Name = "information_types", EmitDefaultValue = true)]
+        public List<PartialClassification> InformationTypes { get; set; }
 
         /// <summary>
         /// Gets or Sets Informative
         /// </summary>
-        [DataMember(Name = "informative", EmitDefaultValue = false)]
+        [DataMember(Name = "informative", EmitDefaultValue = true)]
         public bool Informative { get; set; }
 
         /// <summary>
         /// Gets or Sets Lang
         /// </summary>
-        [DataMember(Name = "lang", EmitDefaultValue = false)]
+        [DataMember(Name = "lang", EmitDefaultValue = true)]
         public string Lang { get; set; }
 
         /// <summary>
@@ -140,37 +148,37 @@ namespace Abp.SocialMedia.Model
         /// <summary>
         /// Gets or Sets Media
         /// </summary>
-        [DataMember(Name = "media", EmitDefaultValue = false)]
-        public List<PartialMedia> Media { get; set; }
+        [DataMember(Name = "media", EmitDefaultValue = true)]
+        public List<Media> Media { get; set; }
 
         /// <summary>
         /// Gets or Sets Quoted
         /// </summary>
-        [DataMember(Name = "quoted", EmitDefaultValue = false)]
+        [DataMember(Name = "quoted", EmitDefaultValue = true)]
         public int Quoted { get; set; }
 
         /// <summary>
         /// Gets or Sets RetweetCount
         /// </summary>
-        [DataMember(Name = "retweet_count", EmitDefaultValue = false)]
+        [DataMember(Name = "retweet_count", EmitDefaultValue = true)]
         public int RetweetCount { get; set; }
 
         /// <summary>
         /// Gets or Sets Retweeted
         /// </summary>
-        [DataMember(Name = "retweeted", EmitDefaultValue = false)]
+        [DataMember(Name = "retweeted", EmitDefaultValue = true)]
         public bool Retweeted { get; set; }
 
         /// <summary>
         /// Gets or Sets Source
         /// </summary>
-        [DataMember(Name = "source", EmitDefaultValue = false)]
+        [DataMember(Name = "source", EmitDefaultValue = true)]
         public string Source { get; set; }
 
         /// <summary>
         /// Gets or Sets Text
         /// </summary>
-        [DataMember(Name = "text", EmitDefaultValue = false)]
+        [DataMember(Name = "text", EmitDefaultValue = true)]
         public string Text { get; set; }
 
         /// <summary>
@@ -188,6 +196,7 @@ namespace Abp.SocialMedia.Model
             sb.Append("  Hashtags: ").Append(Hashtags).Append("\n");
             sb.Append("  HazardTypes: ").Append(HazardTypes).Append("\n");
             sb.Append("  Id: ").Append(Id).Append("\n");
+            sb.Append("  IdStr: ").Append(IdStr).Append("\n");
             sb.Append("  InformationTypes: ").Append(InformationTypes).Append("\n");
             sb.Append("  Informative: ").Append(Informative).Append("\n");
             sb.Append("  Lang: ").Append(Lang).Append("\n");
@@ -269,6 +278,11 @@ namespace Abp.SocialMedia.Model
                     this.Id.Equals(input.Id)
                 ) && 
                 (
+                    this.IdStr == input.IdStr ||
+                    (this.IdStr != null &&
+                    this.IdStr.Equals(input.IdStr))
+                ) && 
+                (
                     this.InformationTypes == input.InformationTypes ||
                     this.InformationTypes != null &&
                     input.InformationTypes != null &&
@@ -339,6 +353,8 @@ namespace Abp.SocialMedia.Model
                 if (this.HazardTypes != null)
                     hashCode = hashCode * 59 + this.HazardTypes.GetHashCode();
                 hashCode = hashCode * 59 + this.Id.GetHashCode();
+                if (this.IdStr != null)
+                    hashCode = hashCode * 59 + this.IdStr.GetHashCode();
                 if (this.InformationTypes != null)
                     hashCode = hashCode * 59 + this.InformationTypes.GetHashCode();
                 hashCode = hashCode * 59 + this.Informative.GetHashCode();

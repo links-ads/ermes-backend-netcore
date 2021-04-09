@@ -34,8 +34,8 @@ namespace Abp.SocialMedia.Api
         /// </remarks>
         /// <exception cref="Abp.SocialMedia.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="eventId">ID of the event</param>
-        /// <returns>EventDetails</returns>
-        EventDetails ApiV1EventsEventIdGet(int eventId);
+        /// <returns>Event</returns>
+        Event ApiV1EventsEventIdGet(int eventId);
 
         /// <summary>
         /// Gets a single event (with tweet id associated)
@@ -45,8 +45,8 @@ namespace Abp.SocialMedia.Api
         /// </remarks>
         /// <exception cref="Abp.SocialMedia.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="eventId">ID of the event</param>
-        /// <returns>ApiResponse of EventDetails</returns>
-        ApiResponse<EventDetails> ApiV1EventsEventIdGetWithHttpInfo(int eventId);
+        /// <returns>ApiResponse of Event</returns>
+        ApiResponse<Event> ApiV1EventsEventIdGetWithHttpInfo(int eventId);
         /// <summary>
         /// Retrieves a paged list of events
         /// </summary>
@@ -102,8 +102,8 @@ namespace Abp.SocialMedia.Api
         /// <exception cref="Abp.SocialMedia.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="eventId">ID of the event</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
-        /// <returns>Task of EventDetails</returns>
-        System.Threading.Tasks.Task<EventDetails> ApiV1EventsEventIdGetAsync(int eventId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        /// <returns>Task of Event</returns>
+        System.Threading.Tasks.Task<Event> ApiV1EventsEventIdGetAsync(int eventId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <summary>
         /// Gets a single event (with tweet id associated)
@@ -114,8 +114,8 @@ namespace Abp.SocialMedia.Api
         /// <exception cref="Abp.SocialMedia.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="eventId">ID of the event</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
-        /// <returns>Task of ApiResponse (EventDetails)</returns>
-        System.Threading.Tasks.Task<ApiResponse<EventDetails>> ApiV1EventsEventIdGetWithHttpInfoAsync(int eventId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        /// <returns>Task of ApiResponse (Event)</returns>
+        System.Threading.Tasks.Task<ApiResponse<Event>> ApiV1EventsEventIdGetWithHttpInfoAsync(int eventId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
         /// <summary>
         /// Retrieves a paged list of events
         /// </summary>
@@ -280,10 +280,10 @@ namespace Abp.SocialMedia.Api
         /// </summary>
         /// <exception cref="Abp.SocialMedia.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="eventId">ID of the event</param>
-        /// <returns>EventDetails</returns>
-        public EventDetails ApiV1EventsEventIdGet(int eventId)
+        /// <returns>Event</returns>
+        public Event ApiV1EventsEventIdGet(int eventId)
         {
-            Abp.SocialMedia.Client.ApiResponse<EventDetails> localVarResponse = ApiV1EventsEventIdGetWithHttpInfo(eventId);
+            Abp.SocialMedia.Client.ApiResponse<Event> localVarResponse = ApiV1EventsEventIdGetWithHttpInfo(eventId);
             return localVarResponse.Data;
         }
 
@@ -292,8 +292,8 @@ namespace Abp.SocialMedia.Api
         /// </summary>
         /// <exception cref="Abp.SocialMedia.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="eventId">ID of the event</param>
-        /// <returns>ApiResponse of EventDetails</returns>
-        public Abp.SocialMedia.Client.ApiResponse<EventDetails> ApiV1EventsEventIdGetWithHttpInfo(int eventId)
+        /// <returns>ApiResponse of Event</returns>
+        public Abp.SocialMedia.Client.ApiResponse<Event> ApiV1EventsEventIdGetWithHttpInfo(int eventId)
         {
             Abp.SocialMedia.Client.RequestOptions localVarRequestOptions = new Abp.SocialMedia.Client.RequestOptions();
 
@@ -325,7 +325,7 @@ namespace Abp.SocialMedia.Api
             }
 
             // make the HTTP request
-            var localVarResponse = this.Client.Get<EventDetails>("/api/v1/events/{event_id}", localVarRequestOptions, this.Configuration);
+            var localVarResponse = this.Client.Get<Event>("/api/v1/events/{event_id}", localVarRequestOptions, this.Configuration);
 
             if (this.ExceptionFactory != null)
             {
@@ -342,10 +342,10 @@ namespace Abp.SocialMedia.Api
         /// <exception cref="Abp.SocialMedia.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="eventId">ID of the event</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
-        /// <returns>Task of EventDetails</returns>
-        public async System.Threading.Tasks.Task<EventDetails> ApiV1EventsEventIdGetAsync(int eventId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        /// <returns>Task of Event</returns>
+        public async System.Threading.Tasks.Task<Event> ApiV1EventsEventIdGetAsync(int eventId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
-            Abp.SocialMedia.Client.ApiResponse<EventDetails> localVarResponse = await ApiV1EventsEventIdGetWithHttpInfoAsync(eventId, cancellationToken).ConfigureAwait(false);
+            Abp.SocialMedia.Client.ApiResponse<Event> localVarResponse = await ApiV1EventsEventIdGetWithHttpInfoAsync(eventId, cancellationToken).ConfigureAwait(false);
             return localVarResponse.Data;
         }
 
@@ -355,8 +355,8 @@ namespace Abp.SocialMedia.Api
         /// <exception cref="Abp.SocialMedia.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="eventId">ID of the event</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
-        /// <returns>Task of ApiResponse (EventDetails)</returns>
-        public async System.Threading.Tasks.Task<Abp.SocialMedia.Client.ApiResponse<EventDetails>> ApiV1EventsEventIdGetWithHttpInfoAsync(int eventId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        /// <returns>Task of ApiResponse (Event)</returns>
+        public async System.Threading.Tasks.Task<Abp.SocialMedia.Client.ApiResponse<Event>> ApiV1EventsEventIdGetWithHttpInfoAsync(int eventId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
 
             Abp.SocialMedia.Client.RequestOptions localVarRequestOptions = new Abp.SocialMedia.Client.RequestOptions();
@@ -391,7 +391,7 @@ namespace Abp.SocialMedia.Api
 
             // make the HTTP request
 
-            var localVarResponse = await this.AsynchronousClient.GetAsync<EventDetails>("/api/v1/events/{event_id}", localVarRequestOptions, this.Configuration, cancellationToken).ConfigureAwait(false);
+            var localVarResponse = await this.AsynchronousClient.GetAsync<Event>("/api/v1/events/{event_id}", localVarRequestOptions, this.Configuration, cancellationToken).ConfigureAwait(false);
 
             if (this.ExceptionFactory != null)
             {

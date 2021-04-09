@@ -50,31 +50,31 @@ namespace Abp.SocialMedia.Model
         /// <summary>
         /// Gets or Sets Items
         /// </summary>
-        [DataMember(Name = "items", EmitDefaultValue = false)]
+        [DataMember(Name = "items", EmitDefaultValue = true)]
         public List<Object> Items { get; set; }
 
         /// <summary>
         /// Gets or Sets Next
         /// </summary>
-        [DataMember(Name = "next", EmitDefaultValue = false)]
+        [DataMember(Name = "next", EmitDefaultValue = true)]
         public string Next { get; set; }
 
         /// <summary>
         /// Gets or Sets Pages
         /// </summary>
-        [DataMember(Name = "pages", EmitDefaultValue = false)]
+        [DataMember(Name = "pages", EmitDefaultValue = true)]
         public int Pages { get; set; }
 
         /// <summary>
         /// Gets or Sets Prev
         /// </summary>
-        [DataMember(Name = "prev", EmitDefaultValue = false)]
+        [DataMember(Name = "prev", EmitDefaultValue = true)]
         public string Prev { get; set; }
 
         /// <summary>
         /// Gets or Sets Total
         /// </summary>
-        [DataMember(Name = "total", EmitDefaultValue = false)]
+        [DataMember(Name = "total", EmitDefaultValue = true)]
         public int Total { get; set; }
 
         /// <summary>

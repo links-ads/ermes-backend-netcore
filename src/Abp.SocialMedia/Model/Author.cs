@@ -38,27 +38,29 @@ namespace Abp.SocialMedia.Model
         /// <summary>
         /// Initializes a new instance of the <see cref="Author" /> class.
         /// </summary>
-        /// <param name="createdAt">createdAt (required).</param>
+        /// <param name="createdAt">createdAt.</param>
         /// <param name="displayName">displayName (required).</param>
         /// <param name="favoriteCount">favoriteCount.</param>
         /// <param name="followedCount">followedCount.</param>
         /// <param name="followerCount">followerCount.</param>
         /// <param name="id">id.</param>
+        /// <param name="idStr">idStr.</param>
         /// <param name="profileImage">profileImage.</param>
         /// <param name="statusesCount">statusesCount.</param>
         /// <param name="userName">userName (required).</param>
         /// <param name="verified">verified.</param>
-        public Author(DateTime createdAt = default(DateTime), string displayName = default(string), int favoriteCount = default(int), int followedCount = default(int), int followerCount = default(int), long id = default(long), string profileImage = default(string), int statusesCount = default(int), string userName = default(string), bool verified = default(bool))
+        public Author(string createdAt = default(string), string displayName = default(string), int favoriteCount = default(int), int followedCount = default(int), int followerCount = default(int), long id = default(long), string idStr = default(string), string profileImage = default(string), int statusesCount = default(int), string userName = default(string), bool verified = default(bool))
         {
-            this.CreatedAt = createdAt;
             // to ensure "displayName" is required (not null)
             this.DisplayName = displayName ?? throw new ArgumentNullException("displayName is a required property for Author and cannot be null");
             // to ensure "userName" is required (not null)
             this.UserName = userName ?? throw new ArgumentNullException("userName is a required property for Author and cannot be null");
+            this.CreatedAt = createdAt;
             this.FavoriteCount = favoriteCount;
             this.FollowedCount = followedCount;
             this.FollowerCount = followerCount;
             this.Id = id;
+            this.IdStr = idStr;
             this.ProfileImage = profileImage;
             this.StatusesCount = statusesCount;
             this.Verified = verified;
@@ -67,38 +69,44 @@ namespace Abp.SocialMedia.Model
         /// <summary>
         /// Gets or Sets CreatedAt
         /// </summary>
-        [DataMember(Name = "created_at", EmitDefaultValue = false)]
-        public DateTime CreatedAt { get; set; }
+        [DataMember(Name = "created_at", EmitDefaultValue = true)]
+        public string CreatedAt { get; set; }
 
         /// <summary>
         /// Gets or Sets DisplayName
         /// </summary>
-        [DataMember(Name = "display_name", EmitDefaultValue = false)]
+        [DataMember(Name = "display_name", EmitDefaultValue = true)]
         public string DisplayName { get; set; }
 
         /// <summary>
         /// Gets or Sets FavoriteCount
         /// </summary>
-        [DataMember(Name = "favorite_count", EmitDefaultValue = false)]
+        [DataMember(Name = "favorite_count", EmitDefaultValue = true)]
         public int FavoriteCount { get; set; }
 
         /// <summary>
         /// Gets or Sets FollowedCount
         /// </summary>
-        [DataMember(Name = "followed_count", EmitDefaultValue = false)]
+        [DataMember(Name = "followed_count", EmitDefaultValue = true)]
         public int FollowedCount { get; set; }
 
         /// <summary>
         /// Gets or Sets FollowerCount
         /// </summary>
-        [DataMember(Name = "follower_count", EmitDefaultValue = false)]
+        [DataMember(Name = "follower_count", EmitDefaultValue = true)]
         public int FollowerCount { get; set; }
 
         /// <summary>
         /// Gets or Sets Id
         /// </summary>
-        [DataMember(Name = "id", EmitDefaultValue = false)]
+        [DataMember(Name = "id", EmitDefaultValue = true)]
         public long Id { get; set; }
+
+        /// <summary>
+        /// Gets or Sets IdStr
+        /// </summary>
+        [DataMember(Name = "id_str", EmitDefaultValue = true)]
+        public string IdStr { get; set; }
 
         /// <summary>
         /// Gets or Sets ProfileImage
@@ -109,19 +117,19 @@ namespace Abp.SocialMedia.Model
         /// <summary>
         /// Gets or Sets StatusesCount
         /// </summary>
-        [DataMember(Name = "statuses_count", EmitDefaultValue = false)]
+        [DataMember(Name = "statuses_count", EmitDefaultValue = true)]
         public int StatusesCount { get; set; }
 
         /// <summary>
         /// Gets or Sets UserName
         /// </summary>
-        [DataMember(Name = "user_name", EmitDefaultValue = false)]
+        [DataMember(Name = "user_name", EmitDefaultValue = true)]
         public string UserName { get; set; }
 
         /// <summary>
         /// Gets or Sets Verified
         /// </summary>
-        [DataMember(Name = "verified", EmitDefaultValue = false)]
+        [DataMember(Name = "verified", EmitDefaultValue = true)]
         public bool Verified { get; set; }
 
         /// <summary>
@@ -138,6 +146,7 @@ namespace Abp.SocialMedia.Model
             sb.Append("  FollowedCount: ").Append(FollowedCount).Append("\n");
             sb.Append("  FollowerCount: ").Append(FollowerCount).Append("\n");
             sb.Append("  Id: ").Append(Id).Append("\n");
+            sb.Append("  IdStr: ").Append(IdStr).Append("\n");
             sb.Append("  ProfileImage: ").Append(ProfileImage).Append("\n");
             sb.Append("  StatusesCount: ").Append(StatusesCount).Append("\n");
             sb.Append("  UserName: ").Append(UserName).Append("\n");
@@ -203,6 +212,11 @@ namespace Abp.SocialMedia.Model
                     this.Id.Equals(input.Id)
                 ) && 
                 (
+                    this.IdStr == input.IdStr ||
+                    (this.IdStr != null &&
+                    this.IdStr.Equals(input.IdStr))
+                ) && 
+                (
                     this.ProfileImage == input.ProfileImage ||
                     (this.ProfileImage != null &&
                     this.ProfileImage.Equals(input.ProfileImage))
@@ -239,6 +253,8 @@ namespace Abp.SocialMedia.Model
                 hashCode = hashCode * 59 + this.FollowedCount.GetHashCode();
                 hashCode = hashCode * 59 + this.FollowerCount.GetHashCode();
                 hashCode = hashCode * 59 + this.Id.GetHashCode();
+                if (this.IdStr != null)
+                    hashCode = hashCode * 59 + this.IdStr.GetHashCode();
                 if (this.ProfileImage != null)
                     hashCode = hashCode * 59 + this.ProfileImage.GetHashCode();
                 hashCode = hashCode * 59 + this.StatusesCount.GetHashCode();

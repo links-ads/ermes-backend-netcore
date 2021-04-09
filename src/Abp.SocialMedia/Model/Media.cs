@@ -39,26 +39,36 @@ namespace Abp.SocialMedia.Model
         /// Initializes a new instance of the <see cref="Media" /> class.
         /// </summary>
         /// <param name="id">id.</param>
+        /// <param name="idStr">idStr.</param>
         /// <param name="informative">informative.</param>
         /// <param name="tweetId">tweetId.</param>
+        /// <param name="tweetIdStr">tweetIdStr.</param>
         /// <param name="type">type (required).</param>
         /// <param name="url">url (required).</param>
-        public Media(long id = default(long), bool? informative = default(bool?), long tweetId = default(long), string type = default(string), string url = default(string))
+        public Media(long id = default(long), string idStr = default(string), bool? informative = default(bool?), long tweetId = default(long), string tweetIdStr = default(string), string type = default(string), string url = default(string))
         {
             // to ensure "type" is required (not null)
             this.Type = type ?? throw new ArgumentNullException("type is a required property for Media and cannot be null");
             // to ensure "url" is required (not null)
             this.Url = url ?? throw new ArgumentNullException("url is a required property for Media and cannot be null");
             this.Id = id;
+            this.IdStr = idStr;
             this.Informative = informative;
             this.TweetId = tweetId;
+            this.TweetIdStr = tweetIdStr;
         }
 
         /// <summary>
         /// Gets or Sets Id
         /// </summary>
-        [DataMember(Name = "id", EmitDefaultValue = false)]
+        [DataMember(Name = "id", EmitDefaultValue = true)]
         public long Id { get; set; }
+
+        /// <summary>
+        /// Gets or Sets IdStr
+        /// </summary>
+        [DataMember(Name = "id_str", EmitDefaultValue = true)]
+        public string IdStr { get; set; }
 
         /// <summary>
         /// Gets or Sets Informative
@@ -69,19 +79,25 @@ namespace Abp.SocialMedia.Model
         /// <summary>
         /// Gets or Sets TweetId
         /// </summary>
-        [DataMember(Name = "tweet_id", EmitDefaultValue = false)]
+        [DataMember(Name = "tweet_id", EmitDefaultValue = true)]
         public long TweetId { get; set; }
+
+        /// <summary>
+        /// Gets or Sets TweetIdStr
+        /// </summary>
+        [DataMember(Name = "tweet_id_str", EmitDefaultValue = true)]
+        public string TweetIdStr { get; set; }
 
         /// <summary>
         /// Gets or Sets Type
         /// </summary>
-        [DataMember(Name = "type", EmitDefaultValue = false)]
+        [DataMember(Name = "type", EmitDefaultValue = true)]
         public string Type { get; set; }
 
         /// <summary>
         /// Gets or Sets Url
         /// </summary>
-        [DataMember(Name = "url", EmitDefaultValue = false)]
+        [DataMember(Name = "url", EmitDefaultValue = true)]
         public string Url { get; set; }
 
         /// <summary>
@@ -93,8 +109,10 @@ namespace Abp.SocialMedia.Model
             var sb = new StringBuilder();
             sb.Append("class Media {\n");
             sb.Append("  Id: ").Append(Id).Append("\n");
+            sb.Append("  IdStr: ").Append(IdStr).Append("\n");
             sb.Append("  Informative: ").Append(Informative).Append("\n");
             sb.Append("  TweetId: ").Append(TweetId).Append("\n");
+            sb.Append("  TweetIdStr: ").Append(TweetIdStr).Append("\n");
             sb.Append("  Type: ").Append(Type).Append("\n");
             sb.Append("  Url: ").Append(Url).Append("\n");
             sb.Append("}\n");
@@ -136,6 +154,11 @@ namespace Abp.SocialMedia.Model
                     this.Id.Equals(input.Id)
                 ) && 
                 (
+                    this.IdStr == input.IdStr ||
+                    (this.IdStr != null &&
+                    this.IdStr.Equals(input.IdStr))
+                ) && 
+                (
                     this.Informative == input.Informative ||
                     (this.Informative != null &&
                     this.Informative.Equals(input.Informative))
@@ -143,6 +166,11 @@ namespace Abp.SocialMedia.Model
                 (
                     this.TweetId == input.TweetId ||
                     this.TweetId.Equals(input.TweetId)
+                ) && 
+                (
+                    this.TweetIdStr == input.TweetIdStr ||
+                    (this.TweetIdStr != null &&
+                    this.TweetIdStr.Equals(input.TweetIdStr))
                 ) && 
                 (
                     this.Type == input.Type ||
@@ -166,9 +194,13 @@ namespace Abp.SocialMedia.Model
             {
                 int hashCode = 41;
                 hashCode = hashCode * 59 + this.Id.GetHashCode();
+                if (this.IdStr != null)
+                    hashCode = hashCode * 59 + this.IdStr.GetHashCode();
                 if (this.Informative != null)
                     hashCode = hashCode * 59 + this.Informative.GetHashCode();
                 hashCode = hashCode * 59 + this.TweetId.GetHashCode();
+                if (this.TweetIdStr != null)
+                    hashCode = hashCode * 59 + this.TweetIdStr.GetHashCode();
                 if (this.Type != null)
                     hashCode = hashCode * 59 + this.Type.GetHashCode();
                 if (this.Url != null)

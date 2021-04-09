@@ -14,7 +14,7 @@ namespace Ermes.Social
         Task<Pagination> GetAuthors(SocialPaginationInput input);
         Task<SocialItemOutput<Author>> GetAuthorById(IdInput<long> input);
         Task<Pagination> GetEvents(GetEventsInput input);
-        Task<SocialItemOutput<EventDetails>> GetEventById(IdInput<int> input);
+        Task<SocialItemOutput<Event>> GetEventById(IdInput<int> input);
         Task<GetLabelsOutput> GetLabels(GetLabelsInput input);
         Task<SocialItemOutput<Label>> GetLabelById(IdInput<int> input);
         Task<Pagination> GetMedia(SocialPaginationInput input);

@@ -148,11 +148,11 @@ namespace Ermes.Social
                 Output: SocialItemOutput Dto with Event item
             "
         )]
-        public virtual async Task<SocialItemOutput<EventDetails>> GetEventById(IdInput<int> input)
+        public virtual async Task<SocialItemOutput<Event>> GetEventById(IdInput<int> input)
         {
             try
             {
-                return new SocialItemOutput<EventDetails>()
+                return new SocialItemOutput<Event>()
                 {
                     Item = await _socialManager.GetEventById(input.Id)
                 };

@@ -107,7 +107,7 @@ namespace Abp.SocialMedia
             return await api.ApiV1EventsGetAsync(input.Page, input.Limit, input.Start, input.End, lan, input.Hazards, input.Infotypes, input.SouthWest, input.NorthEast);
         }
 
-        public async Task<EventDetails> GetEventById(int eventId)
+        public async Task<Event> GetEventById(int eventId)
         {
             var api = new EventsApi();
             return await api.ApiV1EventsEventIdGetAsync(eventId);

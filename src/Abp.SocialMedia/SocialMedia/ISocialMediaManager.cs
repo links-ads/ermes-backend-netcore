@@ -19,7 +19,7 @@ namespace Abp.SocialMedia
         Task<Pagination> GetTweets(int? page = null, int? limit = null);
         Task<Tweet> GetTweetById(long tweetId);
         Task<Pagination> GetEvents(GetEventsQuery input);
-        Task<EventDetails> GetEventById(int eventId);
+        Task<Event> GetEventById(int eventId);
         Task<StatisticsTweet> GetTweetStatistics(GenericQuery input);
         Task<StatisticsEvent> GetEventStatistics(EventStatsQuery input);
     }

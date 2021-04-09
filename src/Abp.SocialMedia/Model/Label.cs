@@ -59,7 +59,7 @@ namespace Abp.SocialMedia.Model
         /// <summary>
         /// Gets or Sets Task
         /// </summary>
-        [DataMember(Name = "task", EmitDefaultValue = false)]
+        [DataMember(Name = "task", EmitDefaultValue = true)]
         public TaskEnum Task { get; set; }
         /// <summary>
         /// Defines Type
@@ -84,7 +84,7 @@ namespace Abp.SocialMedia.Model
         /// <summary>
         /// Gets or Sets Type
         /// </summary>
-        [DataMember(Name = "type", EmitDefaultValue = false)]
+        [DataMember(Name = "type", EmitDefaultValue = true)]
         public TypeEnum Type { get; set; }
         /// <summary>
         /// Initializes a new instance of the <see cref="Label" /> class.
@@ -119,7 +119,7 @@ namespace Abp.SocialMedia.Model
         /// <summary>
         /// Gets or Sets CreatedAt
         /// </summary>
-        [DataMember(Name = "created_at", EmitDefaultValue = false)]
+        [DataMember(Name = "created_at", EmitDefaultValue = true)]
         public DateTime CreatedAt { get; set; }
 
         /// <summary>
@@ -131,25 +131,25 @@ namespace Abp.SocialMedia.Model
         /// <summary>
         /// Gets or Sets DisplayName
         /// </summary>
-        [DataMember(Name = "display_name", EmitDefaultValue = false)]
+        [DataMember(Name = "display_name", EmitDefaultValue = true)]
         public string DisplayName { get; set; }
 
         /// <summary>
         /// Gets or Sets Id
         /// </summary>
-        [DataMember(Name = "id", EmitDefaultValue = false)]
+        [DataMember(Name = "id", EmitDefaultValue = true)]
         public int Id { get; set; }
 
         /// <summary>
         /// Gets or Sets Name
         /// </summary>
-        [DataMember(Name = "name", EmitDefaultValue = false)]
+        [DataMember(Name = "name", EmitDefaultValue = true)]
         public string Name { get; set; }
 
         /// <summary>
         /// Gets or Sets Operational
         /// </summary>
-        [DataMember(Name = "operational", EmitDefaultValue = false)]
+        [DataMember(Name = "operational", EmitDefaultValue = true)]
         public bool Operational { get; set; }
 
         /// <summary>

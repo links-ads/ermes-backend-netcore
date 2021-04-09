@@ -40,23 +40,26 @@ namespace Abp.SocialMedia.Model
         /// </summary>
         /// <param name="author">author.</param>
         /// <param name="authorId">authorId.</param>
+        /// <param name="authorIdStr">authorIdStr.</param>
         /// <param name="createdAt">createdAt (required).</param>
         /// <param name="favoriteCount">favoriteCount.</param>
         /// <param name="filterId">filterId.</param>
         /// <param name="hashtags">hashtags.</param>
         /// <param name="id">id.</param>
+        /// <param name="idStr">idStr.</param>
         /// <param name="informative">informative.</param>
         /// <param name="insertedAt">insertedAt.</param>
         /// <param name="lang">lang (required).</param>
         /// <param name="location">location.</param>
         /// <param name="media">media.</param>
         /// <param name="parent">parent.</param>
+        /// <param name="parentStr">parentStr.</param>
         /// <param name="retweetCount">retweetCount.</param>
         /// <param name="retweeted">retweeted.</param>
         /// <param name="source">source.</param>
         /// <param name="text">text (required).</param>
         /// <param name="tokens">tokens.</param>
-        public Tweet(Object author = default(Object), long authorId = default(long), DateTime createdAt = default(DateTime), int favoriteCount = default(int), int? filterId = default(int?), string hashtags = default(string), long id = default(long), bool? informative = default(bool?), DateTime insertedAt = default(DateTime), string lang = default(string), Object location = default(Object), List<Object> media = default(List<Object>), long? parent = default(long?), int retweetCount = default(int), bool retweeted = default(bool), string source = default(string), string text = default(string), string tokens = default(string))
+        public Tweet(Object author = default(Object), long authorId = default(long), string authorIdStr = default(string), DateTime createdAt = default(DateTime), int favoriteCount = default(int), int? filterId = default(int?), string hashtags = default(string), long id = default(long), string idStr = default(string), bool? informative = default(bool?), DateTime insertedAt = default(DateTime), string lang = default(string), Object location = default(Object), List<Object> media = default(List<Object>), long? parent = default(long?), string parentStr = default(string), int retweetCount = default(int), bool retweeted = default(bool), string source = default(string), string text = default(string), string tokens = default(string))
         {
             this.CreatedAt = createdAt;
             // to ensure "lang" is required (not null)
@@ -65,15 +68,18 @@ namespace Abp.SocialMedia.Model
             this.Text = text ?? throw new ArgumentNullException("text is a required property for Tweet and cannot be null");
             this.Author = author;
             this.AuthorId = authorId;
+            this.AuthorIdStr = authorIdStr;
             this.FavoriteCount = favoriteCount;
             this.FilterId = filterId;
             this.Hashtags = hashtags;
             this.Id = id;
+            this.IdStr = idStr;
             this.Informative = informative;
             this.InsertedAt = insertedAt;
             this.Location = location;
             this.Media = media;
             this.Parent = parent;
+            this.ParentStr = parentStr;
             this.RetweetCount = retweetCount;
             this.Retweeted = retweeted;
             this.Source = source;
@@ -89,19 +95,25 @@ namespace Abp.SocialMedia.Model
         /// <summary>
         /// Gets or Sets AuthorId
         /// </summary>
-        [DataMember(Name = "author_id", EmitDefaultValue = false)]
+        [DataMember(Name = "author_id", EmitDefaultValue = true)]
         public long AuthorId { get; set; }
+
+        /// <summary>
+        /// Gets or Sets AuthorIdStr
+        /// </summary>
+        [DataMember(Name = "author_id_str", EmitDefaultValue = true)]
+        public string AuthorIdStr { get; set; }
 
         /// <summary>
         /// Gets or Sets CreatedAt
         /// </summary>
-        [DataMember(Name = "created_at", EmitDefaultValue = false)]
+        [DataMember(Name = "created_at", EmitDefaultValue = true)]
         public DateTime CreatedAt { get; set; }
 
         /// <summary>
         /// Gets or Sets FavoriteCount
         /// </summary>
-        [DataMember(Name = "favorite_count", EmitDefaultValue = false)]
+        [DataMember(Name = "favorite_count", EmitDefaultValue = true)]
         public int FavoriteCount { get; set; }
 
         /// <summary>
@@ -119,8 +131,14 @@ namespace Abp.SocialMedia.Model
         /// <summary>
         /// Gets or Sets Id
         /// </summary>
-        [DataMember(Name = "id", EmitDefaultValue = false)]
+        [DataMember(Name = "id", EmitDefaultValue = true)]
         public long Id { get; set; }
+
+        /// <summary>
+        /// Gets or Sets IdStr
+        /// </summary>
+        [DataMember(Name = "id_str", EmitDefaultValue = true)]
+        public string IdStr { get; set; }
 
         /// <summary>
         /// Gets or Sets Informative
@@ -131,13 +149,13 @@ namespace Abp.SocialMedia.Model
         /// <summary>
         /// Gets or Sets InsertedAt
         /// </summary>
-        [DataMember(Name = "inserted_at", EmitDefaultValue = false)]
+        [DataMember(Name = "inserted_at", EmitDefaultValue = true)]
         public DateTime InsertedAt { get; set; }
 
         /// <summary>
         /// Gets or Sets Lang
         /// </summary>
-        [DataMember(Name = "lang", EmitDefaultValue = false)]
+        [DataMember(Name = "lang", EmitDefaultValue = true)]
         public string Lang { get; set; }
 
         /// <summary>
@@ -149,7 +167,7 @@ namespace Abp.SocialMedia.Model
         /// <summary>
         /// Gets or Sets Media
         /// </summary>
-        [DataMember(Name = "media", EmitDefaultValue = false)]
+        [DataMember(Name = "media", EmitDefaultValue = true)]
         public List<Object> Media { get; set; }
 
         /// <summary>
@@ -159,15 +177,21 @@ namespace Abp.SocialMedia.Model
         public long? Parent { get; set; }
 
         /// <summary>
+        /// Gets or Sets ParentStr
+        /// </summary>
+        [DataMember(Name = "parent_str", EmitDefaultValue = true)]
+        public string ParentStr { get; set; }
+
+        /// <summary>
         /// Gets or Sets RetweetCount
         /// </summary>
-        [DataMember(Name = "retweet_count", EmitDefaultValue = false)]
+        [DataMember(Name = "retweet_count", EmitDefaultValue = true)]
         public int RetweetCount { get; set; }
 
         /// <summary>
         /// Gets or Sets Retweeted
         /// </summary>
-        [DataMember(Name = "retweeted", EmitDefaultValue = false)]
+        [DataMember(Name = "retweeted", EmitDefaultValue = true)]
         public bool Retweeted { get; set; }
 
         /// <summary>
@@ -179,7 +203,7 @@ namespace Abp.SocialMedia.Model
         /// <summary>
         /// Gets or Sets Text
         /// </summary>
-        [DataMember(Name = "text", EmitDefaultValue = false)]
+        [DataMember(Name = "text", EmitDefaultValue = true)]
         public string Text { get; set; }
 
         /// <summary>
@@ -198,17 +222,20 @@ namespace Abp.SocialMedia.Model
             sb.Append("class Tweet {\n");
             sb.Append("  Author: ").Append(Author).Append("\n");
             sb.Append("  AuthorId: ").Append(AuthorId).Append("\n");
+            sb.Append("  AuthorIdStr: ").Append(AuthorIdStr).Append("\n");
             sb.Append("  CreatedAt: ").Append(CreatedAt).Append("\n");
             sb.Append("  FavoriteCount: ").Append(FavoriteCount).Append("\n");
             sb.Append("  FilterId: ").Append(FilterId).Append("\n");
             sb.Append("  Hashtags: ").Append(Hashtags).Append("\n");
             sb.Append("  Id: ").Append(Id).Append("\n");
+            sb.Append("  IdStr: ").Append(IdStr).Append("\n");
             sb.Append("  Informative: ").Append(Informative).Append("\n");
             sb.Append("  InsertedAt: ").Append(InsertedAt).Append("\n");
             sb.Append("  Lang: ").Append(Lang).Append("\n");
             sb.Append("  Location: ").Append(Location).Append("\n");
             sb.Append("  Media: ").Append(Media).Append("\n");
             sb.Append("  Parent: ").Append(Parent).Append("\n");
+            sb.Append("  ParentStr: ").Append(ParentStr).Append("\n");
             sb.Append("  RetweetCount: ").Append(RetweetCount).Append("\n");
             sb.Append("  Retweeted: ").Append(Retweeted).Append("\n");
             sb.Append("  Source: ").Append(Source).Append("\n");
@@ -258,6 +285,11 @@ namespace Abp.SocialMedia.Model
                     this.AuthorId.Equals(input.AuthorId)
                 ) && 
                 (
+                    this.AuthorIdStr == input.AuthorIdStr ||
+                    (this.AuthorIdStr != null &&
+                    this.AuthorIdStr.Equals(input.AuthorIdStr))
+                ) && 
+                (
                     this.CreatedAt == input.CreatedAt ||
                     (this.CreatedAt != null &&
                     this.CreatedAt.Equals(input.CreatedAt))
@@ -279,6 +311,11 @@ namespace Abp.SocialMedia.Model
                 (
                     this.Id == input.Id ||
                     this.Id.Equals(input.Id)
+                ) && 
+                (
+                    this.IdStr == input.IdStr ||
+                    (this.IdStr != null &&
+                    this.IdStr.Equals(input.IdStr))
                 ) && 
                 (
                     this.Informative == input.Informative ||
@@ -310,6 +347,11 @@ namespace Abp.SocialMedia.Model
                     this.Parent == input.Parent ||
                     (this.Parent != null &&
                     this.Parent.Equals(input.Parent))
+                ) && 
+                (
+                    this.ParentStr == input.ParentStr ||
+                    (this.ParentStr != null &&
+                    this.ParentStr.Equals(input.ParentStr))
                 ) && 
                 (
                     this.RetweetCount == input.RetweetCount ||
@@ -348,6 +390,8 @@ namespace Abp.SocialMedia.Model
                 if (this.Author != null)
                     hashCode = hashCode * 59 + this.Author.GetHashCode();
                 hashCode = hashCode * 59 + this.AuthorId.GetHashCode();
+                if (this.AuthorIdStr != null)
+                    hashCode = hashCode * 59 + this.AuthorIdStr.GetHashCode();
                 if (this.CreatedAt != null)
                     hashCode = hashCode * 59 + this.CreatedAt.GetHashCode();
                 hashCode = hashCode * 59 + this.FavoriteCount.GetHashCode();
@@ -356,6 +400,8 @@ namespace Abp.SocialMedia.Model
                 if (this.Hashtags != null)
                     hashCode = hashCode * 59 + this.Hashtags.GetHashCode();
                 hashCode = hashCode * 59 + this.Id.GetHashCode();
+                if (this.IdStr != null)
+                    hashCode = hashCode * 59 + this.IdStr.GetHashCode();
                 if (this.Informative != null)
                     hashCode = hashCode * 59 + this.Informative.GetHashCode();
                 if (this.InsertedAt != null)
@@ -368,6 +414,8 @@ namespace Abp.SocialMedia.Model
                     hashCode = hashCode * 59 + this.Media.GetHashCode();
                 if (this.Parent != null)
                     hashCode = hashCode * 59 + this.Parent.GetHashCode();
+                if (this.ParentStr != null)
+                    hashCode = hashCode * 59 + this.ParentStr.GetHashCode();
                 hashCode = hashCode * 59 + this.RetweetCount.GetHashCode();
                 hashCode = hashCode * 59 + this.Retweeted.GetHashCode();
                 if (this.Source != null)
