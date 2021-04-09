@@ -35,30 +35,38 @@ namespace Abp.SocialMedia.Model
         /// </summary>
         /// <param name="createdAt">createdAt.</param>
         /// <param name="id">id.</param>
+        /// <param name="idStr">idStr.</param>
         /// <param name="text">text.</param>
-        public PartialTweet(DateTime createdAt = default(DateTime), long id = default(long), string text = default(string))
+        public PartialTweet(string createdAt = default(string), long id = default(long), string idStr = default(string), string text = default(string))
         {
             this.CreatedAt = createdAt;
             this.Id = id;
+            this.IdStr = idStr;
             this.Text = text;
         }
 
         /// <summary>
         /// Gets or Sets CreatedAt
         /// </summary>
-        [DataMember(Name = "created_at", EmitDefaultValue = false)]
-        public DateTime CreatedAt { get; set; }
+        [DataMember(Name = "created_at", EmitDefaultValue = true)]
+        public string CreatedAt { get; set; }
 
         /// <summary>
         /// Gets or Sets Id
         /// </summary>
-        [DataMember(Name = "id", EmitDefaultValue = false)]
+        [DataMember(Name = "id", EmitDefaultValue = true)]
         public long Id { get; set; }
+
+        /// <summary>
+        /// Gets or Sets IdStr
+        /// </summary>
+        [DataMember(Name = "id_str", EmitDefaultValue = true)]
+        public string IdStr { get; set; }
 
         /// <summary>
         /// Gets or Sets Text
         /// </summary>
-        [DataMember(Name = "text", EmitDefaultValue = false)]
+        [DataMember(Name = "text", EmitDefaultValue = true)]
         public string Text { get; set; }
 
         /// <summary>
@@ -71,6 +79,7 @@ namespace Abp.SocialMedia.Model
             sb.Append("class PartialTweet {\n");
             sb.Append("  CreatedAt: ").Append(CreatedAt).Append("\n");
             sb.Append("  Id: ").Append(Id).Append("\n");
+            sb.Append("  IdStr: ").Append(IdStr).Append("\n");
             sb.Append("  Text: ").Append(Text).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
@@ -116,6 +125,11 @@ namespace Abp.SocialMedia.Model
                     this.Id.Equals(input.Id)
                 ) && 
                 (
+                    this.IdStr == input.IdStr ||
+                    (this.IdStr != null &&
+                    this.IdStr.Equals(input.IdStr))
+                ) && 
+                (
                     this.Text == input.Text ||
                     (this.Text != null &&
                     this.Text.Equals(input.Text))
@@ -134,6 +148,8 @@ namespace Abp.SocialMedia.Model
                 if (this.CreatedAt != null)
                     hashCode = hashCode * 59 + this.CreatedAt.GetHashCode();
                 hashCode = hashCode * 59 + this.Id.GetHashCode();
+                if (this.IdStr != null)
+                    hashCode = hashCode * 59 + this.IdStr.GetHashCode();
                 if (this.Text != null)
                     hashCode = hashCode * 59 + this.Text.GetHashCode();
                 return hashCode;

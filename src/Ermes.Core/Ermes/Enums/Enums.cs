@@ -7,6 +7,7 @@ namespace Ermes.Enums
     public enum ActionStatusType
     {
         Off = 10,
+        Ready = 15,
         Moving = 20,
         Active = 30
     }

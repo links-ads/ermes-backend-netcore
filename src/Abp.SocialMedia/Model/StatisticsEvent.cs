@@ -48,25 +48,25 @@ namespace Abp.SocialMedia.Model
         /// <summary>
         /// Gets or Sets EventsCount
         /// </summary>
-        [DataMember(Name = "events_count", EmitDefaultValue = false)]
+        [DataMember(Name = "events_count", EmitDefaultValue = true)]
         public int EventsCount { get; set; }
 
         /// <summary>
         /// Gets or Sets HazardsCount
         /// </summary>
-        [DataMember(Name = "hazards_count", EmitDefaultValue = false)]
+        [DataMember(Name = "hazards_count", EmitDefaultValue = true)]
         public Object HazardsCount { get; set; }
 
         /// <summary>
         /// Gets or Sets InfotypesCount
         /// </summary>
-        [DataMember(Name = "infotypes_count", EmitDefaultValue = false)]
+        [DataMember(Name = "infotypes_count", EmitDefaultValue = true)]
         public Object InfotypesCount { get; set; }
 
         /// <summary>
         /// Gets or Sets LanguagesCount
         /// </summary>
-        [DataMember(Name = "languages_count", EmitDefaultValue = false)]
+        [DataMember(Name = "languages_count", EmitDefaultValue = true)]
         public Object LanguagesCount { get; set; }
 
         /// <summary>
