@@ -1,6 +1,6 @@
 Ver.
 ---------------------------
-- Feature - Update of Social Media Module SDK: NL added, id_str for tweet (#18)
+- Feature - Status 'Ready' added, update of Social Media Module SDK: NL added, id_str for tweet (#18)
 
 Ver. 1.5.3. - 2021-04-01
 ---------------------------
