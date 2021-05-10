@@ -11,7 +11,9 @@ namespace Ermes.Users
 {
     public interface IUsersAppService : IBackofficeApi
     {
-       Task<DTResult<ProfileDto>> GetUsers(GetUsersInput input);
-       Task<long> CreateUser(UpdateProfileInput input);
+        Task<DTResult<ProfileDto>> GetUsers(GetUsersInput input);
+        Task<long> CreateUser(UpdateProfileInput input);
+        Task RegisterUser(RegisterUserEventInput input);
+
     }
 }
