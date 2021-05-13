@@ -14,5 +14,6 @@ namespace Ermes.Profile.Dto
         public int? OrganizationId { get; set; }
         public int? TeamId { get; set; }
         public long? PersonId { get; set; }
+        public bool IsFirstLogin { get; set; }
     }
 }

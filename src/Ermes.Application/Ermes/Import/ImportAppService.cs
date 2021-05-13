@@ -149,7 +149,7 @@ namespace Ermes.Import
             "
        )]
         [ErmesAuthorize(AppPermissions.Imports.Import_Activities)]
-        public virtual async Task<ImportResultDto> ImportActivities()
+        public virtual async Task<ImportResultDto> ImportActivities(IFormFile file)
         {
             return await LoadFileAndImport((filename, contentType) =>
             {
@@ -219,7 +219,7 @@ namespace Ermes.Import
 s            "
        )]
         [ErmesAuthorize(AppPermissions.Imports.Import_Categories)]
-        public virtual async Task<ImportResultDto> ImportCategories()
+        public virtual async Task<ImportResultDto> ImportCategories(IFormFile file)
         {
             return await LoadFileAndImport((filename, contentType) =>
             {

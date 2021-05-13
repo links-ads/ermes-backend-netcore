@@ -28,26 +28,26 @@ namespace Ermes.Users
     {
         private readonly ErmesAppSession _session;
         private readonly PersonManager _personManager;
-        private readonly OrganizationManager _organizationManager;
         private readonly MissionManager _missionManager;
+        private readonly OrganizationManager _organizationManager;
         private readonly TeamManager _teamManager;
         private readonly IOptions<FusionAuthSettings> _fusionAuthSettings;
 
         public UsersAppService(
                     ErmesAppSession session,
                     PersonManager personManger,
-                    OrganizationManager organizationManager,
                     MissionManager missionManager,
-                    TeamManager teamManager,
-                    IOptions<FusionAuthSettings> fusionAuthSettings
+                    IOptions<FusionAuthSettings> fusionAuthSettings,
+                    OrganizationManager organizationManager,
+                    TeamManager teamManager
             )
         {
             _session = session;
             _personManager = personManger;
             _missionManager = missionManager;
-            _organizationManager = organizationManager;
-            _teamManager = teamManager;
             _fusionAuthSettings = fusionAuthSettings;
+            _teamManager = teamManager;
+            _organizationManager = organizationManager;
         }
 
         #region Private
@@ -100,20 +100,7 @@ namespace Ermes.Users
             if (input.User.Timezone == null || input.User.Timezone.Length < 2)
                 input.User.Timezone = AppConsts.DefaultTimezone;
 
-            //Check if Organization exists
-            var org = await _organizationManager.GetOrganizationByIdAsync(input.OrganizationId.Value);
-            if (org == null)
-                throw new UserFriendlyException(L("InvalidOrganizationId", input.OrganizationId));
-
-            //Check if Team exists
-            if (input.TeamId.HasValue)
-            {
-                var team = await _teamManager.GetTeamByIdAsync(input.TeamId.Value);
-                if (team == null)
-                    throw new UserFriendlyException(L("InvalidTeamId", input.TeamId.Value));
-                if (team.OrganizationId != org.Id)
-                    throw new UserFriendlyException(L("TeamNotInOrganization", input.TeamId, input.OrganizationId));
-            }
+            await CheckOrganizationAndTeam(_organizationManager, _teamManager, input.OrganizationId, input.TeamId);
 
             List<Role> rolesToAssign = await GetRolesAndCheckOrganization(input.User.Roles, input.OrganizationId, _personManager, _organizationManager, _session);
 

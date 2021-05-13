@@ -75,7 +75,8 @@
     "EntityOutsideOrganization": "Non hai la visibilità su questo elemento",
     "MissingPermission": "Non si dispone dei permessi per effettuare questa operazione",
     "InvalidActivityCode": "Codice Attività non valido: {0}, lunghezza massima consentita: {1}",
-    "CategoryImportIndexMustBeFirst": "Il foglio indice deve essere il primo"
+    "CategoryImportIndexMustBeFirst": "Il foglio indice deve essere il primo",
+    "MissingField": "Campo mancante: {0}"
 
   }
 }

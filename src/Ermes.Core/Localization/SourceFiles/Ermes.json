@@ -75,6 +75,7 @@
     "EntityOutsideOrganization": "You do not have the visibility on this item",
     "MissingPermission": "You don't have the permission to perform this operation",
     "InvalidActivityCode": "Invalid Activity Code: {0}, max allowed length: {1}",
-    "CategoryImportIndexMustBeFirst": "The index sheet must be the first"
+    "CategoryImportIndexMustBeFirst": "The index sheet must be the first",
+    "MissingField":  "Missing field: {0}"
   }
 }

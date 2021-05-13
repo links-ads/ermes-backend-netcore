@@ -75,6 +75,7 @@
     "EntityOutsideOrganization": "Käyttöoikeutesi eivät riitä katsomaan tietoa",
     "MissingPermission": "Käyttöoikeutesi eivät riitä toiminnon suorittamiseen",
     "InvalidActivityCode": "Virheellinen aktiviteettitunnus: {0}, enimmäispituus: {1}",
-    "CategoryImportIndexMustBeFirst": "Indeksitaulukon on oltava ensimmäisenä"
+    "CategoryImportIndexMustBeFirst": "Indeksitaulukon on oltava ensimmäisenä",
+    "MissingField": "Missing field: {0}"
   }
 }

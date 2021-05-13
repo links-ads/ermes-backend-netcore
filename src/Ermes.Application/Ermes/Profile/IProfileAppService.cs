@@ -10,7 +10,7 @@ namespace Profile
     {
         Task<GetProfileOutput> GetProfile();
         Task<GetProfileOutput> GetProfileById(IdInput<long> input);
-        Task<long> UpdateProfile(UpdateProfileInput input);
+        Task<UpdateProfileOutput> UpdateProfile(UpdateProfileInput input);
         Task<bool> UpdatePreferredLanguages(UpdatePreferredLanguagesInput input);
         Task<bool> DeleteProfile(IdInput<int> input);
         Task<bool> UpdateRegistrationToken(UpdateRegistrationTokenInput input);

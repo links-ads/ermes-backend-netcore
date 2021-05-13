@@ -39,5 +39,7 @@ namespace Ermes.Persons
         /// Token for push notification (i.e. Firebase)
         /// </summary>
         public string RegistrationToken { get; set; }
+
+        public bool IsFirstLogin { get; set; } = true;
     }
 }

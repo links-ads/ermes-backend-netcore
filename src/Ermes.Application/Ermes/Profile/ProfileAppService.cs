@@ -10,6 +10,7 @@ using Ermes.Missions;
 using Ermes.Organizations;
 using Ermes.Persons;
 using Ermes.Profile.Dto;
+using Ermes.Teams;
 using FusionAuthNetCore;
 using io.fusionauth.domain;
 using io.fusionauth.domain.api;
@@ -30,17 +31,23 @@ namespace Ermes.Profile
         private readonly ErmesAppSession _session;
         private readonly PersonManager _personManager;
         private readonly MissionManager _missionManager;
+        private readonly TeamManager _teamManager;
+        private readonly OrganizationManager _organizationManager;
         private readonly IOptions<FusionAuthSettings> _fusionAuthSettings;
 
         public ProfileAppService(ErmesAppSession session,
                     PersonManager personManger,
                     MissionManager missionManager,
+                    TeamManager teamManager,
+                    OrganizationManager organizationManager,
                     IOptions<FusionAuthSettings> fusionAuthSettings)
         {
             _session = session;
             _personManager = personManger;
             _fusionAuthSettings = fusionAuthSettings;
             _missionManager = missionManager;
+            _teamManager = teamManager;
+            _organizationManager = organizationManager;
         }
 
         #region Private
@@ -76,7 +83,7 @@ namespace Ermes.Profile
 
             return result;
         }
-        private async Task<bool> UpdateUserAsync(User user)
+        private async Task<User> UpdateUserAsync(User user)
         {
             var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
             var request = new UserRequest()
@@ -89,8 +96,8 @@ namespace Ermes.Profile
             var response = await client.UpdateUserAsync(user.id, request);
             if (response.WasSuccessful())
             {
-                Logger.Info("Ermes: Update User preferred languages: " + user.username);
-                return true;
+                Logger.Info("Ermes: Update User: " + user.username);
+                return response.successResponse.user;
             }
             else
             {
@@ -160,7 +167,7 @@ namespace Ermes.Profile
             "
         )]
         
-        public virtual async Task<long> UpdateProfile(UpdateProfileInput input)
+        public virtual async Task<UpdateProfileOutput> UpdateProfile(UpdateProfileInput input)
         {
             Person person = await _personManager.GetPersonByIdAsync(input.PersonId ?? _session.UserId.Value);
             // Validation
@@ -171,6 +178,9 @@ namespace Ermes.Profile
             if (input.OrganizationId != person.OrganizationId)
                 throw new UserFriendlyException(L("CannotChangeOrganization"));
 
+            await CheckOrganizationAndTeam(_organizationManager, _teamManager, input.OrganizationId, input.TeamId);
+            person.TeamId = input.TeamId;
+
             // Security
             if (_session.LoggedUserPerson.OrganizationId.HasValue && person.OrganizationId != _session.LoggedUserPerson.OrganizationId)
                 throw new UserFriendlyException(L("Forbidden_DifferentOrganizations"));
@@ -180,11 +190,18 @@ namespace Ermes.Profile
 
             // Update database fields
             person.Username = input.User.Username;
+            person.IsFirstLogin = input.IsFirstLogin;
             input.User.Id = person.FusionAuthUserGuid;
-            if (await UpdateUserAsync(ObjectMapper.Map<User>(input.User)))
-                return person.Id;
-
-            return -1;
+            var user = await UpdateUserAsync(ObjectMapper.Map<User>(input.User));
+            if (user != null)
+            {
+                return new UpdateProfileOutput()
+                {
+                    Profile = await GetProfileInternal(person, user, _personManager, _missionManager),
+                };
+            }
+            else
+                throw new UserFriendlyException(L("InvalidUser"));
         }
 
         [OpenApiOperation("Delete profile",
@@ -259,6 +276,7 @@ namespace Ermes.Profile
                 Update Person Preferred Languages
                 Input: UpdatePreferredLanguagesInput Dto object with the full list of preferred languages in Iso2Code format
                 Output: true if the operation has been excuted successfully
+                Note: kept for retrocompatibility, use UpdateProfile API
             "
         )]
         public virtual async Task<bool> UpdatePreferredLanguages(UpdatePreferredLanguagesInput input)
@@ -274,7 +292,8 @@ namespace Ermes.Profile
                 person.Username = userToUpdate.username;
 
             userToUpdate.preferredLanguages = input.PreferredLanguages;
-            return await UpdateUserAsync(userToUpdate);
+            var user = await UpdateUserAsync(userToUpdate);
+            return user != null;
         }
     }
 }

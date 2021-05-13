@@ -9,6 +9,7 @@ using Ermes.Organizations.Dto;
 using Ermes.Persons;
 using Ermes.Profile.Dto;
 using Ermes.Roles;
+using Ermes.Teams;
 using Ermes.Teams.Dto;
 using io.fusionauth.domain;
 using System;
@@ -24,7 +25,8 @@ namespace Ermes
     /// </summary>
     public abstract class ErmesAppServiceBase : ApplicationService
     {
-        protected ErmesAppServiceBase()
+        protected ErmesAppServiceBase(
+            )
         {
             LocalizationSourceName = ErmesConsts.LocalizationSourceName;
         }
@@ -66,6 +68,7 @@ namespace Ermes
             ProfileDto profile = new ProfileDto()
             {
                 PersonId = person.Id,
+                IsFirstLogin = person.IsFirstLogin,
                 User = ObjectMapper.Map<UserDto>(user)
             };
 
@@ -98,6 +101,29 @@ namespace Ermes
                 profile.User.Timezone = AppConsts.DefaultTimezone;
 
             return profile;
+        }
+    
+        protected async Task<bool> CheckOrganizationAndTeam(OrganizationManager _organizationManager, TeamManager _teamManager, int? organizationId, int? teamId)
+        {
+            if (!organizationId.HasValue)
+                return true;
+
+            //Check if Organization exists
+            var org = await _organizationManager.GetOrganizationByIdAsync(organizationId.Value);
+            if (org == null)
+                throw new UserFriendlyException(L("InvalidOrganizationId", organizationId.Value));
+
+            //Check if Team exists
+            if (teamId.HasValue)
+            {
+                var team = await _teamManager.GetTeamByIdAsync(teamId.Value);
+                if (team == null)
+                    throw new UserFriendlyException(L("InvalidTeamId", teamId.Value));
+                if (team.OrganizationId != org.Id)
+                    throw new UserFriendlyException(L("TeamNotInOrganization", teamId, organizationId.Value));
+            }
+
+            return true;
         }
     }
 }
