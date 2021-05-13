@@ -32,12 +32,14 @@ namespace Ermes.Profile
         private readonly PersonManager _personManager;
         private readonly MissionManager _missionManager;
         private readonly TeamManager _teamManager;
+        private readonly OrganizationManager _organizationManager;
         private readonly IOptions<FusionAuthSettings> _fusionAuthSettings;
 
         public ProfileAppService(ErmesAppSession session,
                     PersonManager personManger,
                     MissionManager missionManager,
                     TeamManager teamManager,
+                    OrganizationManager organizationManager,
                     IOptions<FusionAuthSettings> fusionAuthSettings)
         {
             _session = session;
@@ -45,6 +47,7 @@ namespace Ermes.Profile
             _fusionAuthSettings = fusionAuthSettings;
             _missionManager = missionManager;
             _teamManager = teamManager;
+            _organizationManager = organizationManager;
         }
 
         #region Private
@@ -174,14 +177,9 @@ namespace Ermes.Profile
                 throw new UserFriendlyException(L("MissingRequiredField", "Timezone"));
             if (input.OrganizationId != person.OrganizationId)
                 throw new UserFriendlyException(L("CannotChangeOrganization"));
-            if(input.TeamId.HasValue)
-            {
-                var team = await _teamManager.GetTeamByIdAsync(input.TeamId.Value);
-                if (team == null)
-                    throw new UserFriendlyException(L("InvalidTeamId", input.TeamId));
-                else
-                    person.TeamId = input.TeamId;
-            }
+
+            await CheckOrganizationAndTeam(_organizationManager, _teamManager, input.OrganizationId, input.TeamId);
+            person.TeamId = input.TeamId;
 
             // Security
             if (_session.LoggedUserPerson.OrganizationId.HasValue && person.OrganizationId != _session.LoggedUserPerson.OrganizationId)
