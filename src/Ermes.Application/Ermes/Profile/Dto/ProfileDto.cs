@@ -23,6 +23,7 @@ namespace Ermes.Profile.Dto
         public long PersonId { get; set; }
         public Location? Location { get; set; }
         public List<MissionDto> CurrentMissions { get; set; }
+        public bool IsFirstLogin { get; set; }
 
     }
 

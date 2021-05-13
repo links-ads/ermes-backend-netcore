@@ -66,6 +66,7 @@ namespace Ermes
             ProfileDto profile = new ProfileDto()
             {
                 PersonId = person.Id,
+                IsFirstLogin = person.IsFirstLogin,
                 User = ObjectMapper.Map<UserDto>(user)
             };
 
