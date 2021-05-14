@@ -147,11 +147,20 @@ namespace Ermes.Teams
 
             if (input.OrganizationId.HasValue)
             {
-                if (input.OrganizationId.Value != team.OrganizationId)
-                    throw new UserFriendlyException(L("InvalidOrganizationId", input.OrganizationId.Value));
-                //TODO: implemet permission checker
-                if (_session.LoggedUserPerson.OrganizationId.HasValue)
-                    throw new UserFriendlyException(L("MissingPermission"));
+                if (!_permissionChecker.IsGranted(AppPermissions.Teams.Team_CanCreateTeamCrossOrganization))
+                {
+                    //citizen
+                    if (!_session.LoggedUserPerson.OrganizationId.HasValue)
+                        throw new UserFriendlyException(L("MissingPermission"));
+
+                    //cannot update team cross-org
+                    if (input.OrganizationId.Value != _session.LoggedUserPerson.OrganizationId.Value)
+                        throw new UserFriendlyException(L("MissingPermission"));
+
+                    //invalid input
+                    if (input.OrganizationId.Value != team.OrganizationId)
+                        throw new UserFriendlyException(L("InvalidOrganizationId", input.OrganizationId.Value));
+                }
             }
             else {
                 if (_session.LoggedUserPerson.OrganizationId != team.OrganizationId)
@@ -171,7 +180,7 @@ namespace Ermes.Teams
                 team.OrganizationId = person.OrganizationId.Value;
             else
             {
-                if (await PermissionChecker.IsGrantedAsync(AppPermissions.Teams.Team_CanCreateTeamCrossOrganization))
+                if (_permissionChecker.IsGranted(AppPermissions.Teams.Team_CanCreateTeamCrossOrganization))
                 {
                     if (input.OrganizationId.HasValue && input.OrganizationId.Value > 0)
                     {
