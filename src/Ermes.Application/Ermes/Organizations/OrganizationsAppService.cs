@@ -29,12 +29,14 @@ namespace Ermes.Organizations
         private readonly IObjectMapper _objectMapper;
         private readonly PersonManager _personManager;
         private readonly ErmesAppSession _session;
+        private readonly ErmesPermissionChecker _permissionChecker;
         public OrganizationsAppService(
                 OrganizationManager organizationManager, 
                 IObjectMapper objectMapper,
                 CompetenceAreaManager compAreaManager,
                 PersonManager personManager,
-                ErmesAppSession session
+                ErmesAppSession session,
+                ErmesPermissionChecker permissionChecker
             )
         {
             _organizationManager = organizationManager;
@@ -42,11 +44,15 @@ namespace Ermes.Organizations
             _compAreaManager = compAreaManager;
             _personManager = personManager;
             _session = session;
+            _permissionChecker = permissionChecker;
         }
 
         #region Private Methods
         private async Task<int> CreateOrganization(OrganizationDto newOrganization)
         {
+            if (!_permissionChecker.IsGranted(_session.Roles, AppPermissions.Organizations.Organization_CanCreate))
+                throw new UserFriendlyException(L("MissingPermission", AppPermissions.Organizations.Organization_CanCreate));
+
             var newOrg = _objectMapper.Map<Organization>(newOrganization);
             
             var newOrgId = await _organizationManager.InsertOrganizationAsync(newOrg);
@@ -56,6 +62,12 @@ namespace Ermes.Organizations
 
         private async Task<OrganizationDto> UpdateOrganization(OrganizationDto updatedOrganization)
         {
+            if (!_permissionChecker.IsGranted(_session.Roles, AppPermissions.Organizations.Organization_CanUpdateAll))
+            {
+                if (!_permissionChecker.IsGranted(_session.Roles, AppPermissions.Organizations.Organization_CanUpdate) || _session.LoggedUserPerson.OrganizationId != updatedOrganization.Id)
+                    throw new UserFriendlyException(L("MissingPermission", AppPermissions.Organizations.Organization_CanUpdate));
+            }
+
             var org = await _organizationManager.GetOrganizationByIdAsync(updatedOrganization.Id);
 
             _objectMapper.Map(updatedOrganization, org);
@@ -71,6 +83,8 @@ namespace Ermes.Organizations
             query = query.DTFilterBy(input);
 
             var person = _session.LoggedUserPerson;
+
+            filterByOrganization = !(_permissionChecker.IsGranted(_session.Roles, AppPermissions.Organizations.Organization_CanViewAll));
 
             if (filterByOrganization && person != null && person.OrganizationId.HasValue)
                 query = query.DataOwnership(new List<int>() { person.OrganizationId.Value });

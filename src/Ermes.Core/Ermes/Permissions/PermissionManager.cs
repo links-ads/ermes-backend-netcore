@@ -67,6 +67,11 @@ namespace Ermes.Permissions
             return await Roles.ToListAsync();
         }
 
+        public async Task<Role> GetRoleByNameAsync(string roleName)
+        {
+            return await Roles.SingleOrDefaultAsync(r => r.Name == roleName);
+        }
+
         public async Task<int> AssignPermissionToRoleAsync(ErmesPermission permission)
         {
             if (Permissions.Where(p => p.RoleId == permission.RoleId && p.Name == permission.Name).Count() > 0)
@@ -86,6 +91,17 @@ namespace Ermes.Permissions
                 await PermissionRepository.DeleteAsync(perm);
 
             return 0;
+        }
+
+        public async Task<bool> DeleteAllPermissionsAsync()
+        {
+            var permList = await Permissions.ToListAsync();
+            foreach (var item in permList)
+            {
+                await PermissionRepository.DeleteAsync(item);
+            }
+
+            return true;
         }
     }
 }

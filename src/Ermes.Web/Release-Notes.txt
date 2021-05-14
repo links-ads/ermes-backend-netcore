@@ -1,6 +1,6 @@
 Ver.
 ---------------------------
-- Feature - IsFirstLogin field added to Person, update of ImportApiService (migration added) (#25)
+- Feature - IsFirstLogin field added to Person, update of ImportApiService, Permission initializations (migration added) (#25)
 
 Ver. 1.5.4 - 2021-04-09
 ---------------------------

@@ -175,6 +175,38 @@ namespace Ermes.Roles
             }      
         }
 
-        
+        [ErmesAuthorize(AppPermissions.Roles.Roles_PermissionInitialize)]
+        public virtual async Task<bool> InitilizePermissions()
+        {
+            //step 1) delete current role-permission associations
+            await _permissionManager.DeleteAllPermissionsAsync();
+
+            //step 2) create new role-permission associations
+            var permList = AppRoles.ADMINISTRATOR_PERMISSION_LIST;
+
+            Role role = await _permissionManager.GetRoleByNameAsync(AppRoles.ADMINISTRATOR);
+            foreach (var perm in permList)
+            {
+                await _permissionManager.AssignPermissionToRoleAsync(new ErmesPermission(perm, role.Id));
+            }
+
+            permList = AppRoles.DECISION_MAKER_PERMISSION_LIST;
+            role = await _permissionManager.GetRoleByNameAsync(AppRoles.DECISION_MAKER);
+            foreach (var perm in permList)
+            {
+                await _permissionManager.AssignPermissionToRoleAsync(new ErmesPermission(perm, role.Id));
+            }
+
+            permList = AppRoles.ORGANIZATION_MANAGER_PERMISSION_LIST;
+            role = await _permissionManager.GetRoleByNameAsync(AppRoles.ORGANIZATION_MANAGER);
+            foreach (var perm in permList)
+            {
+                await _permissionManager.AssignPermissionToRoleAsync(new ErmesPermission(perm, role.Id));
+            }
+
+            return true;
+        }
+
+
     }
 }

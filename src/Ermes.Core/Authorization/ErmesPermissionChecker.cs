@@ -1,14 +1,8 @@
 ﻿using Abp;
 using Abp.Authorization;
-using Abp.Dependency;
-using Ermes.Permissions;
 using System;
-using System.Collections.Generic;
-using System.Linq.Dynamic.Core;
-using System.Linq;
 using System.Threading.Tasks;
 using PermissionManager = Ermes.Permissions.PermissionManager;
-using Microsoft.EntityFrameworkCore;
 
 namespace Ermes.Authorization
 {
@@ -36,12 +30,12 @@ namespace Ermes.Authorization
             throw new NotImplementedException();
         }
 
-        public async Task<bool> IsGrantedAsync(string permissionName)
+        public Task<bool> IsGrantedAsync(UserIdentifier user, string permissionName)
         {
-            return await _permissionManager.Permissions.Where(p => p.Name == permissionName && p.RoleId == 2).SingleOrDefaultAsync() != null;
+            throw new NotImplementedException();
         }
 
-        public Task<bool> IsGrantedAsync(UserIdentifier user, string permissionName)
+        public Task<bool> IsGrantedAsync(string permissionName)
         {
             throw new NotImplementedException();
         }
