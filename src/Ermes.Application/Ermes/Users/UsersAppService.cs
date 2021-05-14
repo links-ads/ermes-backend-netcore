@@ -4,8 +4,10 @@ using Ermes.Attributes;
 using Ermes.Auth.Dto;
 using Ermes.Authorization;
 using Ermes.Dto.Datatable;
+using Ermes.Helpers;
 using Ermes.Missions;
 using Ermes.Organizations;
+using Ermes.Permissions;
 using Ermes.Persons;
 using Ermes.Profile.Dto;
 using Ermes.Roles;
@@ -29,6 +31,7 @@ namespace Ermes.Users
     {
         private readonly ErmesAppSession _session;
         private readonly PersonManager _personManager;
+        private readonly PermissionManager _permissionManager;
         private readonly MissionManager _missionManager;
         private readonly OrganizationManager _organizationManager;
         private readonly TeamManager _teamManager;
@@ -37,6 +40,7 @@ namespace Ermes.Users
         public UsersAppService(
                     ErmesAppSession session,
                     PersonManager personManger,
+                    PermissionManager permissionManager,
                     MissionManager missionManager,
                     IOptions<FusionAuthSettings> fusionAuthSettings,
                     OrganizationManager organizationManager,
@@ -49,6 +53,7 @@ namespace Ermes.Users
             _fusionAuthSettings = fusionAuthSettings;
             _teamManager = teamManager;
             _organizationManager = organizationManager;
+            _permissionManager = permissionManager;
         }
 
         #region Private

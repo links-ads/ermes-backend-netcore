@@ -54,5 +54,10 @@ namespace Ermes.Authorization
         {
             public const string Team_CanCreateTeamCrossOrganization = "Team.CanCreateTeamCrossOrganization";
         }
+
+        public static class Roles
+        {
+            public const string Roles_PermissionInitialize = "Roles.PermissionInitialize";
+        }
     }
 }

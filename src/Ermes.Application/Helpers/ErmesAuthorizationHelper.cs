@@ -19,6 +19,7 @@ namespace Ermes.Helpers
         private readonly IAuthorizationConfiguration _authConfiguration;
         private readonly ErmesAppSession _session;
         public ErmesPermissionChecker ErmesPermissionChecker { get; set; }
+
         public ErmesAuthorizationHelper(
                 IFeatureChecker featureChecker,
                 ErmesAppSession session,
