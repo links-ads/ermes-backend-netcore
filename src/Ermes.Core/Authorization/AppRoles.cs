@@ -25,6 +25,7 @@ namespace Ermes.Authorization
             AppPermissions.Organizations.Organization_CanCreate,
             AppPermissions.Organizations.Organization_CanUpdateAll,
             AppPermissions.Organizations.Organization_CanAssignPersonCrossOrganization,
+            AppPermissions.Teams.Team_CanViewAll,
             AppPermissions.Teams.Team_CanCreateTeamCrossOrganization
         };
 
