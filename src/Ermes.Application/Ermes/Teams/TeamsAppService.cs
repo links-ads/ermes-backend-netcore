@@ -147,7 +147,7 @@ namespace Ermes.Teams
 
             if (input.OrganizationId.HasValue)
             {
-                if (!_permissionChecker.IsGranted(AppPermissions.Teams.Team_CanCreateTeamCrossOrganization))
+                if (!_permissionChecker.IsGranted(_session.Roles, AppPermissions.Teams.Team_CanCreateTeamCrossOrganization))
                 {
                     //citizen
                     if (!_session.LoggedUserPerson.OrganizationId.HasValue)
@@ -180,7 +180,7 @@ namespace Ermes.Teams
                 team.OrganizationId = person.OrganizationId.Value;
             else
             {
-                if (_permissionChecker.IsGranted(AppPermissions.Teams.Team_CanCreateTeamCrossOrganization))
+                if (_permissionChecker.IsGranted(_session.Roles, AppPermissions.Teams.Team_CanCreateTeamCrossOrganization))
                 {
                     if (input.OrganizationId.HasValue && input.OrganizationId.Value > 0)
                     {
