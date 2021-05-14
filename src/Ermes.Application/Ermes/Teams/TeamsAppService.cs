@@ -29,16 +29,19 @@ namespace Ermes.Teams
         private readonly TeamManager _teamManager;
         private readonly PersonManager _personManager;
         private readonly OrganizationManager _organizationManager;
+        private readonly ErmesPermissionChecker _permissionChecker;
         public TeamsAppService(
                     TeamManager teamManager, 
                     PersonManager personManager,
                     OrganizationManager organizationManager,
+                    ErmesPermissionChecker permissionChecker,
                     ErmesAppSession session)
         {
             _session = session;
             _teamManager = teamManager;
             _personManager = personManager;
             _organizationManager = organizationManager;
+            _permissionChecker = permissionChecker;
         }
         [OpenApiOperation("Get Team",
             @"
@@ -75,19 +78,27 @@ namespace Ermes.Teams
         )]
         public virtual async Task<DTResult<TeamOutputDto>> GetTeams(GetTeamsInput input)
         {
+            PagedResultDto<TeamOutputDto> result = await InternalGetTeams(input);
+            return new DTResult<TeamOutputDto>(input.Draw, result.TotalCount, result.Items.Count, result.Items.ToList());
+        }
+
+        private async Task<PagedResultDto<TeamOutputDto>> InternalGetTeams(GetTeamsInput input, bool filterByOrganization = true)
+        {
             PagedResultDto<TeamOutputDto> result = new PagedResultDto<TeamOutputDto>();
-            var currentPersonUser = _session.LoggedUserPerson;
+            var person = _session.LoggedUserPerson;
 
             IQueryable<Team> query = _teamManager.Teams.Include(t => t.Organization);
-            
-            if(currentPersonUser.OrganizationId.HasValue)
-                query = query.Where(t=> t.OrganizationId == currentPersonUser.OrganizationId);
+
+            filterByOrganization = !(_permissionChecker.IsGranted(_session.Roles, AppPermissions.Teams.Team_CanViewAll));
+
+            //citizen not allowed to see teams
+            if (filterByOrganization && person != null && !person.OrganizationId.HasValue)
+                throw new UserFriendlyException(L("MissingPermission", AppPermissions.Teams.Team_CanViewAll));
+
+            if (filterByOrganization && person != null && person.OrganizationId.HasValue)
+                query = query.DataOwnership(new List<int>() { person.OrganizationId.Value });
 
             query = query.DTFilterBy(input);
-
-            // TODO-Security: Mantained as it was in other apis, unsure its effects
-            //if (currentPersonUser.OrganizationId.HasValue)
-            //     query = query.DataOwnership(new List<int>() { currentPersonUser.OrganizationId.Value });
 
             result.TotalCount = await query.CountAsync();
 
@@ -103,9 +114,11 @@ namespace Ermes.Teams
 
             List<Team> items = await query.ToListAsync();
             List<TeamOutputDto> resultItems = ObjectMapper.Map<List<TeamOutputDto>>(items);
-            IEnumerable<TeamOutputDto> joinedresults = resultItems.GroupJoin(_personManager.Persons, t => t.Id, p => p.TeamId, (t, p) => { t.Members = p.Select(p => ObjectMapper.Map<ListUsernamesDto>(p)).ToList(); return t; });
-            return new DTResult<TeamOutputDto>(input.Draw, result.TotalCount, result.Items.Count, joinedresults.ToList());
+            result.Items = resultItems.GroupJoin(_personManager.Persons, t => t.Id, p => p.TeamId, (t, p) => { t.Members = p.Select(p => ObjectMapper.Map<ListUsernamesDto>(p)).ToList(); return t; }).ToList();
+            return result;
         }
+
+
         [OpenApiOperation("Create or Update Team",
             @"
                 Create or update the data for a team.

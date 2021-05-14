@@ -6,6 +6,7 @@ using Ermes.Organizations;
 using Ermes.Persons;
 using Ermes.ReportRequests;
 using Ermes.Reports;
+using Ermes.Teams;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,6 +51,8 @@ namespace Ermes.Linq.Extensions
                 return new PersonActionDataOwnershipResolver().Resolve(query as IQueryable<PersonAction>, organizationIdList, person) as IQueryable<T>;
             else if (typeof(T) == typeof(Communication))
                 return new CommunicationDataOwnershipResolver().Resolve(query as IQueryable<Communication>, organizationIdList, person) as IQueryable<T>;
+            else if (typeof(T) == typeof(Team))
+                return new TeamDataOwnershipResolver().Resolve(query as IQueryable<Team>, organizationIdList, person) as IQueryable<T>;
 
             return query;
         }
@@ -149,6 +152,15 @@ namespace Ermes.Linq.Extensions
                                     //User contents
                                     !r.Creator.OrganizationId.HasValue
                                 );
+            }
+        }
+
+        private class TeamDataOwnershipResolver : IDataOwnershipResolver<Team>
+        {
+            public IQueryable<Team> Resolve(IQueryable<Team> query, List<int> organizationIdList, IPersonBase person)
+            {
+                return  query
+                        .Where(t => organizationIdList.Contains(t.OrganizationId));
             }
         }
         #endregion
