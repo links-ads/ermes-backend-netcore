@@ -10,6 +10,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -85,6 +86,8 @@ namespace Abp.SocialMedia.Client
                 return dateTimeOffset.ToString((configuration ?? GlobalConfiguration.Instance).DateTimeFormat);
             if (obj is bool boolean)
                 return boolean ? "true" : "false";
+            if (obj is List<float> decimalArray)
+                return string.Join(",", decimalArray.Select(n => n.ToString(CultureInfo.InvariantCulture)));
             if (obj is ICollection collection)
                 return string.Join(",", collection.Cast<object>());
 
