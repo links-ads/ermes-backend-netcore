@@ -29,11 +29,9 @@ namespace Ermes.Teams
         private readonly TeamManager _teamManager;
         private readonly PersonManager _personManager;
         private readonly OrganizationManager _organizationManager;
-        private readonly ErmesPermissionChecker ErmesPermissionChecker;
         public TeamsAppService(
                     TeamManager teamManager, 
                     PersonManager personManager,
-                    ErmesPermissionChecker ermesPermissionChecker,
                     OrganizationManager organizationManager,
                     ErmesAppSession session)
         {
@@ -41,7 +39,6 @@ namespace Ermes.Teams
             _teamManager = teamManager;
             _personManager = personManager;
             _organizationManager = organizationManager;
-            ErmesPermissionChecker = ermesPermissionChecker;
         }
         [OpenApiOperation("Get Team",
             @"

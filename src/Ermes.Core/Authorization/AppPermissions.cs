@@ -21,6 +21,10 @@ namespace Ermes.Authorization
         public static class Organizations
         {
             public const string Organization = "Organizations";
+            public const string Organization_CanViewAll = "Organizations.CanViewAll";
+            public const string Organization_CanCreate = "Organizations.CanCreate";
+            public const string Organization_CanUpdate = "Organizations.CanUpdate";
+            public const string Organization_CanUpdateAll = "Organizations.CanUpdateAll";
             public const string Organization_CanAssignPersonCrossOrganization = "Organizations.CanAssignPersonCrossOrganization";
         }
 

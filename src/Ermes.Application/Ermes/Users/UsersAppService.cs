@@ -1,6 +1,7 @@
 ﻿using Abp.Application.Services.Dto;
 using Abp.UI;
 using Ermes.Attributes;
+using Ermes.Auth.Dto;
 using Ermes.Authorization;
 using Ermes.Dto.Datatable;
 using Ermes.Missions;
@@ -95,8 +96,6 @@ namespace Ermes.Users
 
         private async Task<long> CreateUserAsync(UpdateProfileInput input)
         {
-            var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
-
             if (input.User.Timezone == null || input.User.Timezone.Length < 2)
                 input.User.Timezone = AppConsts.DefaultTimezone;
 
@@ -104,18 +103,50 @@ namespace Ermes.Users
 
             List<Role> rolesToAssign = await GetRolesAndCheckOrganization(input.User.Roles, input.OrganizationId, _personManager, _organizationManager, _session);
 
+            var newUser = await CreateUserInternalAsync(input.User, rolesToAssign);
+
+            //Create Person on Ermes DB
+            var newPerson = new Person()
+            {
+                FusionAuthUserGuid = newUser.id.Value,
+                Username = newUser.username,
+                OrganizationId = input.OrganizationId,
+                TeamId = input.TeamId
+            };
+
+            Logger.Info("Ermes: Create Person: " + newPerson.Username);
+            long personId = await _personManager.InsertPerson(newPerson);
+
+            // Assign roles
+            foreach (Role rta in rolesToAssign)
+            {
+                PersonRole pr = new PersonRole()
+                {
+                    PersonId = personId,
+                    RoleId = rta.Id
+                };
+                await _personManager.InsertPersonRoleAsync(pr);
+            }
+
+            return personId;
+        }
+
+        private async Task<User> CreateUserInternalAsync(UserDto userDto, List<Role> rolesToAssign)
+        {
+            var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
+
             //Create user on FusionAuth
             var newUser = new RegistrationRequest()
             {
-                user = ObjectMapper.Map<User>(input.User),
+                user = ObjectMapper.Map<User>(userDto),
                 registration = new UserRegistration()
                 {
                     applicationId = new Guid(_fusionAuthSettings.Value.ApplicationId),
                     roles = rolesToAssign.Select(r => r.Name).ToList()
                 },
-                sendSetPasswordEmail = false,// input.SendSetPasswordEmail,
-                skipVerification = true,// input.SkipVerification,
-                skipRegistrationVerification = true//input.SkipRegistrationVerification
+                sendSetPasswordEmail = false,
+                skipVerification = true,
+                skipRegistrationVerification = true
             };
 
             var response = await client.RegisterAsync(null, newUser);
@@ -124,31 +155,7 @@ namespace Ermes.Users
             {
                 if (response.successResponse.user.id.HasValue)
                 {
-                    //Create Person on Ermes DB
-                    var newPerson = new Person()
-                    {
-                        FusionAuthUserGuid = response.successResponse.user.id.Value,
-                        Username = response.successResponse.user.username,
-                        OrganizationId = input.OrganizationId,
-                        TeamId = input.TeamId
-                    };
-
-                    if (input.User != null)
-                        Logger.Info("Ermes: CreateUser: " + input.User.Username);
-
-                    long personId = await _personManager.InsertPerson(newPerson);
-
-                    // Assign roles
-                    foreach(Role rta in rolesToAssign)
-                    {
-                        PersonRole pr = new PersonRole(){
-                            PersonId = personId,
-                            RoleId = rta.Id
-                        };
-                        await _personManager.InsertPersonRoleAsync(pr);
-                    }
-
-                    return personId;
+                    return response.successResponse.user;
                 }
                 else
                     throw new UserFriendlyException(L("FusionAuthUnknonwError"));
@@ -156,7 +163,7 @@ namespace Ermes.Users
             else
             {
                 var fa_error = FusionAuth.ManageErrorResponse(response);
-                throw new UserFriendlyException(fa_error.ErrorCode, fa_error.HasTranslation?L(fa_error.Message):fa_error.Message);
+                throw new UserFriendlyException(fa_error.ErrorCode, fa_error.HasTranslation ? L(fa_error.Message) : fa_error.Message);
             }
         }
         #endregion

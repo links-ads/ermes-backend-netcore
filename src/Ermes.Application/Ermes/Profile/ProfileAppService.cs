@@ -273,10 +273,10 @@ namespace Ermes.Profile
 
         [OpenApiOperation("Update Person preferred languages",
             @"
+                [Deprecated]
                 Update Person Preferred Languages
                 Input: UpdatePreferredLanguagesInput Dto object with the full list of preferred languages in Iso2Code format
                 Output: true if the operation has been excuted successfully
-                Note: kept for retrocompatibility, use UpdateProfile API
             "
         )]
         public virtual async Task<bool> UpdatePreferredLanguages(UpdatePreferredLanguagesInput input)
