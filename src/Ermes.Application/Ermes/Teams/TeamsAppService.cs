@@ -193,6 +193,8 @@ namespace Ermes.Teams
                     else
                         throw new UserFriendlyException(L("OrganizationRequiredForOperation", input.Id, "Team"));
                 }
+                else
+                    throw new UserFriendlyException(L("MissingPermission"));
             }
                 
             return await _teamManager.InsertTeamAsync(team);
