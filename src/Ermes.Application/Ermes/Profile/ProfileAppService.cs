@@ -3,6 +3,8 @@ using Abp.Extensions;
 using Abp.Linq.Extensions;
 using Abp.UI;
 using Ermes.Attributes;
+using Ermes.Auth.Dto;
+using Ermes.Authorization;
 using Ermes.Dto;
 using Ermes.Dto.Datatable;
 using Ermes.Linq.Extensions;
@@ -10,10 +12,10 @@ using Ermes.Missions;
 using Ermes.Organizations;
 using Ermes.Persons;
 using Ermes.Profile.Dto;
+using Ermes.Roles;
 using Ermes.Teams;
 using FusionAuthNetCore;
 using io.fusionauth.domain;
-using io.fusionauth.domain.api;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using NSwag.Annotations;
@@ -34,12 +36,14 @@ namespace Ermes.Profile
         private readonly TeamManager _teamManager;
         private readonly OrganizationManager _organizationManager;
         private readonly IOptions<FusionAuthSettings> _fusionAuthSettings;
+        private readonly ErmesPermissionChecker _permissionChecker;
 
         public ProfileAppService(ErmesAppSession session,
                     PersonManager personManger,
                     MissionManager missionManager,
                     TeamManager teamManager,
                     OrganizationManager organizationManager,
+                    ErmesPermissionChecker permissionChecker,
                     IOptions<FusionAuthSettings> fusionAuthSettings)
         {
             _session = session;
@@ -47,6 +51,7 @@ namespace Ermes.Profile
             _fusionAuthSettings = fusionAuthSettings;
             _missionManager = missionManager;
             _teamManager = teamManager;
+            _permissionChecker = permissionChecker;
             _organizationManager = organizationManager;
         }
 
@@ -83,28 +88,28 @@ namespace Ermes.Profile
 
             return result;
         }
-        private async Task<User> UpdateUserAsync(User user)
-        {
-            var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
-            var request = new UserRequest()
-            {
-                user = user,
-                sendSetPasswordEmail = false,
-                skipVerification = true
-            };
+        //private async Task<User> UpdateUserAsync(User user)
+        //{
+        //    var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
+        //    var request = new UserRequest()
+        //    {
+        //        user = user,
+        //        sendSetPasswordEmail = false,
+        //        skipVerification = true
+        //    };
 
-            var response = await client.UpdateUserAsync(user.id, request);
-            if (response.WasSuccessful())
-            {
-                Logger.Info("Ermes: Update User: " + user.username);
-                return response.successResponse.user;
-            }
-            else
-            {
-                var fa_error = FusionAuth.ManageErrorResponse(response);
-                throw new UserFriendlyException(fa_error.ErrorCode, fa_error.HasTranslation ? L(fa_error.Message) : fa_error.Message);
-            }
-        }
+        //    var response = await client.UpdateUserAsync(user.id, request);
+        //    if (response.WasSuccessful())
+        //    {
+        //        Logger.Info("Ermes: Update User: " + user.username);
+        //        return response.successResponse.user;
+        //    }
+        //    else
+        //    {
+        //        var fa_error = FusionAuth.ManageErrorResponse(response);
+        //        throw new UserFriendlyException(fa_error.ErrorCode, fa_error.HasTranslation ? L(fa_error.Message) : fa_error.Message);
+        //    }
+        //}
         private async Task<User> GetUserAsync(Guid userGuid)
         {
             var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
@@ -169,30 +174,15 @@ namespace Ermes.Profile
         
         public virtual async Task<UpdateProfileOutput> UpdateProfile(UpdateProfileInput input)
         {
+            if (input.User.Timezone == null || input.User.Timezone.Length < 2)
+                input.User.Timezone = AppConsts.DefaultTimezone;
+
             Person person = await _personManager.GetPersonByIdAsync(input.PersonId ?? _session.UserId.Value);
-            // Validation
-            if (person == null)
-                throw new UserFriendlyException(L("InvalidPersonId", input.PersonId));
-            if (input.User.Timezone == null)
-                throw new UserFriendlyException(L("MissingRequiredField", "Timezone"));
-            if (input.OrganizationId != person.OrganizationId)
-                throw new UserFriendlyException(L("CannotChangeOrganization"));
+            var rolesToAssign = await GetRolesAndCheckOrganizationAndTeam(input.User.Roles, input.OrganizationId, input.TeamId, input.PersonId, _personManager, _organizationManager, _teamManager, _session, _permissionChecker);
+            var user = await UpdateUserInternalAsync(input.User, _fusionAuthSettings);
 
-            await CheckOrganizationAndTeam(_organizationManager, _teamManager, input.OrganizationId, input.TeamId);
-            person.TeamId = input.TeamId;
+            person = await UpdatePersonInternalAsync(person, user, input.OrganizationId, input.TeamId, input.IsFirstLogin, rolesToAssign, _personManager);
 
-            // Security
-            if (_session.LoggedUserPerson.OrganizationId.HasValue && person.OrganizationId != _session.LoggedUserPerson.OrganizationId)
-                throw new UserFriendlyException(L("Forbidden_DifferentOrganizations"));
-            // TODO-Security: Add Check: Same User or Role allowing Other User Access
-            if (_session.UserId != person.Id) // for the moment allow only same user
-                throw new UserFriendlyException(L("Forbidden_InsufficientRole"));
-
-            // Update database fields
-            person.Username = input.User.Username;
-            person.IsFirstLogin = input.IsFirstLogin;
-            input.User.Id = person.FusionAuthUserGuid;
-            var user = await UpdateUserAsync(ObjectMapper.Map<User>(input.User));
             if (user != null)
             {
                 return new UpdateProfileOutput()
@@ -292,7 +282,7 @@ namespace Ermes.Profile
                 person.Username = userToUpdate.username;
 
             userToUpdate.preferredLanguages = input.PreferredLanguages;
-            var user = await UpdateUserAsync(userToUpdate);
+            var user = await UpdateUserInternalAsync(ObjectMapper.Map<UserDto>(userToUpdate), _fusionAuthSettings);
             return user != null;
         }
     }

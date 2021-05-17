@@ -1,6 +1,7 @@
 ﻿using Abp.UI;
 using Ermes.Activities.Dto;
 using Ermes.Attributes;
+using Ermes.Authorization;
 using Ermes.Communications;
 using Ermes.Dto.Spatial;
 using Ermes.Enums;
@@ -18,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace Ermes.GeoJson
 {
-    [ErmesAuthorize]
+    [ErmesAuthorize(AppPermissions.Backoffice)]
     [ErmesIgnoreApi(true)]
     public class GeoJsonAppService: ErmesAppServiceBase, IGeoJsonAppService
     {

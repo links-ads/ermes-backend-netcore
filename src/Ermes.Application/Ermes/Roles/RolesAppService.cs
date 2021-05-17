@@ -17,10 +17,10 @@ using io.fusionauth.domain;
 using Ermes.Persons;
 using io.fusionauth.domain.api.user;
 using Ermes.Organizations;
+using Ermes.Teams;
 
 namespace Ermes.Roles
 {
-    //[FasterAuthorize(AppPermissions.Backoffice)]
     public class RolesAppService : ErmesAppServiceBase, IRolesAppService
     {
         private readonly IObjectMapper _objectMapper;
@@ -28,6 +28,8 @@ namespace Ermes.Roles
         private readonly IOptions<FusionAuthSettings> _fusionAuthSettings;
         private readonly PersonManager _personManager;
         private readonly OrganizationManager _organizationManager;
+        private readonly TeamManager _teamManager;
+        private readonly ErmesPermissionChecker _permissionChecker;
         private readonly ErmesAppSession _session;
         public RolesAppService(
                     IObjectMapper objectMapper,
@@ -35,6 +37,8 @@ namespace Ermes.Roles
                     PersonManager personManager,
                     IOptions<FusionAuthSettings> fusionAuthSettings,
                     OrganizationManager organizationManager,
+                    TeamManager teamManager,
+                    ErmesPermissionChecker permissionChecker,
                     ErmesAppSession session
             )
         {
@@ -44,6 +48,8 @@ namespace Ermes.Roles
             _personManager = personManager;
             _organizationManager = organizationManager;
             _session = session;
+            _permissionChecker = permissionChecker;
+            _teamManager = teamManager;
         }
 
         /*public virtual async Task<CreateOrUpdateRoleOutput> CreateOrUpdateRole(CreateOrUpdateRoleInput input)
@@ -69,7 +75,7 @@ namespace Ermes.Roles
             else
                 throw new UserFriendlyException("Invalid Role Id");
         }*/
-
+        [ErmesAuthorize(AppPermissions.Backoffice)]
         public virtual async Task<GetRolesOutput> GetRoles()
         {
             var list = await _permissionManager.GetRolesAsync();
@@ -80,6 +86,7 @@ namespace Ermes.Roles
             };
         }
 
+        [ErmesAuthorize(AppPermissions.Backoffice)]
         public virtual async Task<bool> AssignPermissionToRole(AssignPermissionToRoleInput input)
         {
             var permission = _objectMapper.Map<ErmesPermission>(input.Permission);
@@ -95,6 +102,7 @@ namespace Ermes.Roles
             }
         }
 
+        [ErmesAuthorize(AppPermissions.Backoffice)]
         public virtual async Task<bool> DeletePermissionForRole(DeletePermissionForRoleInput input)
         {
             var permission = _objectMapper.Map<ErmesPermission>(input.Permission);
@@ -104,6 +112,7 @@ namespace Ermes.Roles
             return true;
         }
 
+        [ErmesAuthorize(AppPermissions.Backoffice)]
         public virtual async Task<bool> SyncRolesFromFusionAuth()
         {
             List<Role> list = await _permissionManager.GetRolesAsync();
@@ -137,13 +146,14 @@ namespace Ermes.Roles
             return true;
         }
 
+        [ErmesAuthorize(AppPermissions.Backoffice)]
         public virtual async Task<bool> AssignRolesToPerson(AssignRolesToPersonInput input)
         {            
             Person person = await _personManager.GetPersonByIdAsync(input.PersonId);
             if (person == null)
                throw new UserFriendlyException(L("InvalidPersonId"));
 
-            List<Role> rolesToAssign = await GetRolesAndCheckOrganization(input.Roles, person.OrganizationId, _personManager, _organizationManager, _session);
+            List<Role> rolesToAssign = await GetRolesAndCheckOrganizationAndTeam(input.Roles, person.OrganizationId, person.TeamId, input.PersonId, _personManager, _organizationManager, _teamManager, _session, _permissionChecker);
 
             FusionAuthClient client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
 
@@ -175,7 +185,6 @@ namespace Ermes.Roles
             }      
         }
 
-        [ErmesAuthorize(AppPermissions.Roles.Roles_PermissionInitialize)]
         public virtual async Task<bool> InitilizePermissions()
         {
             //step 1) delete current role-permission associations

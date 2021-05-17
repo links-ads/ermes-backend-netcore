@@ -1,6 +1,7 @@
 ﻿using Abp.Application.Services;
 using Abp.UI;
 using Ermes.Auth.Dto;
+using Ermes.Authorization;
 using Ermes.Enums;
 using Ermes.Missions;
 using Ermes.Missions.Dto;
@@ -11,7 +12,10 @@ using Ermes.Profile.Dto;
 using Ermes.Roles;
 using Ermes.Teams;
 using Ermes.Teams.Dto;
+using FusionAuthNetCore;
 using io.fusionauth.domain;
+using io.fusionauth.domain.api;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,7 +42,7 @@ namespace Ermes
             return result;
         }
 
-        protected async Task<List<Role>> GetRolesAndCheckOrganization(string[] roles, int? organizationId, PersonManager _personManager, OrganizationManager _organizationManager, ErmesAppSession _session)
+        protected async Task<List<Role>> GetRolesAndCheckOrganizationAndTeam(string[] roles, int? organizationId, int? teamId, long? personId, PersonManager _personManager, OrganizationManager _organizationManager, TeamManager _teamManager, ErmesAppSession _session, ErmesPermissionChecker _permissionChecker)
         {
             List<Role> roleList;
 
@@ -51,14 +55,46 @@ namespace Ermes
                     throw new UserFriendlyException(L("InvalidRole", roles.Except(roleList.Select(r => r.Name)).Aggregate((r1, r2) => r1 + ", " + r2)));
             }
 
-            if (organizationId == null)
-                throw new UserFriendlyException(L("InvalidOrganizationId", organizationId));
-            var org = await _organizationManager.GetOrganizationByIdAsync(organizationId.Value);
-            if (org == null)
-                throw new UserFriendlyException(L("InvalidOrganizationId", organizationId));
+            var users_CanCreateCitizenOrPersonCrossOrganization = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Users.Users_CanCreateCitizenOrPersonCrossOrganization);
+            var users_CanEditColleagues = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Users.Users_CanEditColleagues);
+            if (organizationId == null) //if null, must be a citizen or must have the right permission
+            {
+                if (!users_CanCreateCitizenOrPersonCrossOrganization && roleList.Count(a => a.Name == AppRoles.CITIZEN) == 0)
+                    throw new UserFriendlyException(L("InvalidOrganizationId", organizationId));
 
-            if (_session.LoggedUserPerson.OrganizationId.HasValue && _session.LoggedUserPerson.OrganizationId.Value != organizationId)
-                throw new UserFriendlyException(L("Forbidden_DifferentOrganizations"));
+                if (personId.HasValue) //cannot edit other profiles without permissions
+                {
+                    if (!users_CanEditColleagues && _session.LoggedUserPerson.Id != personId && !users_CanCreateCitizenOrPersonCrossOrganization)
+                        throw new UserFriendlyException(L("Forbidden_DifferentOrganizations"));
+                }
+            }
+            else
+            {
+                var org = await _organizationManager.GetOrganizationByIdAsync(organizationId.Value);
+                if (org == null)
+                    throw new UserFriendlyException(L("InvalidOrganizationId", organizationId));
+
+                if (!users_CanCreateCitizenOrPersonCrossOrganization) {
+                    //cannot edit people belonging to other organizations without the right permission
+                    if (_session.LoggedUserPerson.OrganizationId.HasValue && _session.LoggedUserPerson.OrganizationId.Value != organizationId)
+                        throw new UserFriendlyException(L("Forbidden_DifferentOrganizations"));
+
+                    if (personId.HasValue) //cannot edit other profiles without permissions
+                    {
+                        if(!users_CanEditColleagues && _session.LoggedUserPerson.Id != personId)
+                            throw new UserFriendlyException(L("Forbidden_DifferentOrganizations"));
+                    }
+                }
+                //Check if Team exists
+                if (teamId.HasValue)
+                {
+                    var team = await _teamManager.GetTeamByIdAsync(teamId.Value);
+                    if (team == null)
+                        throw new UserFriendlyException(L("InvalidTeamId", teamId.Value));
+                    if (team.OrganizationId != org.Id)
+                        throw new UserFriendlyException(L("TeamNotInOrganization", teamId, organizationId.Value));
+                }
+            }
 
             return roleList;
         }
@@ -94,36 +130,69 @@ namespace Ermes
 
             profile.CurrentMissions = ObjectMapper.Map<List<MissionDto>>(_missionManager.GetCurrentMissions(person));
 
-            if (user.registrations != null && user.registrations.Count > 0)
-                profile.User.Roles = user.registrations?.FirstOrDefault().roles.ToArray();
+            profile.User.Roles = await _personManager.GetPersonRoles(profile.PersonId);
 
             if (profile.User.Timezone == null)
                 profile.User.Timezone = AppConsts.DefaultTimezone;
 
             return profile;
         }
-    
-        protected async Task<bool> CheckOrganizationAndTeam(OrganizationManager _organizationManager, TeamManager _teamManager, int? organizationId, int? teamId)
+
+        protected async Task<User> UpdateUserInternalAsync(UserDto userDto, IOptions<FusionAuthSettings> _fusionAuthSettings)
         {
-            if (!organizationId.HasValue)
-                return true;
+            var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
 
-            //Check if Organization exists
-            var org = await _organizationManager.GetOrganizationByIdAsync(organizationId.Value);
-            if (org == null)
-                throw new UserFriendlyException(L("InvalidOrganizationId", organizationId.Value));
-
-            //Check if Team exists
-            if (teamId.HasValue)
+            //Create user on FusionAuth
+            var userToUpdate = new UserRequest()
             {
-                var team = await _teamManager.GetTeamByIdAsync(teamId.Value);
-                if (team == null)
-                    throw new UserFriendlyException(L("InvalidTeamId", teamId.Value));
-                if (team.OrganizationId != org.Id)
-                    throw new UserFriendlyException(L("TeamNotInOrganization", teamId, organizationId.Value));
+                user = ObjectMapper.Map<User>(userDto),
+                sendSetPasswordEmail = false,
+                skipVerification = true,
+            };
+
+            var response = await client.UpdateUserAsync(userToUpdate.user.id, userToUpdate);
+
+            if (response.WasSuccessful())
+                return response.successResponse.user;
+            else
+            {
+                var fa_error = FusionAuth.ManageErrorResponse(response);
+                throw new UserFriendlyException(fa_error.ErrorCode, fa_error.HasTranslation ? L(fa_error.Message) : fa_error.Message);
+            }
+        }
+
+        protected async Task<Person> UpdatePersonInternalAsync(Person person, User user, int? organizationId, int? teamId, bool isFirstLogin, List<Role> rolesToAssign, PersonManager _personManager)
+        {
+            //Manage Person on Ermes DB
+            if (person == null)
+            {
+                person = new Person()
+                {
+                    FusionAuthUserGuid = user.id.Value,
+                    Username = user.username,
+                };
             }
 
-            return true;
+            person.OrganizationId = organizationId;
+            person.TeamId = teamId;
+            person.IsFirstLogin = isFirstLogin;
+
+
+            Logger.Info("Ermes: Create or update Person: " + person.Username);
+            long personId = await _personManager.InsertOrUpdatePersonAsync(person);
+
+            // Assign roles
+            foreach (Role rta in rolesToAssign)
+            {
+                PersonRole pr = new PersonRole()
+                {
+                    PersonId = personId,
+                    RoleId = rta.Id
+                };
+                await _personManager.InsertPersonRoleAsync(pr);
+            }
+            await CurrentUnitOfWork.SaveChangesAsync();
+            return person;
         }
     }
 }

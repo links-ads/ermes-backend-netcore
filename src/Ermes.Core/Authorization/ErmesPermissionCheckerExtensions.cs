@@ -50,9 +50,6 @@ namespace Ermes.Authorization
             if (roles.IsNullOrEmpty())
                 return false;
 
-            if (roles.Count(r => r == "administrator") > 0)
-                return true;
-
             if (requiresAll)
             {
                 foreach (var permissionName in permissionNames)
