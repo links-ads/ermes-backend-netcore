@@ -15,6 +15,7 @@ using Ermes.Teams;
 using Ermes.Users.Dto;
 using FusionAuthNetCore;
 using io.fusionauth.domain;
+using io.fusionauth.domain.api;
 using io.fusionauth.domain.api.user;
 using io.fusionauth.domain.search;
 using Microsoft.Extensions.Options;
@@ -31,20 +32,20 @@ namespace Ermes.Users
     {
         private readonly ErmesAppSession _session;
         private readonly PersonManager _personManager;
-        private readonly PermissionManager _permissionManager;
         private readonly MissionManager _missionManager;
         private readonly OrganizationManager _organizationManager;
         private readonly TeamManager _teamManager;
+        private readonly ErmesPermissionChecker _permissionChecker;
         private readonly IOptions<FusionAuthSettings> _fusionAuthSettings;
 
         public UsersAppService(
                     ErmesAppSession session,
                     PersonManager personManger,
-                    PermissionManager permissionManager,
                     MissionManager missionManager,
                     IOptions<FusionAuthSettings> fusionAuthSettings,
                     OrganizationManager organizationManager,
-                    TeamManager teamManager
+                    TeamManager teamManager,
+                    ErmesPermissionChecker permissionChecker
             )
         {
             _session = session;
@@ -53,7 +54,7 @@ namespace Ermes.Users
             _fusionAuthSettings = fusionAuthSettings;
             _teamManager = teamManager;
             _organizationManager = organizationManager;
-            _permissionManager = permissionManager;
+            _permissionChecker = permissionChecker;
         }
 
         #region Private
@@ -99,43 +100,6 @@ namespace Ermes.Users
             return result;
         }
 
-        private async Task<long> CreateUserAsync(UpdateProfileInput input)
-        {
-            if (input.User.Timezone == null || input.User.Timezone.Length < 2)
-                input.User.Timezone = AppConsts.DefaultTimezone;
-
-            await CheckOrganizationAndTeam(_organizationManager, _teamManager, input.OrganizationId, input.TeamId);
-
-            List<Role> rolesToAssign = await GetRolesAndCheckOrganization(input.User.Roles, input.OrganizationId, _personManager, _organizationManager, _session);
-
-            var newUser = await CreateUserInternalAsync(input.User, rolesToAssign);
-
-            //Create Person on Ermes DB
-            var newPerson = new Person()
-            {
-                FusionAuthUserGuid = newUser.id.Value,
-                Username = newUser.username,
-                OrganizationId = input.OrganizationId,
-                TeamId = input.TeamId
-            };
-
-            Logger.Info("Ermes: Create Person: " + newPerson.Username);
-            long personId = await _personManager.InsertPerson(newPerson);
-
-            // Assign roles
-            foreach (Role rta in rolesToAssign)
-            {
-                PersonRole pr = new PersonRole()
-                {
-                    PersonId = personId,
-                    RoleId = rta.Id
-                };
-                await _personManager.InsertPersonRoleAsync(pr);
-            }
-
-            return personId;
-        }
-
         private async Task<User> CreateUserInternalAsync(UserDto userDto, List<Role> rolesToAssign)
         {
             var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
@@ -171,6 +135,29 @@ namespace Ermes.Users
                 throw new UserFriendlyException(fa_error.ErrorCode, fa_error.HasTranslation ? L(fa_error.Message) : fa_error.Message);
             }
         }
+
+        //private async Task<User> UpdateUserInternalAsync(UserDto userDto)
+        //{
+        //    var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
+
+        //    //Create user on FusionAuth
+        //    var userToUpdate = new UserRequest()
+        //    {
+        //        user = ObjectMapper.Map<User>(userDto),
+        //        sendSetPasswordEmail = false,
+        //        skipVerification = true,
+        //    };
+
+        //    var response = await client.UpdateUserAsync(userToUpdate.user.id, userToUpdate);
+
+        //    if (response.WasSuccessful())
+        //        return response.successResponse.user;
+        //    else
+        //    {
+        //        var fa_error = FusionAuth.ManageErrorResponse(response);
+        //        throw new UserFriendlyException(fa_error.ErrorCode, fa_error.HasTranslation ? L(fa_error.Message) : fa_error.Message);
+        //    }
+        //}
         #endregion
 
         public virtual async Task<DTResult<ProfileDto>> GetUsers(GetUsersInput input)
@@ -185,9 +172,29 @@ namespace Ermes.Users
                 BirthDate format: yyyy-mm-dd
             "
         )]
-        public virtual async Task<long> CreateUser(UpdateProfileInput input)
+        public virtual async Task<CreateOrUpdateUserOutput> CreateOrUpdateUser(UpdateProfileInput input)
         {
-            return await CreateUserAsync(input);
+            if (input.User.Timezone == null || input.User.Timezone.Length < 2)
+                input.User.Timezone = AppConsts.DefaultTimezone;
+
+            List<Role> rolesToAssign = await GetRolesAndCheckOrganizationAndTeam(input.User.Roles, input.OrganizationId, input.TeamId, input.PersonId, _personManager, _organizationManager, _teamManager, _session, _permissionChecker);
+
+            User currentUser;
+            Person person = null;
+            if (input.User.Id == Guid.Empty)
+                currentUser = await CreateUserInternalAsync(input.User, rolesToAssign);
+            else
+            {
+                currentUser = await UpdateUserInternalAsync(input.User, _fusionAuthSettings);
+                person = _personManager.GetPersonByFusionAuthUserGuid(currentUser.id.Value);
+            }
+
+            person = await UpdatePersonInternalAsync(person, currentUser, input.OrganizationId, input.TeamId, input.IsFirstLogin, rolesToAssign, _personManager);
+
+            return new CreateOrUpdateUserOutput()
+            {
+                Profile = await GetProfileInternal(person, currentUser, _personManager, _missionManager)
+            };
         }
     }
 }

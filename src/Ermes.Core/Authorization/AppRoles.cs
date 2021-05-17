@@ -16,7 +16,6 @@ namespace Ermes.Authorization
         public static readonly string[] ADMINISTRATOR_PERMISSION_LIST = new string[]
         {
             AppPermissions.Backoffice,
-            AppPermissions.Roles.Roles_PermissionInitialize,
             AppPermissions.Imports.Import,
             AppPermissions.Imports.Import_Activities,
             AppPermissions.Imports.Import_Categories,
@@ -26,21 +25,24 @@ namespace Ermes.Authorization
             AppPermissions.Organizations.Organization_CanUpdateAll,
             AppPermissions.Organizations.Organization_CanAssignPersonCrossOrganization,
             AppPermissions.Teams.Team_CanViewAll,
-            AppPermissions.Teams.Team_CanCreateTeamCrossOrganization
+            AppPermissions.Teams.Team_CanCreateTeamCrossOrganization,
+            AppPermissions.Users.Users_CanCreateCitizenOrPersonCrossOrganization
         };
 
         public static readonly string[] ORGANIZATION_MANAGER_PERMISSION_LIST = new string[]
         {
             AppPermissions.Backoffice,
             AppPermissions.Organizations.Organization,
-            AppPermissions.Organizations.Organization_CanUpdate
+            AppPermissions.Organizations.Organization_CanUpdate,
+            AppPermissions.Users.Users_CanEditColleagues
         };
 
         public static readonly string[] DECISION_MAKER_PERMISSION_LIST = new string[]
         {
             AppPermissions.Backoffice,
             AppPermissions.Organizations.Organization,
-            AppPermissions.Organizations.Organization_CanUpdate
+            AppPermissions.Organizations.Organization_CanUpdate,
+            AppPermissions.Users.Users_CanEditColleagues
         };
     }
 }

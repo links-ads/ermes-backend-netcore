@@ -3,6 +3,7 @@ using Abp.SocialMedia.Dto;
 using Abp.SocialMedia.Model;
 using Abp.UI;
 using Ermes.Attributes;
+using Ermes.Authorization;
 using Ermes.Dto;
 using Ermes.Enums;
 using Ermes.Social.Dto;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Ermes.Social
 {
-    [ErmesAuthorize]
+    [ErmesAuthorize(AppPermissions.Backoffice)]
     public class SocialAppService : ErmesAppServiceBase, ISocialAppService
     {
         private readonly SocialMediaManager _socialManager;

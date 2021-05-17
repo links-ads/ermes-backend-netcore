@@ -22,6 +22,7 @@ namespace Ermes.Persons
         public IQueryable<Person> Persons { get { return PersonRepository.GetAll(); } }
         public IQueryable<Role> Roles { get { return RolesRepository.GetAll(); } }
         public IQueryable<PersonAction> PersonActions { get { return PersonActionsRepository.GetAll(); } }
+        public IQueryable<PersonRole> PersonRoles { get { return PersonRoleRepository.GetAll(); } }
 
         public PersonManager(IRepository<Person, long> personRepository,
                                 IRepository<PersonAction> personActionsRepository,
@@ -152,14 +153,19 @@ namespace Ermes.Persons
                     .ToListAsync();
         }
 
-        public async Task<long> InsertPerson(Person item)
+        public async Task<long> InsertOrUpdatePersonAsync(Person item)
         {
-            return await PersonRepository.InsertAndGetIdAsync(item);
+            return await PersonRepository.InsertOrUpdateAndGetIdAsync(item);
         }
 
         public async Task InsertPersonRoleAsync(PersonRole item)
         {
-            await PersonRoleRepository.InsertAsync(item);
+            //Check if association already exists
+            var personRole = PersonRoles
+                                .SingleOrDefault(pr => pr.PersonId == item.PersonId && pr.RoleId == item.RoleId);
+
+            if(personRole == null)
+                await PersonRoleRepository.InsertAsync(item);
         }
 
         public async Task<bool> CheckPersonIdAsync(long personId)
@@ -224,6 +230,15 @@ namespace Ermes.Persons
         public Person GetPersonByUsername(string username)
         {
             return Persons.SingleOrDefault(p => p.Username == username);
+        }
+
+        public async Task<string[]> GetPersonRoles(long personId)
+        {
+            return await PersonRoles.
+                Include(pr => pr.Role)
+                .Where(pr => pr.PersonId == personId)
+                .Select(pr => pr.Role.Name)
+                .ToArrayAsync();
         }
     }
 }

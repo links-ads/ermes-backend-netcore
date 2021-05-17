@@ -56,9 +56,10 @@ namespace Ermes.Authorization
             public const string Team_CanViewAll = "Team.CanViewAll";
         }
 
-        public static class Roles
+        public static class Users
         {
-            public const string Roles_PermissionInitialize = "Roles.PermissionInitialize";
+            public const string Users_CanCreateCitizenOrPersonCrossOrganization = "Users.CanCreateCitizenOrPersonCrossOrganization";
+            public const string Users_CanEditColleagues = "Users.CanEditColleagues";
         }
     }
 }

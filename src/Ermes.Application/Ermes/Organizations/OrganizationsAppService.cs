@@ -21,7 +21,7 @@ using System.Threading.Tasks;
 
 namespace Ermes.Organizations
 {
-    [ErmesAuthorize(AppPermissions.Organizations.Organization)]
+    [ErmesAuthorize(AppPermissions.Backoffice)]
     public class OrganizationsAppService : ErmesAppServiceBase, IOrganizationsAppService
     {
         private readonly OrganizationManager _organizationManager;
