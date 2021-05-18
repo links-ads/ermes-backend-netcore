@@ -119,7 +119,6 @@ namespace Ermes.EventHandlers
         public virtual async Task HandleEventAsync(NotificationEvent<MissionNotificationDto> eventData)
         {
             await _notifierService.SendBusNotification(eventData.CreatorId, eventData.EntityId, eventData.Content, eventData.Action, EntityType.Mission);
-
             string titleKey = null, bodyKey = null;
             string[] bodyParams = null;
 
