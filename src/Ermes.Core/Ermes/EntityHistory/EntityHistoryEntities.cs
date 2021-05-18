@@ -50,14 +50,11 @@ namespace Ermes.EntityHistory
     public class SplitEntityChangeSet : Entity<long>, IHasCreationTime, IMayHaveTenant, IExtendableObject
     {
         public const int MaxBrowserInfoLength = 512;
-        public const int MaxClientIpAddressLength = 64;
         public const int MaxClientNameLength = 128; 
         public const int MaxReasonLength = 256;
 
         [StringLength(MaxBrowserInfoLength)]
         public string BrowserInfo { get; set; }
-        [StringLength(MaxClientIpAddressLength)]
-        public string ClientIpAddress { get; set; }
         [StringLength(MaxClientNameLength)]
         public string ClientName { get; set; }
         public DateTime CreationTime { get; set; }
