@@ -51,7 +51,6 @@ namespace Ermes.EntityHistory
 
                 // Fill "who did this change"
                 BrowserInfo = ClientInfoProvider.BrowserInfo.TruncateWithPostfix(SplitEntityChangeSet.MaxBrowserInfoLength),
-                ClientIpAddress = ClientInfoProvider.ClientIpAddress.TruncateWithPostfix(SplitEntityChangeSet.MaxClientIpAddressLength),
                 ClientName = ClientInfoProvider.ComputerName.TruncateWithPostfix(SplitEntityChangeSet.MaxClientNameLength),
                 ImpersonatorTenantId = AbpSession.ImpersonatorTenantId,
                 ImpersonatorUserId = AbpSession.ImpersonatorUserId,

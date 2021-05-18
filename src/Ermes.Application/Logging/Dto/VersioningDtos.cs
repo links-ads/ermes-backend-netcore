@@ -34,7 +34,6 @@ namespace Ermes.Logging.Dto
     public class ChangeAuthorDto
     {
         public string BrowserInfo { get; set; }
-        public string ClientIpAddress { get; set; }
         public string Reason { get; set; }
         public long UserId { get; set;  }
     }
