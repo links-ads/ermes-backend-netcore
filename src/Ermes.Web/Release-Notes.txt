@@ -2,6 +2,7 @@ Ver.
 ---------------------------
 - Feature - IsFirstLogin field added to Person, update of ImportApiService, Permission initializations (migration added) (#25)
 - Feature - ClientIpAddress property removed (migration added) (#24)
+- Feature - RabbitMQ client added and Connection management (appsettings Bus section edited)(#2)
 
 Ver. 1.5.4 - 2021-04-09
 ---------------------------
