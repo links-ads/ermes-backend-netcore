@@ -30,6 +30,8 @@ using Abp.Domain.Uow;
 using Ermes.Categories;
 using Ermes.Reports.Dto;
 using static Ermes.Resources.ResourceManager;
+using Ermes.Organizations;
+using Ermes.Persons;
 
 namespace Ermes.Import
 {
@@ -44,11 +46,15 @@ namespace Ermes.Import
         private readonly ErmesAppSession _session;
         private readonly IBackgroundJobManager _backgroundJobManager;
         private readonly CategoryManager _categoryManager;
+        private readonly PersonManager _personManager;
+        private readonly OrganizationManager _organizationManager;
 
         public ImportAppService(
             IHttpContextAccessor httpContextAccessor,
             ActivityManager activityManager,
             CategoryManager categoryManager,
+            PersonManager personManager,
+            OrganizationManager organizationManager,
             IAppFolders appFolders,
             ErmesLocalizationHelper localizer,
             IAzureManager azureManager,
@@ -58,6 +64,8 @@ namespace Ermes.Import
             _httpContextAccessor = httpContextAccessor;
             _appFolders = appFolders;
             _activityManager = activityManager;
+            _personManager = personManager;
+            _organizationManager = organizationManager;
             _localizer = localizer;
             _azureManager = azureManager;
             _session = session;
@@ -226,6 +234,28 @@ s            "
                 return CategoriesImporter.ImportCategoriesAsync(filename, contentType, _categoryManager, _localizer, CurrentUnitOfWork);
             }, new ImportCategoriesResourceContainer(), AcceptedCategorySourceMimeTypes);
         }
+
         #endregion
+
+        #region Users
+        private static readonly string[] AcceptedUsersSourceMimeTypes = { MimeTypeNames.ApplicationVndMsExcel, MimeTypeNames.ApplicationVndOpenxmlformatsOfficedocumentSpreadsheetmlSheet };
+        [OpenApiOperation("Import Users",
+            @"
+                Import a list of users.
+                Input: attach as form-data an excel (.xls or .xlsx) file with the correct format
+                Output: An import result dto, containing a summary of insertions and updates
+            "
+        )]
+        [ErmesAuthorize(AppPermissions.Imports.Import_Users)]
+        public virtual async Task<ImportResultDto> ImportUsers(IFormFile file)
+        {
+            return await LoadFileAndImport((filename, contentType) =>
+            {
+                return UsersImporter.ImportUsersAsync(filename, contentType, _personManager, _organizationManager, CurrentUnitOfWork);
+            }, new ImportUsersResourceContainer(), AcceptedUsersSourceMimeTypes);
+        }
+
+        #endregion
+
     }
 }

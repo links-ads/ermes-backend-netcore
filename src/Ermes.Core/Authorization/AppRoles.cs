@@ -19,6 +19,7 @@ namespace Ermes.Authorization
             AppPermissions.Imports.Import,
             AppPermissions.Imports.Import_Activities,
             AppPermissions.Imports.Import_Categories,
+            AppPermissions.Imports.Import_Users,
             AppPermissions.Organizations.Organization,
             AppPermissions.Organizations.Organization_CanViewAll,
             AppPermissions.Organizations.Organization_CanCreate,
