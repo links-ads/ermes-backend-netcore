@@ -100,41 +100,41 @@ namespace Ermes.Users
             return result;
         }
 
-        private async Task<User> CreateUserInternalAsync(UserDto userDto, List<Role> rolesToAssign)
-        {
-            var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
+        //private async Task<User> CreateUserInternalAsync(UserDto userDto, List<Role> rolesToAssign)
+        //{
+        //    var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
 
-            //Create user on FusionAuth
-            var newUser = new RegistrationRequest()
-            {
-                user = ObjectMapper.Map<User>(userDto),
-                registration = new UserRegistration()
-                {
-                    applicationId = new Guid(_fusionAuthSettings.Value.ApplicationId),
-                    roles = rolesToAssign.Select(r => r.Name).ToList()
-                },
-                sendSetPasswordEmail = false,
-                skipVerification = true,
-                skipRegistrationVerification = true
-            };
+        //    //Create user on FusionAuth
+        //    var newUser = new RegistrationRequest()
+        //    {
+        //        user = ObjectMapper.Map<User>(userDto),
+        //        registration = new UserRegistration()
+        //        {
+        //            applicationId = new Guid(_fusionAuthSettings.Value.ApplicationId),
+        //            roles = rolesToAssign.Select(r => r.Name).ToList()
+        //        },
+        //        sendSetPasswordEmail = false,
+        //        skipVerification = true,
+        //        skipRegistrationVerification = true
+        //    };
 
-            var response = await client.RegisterAsync(null, newUser);
+        //    var response = await client.RegisterAsync(null, newUser);
 
-            if (response.WasSuccessful())
-            {
-                if (response.successResponse.user.id.HasValue)
-                {
-                    return response.successResponse.user;
-                }
-                else
-                    throw new UserFriendlyException(L("FusionAuthUnknonwError"));
-            }
-            else
-            {
-                var fa_error = FusionAuth.ManageErrorResponse(response);
-                throw new UserFriendlyException(fa_error.ErrorCode, fa_error.HasTranslation ? L(fa_error.Message) : fa_error.Message);
-            }
-        }
+        //    if (response.WasSuccessful())
+        //    {
+        //        if (response.successResponse.user.id.HasValue)
+        //        {
+        //            return response.successResponse.user;
+        //        }
+        //        else
+        //            throw new UserFriendlyException(L("FusionAuthUnknonwError"));
+        //    }
+        //    else
+        //    {
+        //        var fa_error = FusionAuth.ManageErrorResponse(response);
+        //        throw new UserFriendlyException(fa_error.ErrorCode, fa_error.HasTranslation ? L(fa_error.Message) : fa_error.Message);
+        //    }
+        //}
 
         //private async Task<User> UpdateUserInternalAsync(UserDto userDto)
         //{
@@ -182,14 +182,14 @@ namespace Ermes.Users
             User currentUser;
             Person person = null;
             if (input.User.Id == Guid.Empty)
-                currentUser = await CreateUserInternalAsync(input.User, rolesToAssign);
+                currentUser = await CreateUserInternalAsync(input.User, input.User.Roles, _fusionAuthSettings);
             else
             {
                 currentUser = await UpdateUserInternalAsync(input.User, _fusionAuthSettings);
                 person = _personManager.GetPersonByFusionAuthUserGuid(currentUser.id.Value);
             }
 
-            person = await UpdatePersonInternalAsync(person, currentUser, input.OrganizationId, input.TeamId, input.IsFirstLogin, rolesToAssign, _personManager);
+            person = await CreateOrUpdatePersonInternalAsync(person, currentUser, input.OrganizationId, input.TeamId, input.IsFirstLogin, rolesToAssign, _personManager);
 
             return new CreateOrUpdateUserOutput()
             {

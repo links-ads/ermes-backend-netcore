@@ -49,6 +49,7 @@ using Ermes.Helpers;
 using Abp.SocialMedia.Model;
 using Abp.SocialMedia.Dto;
 using io.fusionauth.domain.api;
+using Ermes.Import.Dto;
 
 namespace Ermes
 {
@@ -211,7 +212,7 @@ namespace Ermes
                            .ReverseMap()
                            .ForMember(entity => entity.Location, options => options.MapFrom(l => l.Latitude.HasValue && l.Longitude.HasValue ? new Point(l.Longitude.Value, l.Latitude.Value) : null))
                            .ForMember(entity => entity.CurrentActivityId, options => options.MapFrom(l => l.ActivityId));
-
+            configuration.CreateMap<ImportResultDto, ImportUsersDto>().ReverseMap();
             #region GeoJsons
             configuration.CreateMap<Communication, FeatureDto<GeoJsonItem>>()
                             .ForMember(fd => fd.Geometry, options => options.MapFrom(c => new GeoJsonWriter().Write(c.AreaOfInterest)))

@@ -18,6 +18,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Ermes.Persons;
 using Ermes.Organizations;
+using Ermes.Profile.Dto;
+using Ermes.Auth.Dto;
+using Ermes.Teams;
+using io.fusionauth.domain;
+using Ermes.Authorization;
 
 namespace Ermes.Import
 {
@@ -37,9 +42,9 @@ namespace Ermes.Import
 
         private interface IUserRow
         {
-            int GetInt(string columnName)
+            int? GetInt(string columnName)
             {
-                return Convert.ToInt32(GetString(columnName) ?? "0");
+                return Convert.ToInt32(GetString(columnName));
             }
             string GetString(string columnName);
             string[] GetStringArray(string columnName)
@@ -83,7 +88,7 @@ namespace Ermes.Import
             {
                 if (!_columnsIndexes.TryGetValue(columnName, out int columnIndex))
                 {
-                    throw new UserFriendlyException($"No such column: {columnName} in sheet {Language}");
+                    throw new UserFriendlyException($"No such column: {columnName} in sheet");
                 }
                 string retval = _excelWorksheet.Cells[rowId + numberOfHeaderRows + excelIndexingStart, columnIndex + excelIndexingStart].Text.Trim();
 
@@ -115,10 +120,12 @@ namespace Ermes.Import
         }
 
         #endregion
-        public static async Task<ImportResultDto> ImportUsersAsync(string filename, string contentType, PersonManager personManager, OrganizationManager organizationManager, IActiveUnitOfWork context)
+        public static async Task<ImportUsersDto> ImportUsersAsync(string filename, string contentType, PersonManager personManager, OrganizationManager organizationManager, TeamManager teamManager, ErmesLocalizationHelper localizer)
         {
             IUserTable users;
-            ImportResultDto result = new ImportResultDto();
+            ImportUsersDto result = new ImportUsersDto() {
+               Accounts = new List<Tuple<UserDto, Person>>()
+            };
             if (contentType == MimeTypeNames.ApplicationVndMsExcel || contentType == MimeTypeNames.ApplicationVndOpenxmlformatsOfficedocumentSpreadsheetmlSheet)
             {
                 FileInfo finfo = new FileInfo(filename);
@@ -138,39 +145,73 @@ namespace Ermes.Import
                     break;
                 foreach (IUserRow row in sheet.Rows)
                 {
-                    Person person = personManager.GetPersonByUsername(row.GetString("Username"));
-                    ProfileDto
+                    UserDto user = new UserDto();
+                    var person = personManager.GetPersonByUsername(row.GetString("Username"));
                     if (person != null)
-                    {
                         throw new NotImplementedException();
-                    }
                     else
                     {
-                        person = new Person();
                         result.ElementsAdded++;
+                        person = new Person();
                     }
+
+                    var roles = row.GetStringArray("Roles").ToList();
+                    if (roles == null || roles.Count == 0)
+                        throw new UserFriendlyException(localizer.L("InvalidRoles"));
+                    user.Roles = roles;
 
                     var organizationId = row.GetInt("OrganizationId");
-                    var org = await organizationManager.GetOrganizationByIdAsync(organizationId);
-                    if (org == null)
-                        throw new UserFriendlyException(string.Format("Invalid Organization Id: {0}", organizationId));
+                    if (organizationId.HasValue && organizationId.Value > 0)
+                    {
+                        var org = await organizationManager.GetOrganizationByIdAsync(organizationId.Value);
+                        if (org == null)
+                            throw new UserFriendlyException(localizer.L("InvalidOrganizationId", organizationId));
+                        else
+                            person.OrganizationId = organizationId;
+                    }
                     else
-                        person.OrganizationId = organizationId;
+                    {
+                        //must be a citizen
+                        if(user.Roles.Count(r => r == AppRoles.CITIZEN) == 0)
+                            throw new UserFriendlyException(localizer.L("InvalidOrganizationId", organizationId));
+                    }
 
-                    person.Username = row.GetString("Username");
-                    person.TeamId = row.GetString("TeamId");
-                    var 
-                    cat.Code = 
-                    cat.GroupCode = row.GetString("GroupCode");
-                    cat.Hazard = row.GetEnum<HazardType>("Hazard");
-                    cat.MaxValue = row.GetInt("Max Value");
-                    cat.MinValue = row.GetInt("Min Value");
-                    cat.Type = row.GetEnum<CategoryType>("Type");
-                    cat.StatusValues = row.GetStringArray("Status Values");
-                    cat.GroupIcon = row.GetString("Group Icon");
+                    var teamId = row.GetInt("TeamId");
+                    if (teamId.HasValue && teamId.Value > 0)
+                    {
+                        var team = await teamManager.GetTeamByIdAsync(teamId.Value);
+                        if (team == null)
+                            throw new UserFriendlyException(localizer.L("InvalidTeamId", teamId));
+                        else
+                            person.TeamId = teamId;
+                    }
+                    
 
-                    await categoryManager.InsertOrUpdateCategoryAsync(cat);
-                    context.SaveChanges();
+                    var username = row.GetString("Username");
+                    if (username == null || string.IsNullOrWhiteSpace(username))
+                        throw new UserFriendlyException(localizer.L("InvalidUsername", username));
+                    else
+                        person.Username = user.Username  = username;
+
+                    var preferredLanguages = row.GetStringArray("PreferredLanguages").ToList();
+                    if (preferredLanguages == null || preferredLanguages.Count == 0)
+                        preferredLanguages.Add("en");
+                    user.PreferredLanguages = preferredLanguages;
+
+                    user.Email = row.GetString("Email");
+
+                    var timezone = row.GetString("Timezone");
+                    if (timezone == null || string.IsNullOrWhiteSpace(timezone))
+                        timezone = AppConsts.DefaultTimezone;
+                    user.Timezone = timezone;
+
+                    var password = row.GetString("Password");
+                    if(password == null || string.IsNullOrWhiteSpace(password))
+                        throw new UserFriendlyException(localizer.L("InvalidPassword", password));
+                    user.Password = password;
+                    user.Id = Guid.NewGuid();
+                    person.FusionAuthUserGuid = user.Id;
+                    result.Accounts.Add(new Tuple<UserDto, Person>(user, person));
                 }
                 isFirstSheet = false;
             }

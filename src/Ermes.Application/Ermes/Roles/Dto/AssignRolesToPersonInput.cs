@@ -8,7 +8,7 @@ namespace Ermes.Roles.Dto
     public class AssignRolesToPersonInput
     {
         [Required]
-        public string[] Roles { get; set; }
+        public List<string> Roles { get; set; }
         [Required]
         public long PersonId { get; set; }
     }
