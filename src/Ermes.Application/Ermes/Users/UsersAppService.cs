@@ -100,64 +100,6 @@ namespace Ermes.Users
             return result;
         }
 
-        //private async Task<User> CreateUserInternalAsync(UserDto userDto, List<Role> rolesToAssign)
-        //{
-        //    var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
-
-        //    //Create user on FusionAuth
-        //    var newUser = new RegistrationRequest()
-        //    {
-        //        user = ObjectMapper.Map<User>(userDto),
-        //        registration = new UserRegistration()
-        //        {
-        //            applicationId = new Guid(_fusionAuthSettings.Value.ApplicationId),
-        //            roles = rolesToAssign.Select(r => r.Name).ToList()
-        //        },
-        //        sendSetPasswordEmail = false,
-        //        skipVerification = true,
-        //        skipRegistrationVerification = true
-        //    };
-
-        //    var response = await client.RegisterAsync(null, newUser);
-
-        //    if (response.WasSuccessful())
-        //    {
-        //        if (response.successResponse.user.id.HasValue)
-        //        {
-        //            return response.successResponse.user;
-        //        }
-        //        else
-        //            throw new UserFriendlyException(L("FusionAuthUnknonwError"));
-        //    }
-        //    else
-        //    {
-        //        var fa_error = FusionAuth.ManageErrorResponse(response);
-        //        throw new UserFriendlyException(fa_error.ErrorCode, fa_error.HasTranslation ? L(fa_error.Message) : fa_error.Message);
-        //    }
-        //}
-
-        //private async Task<User> UpdateUserInternalAsync(UserDto userDto)
-        //{
-        //    var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
-
-        //    //Create user on FusionAuth
-        //    var userToUpdate = new UserRequest()
-        //    {
-        //        user = ObjectMapper.Map<User>(userDto),
-        //        sendSetPasswordEmail = false,
-        //        skipVerification = true,
-        //    };
-
-        //    var response = await client.UpdateUserAsync(userToUpdate.user.id, userToUpdate);
-
-        //    if (response.WasSuccessful())
-        //        return response.successResponse.user;
-        //    else
-        //    {
-        //        var fa_error = FusionAuth.ManageErrorResponse(response);
-        //        throw new UserFriendlyException(fa_error.ErrorCode, fa_error.HasTranslation ? L(fa_error.Message) : fa_error.Message);
-        //    }
-        //}
         #endregion
 
         public virtual async Task<DTResult<ProfileDto>> GetUsers(GetUsersInput input)
