@@ -232,13 +232,20 @@ namespace Ermes.Persons
             return Persons.SingleOrDefault(p => p.Username == username);
         }
 
-        public async Task<string[]> GetPersonRoles(long personId)
+        public async Task<List<string>> GetPersonRoleNamesAsync(long personId)
         {
             return await PersonRoles.
                 Include(pr => pr.Role)
                 .Where(pr => pr.PersonId == personId)
                 .Select(pr => pr.Role.Name)
-                .ToArrayAsync();
+                .ToListAsync();
+        }
+
+        public async Task<List<Role>> GetRolesByName(List<string> roleNames)
+        {
+            return await Roles
+                .Where(r =>roleNames.Contains(r.Name))
+                .ToListAsync();
         }
     }
 }

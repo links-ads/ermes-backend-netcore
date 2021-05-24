@@ -30,6 +30,12 @@ using Abp.Domain.Uow;
 using Ermes.Categories;
 using Ermes.Reports.Dto;
 using static Ermes.Resources.ResourceManager;
+using Ermes.Organizations;
+using Ermes.Persons;
+using Ermes.Teams;
+using Microsoft.Extensions.Options;
+using FusionAuthNetCore;
+using io.fusionauth.domain;
 
 namespace Ermes.Import
 {
@@ -44,25 +50,40 @@ namespace Ermes.Import
         private readonly ErmesAppSession _session;
         private readonly IBackgroundJobManager _backgroundJobManager;
         private readonly CategoryManager _categoryManager;
+        private readonly PersonManager _personManager;
+        private readonly OrganizationManager _organizationManager;
+        private readonly TeamManager _teamManager;
+        private readonly ErmesPermissionChecker _permissionChecker;
+        private readonly IOptions<FusionAuthSettings> _fusionAuthSettings;
 
         public ImportAppService(
             IHttpContextAccessor httpContextAccessor,
             ActivityManager activityManager,
             CategoryManager categoryManager,
+            PersonManager personManager,
+            OrganizationManager organizationManager,
+            TeamManager teamManager,
             IAppFolders appFolders,
             ErmesLocalizationHelper localizer,
             IAzureManager azureManager,
             IBackgroundJobManager backgroundJobManager,
+            IOptions<FusionAuthSettings> fusionAuthSettings,
+            ErmesPermissionChecker permissionChecker,
             ErmesAppSession session)
         {
             _httpContextAccessor = httpContextAccessor;
             _appFolders = appFolders;
             _activityManager = activityManager;
+            _personManager = personManager;
+            _organizationManager = organizationManager;
             _localizer = localizer;
             _azureManager = azureManager;
             _session = session;
             _backgroundJobManager = backgroundJobManager;
             _categoryManager = categoryManager;
+            _teamManager = teamManager;
+            _fusionAuthSettings = fusionAuthSettings;
+            _permissionChecker = permissionChecker;
         }
 
         private async Task UploadImportSourceAndCleanup(IImportResourceContainer resourceContainer, bool success, IFormFile file, String tempFilePath)
@@ -226,6 +247,45 @@ s            "
                 return CategoriesImporter.ImportCategoriesAsync(filename, contentType, _categoryManager, _localizer, CurrentUnitOfWork);
             }, new ImportCategoriesResourceContainer(), AcceptedCategorySourceMimeTypes);
         }
+
         #endregion
+
+        #region Users
+        private static readonly string[] AcceptedUsersSourceMimeTypes = { MimeTypeNames.ApplicationVndMsExcel, MimeTypeNames.ApplicationVndOpenxmlformatsOfficedocumentSpreadsheetmlSheet };
+        [OpenApiOperation("Import Users",
+            @"
+                Import a list of users.
+                Input: attach as form-data an excel (.xls or .xlsx) file with the correct format
+                Output: An import result dto, containing a summary of insertions and updates
+                N.B. the upload of existing users for an update has not been implemented yet.
+            "
+        )]
+        [ErmesAuthorize(AppPermissions.Imports.Import_Users)]
+        public virtual async Task<ImportResultDto> ImportUsers(IFormFile file)
+        {
+            //read file
+            return await LoadFileAndImport(async (filename, contentType) =>
+            {
+                //create data structure
+                var result = await UsersImporter.ImportUsersAsync(filename, contentType, _personManager, _organizationManager, _teamManager, _localizer);
+                
+                //add user to FusionAuth
+                await ImportUsersInternalAsync(result.Accounts.Select(a => a.Item1).ToList(), _fusionAuthSettings);
+
+                //add person on project DB
+                foreach (var tuple in result.Accounts)
+                {
+                    var rolesToAssgin = await _personManager.GetRolesByName(tuple.Item1.Roles);
+                    //check roles, organizations, teams and permission association
+                    List<Role> rolesToAssign = await GetRolesAndCheckOrganizationAndTeam(tuple.Item1.Roles, tuple.Item2.OrganizationId, tuple.Item2.TeamId, tuple.Item2.Id, _personManager, _organizationManager, _teamManager, _session, _permissionChecker);
+                    await CreateOrUpdatePersonInternalAsync(null, ObjectMapper.Map<User>(tuple.Item1), tuple.Item2.OrganizationId, tuple.Item2.TeamId, tuple.Item2.IsFirstLogin, rolesToAssign, _personManager);
+                }
+
+                return ObjectMapper.Map<ImportResultDto>(result);
+            }, new ImportUsersResourceContainer(), AcceptedUsersSourceMimeTypes);
+        }
+
+        #endregion
+
     }
 }
