@@ -14,6 +14,8 @@ namespace Ermes.Categories
     {
         public const int MaxCodeLength = 100;
         public const int MaxGroupCodeLength = 100;
+        public const int MaxGroupKeyLength = 100;
+        public const int MaxSubGroupKeyLength = 255;
 
         [Required]
         [Column("Type")]
@@ -62,5 +64,12 @@ namespace Ermes.Categories
         }
         [NotMapped]
         public TargetType Target { get; set; }
+
+        [Required]
+        [StringLength(MaxGroupKeyLength)]
+        public string GroupKey { get; set; }
+
+        [StringLength(MaxSubGroupKeyLength)]
+        public string SubGroupKey { get; set; }
     }
 }

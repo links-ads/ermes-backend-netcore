@@ -15,7 +15,7 @@ namespace Ermes.Categories
         [StringLength(MaxGroupLength)]
         public string Group { get; set; }
 
-        [StringLength(MaxGroupLength)]
+        [StringLength(MaxSubGroupLength)]
         public string SubGroup { get; set; }
 
         [Required]
