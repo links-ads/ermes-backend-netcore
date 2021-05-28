@@ -11,7 +11,10 @@ namespace Ermes.Categories
 {
     [Table("categories")]
     public class Category: Entity, IMultiLingualEntity<CategoryTranslation>
-    {    
+    {
+        public const int MaxCodeLength = 100;
+        public const int MaxGroupCodeLength = 100;
+
         [Required]
         [Column("Type")]
         public string TypeString
@@ -35,8 +38,10 @@ namespace Ermes.Categories
         public HazardType Hazard { get; set; }
 
         [Required]
+        [StringLength(MaxCodeLength)]
         public string Code { get; set; }
         [Required]
+        [StringLength(MaxGroupCodeLength)]
         public string GroupCode { get; set; }
 
         public ICollection<CategoryTranslation> Translations { get; set; }
@@ -46,10 +51,16 @@ namespace Ermes.Categories
         public int MaxValue { get; set; }
         #endregion
 
-        #region Range
-        public string[] StatusValues { get; set; }
-        #endregion
-
         public string GroupIcon { get; set; }
+
+        [Required]
+        [Column("Target")]
+        public string TargetString
+        {
+            get { return Target.ToString(); }
+            private set { Target = value.ParseEnum<TargetType>(); }
+        }
+        [NotMapped]
+        public TargetType Target { get; set; }
     }
 }
