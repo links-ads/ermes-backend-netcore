@@ -69,38 +69,67 @@ namespace Ermes.Enums
         Range = 0,
         Numeric = 10
     }
+
+    //OLD LIST
+    //[JsonConverter(typeof(StringEnumConverter))]
+    //public enum HazardType
+    //{
+    //    None = 0,
+    //    Flood = 10,
+    //    Fire = 20,
+    //    Landslide = 30,
+    //    Wind = 40,
+    //    Storm = 50,
+    //    Temperature = 60,
+    //    Avalanche = 70,
+    //    Snow = 80,
+    //    Rain = 90,
+    //    Earthquake = 100,
+    //    Subsidence = 110,
+    //    Weather = 120,
+    //    All = 130
+    //}
+
     [JsonConverter(typeof(StringEnumConverter))]
     public enum HazardType
     {
         None = 0,
-        Flood = 10,
-        Fire = 20,
-        Landslide = 30,
-        Wind = 40,
-        Storm = 50,
-        Temperature = 60,
-        Avalanche = 70,
-        Snow = 80,
-        Rain = 90,
-        Earthquake = 100,
-        Subsidence = 110,
-        Weather = 120,
-        All = 130
+        Avalanche = 10,
+        Earthquake = 20,
+        Fire = 30,
+        Flood = 40,
+        Landslide = 50,
+        Storm = 60,
+        Weather = 70
     }
+    //old list
+    //[JsonConverter(typeof(StringEnumConverter))]
+    //public enum TargetType
+    //{
+    //    Others = 0,
+    //    UnsafePeople = 10,
+    //    Roads = 20,
+    //    Schools = 30,
+    //    Hospitals = 40,
+    //    Networks = 50,
+    //    Railroads = 60,
+    //    Bridges = 70,
+    //    Buildings = 80,
+    //    Factories = 90
+    //}
 
     [JsonConverter(typeof(StringEnumConverter))]
     public enum TargetType
     {
-        Others = 0,
-        UnsafePeople = 10,
-        Roads = 20,
-        Schools = 30,
+        None = 0,
+        Buildings = 10,
+        CulturalHeritage = 20,
+        Factories = 30,
         Hospitals = 40,
-        Networks = 50,
-        Railroads = 60,
-        Bridges = 70,
-        Buildings = 80,
-        Factories = 90
+        Infrastructures = 50,
+        Networks = 60,
+        Schools = 70,
+        Other = 80
     }
 
     [JsonConverter(typeof(StringEnumConverter))]

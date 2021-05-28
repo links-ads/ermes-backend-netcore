@@ -173,8 +173,8 @@ namespace Ermes.Import
                         cat.MaxValue = row.GetInt("Max Value");
                         cat.MinValue = row.GetInt("Min Value");
                         cat.Type = row.GetEnum<CategoryType>("Type");
-                        cat.StatusValues = row.GetStringArray("Status Values");
                         cat.GroupIcon = row.GetString("Group Icon");
+                        cat.Target = row.GetEnum<TargetType>("Target");
 
                         await categoryManager.InsertOrUpdateCategoryAsync(cat);
                         context.SaveChanges();
@@ -204,7 +204,6 @@ namespace Ermes.Import
                             result.TranslationsAdded++;
                         }
 
-                        catTrans.Description = row.GetString("Description");
                         catTrans.Group = row.GetString("Group");
                         catTrans.SubGroup = row.GetString("SubGroup");
                         catTrans.Language = sheet.Language.ToLower();
