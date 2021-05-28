@@ -14,7 +14,11 @@ namespace Ermes.Reports.Dto
         public HazardType Hazard { get; set; }
         public TargetType Target { get; set; }
         public string Group { get; set; }
+        //Key value for Group, not influenced by localization
+        public string GroupKey { get; set; }
         public string SubGroup { get; set; }
+        //Key value for SubGroup, not influenced by localization
+        public string SubGroupKey { get; set; }
         public string Name { get; set; }
         public string Code { get; set; }
         public string GroupCode { get; set; }
