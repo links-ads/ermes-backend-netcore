@@ -86,6 +86,9 @@ namespace Ermes.Web.Startup
             services.Configure<AbpAzureCognitiveServicesSettings>(
                 _appConfiguration.GetSection("AzureCognitiveServices")
             );
+            services.Configure<ErmesSettings>(
+                _appConfiguration.GetSection("App")
+            );
 
 
             services.AddCors(options =>
