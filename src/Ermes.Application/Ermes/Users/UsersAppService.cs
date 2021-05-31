@@ -37,12 +37,14 @@ namespace Ermes.Users
         private readonly TeamManager _teamManager;
         private readonly ErmesPermissionChecker _permissionChecker;
         private readonly IOptions<FusionAuthSettings> _fusionAuthSettings;
+        private readonly IOptions<ErmesSettings> _ermesSettings;
 
         public UsersAppService(
                     ErmesAppSession session,
                     PersonManager personManger,
                     MissionManager missionManager,
                     IOptions<FusionAuthSettings> fusionAuthSettings,
+                    IOptions<ErmesSettings> ermesSettings,
                     OrganizationManager organizationManager,
                     TeamManager teamManager,
                     ErmesPermissionChecker permissionChecker
@@ -52,6 +54,7 @@ namespace Ermes.Users
             _personManager = personManger;
             _missionManager = missionManager;
             _fusionAuthSettings = fusionAuthSettings;
+            _ermesSettings = ermesSettings;
             _teamManager = teamManager;
             _organizationManager = organizationManager;
             _permissionChecker = permissionChecker;
@@ -124,7 +127,7 @@ namespace Ermes.Users
             User currentUser;
             Person person = null;
             if (input.User.Id == Guid.Empty)
-                currentUser = await CreateUserInternalAsync(input.User, input.User.Roles, _fusionAuthSettings);
+                currentUser = await CreateUserInternalAsync(input.User, input.User.Roles, _fusionAuthSettings, _ermesSettings);
             else
             {
                 currentUser = await UpdateUserInternalAsync(input.User, _fusionAuthSettings);
