@@ -246,7 +246,7 @@ namespace Ermes.Reports
                         Output: list of grouped categories
                     "
         )]
-        public virtual async Task<GetCategoriesOutput> GetCategories()
+        public async Task<GetCategoriesOutput> GetCategories()
         {
             var res = new GetCategoriesOutput();
             var list = await _categoryManager.GetCategoriesAsync();

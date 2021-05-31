@@ -1,5 +1,6 @@
 Ver.
 ---------------------------
+- Feature - GetCategories API made public
 - Feature - ImportUsers API implementation (#26)
 
 Ver. 1.5.5 - 2021-05-20
