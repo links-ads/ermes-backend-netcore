@@ -71,8 +71,11 @@ namespace Ermes.Linq.Extensions
         {
             public IQueryable<Person> Resolve(IQueryable<Person> query, List<int> organizationIdList, IPersonBase person)
             {
-                return query
-                        .Where(p => p.OrganizationId.HasValue && organizationIdList.Contains(p.OrganizationId.Value));
+                if(organizationIdList != null)
+                    query = query
+                            .Where(p => p.OrganizationId.HasValue && organizationIdList.Contains(p.OrganizationId.Value));
+
+                return query;
             }
         }
 
@@ -80,8 +83,12 @@ namespace Ermes.Linq.Extensions
         {
             public IQueryable<Mission> Resolve(IQueryable<Mission> query, List<int> organizationIdList, IPersonBase person)
             {
-                return query
-                    .Where(m => organizationIdList.Contains(m.OrganizationId));
+                return organizationIdList == null
+                            ? query
+                            //TODO: implement ADMIN visibility by using permission                            
+                            : 
+                            query
+                            .Where(m => organizationIdList.Contains(m.OrganizationId));
             }
         }
 
@@ -91,6 +98,7 @@ namespace Ermes.Linq.Extensions
             {
                 return organizationIdList == null
                     ? query
+                            //TODO: implement ADMIN visibility by using permission
                             .Where(r => !r.Creator.OrganizationId.HasValue)
                     : query
                     .Where(r =>
@@ -123,8 +131,12 @@ namespace Ermes.Linq.Extensions
         {
             public IQueryable<Organization> Resolve(IQueryable<Organization> query, List<int> organizationIdList, IPersonBase person)
             {
-                return query
-                    .Where(o => organizationIdList.Contains(o.Id));
+                if(organizationIdList != null)
+                    query = query
+                            .Where(o => organizationIdList.Contains(o.Id));
+
+                return query;
+
             }
         }
 
@@ -159,8 +171,11 @@ namespace Ermes.Linq.Extensions
         {
             public IQueryable<Team> Resolve(IQueryable<Team> query, List<int> organizationIdList, IPersonBase person)
             {
-                return  query
+                if(organizationIdList != null)
+                query =  query
                         .Where(t => organizationIdList.Contains(t.OrganizationId));
+
+                return query;
             }
         }
         #endregion

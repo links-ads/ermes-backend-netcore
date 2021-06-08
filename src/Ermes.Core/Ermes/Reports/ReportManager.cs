@@ -31,5 +31,12 @@ namespace Ermes.Reports
             return await ReportRepository.InsertAndGetIdAsync(report);
         }
 
+        public IQueryable<Report> GetReports(DateTime startDate, DateTime endDate)
+        {
+            return Reports
+                       .Where(r => r.Timestamp >= startDate && r.Timestamp <= endDate);
+                       
+        }
+
     }
 }
