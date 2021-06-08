@@ -2,6 +2,7 @@ Ver.
 ---------------------------
 - Feature - Categories refactoring (2 migrations added)(#28)
 - Feature - Add filter on receiver list in case of new Communication (#29)
+- Feature - DashboardAppService added (#4)
 
 
 Ver. 1.6.0 - 2021-05-31

@@ -43,6 +43,7 @@ namespace Ermes.Missions
         private readonly TeamManager _teamManager;
         private readonly IBackgroundJobManager _backgroundJobManager;
         private readonly IGeoJsonBulkRepository _geoJsonBulkRepository;
+        private readonly ErmesPermissionChecker _permissionChecker;
 
 
         public MissionsAppService(
@@ -52,6 +53,7 @@ namespace Ermes.Missions
                 ReportManager reportManager,
                 TeamManager teamManager,
                 IBackgroundJobManager backgroundJobManager,
+                ErmesPermissionChecker permissionChecker,
                 IGeoJsonBulkRepository geoJsonBulkRepository
         )
         {
@@ -62,6 +64,7 @@ namespace Ermes.Missions
             _teamManager = teamManager;
             _backgroundJobManager = backgroundJobManager;
             _geoJsonBulkRepository = geoJsonBulkRepository;
+            _permissionChecker = permissionChecker;
         }
 
         #region Private
@@ -94,10 +97,14 @@ namespace Ermes.Missions
             var currentUserPerson = _session.LoggedUserPerson;
 
             //List of Missions available only for pro users
-            if (filterByOrganization && currentUserPerson.OrganizationId.HasValue)
-                query = query.DataOwnership(new List<int>() { currentUserPerson.OrganizationId.Value });
-            else
-                return result;
+            var hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Missions.Mission_CanSeeCrossOrganization);
+            if (!hasPermission)
+            {
+                if (filterByOrganization && currentUserPerson.OrganizationId.HasValue)
+                    query = query.DataOwnership(new List<int>() { currentUserPerson.OrganizationId.Value });
+                else
+                    return result;
+            }
 
             result.TotalCount = await query.CountAsync();
 

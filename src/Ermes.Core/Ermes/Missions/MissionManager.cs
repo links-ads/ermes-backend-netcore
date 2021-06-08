@@ -4,6 +4,7 @@ using Abp.UI;
 using Ermes.Enums;
 using Ermes.Persons;
 using Microsoft.EntityFrameworkCore;
+using NpgsqlTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -67,6 +68,13 @@ namespace Ermes.Missions
                 .Where(m => m.CoordinatorPersonId == person.Id || m.CoordinatorTeamId == person.TeamId || (!m.CoordinatorPersonId.HasValue && !m.CoordinatorTeamId.HasValue && m.OrganizationId == person.OrganizationId))
                 .Where(m => m.CurrentStatusString == Enums.MissionStatusType.Created.ToString() || m.CurrentStatusString == Enums.MissionStatusType.TakenInCharge.ToString())
                 .ToList();
+        }
+
+        public IQueryable<Mission> GetMissions(DateTime startDate, DateTime endDate)
+        {
+            NpgsqlRange<DateTime> range = new NpgsqlRange<DateTime>(startDate, endDate);
+            return Missions
+                    .Where(m => m.Duration.Overlaps(range));
         }
 
     }
