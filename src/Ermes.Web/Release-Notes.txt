@@ -1,5 +1,6 @@
 Ver.
 ---------------------------
+- Feature - Add filter on receiver list in case of new Communication (#29)
 - Feature - DashboardAppService added (#4)
 
 
