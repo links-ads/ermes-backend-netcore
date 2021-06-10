@@ -50,6 +50,8 @@ using Abp.SocialMedia.Model;
 using Abp.SocialMedia.Dto;
 using io.fusionauth.domain.api;
 using Ermes.Import.Dto;
+using Ermes.Activations;
+using Ermes.Dashboard.Dto;
 
 namespace Ermes
 {
@@ -251,6 +253,9 @@ namespace Ermes
                            //.ForPath(fd => fd.Properties.Type, options => options.MapFrom(c => EntityType.PersonAction))
                            .ForPath(fd => fd.Properties.Status, options => options.MapFrom(c => c.CurrentStatusString));
             configuration.CreateMap<PersonAction, PersonActionDto>();
+            configuration.CreateMap<Activation, ActivationDto>()
+                            .ForMember(dto => dto.Y, options => options.MapFrom(c => c.Counter))
+                            .ReverseMap();
             #endregion
 
 

@@ -1,8 +1,10 @@
 ﻿using Abp.Localization;
+using Abp.UI;
 using Ermes.Actions.Dto;
 using Ermes.Attributes;
 using Ermes.Authorization;
 using Ermes.Dashboard.Dto;
+using Ermes.Enums;
 using Ermes.GeoJson;
 using Ermes.Helpers;
 using Ermes.Linq.Extensions;
@@ -45,9 +47,13 @@ namespace Ermes.Dashboard
         }
         public virtual async Task<GetStatisticsOutput> GetStatistics(GetStatisticsInput input)
         {
-            var start = input.StartDate ?? DateTime.MinValue;
-            var end = input.EndDate ?? DateTime.MaxValue;
+            var start = input.StartDate ?? DateTime.Today.AddDays(-29);
+            var end = input.EndDate ?? DateTime.Today.AddDays(1);
             var person = _session.LoggedUserPerson;
+
+            var timestap = end.Subtract(start);
+            if (timestap.TotalDays > 30)
+                throw new UserFriendlyException("Time window too wide");
 
             //Reports////////////
             IQueryable<Report> queryReport;
@@ -93,7 +99,8 @@ namespace Ermes.Dashboard
             var deserialized = JsonConvert.DeserializeObject<GetActionsOutput>(items);
             var actions = deserialized != null && deserialized.PersonActions != null ? deserialized.PersonActions : new List<PersonActionDto>();
             ////////////////////
-            
+
+            var activations = _geoJsonBulkRepository.GetPersonActivations(start, end, ActionStatusType.Active);
             return new GetStatisticsOutput()
             {
                 ReportsByHazard = queryReport
@@ -122,7 +129,12 @@ namespace Ermes.Dashboard
                                         Value = g.Count()
                                     })
                                     .ToList(),
-                Persons = actions
+                Persons = actions,
+                ActivationsByDay = new Dictionary<ActionStatusType, List<ActivationDto>>() {
+                    {
+                        ActionStatusType.Active, ObjectMapper.Map<List<ActivationDto>>(activations)
+                    }
+                }
             };
         }
     }
