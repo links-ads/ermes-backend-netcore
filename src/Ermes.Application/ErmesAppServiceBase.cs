@@ -75,14 +75,15 @@ namespace Ermes
                 if (org == null)
                     throw new UserFriendlyException(L("InvalidOrganizationId", organizationId));
 
-                if (!users_CanCreateCitizenOrPersonCrossOrganization) {
+                if (!users_CanCreateCitizenOrPersonCrossOrganization)
+                {
                     //cannot edit people belonging to other organizations without the right permission
                     if (_session.LoggedUserPerson.OrganizationId.HasValue && _session.LoggedUserPerson.OrganizationId.Value != organizationId)
                         throw new UserFriendlyException(L("Forbidden_DifferentOrganizations"));
 
                     if (personId.HasValue) //cannot edit other profiles without permissions
                     {
-                        if(!users_CanEditColleagues && _session.LoggedUserPerson.Id != personId)
+                        if (!users_CanEditColleagues && _session.LoggedUserPerson.Id != personId)
                             throw new UserFriendlyException(L("Forbidden_DifferentOrganizations"));
                     }
                 }
@@ -196,18 +197,24 @@ namespace Ermes
             return person;
         }
 
-        protected async Task<User> CreateUserInternalAsync(UserDto userDto, List<string> rolesToAssign, IOptions<FusionAuthSettings> _fusionAuthSettings)
+        protected async Task<User> CreateUserInternalAsync(UserDto userDto, List<string> rolesToAssign, IOptions<FusionAuthSettings> _fusionAuthSettings, IOptions<ErmesSettings> _ermesSettings)
         {
             var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
+            var user = ObjectMapper.Map<User>(userDto);
 
+            //Set the password based on current project
+            string project = _ermesSettings != null ? _ermesSettings.Value.ErmesProject : "";
+            if (string.IsNullOrWhiteSpace(project))
+                project = ErmesConsts.DefaultProjectName;
+            user.password = string.Concat(project.ToLower(), ErmesConsts.DefaultYear);
             //Create user on FusionAuth
             var newUser = new RegistrationRequest()
             {
-                user = ObjectMapper.Map<User>(userDto),
+                user = user,
                 registration = new UserRegistration()
                 {
                     applicationId = new Guid(_fusionAuthSettings.Value.ApplicationId),
-                    roles = rolesToAssign
+                    roles = rolesToAssign,
                 },
                 sendSetPasswordEmail = false,
                 skipVerification = true,
@@ -245,7 +252,8 @@ namespace Ermes
                     applicationId = new Guid(_fusionAuthSettings.Value.ApplicationId),
                     roles = users.Where(user => user.Id == u.id).Single().Roles
                 }
-            }; return u; }).ToList();
+            }; return u;
+            }).ToList();
             //Create user on FusionAuth
             var import = new ImportRequest()
             {
