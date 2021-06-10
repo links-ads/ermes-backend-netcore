@@ -13,5 +13,6 @@ namespace Ermes.Dashboard.Dto
         public List<GroupDto> MissionsByStatus { get; set; }
         public List<GroupDto> PersonsByStatus { get; set; }
         public List<PersonActionDto> Persons { get; set; }
+        public Dictionary<ActionStatusType, List<ActivationDto>> ActivationsByDay { get; set; }
     }
 }
