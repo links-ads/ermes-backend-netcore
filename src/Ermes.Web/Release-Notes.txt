@@ -1,7 +1,14 @@
 Ver.
 ---------------------------
-- Feature - GetCategories API made public
+- Feature - Add filter on receiver list in case of new Communication (#29)
+- Feature - DashboardAppService added (#4)
 - Feature - Categories refactoring (2 migrations added)(#28)
+
+
+Ver. 1.6.0 - 2021-05-31
+---------------------------
+- Feature - GetCategories API made public
+- Feature - ImportUsers API implementation (#26)
 
 Ver. 1.5.5 - 2021-05-20
 ---------------------------

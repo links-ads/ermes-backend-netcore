@@ -19,6 +19,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Abp;
+using Ermes.Activations;
 
 namespace Ermes.GeoJson
 {
@@ -399,6 +400,68 @@ namespace Ermes.GeoJson
 
 
                 }
+            }
+        }
+
+        public List<Activation> GetPersonActivations(DateTime startDate, DateTime endDate, ActionStatusType statusType)
+        {
+            var result = new List<Activation>();
+            ErmesDbContext context = _dbContextProvider.GetDbContext();
+            using (var command = context.Database.GetDbConnection().CreateCommand())
+            {
+                command.CommandText = @"
+                select ""Timestamp""::date, array_agg(distinct ""PersonId"") as ""PersonIdList"", count(distinct(""PersonId"")) as ""Count""
+                from public.person_actions
+                where ""CurrentStatus"" = @statusType and ""Timestamp"" >= @startDate and ""Timestamp"" <= @endDate
+                GROUP BY ""Timestamp""::date
+                ORDER BY ""Timestamp""::date
+                ";
+
+                command.CommandType = CommandType.Text;
+                command.Parameters.Add(new NpgsqlParameter("@startDate", startDate));
+                command.Parameters.Add(new NpgsqlParameter("@endDate", endDate));
+                command.Parameters.Add(new NpgsqlParameter("@statusType", statusType.ToString()));
+                DateTime refDate = startDate;
+                using (var reader = command.ExecuteReader())
+                {
+
+                    while (reader.Read())
+                    {
+                        var timestamp = reader.GetDateTime("Timestamp");
+                        var count = reader.GetInt32("Count");
+                        var personIdList = reader.GetFieldValue<long[]>("PersonIdList");
+
+
+                        while (refDate != timestamp)
+                        {
+                            result.Add(new Activation
+                            {
+                                Timestamp = refDate
+                            });
+                            refDate = refDate.AddDays(1);
+                        }
+
+
+                        result.Add(new Activation
+                        {
+                            Timestamp = refDate,
+                            Counter = count,
+                            PersonIdList = personIdList
+                        });
+                        refDate = refDate.AddDays(1);
+                    }
+
+                    while (refDate < endDate)
+                    {
+                        result.Add(new Activation
+                        {
+                            Timestamp = refDate
+                        });
+                        refDate = refDate.AddDays(1);
+                    }
+                }
+
+                return result;
             }
         }
     }

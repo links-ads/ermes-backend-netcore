@@ -24,6 +24,7 @@ using Abp.BackgroundJobs;
 using Abp.Domain.Uow;
 using NetTopologySuite.Geometries;
 using Ermes.GeoJson;
+using Ermes.Authorization;
 
 namespace Ermes.Reports
 {
@@ -34,6 +35,7 @@ namespace Ermes.Reports
         private readonly ReportManager _reportManager;
         private readonly ReportRequestManager _reportRequestManager;
         private readonly ErmesAppSession _session;
+        private readonly ErmesPermissionChecker _permissionChecker;
         private readonly IGeoJsonBulkRepository _geoJsonBulkRepository;
         private readonly IBackgroundJobManager _backgroundJobManager;
 
@@ -43,7 +45,8 @@ namespace Ermes.Reports
             ReportRequestManager reportRequestManager,
             IGeoJsonBulkRepository geoJsonBulkRepository,
             ErmesAppSession session,
-            IBackgroundJobManager backgroundJobManager
+            IBackgroundJobManager backgroundJobManager,
+            ErmesPermissionChecker permissionChecker
         )
         {
             _categoryManager = categoryManager;
@@ -52,6 +55,7 @@ namespace Ermes.Reports
             _reportRequestManager = reportRequestManager;
             _backgroundJobManager = backgroundJobManager;
             _geoJsonBulkRepository = geoJsonBulkRepository;
+            _permissionChecker = permissionChecker;
         }
 
         #region Private
@@ -109,7 +113,9 @@ namespace Ermes.Reports
             query = query.DTFilterBy(input);
 
             var person = _session.LoggedUserPerson;
-            query = query.DataOwnership(person.OrganizationId.HasValue ? new List<int>() { person.OrganizationId.Value } : null);
+            var hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Reports.Report_CanSeeCrossOrganization);
+            if(!hasPermission)
+                query = query.DataOwnership(person.OrganizationId.HasValue ? new List<int>() { person.OrganizationId.Value } : null);
 
             if (input.FilterByCreator)
                 query = query.Where(r => r.CreatorUserId.HasValue && r.CreatorUserId.Value == person.Id);

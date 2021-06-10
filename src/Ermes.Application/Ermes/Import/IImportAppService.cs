@@ -14,7 +14,6 @@ namespace Ermes.Import
         Task<ImportResultDto> ImportActivities(IFormFile file);
         Task<bool> ImportCompetenceAreas();
         Task<ImportResultDto> ImportCategories(IFormFile file);
-
-
+        Task<ImportResultDto> ImportUsers(IFormFile file);
     }
 }

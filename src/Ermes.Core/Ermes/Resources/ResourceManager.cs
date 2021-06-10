@@ -18,6 +18,7 @@ namespace Ermes.Resources
         private const string Thumbnails_Container_Name = "thumbnails";
         private const string ImportActivities_Container_Name = "import-activities";
         private const string ImportCategories_Container_Name = "import-categories";
+        private const string ImportUsers_Container_Name = "import-users";
         private static string baseResourcesUrl = string.Empty;
         private static readonly Lazy<IAzureConnectionProvider> _connectionProvider;
         static ResourceManager()
@@ -110,6 +111,13 @@ namespace Ermes.Resources
         {
             public string ContainerName { get { return ImportCategories_Container_Name; } }
             public string FileNameBase { get { return "categories-"; } }
+
+        }
+
+        public class ImportUsersResourceContainer : IImportResourceContainer
+        {
+            public string ContainerName { get { return ImportUsers_Container_Name; } }
+            public string FileNameBase { get { return "users-"; } }
 
         }
 

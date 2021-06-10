@@ -27,12 +27,14 @@ namespace Ermes.Actions
         private readonly ActivityManager _activityManager;
         private readonly IGeoJsonBulkRepository _geoJsonBulkRepository;
         private readonly ILanguageManager _languageManager;
+        private readonly ErmesPermissionChecker _permissionChecker;
 
         public ActionsAppService(
             PersonManager personManager,
             ErmesAppSession session,
             ActivityManager activityManager,
             IGeoJsonBulkRepository geoJsonBulkRepository,
+            ErmesPermissionChecker permissionChecker,
             ILanguageManager languageManager)
         {
             _personManager = personManager;
@@ -40,6 +42,7 @@ namespace Ermes.Actions
             _activityManager = activityManager;
             _geoJsonBulkRepository = geoJsonBulkRepository;
             _languageManager = languageManager;
+            _permissionChecker = permissionChecker;
         }
         [OpenApiOperation("Get Actions",
             @"
@@ -76,7 +79,15 @@ namespace Ermes.Actions
             if (input.NorthEastBoundary != null && input.SouthWestBoundary != null)
                 boundingBox = GeometryHelper.GetPolygonFromBoundaries(input.SouthWestBoundary, input.NorthEastBoundary);
 
-            var items = _geoJsonBulkRepository.GetPersonActions(start, end, _session.LoggedUserPerson.OrganizationId.HasValue ? new int[] { _session.LoggedUserPerson.OrganizationId.Value } : null, input.StatusTypes, actIds, boundingBox, search, _languageManager.CurrentLanguage.Name);
+            int[] orgIdList;
+            var hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Actions.Action_CanSeeCrossOrganization);
+            if (!hasPermission)
+                orgIdList = null;
+            else
+                orgIdList = _session.LoggedUserPerson.OrganizationId.HasValue ? new int[] { _session.LoggedUserPerson.OrganizationId.Value } : null;
+
+
+            var items = _geoJsonBulkRepository.GetPersonActions(start, end, orgIdList, input.StatusTypes, actIds, boundingBox, search, _languageManager.CurrentLanguage.Name);
 
             var actions = JsonConvert.DeserializeObject<GetActionsOutput>(items);
 

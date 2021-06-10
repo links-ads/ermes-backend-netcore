@@ -16,6 +16,7 @@ namespace Ermes.Authorization
             public const string Import_Activities = "Import.Activities";
             public const string Import_CompetenceArea = "Import.CompetenceArea";
             public const string Import_Categories = "Import.Categories";
+            public const string Import_Users = "Import.Users";
         }
 
         public static class Organizations
@@ -33,7 +34,13 @@ namespace Ermes.Authorization
         public static class Missions
         {
             public const string Mission = "Missions";
-            public const string Mission_Management = "Missions.Management";
+            public const string Mission_CanSeeCrossOrganization = "Missions.CanSeeCrossOrganization";
+        }
+
+        public static class Reports
+        {
+            public const string Report = "Reports";
+            public const string Report_CanSeeCrossOrganization = "Reports.CanSeeCrossOrganization";
         }
 
         public static class Profiles
@@ -46,8 +53,7 @@ namespace Ermes.Authorization
         public static class Actions
         {
             public const string Action = "Actions";
-            public const string Action_ShowAll = "Actions.ShowAll";
-            public const string Action_ShowOrganization = "Actions.ShowOrganization";
+            public const string Action_CanSeeCrossOrganization = "Actions.CanSeeCrossOrganization";
         }
 
         public static class Teams

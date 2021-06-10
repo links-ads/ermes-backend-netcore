@@ -181,7 +181,7 @@ namespace Ermes.Profile
             var rolesToAssign = await GetRolesAndCheckOrganizationAndTeam(input.User.Roles, input.OrganizationId, input.TeamId, input.PersonId, _personManager, _organizationManager, _teamManager, _session, _permissionChecker);
             var user = await UpdateUserInternalAsync(input.User, _fusionAuthSettings);
 
-            person = await UpdatePersonInternalAsync(person, user, input.OrganizationId, input.TeamId, input.IsFirstLogin, rolesToAssign, _personManager);
+            person = await CreateOrUpdatePersonInternalAsync(person, user, input.OrganizationId, input.TeamId, input.IsFirstLogin, rolesToAssign, _personManager);
 
             if (user != null)
             {

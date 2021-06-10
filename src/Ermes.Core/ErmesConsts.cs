@@ -12,6 +12,8 @@
         public const string SwaggerAppDocumentName = "app-v1";
         public const string SwaggerBackofficeDocumentName = "backoffice-v1";
         public const string IgnoreApi = "IgnoreApi";
+        public const string DefaultProjectName = "FASTER";
+        public const string DefaultYear = "2020";
 
 
         public class NotificationNames
