@@ -8,6 +8,8 @@ namespace Ermes.Reports.Dto
     {
         public string Group { get; set; }
         public string GroupIcon { get; set; }
+        //Key value for Group, not influenced by localization
+        public string GroupKey { get; set; }
         public List<CategoryDto> Categories { get; set; }
     }
 }

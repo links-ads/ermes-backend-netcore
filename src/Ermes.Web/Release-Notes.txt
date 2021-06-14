@@ -1,6 +1,10 @@
 Ver.
 ---------------------------
+
+Ver. 1.7.1 - 2021-06-14
+---------------------------
 - Feature - Edited Unique Key of category_translations (migration added)
+- Feature - GroupKey prop added to CategoryGroupDto
 
 Ver. 1.7.0 - 2021-06-10
 ---------------------------
