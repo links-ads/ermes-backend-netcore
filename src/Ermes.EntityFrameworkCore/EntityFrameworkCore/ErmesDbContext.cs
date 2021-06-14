@@ -73,7 +73,7 @@ namespace Ermes.EntityFrameworkCore
             modelBuilder.Entity<Preference>().HasOne<Person>(p => p.PreferenceOwner).WithOne().HasForeignKey<Preference>(p => p.PreferenceOwnerId).OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<Preference>().HasIndex(p => p.PreferenceOwnerId).IsUnique(false);
             modelBuilder.Entity<Preference>().Ignore(p => p.Id);
-            modelBuilder.Entity<CategoryTranslation>().HasIndex(i => new { i.Group, i.Name, i.Language }).IsUnique();
+            modelBuilder.Entity<CategoryTranslation>().HasIndex(i => new { i.Group, i.SubGroup, i.Name, i.Language }).IsUnique();
             modelBuilder.Entity<Team>().HasIndex(t => new { t.Name, t.OrganizationId }).IsUnique(true);
             modelBuilder.Entity<Organization>().HasIndex(t => t.Name).IsUnique(true);
             modelBuilder.Entity<Organization>().HasIndex(t => t.ShortName).IsUnique(true);

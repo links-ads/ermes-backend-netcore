@@ -42,6 +42,8 @@
     <Compile Include="Migrations\20210528105610_Categories_Target_Added.Designer.cs" />
     <Compile Include="Migrations\20210528125730_Category_GroupKey_SubGroupKey_Added.cs" />
     <Compile Include="Migrations\20210528125730_Category_GroupKey_SubGroupKey_Added.Designer.cs" />
+    <Compile Include="Migrations\20210614102255_Category_SubGroup_AddedToUniqueKeys.cs" />
+    <Compile Include="Migrations\20210614102255_Category_SubGroup_AddedToUniqueKeys.Designer.cs" />
     <Compile Include="Migrations\ErmesDbContextModelSnapshot.cs" />
     <Compile Include="Migrations\Seed\ModelBuilderExtensions.cs" />
   </ItemGroup>
