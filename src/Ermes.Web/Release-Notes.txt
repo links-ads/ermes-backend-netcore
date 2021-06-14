@@ -1,6 +1,6 @@
 Ver.
 ---------------------------
-
+- Feature - Edited Unique Key of category_translations (migration added)
 
 Ver. 1.7.0 - 2021-06-10
 ---------------------------
