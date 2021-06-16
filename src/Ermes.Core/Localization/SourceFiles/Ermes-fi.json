@@ -76,6 +76,8 @@
     "MissingPermission": "Käyttöoikeutesi eivät riitä toiminnon suorittamiseen",
     "InvalidActivityCode": "Virheellinen aktiviteettitunnus: {0}, enimmäispituus: {1}",
     "CategoryImportIndexMustBeFirst": "Indeksitaulukon on oltava ensimmäisenä",
-    "MissingField": "Missing field: {0}"
+    "MissingField": "Missing field: {0}",
+    "TimeWindowSizeError": "Reduce the size of the Time window",
+    "TimeWindowLimitError": "End date must be greater than Start date"
   }
 }

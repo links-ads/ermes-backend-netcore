@@ -421,7 +421,7 @@ namespace Ermes.GeoJson
                 command.Parameters.Add(new NpgsqlParameter("@startDate", startDate));
                 command.Parameters.Add(new NpgsqlParameter("@endDate", endDate));
                 command.Parameters.Add(new NpgsqlParameter("@statusType", statusType.ToString()));
-                DateTime refDate = startDate;
+                DateTime refDate = startDate.Date;
                 using (var reader = command.ExecuteReader())
                 {
 

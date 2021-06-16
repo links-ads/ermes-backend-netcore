@@ -47,13 +47,36 @@ namespace Ermes.Dashboard
         }
         public virtual async Task<GetStatisticsOutput> GetStatistics(GetStatisticsInput input)
         {
-            var start = input.StartDate ?? DateTime.Today.AddDays(-29);
-            var end = input.EndDate ?? DateTime.Today.AddDays(1);
-            var person = _session.LoggedUserPerson;
+            DateTime start = DateTime.MinValue, end = DateTime.MaxValue;
+            if(!input.StartDate.HasValue && !input.EndDate.HasValue)
+            {
+                start = DateTime.Today.AddDays(-29);
+                end = DateTime.Today.AddDays(1);
+            }
+            else if (input.StartDate.HasValue && !input.EndDate.HasValue)
+            {
+                start = input.StartDate.Value;
+                end = input.StartDate.Value.AddDays(30);
+                if (end > DateTime.Today.AddDays(1))
+                    end = DateTime.Today.AddDays(1);
+            }
+            else if(!input.StartDate.HasValue && input.EndDate.HasValue)
+            {
+                end = input.EndDate.Value;
+                start = input.EndDate.Value.AddDays(-30);
+            }
+            else
+            {
+                start = input.StartDate.Value;
+                end = input.EndDate.Value;
+            }
 
+            var person = _session.LoggedUserPerson;
+            if (start > end)
+                throw new UserFriendlyException(L("TimeWindowLimitError"));
             var timestap = end.Subtract(start);
             if (timestap.TotalDays > 30)
-                throw new UserFriendlyException("Time window too wide");
+                throw new UserFriendlyException(L("TimeWindowSizeError"));
 
             //Reports////////////
             IQueryable<Report> queryReport;
