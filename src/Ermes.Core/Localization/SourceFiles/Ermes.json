@@ -76,6 +76,8 @@
     "MissingPermission": "You don't have the permission to perform this operation",
     "InvalidActivityCode": "Invalid Activity Code: {0}, max allowed length: {1}",
     "CategoryImportIndexMustBeFirst": "The index sheet must be the first",
-    "MissingField":  "Missing field: {0}"
+    "MissingField": "Missing field: {0}",
+    "TimeWindowSizeError": "Reduce the size of the Time window",
+    "TimeWindowLimitError": "End date must be greater than Start date"
   }
 }
