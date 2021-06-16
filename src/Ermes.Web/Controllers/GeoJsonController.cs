@@ -11,6 +11,7 @@ using NSwag.Annotations;
 using System.Threading.Tasks;
 using Ermes.Web.Controllers;
 using System;
+using Ermes.Authorization;
 
 namespace Ermes.Web.Controllers
 {
@@ -20,11 +21,13 @@ namespace Ermes.Web.Controllers
         IGeoJsonBulkRepository _geoJsonBulkRepository;
         ILanguageManager _languageManager;
         private readonly ErmesAppSession _session;
-        public GeoJsonController(IGeoJsonBulkRepository geoJsonBulkRepository, ErmesAppSession session, ILanguageManager languageManager)
+        private readonly ErmesPermissionChecker _permissionChecker;
+        public GeoJsonController(IGeoJsonBulkRepository geoJsonBulkRepository, ErmesAppSession session, ILanguageManager languageManager, ErmesPermissionChecker permissionChecker)
         {
             _geoJsonBulkRepository = geoJsonBulkRepository;
             _languageManager = languageManager;
             _session = session;
+            _permissionChecker = permissionChecker;
         }
 
         private class PreserializedJsonResult : JsonResult
@@ -58,7 +61,13 @@ namespace Ermes.Web.Controllers
                 boundingBox = GeometryHelper.GetPolygonFromBoundaries(input.SouthWestBoundary, input.NorthEastBoundary);
             input.EndDate = input.EndDate == DateTime.MinValue ? DateTime.MaxValue : input.EndDate;
             var actIds = input.ActivityIds?.ToArray();
-            string responseContent = _geoJsonBulkRepository.GetGeoJsonCollection(input.StartDate, input.EndDate, boundingBox, input.EntityTypes, _session.LoggedUserPerson.OrganizationId.HasValue ? new int[] { _session.LoggedUserPerson.OrganizationId.Value } : null, input.StatusTypes, actIds, AppConsts.Srid, _languageManager.CurrentLanguage.Name);
+            int[] orgIdList;
+            var hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Actions.Action_CanSeeCrossOrganization);
+            if (hasPermission)
+                orgIdList = null;
+            else
+                orgIdList = _session.LoggedUserPerson.OrganizationId.HasValue ? new int[] { _session.LoggedUserPerson.OrganizationId.Value } : null;
+            string responseContent = _geoJsonBulkRepository.GetGeoJsonCollection(input.StartDate, input.EndDate, boundingBox, input.EntityTypes, orgIdList, input.StatusTypes, actIds, AppConsts.Srid, _languageManager.CurrentLanguage.Name);
 
             // I need to return a JsonResult or in case of exception, Abp produces html instead of json. However, the real
             // JsonResult serializes the object I give him while I have an already serialized one.

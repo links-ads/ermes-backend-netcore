@@ -81,7 +81,7 @@ namespace Ermes.Actions
 
             int[] orgIdList;
             var hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Actions.Action_CanSeeCrossOrganization);
-            if (!hasPermission)
+            if (hasPermission)
                 orgIdList = null;
             else
                 orgIdList = _session.LoggedUserPerson.OrganizationId.HasValue ? new int[] { _session.LoggedUserPerson.OrganizationId.Value } : null;
