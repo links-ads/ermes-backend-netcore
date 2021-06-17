@@ -69,6 +69,7 @@ namespace Ermes.EntityFrameworkCore
             modelBuilder.Entity<PersonActionActivity>();
             modelBuilder.Entity<PersonActionTracking>();
             modelBuilder.Entity<PersonActionStatus>();
+            modelBuilder.Entity<PersonActionSharingPosition>();
             modelBuilder.Entity<Preference>().HasKey(p => new { p.PreferenceOwnerId, p.SourceString });
             modelBuilder.Entity<Preference>().HasOne<Person>(p => p.PreferenceOwner).WithOne().HasForeignKey<Preference>(p => p.PreferenceOwnerId).OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<Preference>().HasIndex(p => p.PreferenceOwnerId).IsUnique(false);
