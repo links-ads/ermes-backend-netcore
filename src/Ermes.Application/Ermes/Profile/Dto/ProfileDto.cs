@@ -29,7 +29,7 @@ namespace Ermes.Profile.Dto
 
     public struct Location
     {
-        public Location(double latitude, double longitude, DateTime timestamp)
+        public Location(double longitude, double latitude, DateTime timestamp)
         {
             Latitude = latitude;
             Longitude = longitude;
