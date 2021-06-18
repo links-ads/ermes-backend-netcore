@@ -56,14 +56,14 @@ namespace Ermes.Categories
         public string GroupIcon { get; set; }
 
         [Required]
-        [Column("Target")]
-        public string TargetString
+        [Column("TargetKey")]
+        public string TargetKeyString
         {
-            get { return Target.ToString(); }
-            private set { Target = value.ParseEnum<TargetType>(); }
+            get { return TargetKey.ToString(); }
+            private set { TargetKey = value.ParseEnum<TargetType>(); }
         }
         [NotMapped]
-        public TargetType Target { get; set; }
+        public TargetType TargetKey { get; set; }
 
         [Required]
         [StringLength(MaxGroupKeyLength)]

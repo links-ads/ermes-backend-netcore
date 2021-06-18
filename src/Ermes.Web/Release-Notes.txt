@@ -1,5 +1,6 @@
 Ver.
 ---------------------------
+- Feature - Target translations added (migration added)(#31)
 
 Ver. 1.7.1 - 2021-06-14
 ---------------------------

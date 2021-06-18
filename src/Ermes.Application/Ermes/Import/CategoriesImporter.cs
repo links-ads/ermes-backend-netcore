@@ -174,7 +174,7 @@ namespace Ermes.Import
                         cat.MinValue = row.GetInt("Min Value");
                         cat.Type = row.GetEnum<CategoryType>("Type");
                         cat.GroupIcon = row.GetString("Group Icon");
-                        cat.Target = row.GetEnum<TargetType>("Target");
+                        cat.TargetKey = row.GetEnum<TargetType>("Target Key");
                         cat.GroupKey = row.GetString("Group Key");
                         cat.SubGroupKey = row.GetString("SubGroup Key");
 
@@ -212,6 +212,7 @@ namespace Ermes.Import
                         catTrans.Name = row.GetString("Name");
                         catTrans.Values = row.GetStringArray("Values");
                         catTrans.UnitOfMeasure = row.GetString("Unit of Measure");
+                        catTrans.Target = row.GetString("Target");
                         catTrans.CoreId = parentCat.Id;
 
                         // Check if other entities in this language have the same groupcode but a different translation for group, in that case update it
