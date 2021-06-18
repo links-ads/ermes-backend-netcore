@@ -27,6 +27,7 @@ namespace Ermes.Categories
         public int CoreId { get; set; }
         public string Language { get; set; }
         public string UnitOfMeasure { get; set; }
+        public string Target { get; set; }
 
     }
 }

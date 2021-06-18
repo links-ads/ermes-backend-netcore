@@ -12,7 +12,8 @@ namespace Ermes.Reports.Dto
         public int CategoryId { get; set; }
         public CategoryType Type { get; set; }
         public HazardType Hazard { get; set; }
-        public TargetType Target { get; set; }
+        public string TargetKey { get; set; }
+        public string Target { get; set; }
         public string Group { get; set; }
         //Key value for Group, not influenced by localization
         public string GroupKey { get; set; }
