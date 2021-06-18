@@ -16,6 +16,7 @@ using Ermes.GeoJson;
 using Abp.Localization;
 using Newtonsoft.Json;
 using Ermes.Dto.Datatable;
+using Ermes.Organizations;
 
 namespace Ermes.Actions
 {
@@ -25,6 +26,7 @@ namespace Ermes.Actions
         private readonly ErmesAppSession _session;
         private readonly PersonManager _personManager;
         private readonly ActivityManager _activityManager;
+        private readonly OrganizationManager _organizationManager;
         private readonly IGeoJsonBulkRepository _geoJsonBulkRepository;
         private readonly ILanguageManager _languageManager;
         private readonly ErmesPermissionChecker _permissionChecker;
@@ -34,6 +36,7 @@ namespace Ermes.Actions
             ErmesAppSession session,
             ActivityManager activityManager,
             IGeoJsonBulkRepository geoJsonBulkRepository,
+            OrganizationManager organizationManager,
             ErmesPermissionChecker permissionChecker,
             ILanguageManager languageManager)
         {
@@ -43,6 +46,7 @@ namespace Ermes.Actions
             _geoJsonBulkRepository = geoJsonBulkRepository;
             _languageManager = languageManager;
             _permissionChecker = permissionChecker;
+            _organizationManager = organizationManager;
         }
         [OpenApiOperation("Get Actions",
             @"
@@ -82,7 +86,7 @@ namespace Ermes.Actions
             int[] orgIdList;
             var hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Actions.Action_CanSeeCrossOrganization);
             if (hasPermission)
-                orgIdList = null;
+                orgIdList = await _organizationManager.GetOrganizationIdsAsync();
             else
                 orgIdList = _session.LoggedUserPerson.OrganizationId.HasValue ? new int[] { _session.LoggedUserPerson.OrganizationId.Value } : null;
 

@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Ermes.Web.Controllers;
 using System;
 using Ermes.Authorization;
+using Ermes.Organizations;
 
 namespace Ermes.Web.Controllers
 {
@@ -21,13 +22,15 @@ namespace Ermes.Web.Controllers
         IGeoJsonBulkRepository _geoJsonBulkRepository;
         ILanguageManager _languageManager;
         private readonly ErmesAppSession _session;
+        private readonly OrganizationManager _organizationManager;
         private readonly ErmesPermissionChecker _permissionChecker;
-        public GeoJsonController(IGeoJsonBulkRepository geoJsonBulkRepository, ErmesAppSession session, ILanguageManager languageManager, ErmesPermissionChecker permissionChecker)
+        public GeoJsonController(IGeoJsonBulkRepository geoJsonBulkRepository, ErmesAppSession session, ILanguageManager languageManager, ErmesPermissionChecker permissionChecker, OrganizationManager organizationManager)
         {
             _geoJsonBulkRepository = geoJsonBulkRepository;
             _languageManager = languageManager;
             _session = session;
             _permissionChecker = permissionChecker;
+            _organizationManager = organizationManager;
         }
 
         private class PreserializedJsonResult : JsonResult
@@ -64,7 +67,7 @@ namespace Ermes.Web.Controllers
             int[] orgIdList;
             var hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Actions.Action_CanSeeCrossOrganization);
             if (hasPermission)
-                orgIdList = null;
+                orgIdList = _organizationManager.GetOrganizationIds();
             else
                 orgIdList = _session.LoggedUserPerson.OrganizationId.HasValue ? new int[] { _session.LoggedUserPerson.OrganizationId.Value } : null;
             string responseContent = _geoJsonBulkRepository.GetGeoJsonCollection(input.StartDate, input.EndDate, boundingBox, input.EntityTypes, orgIdList, input.StatusTypes, actIds, AppConsts.Srid, _languageManager.CurrentLanguage.Name);

@@ -68,5 +68,15 @@ namespace Ermes.Organizations
         {
             await OrganizationCARepository.DeleteAsync(id);
         }
+
+        public int[]GetOrganizationIds()
+        {
+            return Organizations.Select(a => a.Id).ToArray();
+        }
+
+        public async Task<int[]> GetOrganizationIdsAsync()
+        {
+            return await Organizations.Select(a => a.Id).ToArrayAsync();
+        }
     }
 }
