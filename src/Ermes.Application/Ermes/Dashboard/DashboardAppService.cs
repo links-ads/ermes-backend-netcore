@@ -9,6 +9,7 @@ using Ermes.GeoJson;
 using Ermes.Helpers;
 using Ermes.Linq.Extensions;
 using Ermes.Missions;
+using Ermes.Organizations;
 using Ermes.Reports;
 using NetTopologySuite.Geometries;
 using Newtonsoft.Json;
@@ -24,6 +25,7 @@ namespace Ermes.Dashboard
     public class DashboardAppService : ErmesAppServiceBase, IDashboardAppService
     {
         private readonly ReportManager _reportManager;
+        private readonly OrganizationManager _organizationManager;
         private readonly MissionManager _missionManager;
         private readonly IGeoJsonBulkRepository _geoJsonBulkRepository;
         private readonly ErmesAppSession _session;
@@ -35,7 +37,8 @@ namespace Ermes.Dashboard
                 IGeoJsonBulkRepository geoJsonBulkRepository,
                 ErmesAppSession session,
                 ILanguageManager languageManager,
-                ErmesPermissionChecker permissionChecker
+                ErmesPermissionChecker permissionChecker,
+                OrganizationManager organizationManager
             )
         {
             _reportManager = reportManager;
@@ -44,6 +47,7 @@ namespace Ermes.Dashboard
             _languageManager = languageManager;
             _geoJsonBulkRepository = geoJsonBulkRepository;
             _permissionChecker = permissionChecker;
+            _organizationManager = organizationManager;
         }
         public virtual async Task<GetStatisticsOutput> GetStatistics(GetStatisticsInput input)
         {
@@ -113,8 +117,8 @@ namespace Ermes.Dashboard
             //Persons////////////
             int[] orgIdList;
             hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Actions.Action_CanSeeCrossOrganization);
-            if (!hasPermission)
-                orgIdList = null;
+            if (hasPermission)
+                orgIdList = await _organizationManager.GetOrganizationIdsAsync();
             else
                 orgIdList = _session.LoggedUserPerson.OrganizationId.HasValue ? new int[] { _session.LoggedUserPerson.OrganizationId.Value } : null;
 
