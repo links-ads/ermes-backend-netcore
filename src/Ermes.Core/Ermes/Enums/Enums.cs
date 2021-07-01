@@ -100,7 +100,8 @@ namespace Ermes.Enums
         Flood = 40,
         Landslide = 50,
         Storm = 60,
-        Weather = 70
+        Weather = 70,
+        Subsidence = 80
     }
     //old list
     //[JsonConverter(typeof(StringEnumConverter))]
