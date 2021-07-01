@@ -1,0 +1,18 @@
+version: '3.5'
+
+services:
+  safers.web:
+    depends_on:
+      - safers-pgsql
+    image: 'safers.web'
+    build:
+      context: .
+      dockerfile: src/Ermes.Web/Dockerfile
+    restart: unless-stopped
+
+  safers-pgsql:
+    image: 'safers-pgsql'
+    build:
+      context: .
+      dockerfile: src/containers/postgresql/Dockerfile
+    restart: unless-stopped
