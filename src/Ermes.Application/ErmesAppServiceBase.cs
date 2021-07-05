@@ -133,9 +133,23 @@ namespace Ermes
             profile.CurrentMissions = ObjectMapper.Map<List<MissionDto>>(_missionManager.GetCurrentMissions(person));
 
             profile.User.Roles = await _personManager.GetPersonRoleNamesAsync(profile.PersonId);
+            if(profile.User.Roles.Count == 0) //assign default role to current user
+            {
+                var defaultRole = await _personManager.GetDefaultRole();
+                await _personManager.InsertPersonRoleAsync(new PersonRole()
+                {
+                    PersonId = person.Id,
+                    RoleId = defaultRole.Id
+                });
+                profile.User.Roles.Add(defaultRole.Name);
+            }
 
             if (profile.User.Timezone == null)
                 profile.User.Timezone = AppConsts.DefaultTimezone;
+
+            //set Default language, but does not update User profile on FusionAuth
+            if (profile.User.PreferredLanguages == null || profile.User.PreferredLanguages.Count == 0)
+                profile.User.PreferredLanguages = new List<string>() { AppConsts.DefaultLanguage };
 
             return profile;
         }
