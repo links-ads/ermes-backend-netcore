@@ -33,5 +33,10 @@ namespace Ermes
         /// </summary>
         public const int ThumbnailSize = 256;
 
+        /// <summary>
+        /// Default timezone if one is not specified
+        /// </summary>
+        public const string DefaultLanguage = "en";
+
     }
 }

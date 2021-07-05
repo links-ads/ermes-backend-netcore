@@ -247,5 +247,10 @@ namespace Ermes.Persons
                 .Where(r =>roleNames.Contains(r.Name))
                 .ToListAsync();
         }
+
+        public async Task<Role> GetDefaultRole()
+        {
+            return await Roles.SingleOrDefaultAsync(r => r.Default);
+        }
     }
 }
