@@ -149,7 +149,7 @@ namespace Ermes
 
             //set Default language, but does not update User profile on FusionAuth
             if (profile.User.PreferredLanguages == null || profile.User.PreferredLanguages.Count == 0)
-                profile.User.PreferredLanguages.Add(AppConsts.DefaultLanguage);
+                profile.User.PreferredLanguages = new List<string>() { AppConsts.DefaultLanguage };
 
             return profile;
         }
