@@ -27,6 +27,8 @@ using Ermes.Localization;
 using Abp.Events.Bus.Entities;
 using Ermes.EntityHistory;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System.Collections.Generic;
 
 namespace Ermes.EntityFrameworkCore
 {
@@ -66,6 +68,20 @@ namespace Ermes.EntityFrameworkCore
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            //It's necessary to create a specific value-comparer for extensionData prop
+            //This allow the update of this field
+            //see https://stackoverflow.com/questions/62021228/entity-framework-not-detecting-jsonb-properties-changes-in-c-sharp
+            //and https://docs.microsoft.com/en-us/ef/core/modeling/value-comparers?tabs=ef5
+            modelBuilder
+                .Entity<Report>()
+                .Property(r => r.ExtensionData)
+                .Metadata
+                .SetValueComparer(
+                new ValueComparer<List<ReportExtensionData>>(
+                    (c1, c2) => c1.SequenceEqual(c2),
+                    c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                    c => c.ToList())
+                );
             modelBuilder.Entity<PersonActionActivity>();
             modelBuilder.Entity<PersonActionTracking>();
             modelBuilder.Entity<PersonActionStatus>();
