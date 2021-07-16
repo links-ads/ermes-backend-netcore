@@ -28,5 +28,6 @@ namespace Ermes.Reports.Dto
         public long CreatorId { get; set; }
         public int? RelativeMissionId { get; set; }
         public List<ReportTag> Tags { get; set; }
+        public List<ReportAdultInfo> AdultInfo { get; set; }
     }
 }
