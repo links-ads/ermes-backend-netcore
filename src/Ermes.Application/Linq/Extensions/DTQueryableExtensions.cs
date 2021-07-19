@@ -136,7 +136,6 @@ namespace Ermes.Linq.Extensions
                 else
                 {
                     predicate = predicate.Or(p => p.Description != null && p.Description.ToLower().Contains(search.Value));
-                    predicate = predicate.Or(p => p.Address != null && p.Address.ToLower().Contains(search.Value));
                 }
 
                 return query.Where(predicate);
@@ -312,10 +311,6 @@ namespace Ermes.Linq.Extensions
                             break;
                         case "description":
                             query = query.OrderBy(a => a.Description, direction, firstOrderClause);
-                            firstOrderClause = false;
-                            break;
-                        case "notes":
-                            query = query.OrderBy(a => a.Notes, direction, firstOrderClause);
                             firstOrderClause = false;
                             break;
                         default:

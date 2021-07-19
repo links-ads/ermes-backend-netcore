@@ -14,12 +14,9 @@ namespace Ermes.Reports.Dto
         public GeneralStatus Status { get; set; }
         public PointPosition Location { get; set; }
         public DateTime Timestamp { get; set; }
-        public string Address { get; set; }
         public List<MediaURIDto> MediaURIs { get; set; }
         public List<ReportExtensionData> ExtensionData { get; set; }
         public string Description { get; set; }
-        public string Notes { get; set; }
-        public List<ReportTarget> Targets { get; set; }
         public string Username { get; set; }
         public string OrganizationName { get; set; }
         public SourceDeviceType Source { get; set; }
@@ -28,5 +25,6 @@ namespace Ermes.Reports.Dto
         public long CreatorId { get; set; }
         public int? RelativeMissionId { get; set; }
         public List<ReportTag> Tags { get; set; }
+        public List<ReportAdultInfo> AdultInfo { get; set; }
     }
 }
