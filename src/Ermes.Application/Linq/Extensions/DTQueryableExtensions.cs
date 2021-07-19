@@ -44,6 +44,8 @@ namespace Ermes.Linq.Extensions
 
         private static IQueryable<T> ResolveLinqFilter<T>(IQueryable<T> query, DTSearch search)
         {
+            if (search.Value != null)
+                search.Value = search.Value.Trim().ToLower();
 
             // TODO: Usare IoC per risolvere dinamicamente il Linq resolver
             if (typeof(T) == typeof(Person))
@@ -113,8 +115,8 @@ namespace Ermes.Linq.Extensions
                 }
                 else
                 {
-                    predicate = predicate.Or(p => p.Title.Contains(search.Value));
-                    predicate = predicate.Or(p => p.Description.Contains(search.Value));
+                    predicate = predicate.Or(p => p.Title != null && p.Title.ToLower().Contains(search.Value));
+                    predicate = predicate.Or(p => p.Description != null && p.Description.ToLower().Contains(search.Value));
                 }
 
                 return query.Where(predicate);
@@ -133,8 +135,7 @@ namespace Ermes.Linq.Extensions
                 }
                 else
                 {
-                    predicate = predicate.Or(p => p.Description != null && p.Description.Contains(search.Value));
-                    predicate = predicate.Or(p => p.Address != null && p.Address.Contains(search.Value));
+                    predicate = predicate.Or(p => p.Description != null && p.Description.ToLower().Contains(search.Value));
                 }
 
                 return query.Where(predicate);
@@ -153,7 +154,7 @@ namespace Ermes.Linq.Extensions
                 }
                 else
                 {
-                    predicate = predicate.Or(p => p.Title != null && p.Title.Contains(search.Value));
+                    predicate = predicate.Or(p => p.Title != null && p.Title.ToLower().Contains(search.Value));
                 }
 
                 return query.Where(predicate);
@@ -172,9 +173,9 @@ namespace Ermes.Linq.Extensions
                 }
                 else
                 {
-                    predicate = predicate.Or(p => p.Name.Contains(search.Value));
-                    predicate = predicate.Or(p => p.ShortName.Contains(search.Value));
-                    predicate = predicate.Or(p => p.Description.Contains(search.Value));
+                    predicate = predicate.Or(p => p.Name != null && p.Name.ToLower().Contains(search.Value));
+                    predicate = predicate.Or(p => p.ShortName != null && p.ShortName.ToLower().Contains(search.Value));
+                    predicate = predicate.Or(p => p.Description != null && p.Description.ToLower().Contains(search.Value));
                 }
 
                 return query.Where(predicate);
@@ -194,8 +195,8 @@ namespace Ermes.Linq.Extensions
                 }
                 else
                 {
-                    predicate = predicate.Or(p => p.Username.Contains(search.Value));
-                    predicate = predicate.Or(p => p.FusionAuthUserGuid.ToString().Contains(search.Value));
+                    predicate = predicate.Or(p => p.Username != null && p.Username.ToLower().Contains(search.Value));
+                    predicate = predicate.Or(p => p.FusionAuthUserGuid != null && p.FusionAuthUserGuid.ToString().ToLower().Contains(search.Value));
                 }
 
                 return query.Where(predicate);
@@ -215,7 +216,7 @@ namespace Ermes.Linq.Extensions
                 }
                 else
                 {
-                    predicate = predicate.Or(p => p.Message.Contains(search.Value));
+                    predicate = predicate.Or(p => p.Message != null && p.Message.ToLower().Contains(search.Value));
                 }
 
                 return query.Where(predicate);
@@ -233,11 +234,11 @@ namespace Ermes.Linq.Extensions
                 }
                 else
                 {
-                    predicate = predicate.Or(p => p.Title.Contains(search.Value));
-                    predicate = predicate.Or(p => p.ChannelString.Contains(search.Value));
-                    predicate = predicate.Or(p => p.EntityString.Contains(search.Value));
-                    predicate = predicate.Or(p => p.Message.Contains(search.Value));
-                    predicate = predicate.Or(p => p.StatusString.Contains(search.Value));
+                    predicate = predicate.Or(p => p.Title.ToLower().Contains(search.Value));
+                    predicate = predicate.Or(p => p.ChannelString.ToLower().Contains(search.Value));
+                    predicate = predicate.Or(p => p.EntityString.ToLower().Contains(search.Value));
+                    predicate = predicate.Or(p => p.Message.ToLower().Contains(search.Value));
+                    predicate = predicate.Or(p => p.StatusString.ToLower().Contains(search.Value));
                 }
 
                 return query.Where(predicate);
@@ -310,10 +311,6 @@ namespace Ermes.Linq.Extensions
                             break;
                         case "description":
                             query = query.OrderBy(a => a.Description, direction, firstOrderClause);
-                            firstOrderClause = false;
-                            break;
-                        case "notes":
-                            query = query.OrderBy(a => a.Notes, direction, firstOrderClause);
                             firstOrderClause = false;
                             break;
                         default:

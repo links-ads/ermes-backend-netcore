@@ -19,7 +19,6 @@ namespace Ermes.Reports
     public class Report : AuditedEntity
     {
         public const int MaxDescriptionLength = 1000;
-        public const int MaxNotesLength = 1000;
 
         public Report()
         {
@@ -45,16 +44,11 @@ namespace Ermes.Reports
         [Required]
         public Point Location { get; set; }
         public DateTime Timestamp { get; set; }
-        public string Address { get; set; }
         public List<string> MediaURIs { get; set; }
         [Column(TypeName = "jsonb")]
         public List<ReportExtensionData> ExtensionData { get; set; }
         [StringLength(MaxDescriptionLength)]
         public string Description { get; set; }
-        [StringLength(MaxNotesLength)]
-        public string Notes { get; set; }
-        [Column(TypeName = "jsonb")]
-        public List<ReportTarget> Targets { get; set; }
         [ForeignKey("CreatorUserId")]
         public Person Creator { get; set; }
 
@@ -64,6 +58,9 @@ namespace Ermes.Reports
             get { return Source.ToString(); }
             private set { Source = value.ParseEnum<SourceDeviceType>(); }
         }
+        [NotMapped]
+        public SourceDeviceType Source { get; set; }
+
         [ForeignKey("RelativeMissionId")]
         public Mission RelativeMission { get; set; }
         public int? RelativeMissionId { get; set; }
@@ -73,9 +70,6 @@ namespace Ermes.Reports
 
         [Column(TypeName = "jsonb")]
         public List<ReportAdultInfo> AdultInfo { get; set; }
-
-        [NotMapped]
-        public SourceDeviceType Source { get; set; }
         [NotMapped]
         public bool IsEditable { get; set; } 
     }
