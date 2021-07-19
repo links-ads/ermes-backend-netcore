@@ -26,10 +26,16 @@ services:
       DB_PASSWORD: ${SAFERS_PASSWORD_LOCAL}
       DB_NAME: ${SAFERS_DB_LOCAL}
       DB_USER: ${SAFERS_USER_LOCAL}
+    volumes:
+      - safersdbdatalocal:/var/lib/postgresql/data       
     ports:
       - '${PGSQL_PORT_SAFERS_LOCAL}:5432'
     image: 'safers-pgsql'
     build:
       context: .
       dockerfile: src/containers/postgresql/Dockerfile
-    restart: unless-stopped      
+    restart: unless-stopped    
+    
+volumes:
+  safersdbdatadev:    
+  safersdbdatalocal:

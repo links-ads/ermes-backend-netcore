@@ -180,7 +180,9 @@ namespace Ermes.Web.Startup
                 env.IsEnvironment("ShelterLocal") ||
                 env.IsEnvironment("ShelterDevelopment") ||
                 env.IsEnvironment("FasterLocal") ||
-                env.IsEnvironment("FasterDevelopment")
+                env.IsEnvironment("FasterDevelopment") ||
+                env.IsEnvironment("SafersLocal") ||
+                env.IsEnvironment("SafersDevelopment")
             )
             {
                 app.UseDeveloperExceptionPage();

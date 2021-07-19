@@ -32,6 +32,8 @@ services:
     container_name: 'safers-pgsql-${ENVTYPE_SAFERS_TEST}'
     networks:
       - safers-net    
+    volumes:
+      - safersdbdatatest:/var/lib/postgresql/data         
     environment:
       POSTGRES_PASSWORD: ${SAFERS_PASSWORD_TEST}
       DB_PASSWORD: ${SAFERS_PASSWORD_TEST}
@@ -46,4 +48,5 @@ networks:
 
 volumes:
   saferslogstest:
+  safersdbdatatest:
 

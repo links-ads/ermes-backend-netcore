@@ -32,6 +32,8 @@ services:
     container_name: 'safers-pgsql-${ENVTYPE_SAFERS_DEV}'
     networks:
       - safers-net    
+    volumes:
+      - safersdbdatadev:/var/lib/postgresql/data      
     environment:
       POSTGRES_PASSWORD: ${SAFERS_PASSWORD_DEV}
       DB_PASSWORD: ${SAFERS_PASSWORD_DEV}
@@ -46,4 +48,5 @@ networks:
 
 volumes:
   saferslogsdev:
+  safersdbdatadev:
 
