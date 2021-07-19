@@ -151,10 +151,10 @@ namespace Ermes.Web.Startup
                 switch (_appConfiguration["App:ErmesProject"])
                 {
                     case "FASTER":
-                    case "SAFERS":
                         services.AddHostedService<KafkaConsumer>();
                         break;
                     case "SHELTER":
+                    case "SAFERS":
                         services.AddHostedService<RabbitMqManager>();
                         break;
                     default:
