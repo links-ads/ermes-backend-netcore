@@ -174,7 +174,7 @@ namespace Ermes.Linq.Extensions
             {
                 if(organizationIdList != null)
                 query =  query
-                        .Where(t => organizationIdList.Contains(t.OrganizationId));
+                        .Where(t => organizationIdList.Contains(t.OrganizationId) || (t.Organization.ParentId.HasValue && organizationIdList.Contains(t.Organization.ParentId.Value)));
 
                 return query;
             }

@@ -48,22 +48,22 @@ namespace Ermes.Missions
         public MissionStatusType CurrentStatus { get; set; }
 
         [ForeignKey("CoordinatorPersonId")]
-        public Person CoordinatorPerson { get; set; }
-        public long? CoordinatorPersonId { get; set; }
+        public virtual Person CoordinatorPerson { get; set; }
+        public virtual long? CoordinatorPersonId { get; set; }
 
         [ForeignKey("CoordinatorTeamId")]
-        public Team CoordinatorTeam { get; set; }
-        public int? CoordinatorTeamId { get; set; }
+        public virtual Team CoordinatorTeam { get; set; }
+        public virtual int? CoordinatorTeamId { get; set; }
 
         [StringLength(MaxNotesLength)]
         public string Notes { get; set; }
 
         [ForeignKey("CreatorUserId")]
-        public Person CreatorPerson { get; set; }
+        public virtual Person CreatorPerson { get; set; }
 
         [ForeignKey("OrganizationId")]
-        public Organization Organization {get; set;}
-        public int OrganizationId { get; set; }
+        public virtual Organization Organization {get; set;}
+        public virtual int OrganizationId { get; set; }
 
     }
 }

@@ -25,6 +25,7 @@ namespace Ermes.Teams.Dto
         [Required]
         public string Name { get; set; }
         public int? OrganizationId { get; set; }
+        public OrganizationDto Organization { get; set; }
     }
 
     public class CreateUpdateTeamInput
