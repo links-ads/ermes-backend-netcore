@@ -68,7 +68,11 @@ namespace Ermes
                             .ForMember(entity => entity.verified, options => options.MapFrom(dto => true))
                             .ForMember(entity => entity.active, options => options.MapFrom(dto => true));
             configuration.CreateMap<UserRegistration, UserRegistrationDto>().ReverseMap();
-            configuration.CreateMap<Organization, OrganizationDto>().ReverseMap();
+            configuration.CreateMap<Organization, OrganizationDto>()
+                .ForMember(dto => dto.ParentId, options => options.MapFrom(entity => entity.ParentId))
+                .ForMember(dto => dto.ParentName, options => options.MapFrom(entity => entity.ParentId.HasValue ? entity.Parent.Name : string.Empty))
+                .ReverseMap()
+                .ForMember(entity => entity.Parent, options => options.Ignore());
             configuration.CreateMap<Role, RoleDto>().ReverseMap();
             configuration.CreateMap<ErmesPermission, ErmesPermissionDto>().ReverseMap();
             configuration.CreateMap<Team, TeamDto>().ReverseMap();
@@ -82,13 +86,13 @@ namespace Ermes
                             .EntityMap.ForMember(dto => dto.CategoryId, options => options.MapFrom(a => a.Id));
             configuration.CreateMap<Mission, MissionDto>()
                             .ForMember(dto => dto.Centroid, options => options.MapFrom(b => new PointPosition(b.AreaOfInterest.Centroid.X, b.AreaOfInterest.Centroid.Y)))
-                            .ForMember(dto => dto.Organization, options => options.MapFrom(b => b.CreatorPerson.Organization))
+                            .ForMember(dto => dto.Organization, options => options.MapFrom(b => b.Organization))
                             .AfterMap((src, dest) => dest.Duration.LowerBound = dest.Duration.LowerBound.ToUniversalTime())
                             .AfterMap((src, dest) => dest.Duration.UpperBound = dest.Duration.UpperBound.ToUniversalTime())
                             .ReverseMap()
                             .ForMember(entity => entity.CreatorPerson, options => options.Ignore())
-                            .ForMember(entity => entity.Organization, options => options.Ignore())
-                            .ForMember(entity => entity.OrganizationId, options => options.Ignore());
+                            .ForMember(entity => entity.Organization, options => options.Ignore());
+                            //.ForMember(entity => entity.OrganizationId, options => options.Ignore());
             configuration.CreateMap<Mission, MissionNotificationDto>()
                             .ForMember(dto => dto.Centroid, options => options.MapFrom(b => new PointPosition(b.AreaOfInterest.Centroid.X, b.AreaOfInterest.Centroid.Y)))
                             .ForMember(dto => dto.Status, options => options.MapFrom(b => b.CurrentStatus))

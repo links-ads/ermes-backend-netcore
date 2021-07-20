@@ -30,6 +30,7 @@ using Ermes.EventHandlers;
 using NetTopologySuite.Geometries;
 using Ermes.GeoJson;
 using System.Net;
+using Ermes.Organizations;
 
 namespace Ermes.Missions
 {
@@ -40,6 +41,7 @@ namespace Ermes.Missions
         private readonly MissionManager _missionManager;
         private readonly PersonManager _personManager;
         private readonly ReportManager _reportManager;
+        private readonly OrganizationManager _organizationManager;
         private readonly TeamManager _teamManager;
         private readonly IBackgroundJobManager _backgroundJobManager;
         private readonly IGeoJsonBulkRepository _geoJsonBulkRepository;
@@ -54,7 +56,8 @@ namespace Ermes.Missions
                 TeamManager teamManager,
                 IBackgroundJobManager backgroundJobManager,
                 ErmesPermissionChecker permissionChecker,
-                IGeoJsonBulkRepository geoJsonBulkRepository
+                IGeoJsonBulkRepository geoJsonBulkRepository,
+                OrganizationManager organizationManager
         )
         {
             _session = session;
@@ -65,6 +68,7 @@ namespace Ermes.Missions
             _backgroundJobManager = backgroundJobManager;
             _geoJsonBulkRepository = geoJsonBulkRepository;
             _permissionChecker = permissionChecker;
+            _organizationManager = organizationManager;
         }
 
         #region Private
@@ -82,7 +86,7 @@ namespace Ermes.Missions
                 query = _geoJsonBulkRepository.GetMissions(input.StartDate.Value, input.EndDate.Value, boundingBox);
             }
             else
-                query = _missionManager.Missions.Where(a => new NpgsqlRange<DateTime>(input.StartDate.Value, input.EndDate.Value).Contains(a.Duration));
+                query = _missionManager.Missions.Include(m => m.Organization).Where(a => new NpgsqlRange<DateTime>(input.StartDate.Value, input.EndDate.Value).Contains(a.Duration));
 
             if (input.Status != null && input.Status.Count > 0)
             {
@@ -140,7 +144,7 @@ namespace Ermes.Missions
             if (!currentUserOrganizationId.HasValue)
                 throw new UserFriendlyException(L("OrganizationRequiredForOperation"));
 
-            if(oldMission != null && oldMission.OrganizationId != currentUserOrganizationId)
+            if(oldMission != null && oldMission.OrganizationId != currentUserOrganizationId && oldMission.Organization.ParentId != currentUserOrganizationId)
                 throw new UserFriendlyException(L("OrganizationMismatch"));
 
             if (newMissionData.CoordinatorPersonId.HasValue && newMissionData.CoordinatorTeamId.HasValue)
@@ -149,13 +153,13 @@ namespace Ermes.Missions
             if (newMissionData.CoordinatorPersonId.HasValue && (oldMission == null || newMissionData.CoordinatorPersonId != oldMission.CoordinatorPersonId))
             {
                 Person coord = await _personManager.GetPersonByIdAsync(newMissionData.CoordinatorPersonId.Value);
-                if (coord == null || coord.OrganizationId != currentUserOrganizationId)
+                if (coord == null || (coord.OrganizationId != currentUserOrganizationId && coord.Organization.ParentId != currentUserOrganizationId))
                     throw new UserFriendlyException(L("InvalidEntityId", newMissionData.CoordinatorPersonId.Value, "Coordinator-Person"));
             }
             else if (newMissionData.CoordinatorTeamId.HasValue && (oldMission == null || newMissionData.CoordinatorTeamId != oldMission.CoordinatorTeamId))
             {
                 Team coord = await _teamManager.GetTeamByIdAsync(newMissionData.CoordinatorTeamId.Value);
-                if (coord == null || coord.OrganizationId != currentUserOrganizationId)
+                if (coord == null || (coord.OrganizationId != currentUserOrganizationId && coord.Organization.ParentId != currentUserOrganizationId))
                     throw new UserFriendlyException(L("InvalidEntityId", newMissionData.CoordinatorTeamId.Value, "Coordinator-Team"));
             }
         }
@@ -182,13 +186,17 @@ namespace Ermes.Missions
         private async Task<Mission> CheckInputValidity(MissionDto input)
         {
             Mission mission;
+            Organization organization;
             if (input.Id > 0)
             {
                 mission = await _missionManager.GetMissionByIdAsync(input.Id);
                 if (mission == null)
                     throw new UserFriendlyException(L("InvalidMissionId", input.Id));
 
-                if(mission.OrganizationId != _session.LoggedUserPerson.OrganizationId)
+                organization = await _organizationManager.GetOrganizationByIdAsync(mission.OrganizationId);
+                if (organization == null)
+                    throw new UserFriendlyException(L("InvalidOrganizationId", mission.OrganizationId));
+                if (organization.Id != _session.LoggedUserPerson.OrganizationId && organization.ParentId != _session.LoggedUserPerson.OrganizationId)
                     throw new UserFriendlyException(L("EntityOutsideOrganization"));
             }
             else
@@ -200,28 +208,27 @@ namespace Ermes.Missions
             if (input.CoordinatorPersonId.HasValue)
             {
                 var coordinator = await _personManager.GetPersonByIdAsync(input.CoordinatorPersonId.Value);
-                if (coordinator == null || coordinator.OrganizationId != _session.LoggedUserPerson.OrganizationId)
+                if (coordinator == null || (coordinator.OrganizationId != _session.LoggedUserPerson.OrganizationId && coordinator.Organization.ParentId != _session.LoggedUserPerson.OrganizationId))
                     throw new UserFriendlyException(L("InvalidCoordinatorId", input.CoordinatorPersonId.Value));
             }
 
             if (input.CoordinatorTeamId.HasValue)
             {
                 var team = await _teamManager.GetTeamByIdAsync(input.CoordinatorTeamId.Value);
-                if (team == null || team.OrganizationId != _session.LoggedUserPerson.OrganizationId)
+                if (team == null || (team.OrganizationId != _session.LoggedUserPerson.OrganizationId && team.Organization.ParentId != _session.LoggedUserPerson.OrganizationId))
                     throw new UserFriendlyException(L("InvalidTeamId", input.CoordinatorTeamId.Value));
             }
 
             return mission;
-
         }
 
         private async Task<int> CreateMissionAsync(FeatureDto<MissionDto> featureDto)
         {
             var newMission = await CheckInputValidity(featureDto.Properties);
             // Associate the mission to the organization of the current user
-            if (!_session.LoggedUserPerson.OrganizationId.HasValue)
-                throw new UserFriendlyException(L("OrganizationRequiredForOperation"));
-            newMission.OrganizationId = _session.LoggedUserPerson.OrganizationId.Value;
+            //if (!_session.LoggedUserPerson.OrganizationId.HasValue)
+            //    throw new UserFriendlyException(L("OrganizationRequiredForOperation"));
+            //newMission.OrganizationId = _session.LoggedUserPerson.OrganizationId.Value;
 
             if (featureDto.FullGeometry.IsValid)
                 newMission.AreaOfInterest = featureDto.FullGeometry;

@@ -32,6 +32,7 @@ namespace Ermes.Missions.Dto
         public MissionStatusType CurrentStatus { get; set; }
         public long? CoordinatorPersonId { get; set; }
         public int? CoordinatorTeamId { get; set; }
+        public int OrganizationId { get; set; }
         public OrganizationDto Organization { get; set; }
         public string Notes { get; set; }
         public PointPosition Centroid { get; set; }
