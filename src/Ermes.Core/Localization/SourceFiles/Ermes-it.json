@@ -78,6 +78,7 @@
     "CategoryImportIndexMustBeFirst": "Il foglio indice deve essere il primo",
     "MissingField": "Campo mancante: {0}",
     "TimeWindowSizeError": "Ridurre la dimensione della finestra temporale",
-    "TimeWindowLimitError": "La data di fine deve essere più recente di quella di inizio"
+    "TimeWindowLimitError": "La data di fine deve essere più recente di quella di inizio",
+    "InvalidParentId": "Parent Id non valido: {0}"
   }
 }

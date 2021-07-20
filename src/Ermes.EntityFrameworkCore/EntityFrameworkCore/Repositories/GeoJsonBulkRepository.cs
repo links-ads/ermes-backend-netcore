@@ -114,6 +114,7 @@ namespace Ermes.GeoJson
                         m.""CurrentStatus""  as ""status"",
                         o.""Id"" as ""organizationId"",
                         o.""Name"" as ""organizationName"",
+                        o.""ParentId"" as ""organizationParentId"",
                         null as ""extensionData"",
 	                    p.""Username"" as ""creator"",
                         null as ""statusFilter"",
@@ -134,6 +135,7 @@ namespace Ermes.GeoJson
                         null as ""status"",
                         o.""Id"" as ""organizationId"",
                         o.""Name"" as ""organizationName"",
+                        o.""ParentId"" as ""organizationParentId"",
                         null as ""extensionData"",
                         p.""Username"" as ""creator"",
                         null as ""statusFilter"",
@@ -154,6 +156,7 @@ namespace Ermes.GeoJson
                         r.""Status"" as ""status"",
                         o.""Id"" as ""organizationId"",
                         o.""Name"" as ""organizationName"",
+                        o.""ParentId"" as ""organizationParentId"",
                         null as ""extensionData"",
                         p.""Username"" as ""creator"",
                         null as ""statusFilter"",
@@ -174,6 +177,7 @@ namespace Ermes.GeoJson
                         null as ""status"",
                         o.""Id"" as ""organizationId"",
                         o.""Name"" as ""organizationName"",
+                        o.""ParentId"" as ""organizationParentId"",
                         null as ""extensionData"",
                         p.""Username"" as ""creator"",
                         null as ""statusFilter"",
@@ -194,6 +198,7 @@ namespace Ermes.GeoJson
 	                    pa.""CurrentStatus"" as ""status"", 
 	                    o.""Id"" as ""organizationId"",
 	                    o.""Name"" as ""organizationName"",
+                        o.""ParentId"" as ""organizationParentId"",
                         pa.""CurrentExtensionData""::text as ""extensionData"",
 	                    p.""Username"" as ""creator"",
                         pa.""CurrentStatus"" as ""statusFilter"",
@@ -245,7 +250,7 @@ namespace Ermes.GeoJson
 
                 if (organizationIdList != null)
                 {
-                    command.CommandText += @" and (tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationId"" is null)";
+                    command.CommandText += @" and (tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations]) or tmp.""organizationId"" is null)";
                     var p = new NpgsqlParameter("@organizations", NpgsqlDbType.Array | NpgsqlDbType.Integer)
                     {
                         Value = organizationIdList
@@ -311,6 +316,7 @@ namespace Ermes.GeoJson
 	                pa.""CurrentStatus"" as ""Status"",
 	                o.""Id"" as ""OrganizationId"",
 	                o.""Name"" as ""OrganizationName"",
+                    o.""ParentId"" as ""OrganizationParentId"",
 	                p.""Username"",
                     null as ""Type"",
                     coalesce(a.""ParentId"", a.""Id"") as ""activityFilter""
@@ -335,7 +341,7 @@ namespace Ermes.GeoJson
                 command.Parameters.Add(new NpgsqlParameter("@language", language));
                 if (organizationIdList != null)
                 {
-                    command.CommandText += @" and (tmp.""OrganizationId"" = any(array[@organizations]) or tmp.""OrganizationId"" is null)";
+                    command.CommandText += @" and (tmp.""OrganizationId"" = any(array[@organizations]) or tmp.""OrganizationParentId"" = any(array[@organizations]) or tmp.""OrganizationId"" is null)";
                     var p = new NpgsqlParameter("@organizations", NpgsqlDbType.Array | NpgsqlDbType.Integer)
                     {
                         Value = organizationIdList

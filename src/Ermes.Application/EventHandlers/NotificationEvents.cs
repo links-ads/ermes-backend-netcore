@@ -16,6 +16,7 @@ using Ermes.GeoJson;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Ermes.Actions.Dto;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ermes.EventHandlers
 {
@@ -77,7 +78,8 @@ namespace Ermes.EventHandlers
 
             var receivers = _personManager
                                 .Persons
-                                .Where(p => p.OrganizationId == orgId)
+                                .Include(p => p.Organization)
+                                .Where(p => p.OrganizationId == orgId || (p.Organization.ParentId.HasValue && p.Organization.ParentId.Value == orgId))
                                 .Where(p => personUsernameList != null && personUsernameList.Contains(p.Username));
             await _notifierService.SendUserNotification(eventData.CreatorId, receivers, eventData.EntityId, ("Notification_Communication_Create_Body", bodyParams), (titleKey, null), eventData.Action, EntityType.Communication);
         }

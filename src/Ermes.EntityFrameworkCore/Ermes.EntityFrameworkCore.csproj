@@ -48,6 +48,8 @@
     <Compile Include="Migrations\20210618075639_Category_Target_Translations.Designer.cs" />
     <Compile Include="Migrations\20210719073718_Report_Refactoring.cs" />
     <Compile Include="Migrations\20210719073718_Report_Refactoring.Designer.cs" />
+    <Compile Include="Migrations\20210720080458_Organization_Parent.cs" />
+    <Compile Include="Migrations\20210720080458_Organization_Parent.Designer.cs" />
     <Compile Include="Migrations\ErmesDbContextModelSnapshot.cs" />
     <Compile Include="Migrations\Seed\ModelBuilderExtensions.cs" />
   </ItemGroup>

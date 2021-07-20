@@ -88,7 +88,7 @@ namespace Ermes.Linq.Extensions
                             //TODO: implement ADMIN visibility by using permission                            
                             : 
                             query
-                            .Where(m => organizationIdList.Contains(m.OrganizationId));
+                            .Where(m => organizationIdList.Contains(m.OrganizationId) || (m.Organization.ParentId.HasValue && organizationIdList.Contains(m.Organization.ParentId.Value)));
             }
         }
 
@@ -102,11 +102,13 @@ namespace Ermes.Linq.Extensions
                             .Where(r => !r.Creator.OrganizationId.HasValue)
                     : query
                     .Where(r =>
-                                //Organization visibility
-                                (r.Creator.OrganizationId.HasValue && organizationIdList.Contains(r.Creator.OrganizationId.Value)) ||
-                                //User contents
-                                !r.Creator.OrganizationId.HasValue
-                            );
+                            //Organization visibility
+                            (r.Creator.OrganizationId.HasValue && organizationIdList.Contains(r.Creator.OrganizationId.Value)) ||
+                            //Organization hierarchy
+                            (r.Creator.Organization.ParentId.HasValue && organizationIdList.Contains(r.Creator.Organization.ParentId.Value)) ||
+                            //User contents
+                            !r.Creator.OrganizationId.HasValue
+                        );
             }
         }
 
@@ -133,7 +135,7 @@ namespace Ermes.Linq.Extensions
             {
                 if(organizationIdList != null)
                     query = query
-                            .Where(o => organizationIdList.Contains(o.Id));
+                            .Where(o => organizationIdList.Contains(o.Id) || (o.ParentId.HasValue && organizationIdList.Contains(o.ParentId.Value)));
 
                 return query;
 
@@ -156,14 +158,13 @@ namespace Ermes.Linq.Extensions
             {
                 return organizationIdList == null
                         ? query
-                                .Where(r => !r.Creator.OrganizationId.HasValue)
                         : query
                         .Where(r =>
-                                    //Organization visibility
-                                    (r.Creator.OrganizationId.HasValue && organizationIdList.Contains(r.Creator.OrganizationId.Value)) ||
-                                    //User contents
-                                    !r.Creator.OrganizationId.HasValue
-                                );
+                            //Organization visibility
+                            (r.Creator.OrganizationId.HasValue && organizationIdList.Contains(r.Creator.OrganizationId.Value)) ||
+                            //Organization hierarchy
+                            (r.Creator.Organization.ParentId.HasValue && organizationIdList.Contains(r.Creator.Organization.ParentId.Value))
+                        );
             }
         }
 

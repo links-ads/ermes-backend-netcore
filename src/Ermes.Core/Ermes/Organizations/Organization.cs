@@ -28,26 +28,26 @@ namespace Ermes.Organizations
         /// </summary>
         [Required]
         [StringLength(MaxShortNameLength)]
-        public virtual string ShortName { get; set; }
+        public string ShortName { get; set; }
         
         /// <summary>
         /// Organization Name
         /// </summary>
         [Required]
         [StringLength(MaxNameLength)]
-        public virtual string Name { get; set; }
+        public string Name { get; set; }
         
         /// <summary>
         /// Organization Description
         /// </summary>
         [StringLength(MaxDescriptionLength)]
-        public virtual string Description { get; set; }
+        public string Description { get; set; }
         
         /// <summary>
         /// Organization Web site
         /// </summary>
         [StringLength(MaxWebSiteLength)]
-        public virtual string WebSite { get; set; }
+        public string WebSite { get; set; }
         
         /// <summary>
         /// Organization Logo url
@@ -59,5 +59,12 @@ namespace Ermes.Organizations
         /// </summary>
         [ForeignKey("OrganizationId")]
         public virtual ICollection<OrganizationCompetenceArea> CompetenceAreas { get; set; }
+
+        /// <summary>
+        /// Reference to the parent organization in the hierarchy
+        /// </summary>
+        [ForeignKey("ParentId")]
+        public virtual Organization Parent { get; set; }
+        public virtual int? ParentId { get; set; }
     }
 }

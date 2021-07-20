@@ -12,7 +12,7 @@ namespace Ermes.Organizations
 {
     public class OrganizationManager : DomainService
     {
-        public IQueryable<Organization> Organizations { get { return OrganizationRepository.GetAll(); } }
+        public IQueryable<Organization> Organizations { get { return OrganizationRepository.GetAll().Include(o => o.Parent); } }
         public IQueryable<OrganizationCompetenceArea> OrganizationCAs { get { return OrganizationCARepository.GetAll(); } }
         protected IRepository<Organization> OrganizationRepository { get; set; }
         protected IRepository<OrganizationCompetenceArea> OrganizationCARepository { get; set; }
@@ -77,6 +77,17 @@ namespace Ermes.Organizations
         public async Task<int[]> GetOrganizationIdsAsync()
         {
             return await Organizations.Select(a => a.Id).ToArrayAsync();
+        }
+
+        public async Task<bool> CheckParent(int? parentId)
+        {
+            if (parentId.HasValue)
+            {
+                var parent = await GetOrganizationByIdAsync(parentId.Value);
+                return parent != null;
+            }
+
+            return true;
         }
     }
 }
