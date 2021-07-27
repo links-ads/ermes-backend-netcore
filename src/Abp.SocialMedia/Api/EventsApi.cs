@@ -472,15 +472,15 @@ namespace Abp.SocialMedia.Api
             }
             if (languages != null)
             {
-                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("multi", "languages", languages));
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("csv", "languages", languages));
             }
             if (hazards != null)
             {
-                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("multi", "hazards", hazards));
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("csv", "hazards", hazards));
             }
             if (infotypes != null)
             {
-                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("multi", "infotypes", infotypes));
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("csv", "infotypes", infotypes));
             }
             if (southWest != null)
             {
@@ -588,15 +588,15 @@ namespace Abp.SocialMedia.Api
             }
             if (languages != null)
             {
-                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("multi", "languages", languages));
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("csv", "languages", languages));
             }
             if (hazards != null)
             {
-                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("multi", "hazards", hazards));
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("csv", "hazards", hazards));
             }
             if (infotypes != null)
             {
-                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("multi", "infotypes", infotypes));
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("csv", "infotypes", infotypes));
             }
             if (southWest != null)
             {
