@@ -4,6 +4,7 @@ Ver.
 - Bugfix - Search filter case insensitive (#35)
 - Feature - AdultInfo prop added to ReportDto class (#15)
 - Feature - Report refactoring (migration added)(#37)
+- Feature - Social SDK update (#38)
 
 Ver. 1.7.3 - 2021-07-01
 ---------------------------
