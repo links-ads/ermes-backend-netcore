@@ -37,8 +37,11 @@ namespace Abp.SocialMedia.Model
         /// <param name="endedAt">endedAt.</param>
         /// <param name="hazardId">hazardId.</param>
         /// <param name="hotspots">hotspots.</param>
+        /// <param name="hotspotsCentroid">hotspotsCentroid.</param>
         /// <param name="id">id.</param>
+        /// <param name="impactEstimation">impactEstimation.</param>
         /// <param name="lang">lang.</param>
+        /// <param name="lastImpactEstimationAt">lastImpactEstimationAt.</param>
         /// <param name="name">name.</param>
         /// <param name="startedAt">startedAt.</param>
         /// <param name="totalArea">totalArea.</param>
@@ -46,14 +49,17 @@ namespace Abp.SocialMedia.Model
         /// <param name="tweets">tweets.</param>
         /// <param name="updatedAt">updatedAt.</param>
         /// <param name="verified">verified.</param>
-        public Event(DateTime activatedAt = default(DateTime), DateTime endedAt = default(DateTime), int hazardId = default(int), Object hotspots = default(Object), int id = default(int), string lang = default(string), string name = default(string), DateTime startedAt = default(DateTime), Object totalArea = default(Object), DateTime trackingStoppedAt = default(DateTime), List<PartialTweet> tweets = default(List<PartialTweet>), DateTime updatedAt = default(DateTime), bool verified = default(bool))
+        public Event(DateTime activatedAt = default(DateTime), DateTime endedAt = default(DateTime), int hazardId = default(int), Object hotspots = default(Object), Object hotspotsCentroid = default(Object), int id = default(int), Object impactEstimation = default(Object), string lang = default(string), DateTime lastImpactEstimationAt = default(DateTime), string name = default(string), DateTime startedAt = default(DateTime), Object totalArea = default(Object), DateTime trackingStoppedAt = default(DateTime), List<PartialTweet> tweets = default(List<PartialTweet>), DateTime updatedAt = default(DateTime), bool verified = default(bool))
         {
             this.ActivatedAt = activatedAt;
             this.EndedAt = endedAt;
             this.HazardId = hazardId;
             this.Hotspots = hotspots;
+            this.HotspotsCentroid = hotspotsCentroid;
             this.Id = id;
+            this.ImpactEstimation = impactEstimation;
             this.Lang = lang;
+            this.LastImpactEstimationAt = lastImpactEstimationAt;
             this.Name = name;
             this.StartedAt = startedAt;
             this.TotalArea = totalArea;
@@ -88,16 +94,34 @@ namespace Abp.SocialMedia.Model
         public Object Hotspots { get; set; }
 
         /// <summary>
+        /// Gets or Sets HotspotsCentroid
+        /// </summary>
+        [DataMember(Name = "hotspots_centroid", EmitDefaultValue = true)]
+        public Object HotspotsCentroid { get; set; }
+
+        /// <summary>
         /// Gets or Sets Id
         /// </summary>
         [DataMember(Name = "id", EmitDefaultValue = true)]
         public int Id { get; set; }
 
         /// <summary>
+        /// Gets or Sets ImpactEstimation
+        /// </summary>
+        [DataMember(Name = "impact_estimation", EmitDefaultValue = true)]
+        public Object ImpactEstimation { get; set; }
+
+        /// <summary>
         /// Gets or Sets Lang
         /// </summary>
         [DataMember(Name = "lang", EmitDefaultValue = true)]
         public string Lang { get; set; }
+
+        /// <summary>
+        /// Gets or Sets LastImpactEstimationAt
+        /// </summary>
+        [DataMember(Name = "last_impact_estimation_at", EmitDefaultValue = true)]
+        public DateTime LastImpactEstimationAt { get; set; }
 
         /// <summary>
         /// Gets or Sets Name
@@ -153,8 +177,11 @@ namespace Abp.SocialMedia.Model
             sb.Append("  EndedAt: ").Append(EndedAt).Append("\n");
             sb.Append("  HazardId: ").Append(HazardId).Append("\n");
             sb.Append("  Hotspots: ").Append(Hotspots).Append("\n");
+            sb.Append("  HotspotsCentroid: ").Append(HotspotsCentroid).Append("\n");
             sb.Append("  Id: ").Append(Id).Append("\n");
+            sb.Append("  ImpactEstimation: ").Append(ImpactEstimation).Append("\n");
             sb.Append("  Lang: ").Append(Lang).Append("\n");
+            sb.Append("  LastImpactEstimationAt: ").Append(LastImpactEstimationAt).Append("\n");
             sb.Append("  Name: ").Append(Name).Append("\n");
             sb.Append("  StartedAt: ").Append(StartedAt).Append("\n");
             sb.Append("  TotalArea: ").Append(TotalArea).Append("\n");
@@ -216,13 +243,28 @@ namespace Abp.SocialMedia.Model
                     this.Hotspots.Equals(input.Hotspots))
                 ) && 
                 (
+                    this.HotspotsCentroid == input.HotspotsCentroid ||
+                    (this.HotspotsCentroid != null &&
+                    this.HotspotsCentroid.Equals(input.HotspotsCentroid))
+                ) && 
+                (
                     this.Id == input.Id ||
                     this.Id.Equals(input.Id)
+                ) && 
+                (
+                    this.ImpactEstimation == input.ImpactEstimation ||
+                    (this.ImpactEstimation != null &&
+                    this.ImpactEstimation.Equals(input.ImpactEstimation))
                 ) && 
                 (
                     this.Lang == input.Lang ||
                     (this.Lang != null &&
                     this.Lang.Equals(input.Lang))
+                ) && 
+                (
+                    this.LastImpactEstimationAt == input.LastImpactEstimationAt ||
+                    (this.LastImpactEstimationAt != null &&
+                    this.LastImpactEstimationAt.Equals(input.LastImpactEstimationAt))
                 ) && 
                 (
                     this.Name == input.Name ||
@@ -277,9 +319,15 @@ namespace Abp.SocialMedia.Model
                 hashCode = hashCode * 59 + this.HazardId.GetHashCode();
                 if (this.Hotspots != null)
                     hashCode = hashCode * 59 + this.Hotspots.GetHashCode();
+                if (this.HotspotsCentroid != null)
+                    hashCode = hashCode * 59 + this.HotspotsCentroid.GetHashCode();
                 hashCode = hashCode * 59 + this.Id.GetHashCode();
+                if (this.ImpactEstimation != null)
+                    hashCode = hashCode * 59 + this.ImpactEstimation.GetHashCode();
                 if (this.Lang != null)
                     hashCode = hashCode * 59 + this.Lang.GetHashCode();
+                if (this.LastImpactEstimationAt != null)
+                    hashCode = hashCode * 59 + this.LastImpactEstimationAt.GetHashCode();
                 if (this.Name != null)
                     hashCode = hashCode * 59 + this.Name.GetHashCode();
                 if (this.StartedAt != null)
