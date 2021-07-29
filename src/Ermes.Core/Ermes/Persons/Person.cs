@@ -41,5 +41,7 @@ namespace Ermes.Persons
         public string RegistrationToken { get; set; }
 
         public bool IsFirstLogin { get; set; } = true;
+
+        public int? LegacyId { get; set; }
     }
 }

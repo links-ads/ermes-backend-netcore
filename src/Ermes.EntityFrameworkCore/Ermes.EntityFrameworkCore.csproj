@@ -50,6 +50,8 @@
     <Compile Include="Migrations\20210719073718_Report_Refactoring.Designer.cs" />
     <Compile Include="Migrations\20210720080458_Organization_Parent.cs" />
     <Compile Include="Migrations\20210720080458_Organization_Parent.Designer.cs" />
+    <Compile Include="Migrations\20210729104918_Person_LegacyId_Added.cs" />
+    <Compile Include="Migrations\20210729104918_Person_LegacyId_Added.Designer.cs" />
     <Compile Include="Migrations\ErmesDbContextModelSnapshot.cs" />
     <Compile Include="Migrations\Seed\ModelBuilderExtensions.cs" />
   </ItemGroup>

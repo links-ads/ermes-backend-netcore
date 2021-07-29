@@ -16,7 +16,8 @@ namespace Ermes.Configuration
             {
                 //example
                 new SettingDefinition(AppSettings.General.Environment, ConfigurationManager.AppSettings[AppSettings.General.Environment] ?? ErmesConsts.Environments.Dev,null,null,null,SettingScopes.Application,true,true,null),
-                new SettingDefinition(LocalizationSettingNames.DefaultLanguage, "en")
+                new SettingDefinition(LocalizationSettingNames.DefaultLanguage, "en"),
+                new SettingDefinition(AppSettings.General.HouseOrganization, "Protezione Civile Piemonte")
             };
         }
     }

@@ -24,6 +24,8 @@ namespace Ermes.Profile.Dto
         public Location? Location { get; set; }
         public List<MissionDto> CurrentMissions { get; set; }
         public bool IsFirstLogin { get; set; }
+        public int? LegacyId { get; set; }
+        public string TaxCode { get; set; }
 
     }
 

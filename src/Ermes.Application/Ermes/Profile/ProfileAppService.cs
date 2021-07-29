@@ -1,10 +1,12 @@
 ﻿using Abp.Application.Services.Dto;
+using Abp.CsiServices.Csi;
 using Abp.Extensions;
 using Abp.Linq.Extensions;
 using Abp.UI;
 using Ermes.Attributes;
 using Ermes.Auth.Dto;
 using Ermes.Authorization;
+using Ermes.Configuration;
 using Ermes.Dto;
 using Ermes.Dto.Datatable;
 using Ermes.Linq.Extensions;
@@ -36,15 +38,18 @@ namespace Ermes.Profile
         private readonly TeamManager _teamManager;
         private readonly OrganizationManager _organizationManager;
         private readonly IOptions<FusionAuthSettings> _fusionAuthSettings;
+        private readonly IOptions<ErmesSettings> _ermesSettings;
         private readonly ErmesPermissionChecker _permissionChecker;
-
+        private readonly CsiManager _csiManager;
         public ProfileAppService(ErmesAppSession session,
                     PersonManager personManger,
                     MissionManager missionManager,
                     TeamManager teamManager,
                     OrganizationManager organizationManager,
                     ErmesPermissionChecker permissionChecker,
-                    IOptions<FusionAuthSettings> fusionAuthSettings)
+                    IOptions<FusionAuthSettings> fusionAuthSettings,
+                    IOptions<ErmesSettings> ermesSettings,
+                    CsiManager csiManager)
         {
             _session = session;
             _personManager = personManger;
@@ -53,6 +58,8 @@ namespace Ermes.Profile
             _teamManager = teamManager;
             _permissionChecker = permissionChecker;
             _organizationManager = organizationManager;
+            _ermesSettings = ermesSettings;
+            _csiManager = csiManager;
         }
 
         #region Private
@@ -168,7 +175,7 @@ namespace Ermes.Profile
             @"
             Replace all profile information with the new values contained in the request. Note that if the input is not complete or contains null values, the corresponding fields in the profile informations will be overwritten to null - only exception is the password field, that can be null in non-password-changing updates. Ignores roles, throws exception on organization change attempt.
             Input: UpdateProfileInput Dto object
-            Output: UserId of updated profile
+            Output: the profile with updated information
             "
         )]
         
@@ -179,7 +186,24 @@ namespace Ermes.Profile
 
             Person person = await _personManager.GetPersonByIdAsync(input.PersonId ?? _session.UserId.Value);
             var rolesToAssign = await GetRolesAndCheckOrganizationAndTeam(input.User.Roles, input.OrganizationId, input.TeamId, input.PersonId, _personManager, _organizationManager, _teamManager, _session, _permissionChecker);
-            var user = await UpdateUserInternalAsync(input.User, _fusionAuthSettings);
+            var user = await UpdateUserInternalAsync(input.User, _fusionAuthSettings, rolesToAssign.Select(r => r.Name).ToList());
+
+            int? legacyId;
+            if(
+                _ermesSettings.Value != null && 
+                _ermesSettings.Value.ErmesProject == AppConsts.Ermes_Faster &&
+                input.OrganizationId.HasValue
+            )
+            {
+                var refOrg = await _organizationManager.GetOrganizationByIdAsync(input.OrganizationId.Value);
+                var housePartner = await SettingManager.GetSettingValueAsync(AppSettings.General.HouseOrganization);
+                if (refOrg.Name == housePartner || (refOrg.ParentId.HasValue && refOrg.Parent.Name == housePartner))
+                {
+                    legacyId = await _csiManager.SearchVolontarioAsync(input.TaxCode);
+                    if (legacyId.HasValue && legacyId.Value >= 0)
+                        person.LegacyId = legacyId;
+                }
+            }
 
             person = await CreateOrUpdatePersonInternalAsync(person, user, input.OrganizationId, input.TeamId, input.IsFirstLogin, rolesToAssign, _personManager);
 
@@ -261,29 +285,29 @@ namespace Ermes.Profile
             return new DTResult<PersonDto>(input.Draw, result.TotalCount, result.Items.Count, result.Items.ToList());
         }
 
-        [OpenApiOperation("Update Person preferred languages",
-            @"
-                [Deprecated]
-                Update Person Preferred Languages
-                Input: UpdatePreferredLanguagesInput Dto object with the full list of preferred languages in Iso2Code format
-                Output: true if the operation has been excuted successfully
-            "
-        )]
-        public virtual async Task<bool> UpdatePreferredLanguages(UpdatePreferredLanguagesInput input)
-        {
-            Person person = await _personManager.GetPersonByIdAsync(_session.UserId.Value);
+        //[OpenApiOperation("Update Person preferred languages",
+        //    @"
+        //        [Deprecated]
+        //        Update Person Preferred Languages
+        //        Input: UpdatePreferredLanguagesInput Dto object with the full list of preferred languages in Iso2Code format
+        //        Output: true if the operation has been excuted successfully
+        //    "
+        //)]
+        //public virtual async Task<bool> UpdatePreferredLanguages(UpdatePreferredLanguagesInput input)
+        //{
+        //    Person person = await _personManager.GetPersonByIdAsync(_session.UserId.Value);
 
-            // Validation
-            if (person == null)
-                throw new UserFriendlyException(L("InvalidPersonId", _session.UserId.Value));
+        //    // Validation
+        //    if (person == null)
+        //        throw new UserFriendlyException(L("InvalidPersonId", _session.UserId.Value));
 
-            var userToUpdate = await GetUserAsync(person.FusionAuthUserGuid);
-            if (person.Username == null)
-                person.Username = userToUpdate.username;
+        //    var userToUpdate = await GetUserAsync(person.FusionAuthUserGuid);
+        //    if (person.Username == null)
+        //        person.Username = userToUpdate.username;
 
-            userToUpdate.preferredLanguages = input.PreferredLanguages;
-            var user = await UpdateUserInternalAsync(ObjectMapper.Map<UserDto>(userToUpdate), _fusionAuthSettings);
-            return user != null;
-        }
+        //    userToUpdate.preferredLanguages = input.PreferredLanguages;
+        //    var user = await UpdateUserInternalAsync(ObjectMapper.Map<UserDto>(userToUpdate), _fusionAuthSettings);
+        //    return user != null;
+        //}
     }
 }

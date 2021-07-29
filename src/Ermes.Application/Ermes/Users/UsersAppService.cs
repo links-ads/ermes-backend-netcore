@@ -130,7 +130,7 @@ namespace Ermes.Users
                 currentUser = await CreateUserInternalAsync(input.User, input.User.Roles, _fusionAuthSettings, _ermesSettings);
             else
             {
-                currentUser = await UpdateUserInternalAsync(input.User, _fusionAuthSettings);
+                currentUser = await UpdateUserInternalAsync(input.User, _fusionAuthSettings, input.User.Roles);
                 person = _personManager.GetPersonByFusionAuthUserGuid(currentUser.id.Value);
             }
 

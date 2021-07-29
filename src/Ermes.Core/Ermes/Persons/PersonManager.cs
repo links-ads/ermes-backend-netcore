@@ -241,6 +241,14 @@ namespace Ermes.Persons
                 .ToListAsync();
         }
 
+        public async Task<List<PersonRole>> GetPersonRolesAsync(long personId)
+        {
+            return await PersonRoles.
+                 Include(pr => pr.Role)
+                .Where(pr => pr.PersonId == personId)
+                .ToListAsync();
+        }
+
         public async Task<List<Role>> GetRolesByName(List<string> roleNames)
         {
             return await Roles
