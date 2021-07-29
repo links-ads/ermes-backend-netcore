@@ -1,0 +1,52 @@
+#docker-compose.safers.development.yml (Extended config for Safers DEVELOPMENT env.)
+version: '3.5'
+
+services:
+  safers.web:
+    depends_on:
+      - safers-pgsql
+    image: 'safers.web'
+    build:
+      context: .
+      dockerfile: src/Ermes.Web/Dockerfile
+    restart: unless-stopped  
+    environment:
+      - ASPNETCORE_ENVIRONMENT=SafersDevelopment
+      - GOOGLE_APPLICATION_CREDENTIALS=firebasekey-safers.json
+    ports:
+      - '${SAFERS_WEB_PORT_DEV}:80'
+    container_name: 'safers-web-${ENVTYPE_SAFERS_DEV}'
+    networks:
+      - safers-net
+    volumes:
+      - saferslogsdev:/app/App_Data/Logs/      
+    env_file:
+      - ./.env    
+
+  safers-pgsql:
+    image: 'safers-pgsql'
+    build:
+      context: .
+      dockerfile: src/containers/postgresql/Dockerfile
+    restart: unless-stopped  
+    container_name: 'safers-pgsql-${ENVTYPE_SAFERS_DEV}'
+    networks:
+      - safers-net    
+    volumes:
+      - safersdbdatadev:/var/lib/postgresql/data      
+    environment:
+      POSTGRES_PASSWORD: ${SAFERS_PASSWORD_DEV}
+      DB_PASSWORD: ${SAFERS_PASSWORD_DEV}
+      DB_NAME: ${SAFERS_DB_DEV}
+      DB_USER: ${SAFERS_USER_DEV}
+    ports:
+      - '${PGSQL_PORT_SAFERS_DEV}:5432'
+
+networks:
+  safers-net:
+    name: safers-net-${ENVTYPE_SAFERS_DEV}
+
+volumes:
+  saferslogsdev:
+  safersdbdatadev:
+

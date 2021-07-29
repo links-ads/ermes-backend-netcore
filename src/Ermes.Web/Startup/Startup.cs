@@ -151,10 +151,10 @@ namespace Ermes.Web.Startup
                 switch (_appConfiguration["App:ErmesProject"])
                 {
                     case "FASTER":
-                    case "SAFERS":
                         services.AddHostedService<KafkaConsumer>();
                         break;
                     case "SHELTER":
+                    case "SAFERS":
                         services.AddHostedService<RabbitMqManager>();
                         break;
                     default:
@@ -180,7 +180,9 @@ namespace Ermes.Web.Startup
                 env.IsEnvironment("ShelterLocal") ||
                 env.IsEnvironment("ShelterDevelopment") ||
                 env.IsEnvironment("FasterLocal") ||
-                env.IsEnvironment("FasterDevelopment")
+                env.IsEnvironment("FasterDevelopment") ||
+                env.IsEnvironment("SafersLocal") ||
+                env.IsEnvironment("SafersDevelopment")
             )
             {
                 app.UseDeveloperExceptionPage();
