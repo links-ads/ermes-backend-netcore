@@ -38,6 +38,7 @@ namespace Abp.SocialMedia.Model
         /// <summary>
         /// Initializes a new instance of the <see cref="Media" /> class.
         /// </summary>
+        /// <param name="extra">extra.</param>
         /// <param name="id">id.</param>
         /// <param name="idStr">idStr.</param>
         /// <param name="informative">informative.</param>
@@ -45,18 +46,25 @@ namespace Abp.SocialMedia.Model
         /// <param name="tweetIdStr">tweetIdStr.</param>
         /// <param name="type">type (required).</param>
         /// <param name="url">url (required).</param>
-        public Media(long id = default(long), string idStr = default(string), bool? informative = default(bool?), long tweetId = default(long), string tweetIdStr = default(string), string type = default(string), string url = default(string))
+        public Media(Object extra = default(Object), long id = default(long), string idStr = default(string), bool? informative = default(bool?), long tweetId = default(long), string tweetIdStr = default(string), string type = default(string), string url = default(string))
         {
             // to ensure "type" is required (not null)
             this.Type = type ?? throw new ArgumentNullException("type is a required property for Media and cannot be null");
             // to ensure "url" is required (not null)
             this.Url = url ?? throw new ArgumentNullException("url is a required property for Media and cannot be null");
+            this.Extra = extra;
             this.Id = id;
             this.IdStr = idStr;
             this.Informative = informative;
             this.TweetId = tweetId;
             this.TweetIdStr = tweetIdStr;
         }
+
+        /// <summary>
+        /// Gets or Sets Extra
+        /// </summary>
+        [DataMember(Name = "extra", EmitDefaultValue = true)]
+        public Object Extra { get; set; }
 
         /// <summary>
         /// Gets or Sets Id
@@ -108,6 +116,7 @@ namespace Abp.SocialMedia.Model
         {
             var sb = new StringBuilder();
             sb.Append("class Media {\n");
+            sb.Append("  Extra: ").Append(Extra).Append("\n");
             sb.Append("  Id: ").Append(Id).Append("\n");
             sb.Append("  IdStr: ").Append(IdStr).Append("\n");
             sb.Append("  Informative: ").Append(Informative).Append("\n");
@@ -149,6 +158,11 @@ namespace Abp.SocialMedia.Model
                 return false;
 
             return 
+                (
+                    this.Extra == input.Extra ||
+                    (this.Extra != null &&
+                    this.Extra.Equals(input.Extra))
+                ) && 
                 (
                     this.Id == input.Id ||
                     this.Id.Equals(input.Id)
@@ -193,6 +207,8 @@ namespace Abp.SocialMedia.Model
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = 41;
+                if (this.Extra != null)
+                    hashCode = hashCode * 59 + this.Extra.GetHashCode();
                 hashCode = hashCode * 59 + this.Id.GetHashCode();
                 if (this.IdStr != null)
                     hashCode = hashCode * 59 + this.IdStr.GetHashCode();

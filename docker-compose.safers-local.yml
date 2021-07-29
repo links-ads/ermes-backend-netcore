@@ -1,0 +1,41 @@
+#docker-compose.safers-local.yml (Extended config for Local env.)
+version: '3.5'
+
+services:
+  safers.web:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=SafersLocal
+      - GOOGLE_APPLICATION_CREDENTIALS=firebasekey-dev.json
+    ports:
+      - '${SAFERS_WEB_PORT_LOCAL}:80'
+    container_name: 'safers-web-${ENVTYPE_SAFERS_LOCAL}'
+    env_file: 
+      - ./.env
+    depends_on:
+      - safers-pgsql
+    image: 'safers.web'
+    build:
+      context: .
+      dockerfile: src/Ermes.Web/Dockerfile
+    restart: unless-stopped      
+
+  safers-pgsql:
+    container_name: 'safers-pgsql-${ENVTYPE_SAFERS_LOCAL}'
+    environment:
+      POSTGRES_PASSWORD: ${SAFERS_PASSWORD_LOCAL}
+      DB_PASSWORD: ${SAFERS_PASSWORD_LOCAL}
+      DB_NAME: ${SAFERS_DB_LOCAL}
+      DB_USER: ${SAFERS_USER_LOCAL}
+    volumes:
+      - safersdbdatalocal:/var/lib/postgresql/data       
+    ports:
+      - '${PGSQL_PORT_SAFERS_LOCAL}:5432'
+    image: 'safers-pgsql'
+    build:
+      context: .
+      dockerfile: src/containers/postgresql/Dockerfile
+    restart: unless-stopped    
+    
+volumes:
+  safersdbdatadev:    
+  safersdbdatalocal:

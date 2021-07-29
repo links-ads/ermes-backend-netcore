@@ -43,8 +43,10 @@ namespace Abp.SocialMedia.Api
         /// <param name="infotypes">Retrieve only a specific set of comma-separated information types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;information_type. (optional)</param>
         /// <param name="southWest">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
         /// <param name="northEast">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
+        /// <param name="entityLabelId">List of entity label id in order to recover just some entity types. To specify more than one, separate them with &#39;,&#39; (optional)</param>
+        /// <param name="entityValue">List of string representing entity specific values to recover. To specify more than one, separate them with &#39;,&#39; (optional)</param>
         /// <returns>Pagination</returns>
-        Pagination ApiV1AnnotationsGet(int? page = default(int?), int? limit = default(int?), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), bool? informative = default(bool?), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>));
+        Pagination ApiV1AnnotationsGet(int? page = default(int?), int? limit = default(int?), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), bool? informative = default(bool?), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>), List<decimal> entityLabelId = default(List<decimal>), List<string> entityValue = default(List<string>));
 
         /// <summary>
         /// Retrieves a paged list of annotated tweets and associated media and authors
@@ -63,8 +65,10 @@ namespace Abp.SocialMedia.Api
         /// <param name="infotypes">Retrieve only a specific set of comma-separated information types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;information_type. (optional)</param>
         /// <param name="southWest">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
         /// <param name="northEast">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
+        /// <param name="entityLabelId">List of entity label id in order to recover just some entity types. To specify more than one, separate them with &#39;,&#39; (optional)</param>
+        /// <param name="entityValue">List of string representing entity specific values to recover. To specify more than one, separate them with &#39;,&#39; (optional)</param>
         /// <returns>ApiResponse of Pagination</returns>
-        ApiResponse<Pagination> ApiV1AnnotationsGetWithHttpInfo(int? page = default(int?), int? limit = default(int?), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), bool? informative = default(bool?), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>));
+        ApiResponse<Pagination> ApiV1AnnotationsGetWithHttpInfo(int? page = default(int?), int? limit = default(int?), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), bool? informative = default(bool?), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>), List<decimal> entityLabelId = default(List<decimal>), List<string> entityValue = default(List<string>));
         #endregion Synchronous Operations
     }
 
@@ -91,9 +95,11 @@ namespace Abp.SocialMedia.Api
         /// <param name="infotypes">Retrieve only a specific set of comma-separated information types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;information_type. (optional)</param>
         /// <param name="southWest">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
         /// <param name="northEast">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
+        /// <param name="entityLabelId">List of entity label id in order to recover just some entity types. To specify more than one, separate them with &#39;,&#39; (optional)</param>
+        /// <param name="entityValue">List of string representing entity specific values to recover. To specify more than one, separate them with &#39;,&#39; (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of Pagination</returns>
-        System.Threading.Tasks.Task<Pagination> ApiV1AnnotationsGetAsync(int? page = default(int?), int? limit = default(int?), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), bool? informative = default(bool?), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Pagination> ApiV1AnnotationsGetAsync(int? page = default(int?), int? limit = default(int?), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), bool? informative = default(bool?), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>), List<decimal> entityLabelId = default(List<decimal>), List<string> entityValue = default(List<string>), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <summary>
         /// Retrieves a paged list of annotated tweets and associated media and authors
@@ -112,9 +118,11 @@ namespace Abp.SocialMedia.Api
         /// <param name="infotypes">Retrieve only a specific set of comma-separated information types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;information_type. (optional)</param>
         /// <param name="southWest">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
         /// <param name="northEast">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
+        /// <param name="entityLabelId">List of entity label id in order to recover just some entity types. To specify more than one, separate them with &#39;,&#39; (optional)</param>
+        /// <param name="entityValue">List of string representing entity specific values to recover. To specify more than one, separate them with &#39;,&#39; (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of ApiResponse (Pagination)</returns>
-        System.Threading.Tasks.Task<ApiResponse<Pagination>> ApiV1AnnotationsGetWithHttpInfoAsync(int? page = default(int?), int? limit = default(int?), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), bool? informative = default(bool?), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<ApiResponse<Pagination>> ApiV1AnnotationsGetWithHttpInfoAsync(int? page = default(int?), int? limit = default(int?), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), bool? informative = default(bool?), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>), List<decimal> entityLabelId = default(List<decimal>), List<string> entityValue = default(List<string>), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
         #endregion Asynchronous Operations
     }
 
@@ -249,10 +257,12 @@ namespace Abp.SocialMedia.Api
         /// <param name="infotypes">Retrieve only a specific set of comma-separated information types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;information_type. (optional)</param>
         /// <param name="southWest">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
         /// <param name="northEast">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
+        /// <param name="entityLabelId">List of entity label id in order to recover just some entity types. To specify more than one, separate them with &#39;,&#39; (optional)</param>
+        /// <param name="entityValue">List of string representing entity specific values to recover. To specify more than one, separate them with &#39;,&#39; (optional)</param>
         /// <returns>Pagination</returns>
-        public Pagination ApiV1AnnotationsGet(int? page = default(int?), int? limit = default(int?), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), bool? informative = default(bool?), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>))
+        public Pagination ApiV1AnnotationsGet(int? page = default(int?), int? limit = default(int?), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), bool? informative = default(bool?), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>), List<decimal> entityLabelId = default(List<decimal>), List<string> entityValue = default(List<string>))
         {
-            Abp.SocialMedia.Client.ApiResponse<Pagination> localVarResponse = ApiV1AnnotationsGetWithHttpInfo(page, limit, start, end, languages, informative, hazards, infotypes, southWest, northEast);
+            Abp.SocialMedia.Client.ApiResponse<Pagination> localVarResponse = ApiV1AnnotationsGetWithHttpInfo(page, limit, start, end, languages, informative, hazards, infotypes, southWest, northEast, entityLabelId, entityValue);
             return localVarResponse.Data;
         }
 
@@ -270,8 +280,10 @@ namespace Abp.SocialMedia.Api
         /// <param name="infotypes">Retrieve only a specific set of comma-separated information types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;information_type. (optional)</param>
         /// <param name="southWest">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
         /// <param name="northEast">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
+        /// <param name="entityLabelId">List of entity label id in order to recover just some entity types. To specify more than one, separate them with &#39;,&#39; (optional)</param>
+        /// <param name="entityValue">List of string representing entity specific values to recover. To specify more than one, separate them with &#39;,&#39; (optional)</param>
         /// <returns>ApiResponse of Pagination</returns>
-        public Abp.SocialMedia.Client.ApiResponse<Pagination> ApiV1AnnotationsGetWithHttpInfo(int? page = default(int?), int? limit = default(int?), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), bool? informative = default(bool?), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>))
+        public Abp.SocialMedia.Client.ApiResponse<Pagination> ApiV1AnnotationsGetWithHttpInfo(int? page = default(int?), int? limit = default(int?), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), bool? informative = default(bool?), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>), List<decimal> entityLabelId = default(List<decimal>), List<string> entityValue = default(List<string>))
         {
             Abp.SocialMedia.Client.RequestOptions localVarRequestOptions = new Abp.SocialMedia.Client.RequestOptions();
 
@@ -328,6 +340,14 @@ namespace Abp.SocialMedia.Api
             if (northEast != null)
             {
                 localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("csv", "north_east", northEast));
+            }
+            if (entityLabelId != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("csv", "entity_label_id", entityLabelId));
+            }
+            if (entityValue != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("csv", "entity_value", entityValue));
             }
 
             // authentication (api_key) required
@@ -367,11 +387,13 @@ namespace Abp.SocialMedia.Api
         /// <param name="infotypes">Retrieve only a specific set of comma-separated information types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;information_type. (optional)</param>
         /// <param name="southWest">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
         /// <param name="northEast">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
+        /// <param name="entityLabelId">List of entity label id in order to recover just some entity types. To specify more than one, separate them with &#39;,&#39; (optional)</param>
+        /// <param name="entityValue">List of string representing entity specific values to recover. To specify more than one, separate them with &#39;,&#39; (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of Pagination</returns>
-        public async System.Threading.Tasks.Task<Pagination> ApiV1AnnotationsGetAsync(int? page = default(int?), int? limit = default(int?), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), bool? informative = default(bool?), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public async System.Threading.Tasks.Task<Pagination> ApiV1AnnotationsGetAsync(int? page = default(int?), int? limit = default(int?), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), bool? informative = default(bool?), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>), List<decimal> entityLabelId = default(List<decimal>), List<string> entityValue = default(List<string>), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
-            Abp.SocialMedia.Client.ApiResponse<Pagination> localVarResponse = await ApiV1AnnotationsGetWithHttpInfoAsync(page, limit, start, end, languages, informative, hazards, infotypes, southWest, northEast, cancellationToken).ConfigureAwait(false);
+            Abp.SocialMedia.Client.ApiResponse<Pagination> localVarResponse = await ApiV1AnnotationsGetWithHttpInfoAsync(page, limit, start, end, languages, informative, hazards, infotypes, southWest, northEast, entityLabelId, entityValue, cancellationToken).ConfigureAwait(false);
             return localVarResponse.Data;
         }
 
@@ -389,9 +411,11 @@ namespace Abp.SocialMedia.Api
         /// <param name="infotypes">Retrieve only a specific set of comma-separated information types. Refer to the \&quot;id\&quot; field in /api/v1/labels for the complete list, filtering by task&#x3D;information_type. (optional)</param>
         /// <param name="southWest">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
         /// <param name="northEast">bottom-left corner of the bounding box for a spatial query, in (lon, lat) format. (optional)</param>
+        /// <param name="entityLabelId">List of entity label id in order to recover just some entity types. To specify more than one, separate them with &#39;,&#39; (optional)</param>
+        /// <param name="entityValue">List of string representing entity specific values to recover. To specify more than one, separate them with &#39;,&#39; (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of ApiResponse (Pagination)</returns>
-        public async System.Threading.Tasks.Task<Abp.SocialMedia.Client.ApiResponse<Pagination>> ApiV1AnnotationsGetWithHttpInfoAsync(int? page = default(int?), int? limit = default(int?), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), bool? informative = default(bool?), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public async System.Threading.Tasks.Task<Abp.SocialMedia.Client.ApiResponse<Pagination>> ApiV1AnnotationsGetWithHttpInfoAsync(int? page = default(int?), int? limit = default(int?), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> languages = default(List<string>), bool? informative = default(bool?), List<int> hazards = default(List<int>), List<int> infotypes = default(List<int>), List<float> southWest = default(List<float>), List<float> northEast = default(List<float>), List<decimal> entityLabelId = default(List<decimal>), List<string> entityValue = default(List<string>), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
 
             Abp.SocialMedia.Client.RequestOptions localVarRequestOptions = new Abp.SocialMedia.Client.RequestOptions();
@@ -450,6 +474,14 @@ namespace Abp.SocialMedia.Api
             if (northEast != null)
             {
                 localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("csv", "north_east", northEast));
+            }
+            if (entityLabelId != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("csv", "entity_label_id", entityLabelId));
+            }
+            if (entityValue != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.SocialMedia.Client.ClientUtils.ParameterToMultiMap("csv", "entity_value", entityValue));
             }
 
             // authentication (api_key) required
