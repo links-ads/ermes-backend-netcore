@@ -6,6 +6,7 @@ Ver.
 - Feature - Report refactoring (migration added)(#37)
 - Feature - Social SDK update (#38)
 - Feature - Organization hierarchy (migration added)(#30)
+- Feature - CsiServices class library added (migration added for Person.LegacyId)(#39)
 
 Ver. 1.7.3 - 2021-07-01
 ---------------------------
