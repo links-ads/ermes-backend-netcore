@@ -157,11 +157,29 @@ namespace Ermes
             return profile;
         }
 
-        protected async Task<User> UpdateUserInternalAsync(UserDto userDto, IOptions<FusionAuthSettings> _fusionAuthSettings)
+        protected async Task<User> UpdateUserInternalAsync(UserDto userDto, IOptions<FusionAuthSettings> _fusionAuthSettings, List<string> rolesToAssign)
         {
             var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
 
-            //Create user on FusionAuth
+            //Update user-registration on FusionAuth
+            //this function allows to update roles
+            var regRequest = new RegistrationRequest()
+            {
+                user = ObjectMapper.Map<User>(userDto),
+                registration = new UserRegistration()
+                {
+                    applicationId = new Guid(_fusionAuthSettings.Value.ApplicationId),
+                    roles = rolesToAssign,
+                },
+                sendSetPasswordEmail = false,
+                skipVerification = true,
+                skipRegistrationVerification = true
+            };
+            var regResponse = await client.UpdateRegistrationAsync(regRequest.user.id, regRequest);
+            if (!regResponse.WasSuccessful())
+                throw new UserFriendlyException(regResponse.errorResponse.ToString());
+            //Update user on FusionAuth
+            //this function allows to update user profile
             var userToUpdate = new UserRequest()
             {
                 user = ObjectMapper.Map<User>(userDto),
@@ -170,8 +188,8 @@ namespace Ermes
             };
 
             var response = await client.UpdateUserAsync(userToUpdate.user.id, userToUpdate);
-
-            if (response.WasSuccessful())
+            
+            if(response.WasSuccessful())
                 return response.successResponse.user;
             else
             {
@@ -200,6 +218,8 @@ namespace Ermes
             Logger.Info("Ermes: Create or update Person: " + person.Username);
             long personId = await _personManager.InsertOrUpdatePersonAsync(person);
 
+            //Delete old associations
+            await _personManager.DeletePersonRolesAsync(personId);
             // Assign roles
             foreach (Role rta in rolesToAssign)
             {
@@ -210,6 +230,7 @@ namespace Ermes
                 };
                 await _personManager.InsertPersonRoleAsync(pr);
             }
+
             await CurrentUnitOfWork.SaveChangesAsync();
             return person;
         }

@@ -48,7 +48,8 @@ namespace Ermes.Profile
                     OrganizationManager organizationManager,
                     ErmesPermissionChecker permissionChecker,
                     IOptions<FusionAuthSettings> fusionAuthSettings,
-                    IOptions<ErmesSettings> ermesSettings)
+                    IOptions<ErmesSettings> ermesSettings,
+                    CsiManager csiManager)
         {
             _session = session;
             _personManager = personManger;
@@ -58,6 +59,7 @@ namespace Ermes.Profile
             _permissionChecker = permissionChecker;
             _organizationManager = organizationManager;
             _ermesSettings = ermesSettings;
+            _csiManager = csiManager;
         }
 
         #region Private
@@ -184,7 +186,7 @@ namespace Ermes.Profile
 
             Person person = await _personManager.GetPersonByIdAsync(input.PersonId ?? _session.UserId.Value);
             var rolesToAssign = await GetRolesAndCheckOrganizationAndTeam(input.User.Roles, input.OrganizationId, input.TeamId, input.PersonId, _personManager, _organizationManager, _teamManager, _session, _permissionChecker);
-            var user = await UpdateUserInternalAsync(input.User, _fusionAuthSettings);
+            var user = await UpdateUserInternalAsync(input.User, _fusionAuthSettings, rolesToAssign.Select(r => r.Name).ToList());
 
             int? legacyId;
             if(
@@ -195,7 +197,7 @@ namespace Ermes.Profile
             {
                 var refOrg = await _organizationManager.GetOrganizationByIdAsync(input.OrganizationId.Value);
                 var housePartner = await SettingManager.GetSettingValueAsync(AppSettings.General.HouseOrganization);
-                if (refOrg.Name == housePartner)
+                if (refOrg.Name == housePartner || (refOrg.ParentId.HasValue && refOrg.Parent.Name == housePartner))
                 {
                     legacyId = await _csiManager.SearchVolontarioAsync(input.TaxCode);
                     if (legacyId.HasValue && legacyId.Value >= 0)
@@ -283,29 +285,29 @@ namespace Ermes.Profile
             return new DTResult<PersonDto>(input.Draw, result.TotalCount, result.Items.Count, result.Items.ToList());
         }
 
-        [OpenApiOperation("Update Person preferred languages",
-            @"
-                [Deprecated]
-                Update Person Preferred Languages
-                Input: UpdatePreferredLanguagesInput Dto object with the full list of preferred languages in Iso2Code format
-                Output: true if the operation has been excuted successfully
-            "
-        )]
-        public virtual async Task<bool> UpdatePreferredLanguages(UpdatePreferredLanguagesInput input)
-        {
-            Person person = await _personManager.GetPersonByIdAsync(_session.UserId.Value);
+        //[OpenApiOperation("Update Person preferred languages",
+        //    @"
+        //        [Deprecated]
+        //        Update Person Preferred Languages
+        //        Input: UpdatePreferredLanguagesInput Dto object with the full list of preferred languages in Iso2Code format
+        //        Output: true if the operation has been excuted successfully
+        //    "
+        //)]
+        //public virtual async Task<bool> UpdatePreferredLanguages(UpdatePreferredLanguagesInput input)
+        //{
+        //    Person person = await _personManager.GetPersonByIdAsync(_session.UserId.Value);
 
-            // Validation
-            if (person == null)
-                throw new UserFriendlyException(L("InvalidPersonId", _session.UserId.Value));
+        //    // Validation
+        //    if (person == null)
+        //        throw new UserFriendlyException(L("InvalidPersonId", _session.UserId.Value));
 
-            var userToUpdate = await GetUserAsync(person.FusionAuthUserGuid);
-            if (person.Username == null)
-                person.Username = userToUpdate.username;
+        //    var userToUpdate = await GetUserAsync(person.FusionAuthUserGuid);
+        //    if (person.Username == null)
+        //        person.Username = userToUpdate.username;
 
-            userToUpdate.preferredLanguages = input.PreferredLanguages;
-            var user = await UpdateUserInternalAsync(ObjectMapper.Map<UserDto>(userToUpdate), _fusionAuthSettings);
-            return user != null;
-        }
+        //    userToUpdate.preferredLanguages = input.PreferredLanguages;
+        //    var user = await UpdateUserInternalAsync(ObjectMapper.Map<UserDto>(userToUpdate), _fusionAuthSettings);
+        //    return user != null;
+        //}
     }
 }

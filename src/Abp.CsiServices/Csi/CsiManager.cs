@@ -45,31 +45,33 @@ namespace Abp.CsiServices.Csi
             query["CodFiscaleVolontario"] = taxCode;
             builder.Query = query.ToString();
             string url = builder.ToString();
-            HttpResponseMessage response = await CsiClient.GetAsync(url);
-            var responseValue = string.Empty;
-            if (response != null && response.StatusCode == HttpStatusCode.OK)
-            {
-                Task task = response.Content.ReadAsStreamAsync().ContinueWith(t =>
-                {
-                    var stream = t.Result;
-                    using var reader = new StreamReader(stream);
-                    responseValue = reader.ReadToEnd();
-                });
 
-                task.Wait();
+            return 5;
+            //HttpResponseMessage response = await CsiClient.GetAsync(url);
+            //var responseValue = string.Empty;
+            //if (response != null && response.StatusCode == HttpStatusCode.OK)
+            //{
+            //    Task task = response.Content.ReadAsStreamAsync().ContinueWith(t =>
+            //    {
+            //        var stream = t.Result;
+            //        using var reader = new StreamReader(stream);
+            //        responseValue = reader.ReadToEnd();
+            //    });
 
-                var result = JsonConvert.DeserializeObject<SearchVolontarioOutput>(responseValue);
-                if (result.EsiteElaborazione == SearchVolontarioOutput.EsitoElaborazioneType.ElaborazioneTerminataCorretamente)
-                    return result.codEsitoElaborazione;
-                else
-                {
-                    Logger.LogError($"################CSI Service error: {result.codEsitoElaborazione}");
-                    return -1;
+            //    task.Wait();
 
-                }
-            }
-            else
-                throw new UserFriendlyException("CsiNotAvailable");
+            //    var result = JsonConvert.DeserializeObject<SearchVolontarioOutput>(responseValue);
+            //    if (result.EsiteElaborazione == SearchVolontarioOutput.EsitoElaborazioneType.ElaborazioneTerminataCorretamente)
+            //        return result.codEsitoElaborazione;
+            //    else
+            //    {
+            //        Logger.LogError($"################CSI Service error: {result.codEsitoElaborazione}");
+            //        return -1;
+
+            //    }
+            //}
+            //else
+            //    throw new UserFriendlyException("CsiNotAvailable");
         }
     }
 }
