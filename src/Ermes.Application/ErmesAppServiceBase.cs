@@ -80,7 +80,7 @@ namespace Ermes
                 if (!users_CanCreateCitizenOrPersonCrossOrganization)
                 {
                     //cannot edit people belonging to other organizations without the right permission
-                    if (_session.LoggedUserPerson.OrganizationId.HasValue && _session.LoggedUserPerson.OrganizationId.Value != organizationId)
+                    if (_session.LoggedUserPerson.OrganizationId.HasValue && _session.LoggedUserPerson.OrganizationId.Value != organizationId && _session.LoggedUserPerson.OrganizationId != org.ParentId)
                         throw new UserFriendlyException(L("Forbidden_DifferentOrganizations"));
 
                     if (personId.HasValue) //cannot edit other profiles without permissions

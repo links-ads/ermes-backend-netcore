@@ -163,9 +163,15 @@ namespace Ermes.Teams
                 }
             }
             else {
-                if (_session.LoggedUserPerson.OrganizationId != team.OrganizationId)
-                    throw new UserFriendlyException(L("InvalidOrganizationId"));
-                input.OrganizationId = _session.LoggedUserPerson.OrganizationId;
+                if (team.Organization != null)
+                {
+                    var organization = await _organizationManager.GetOrganizationByIdAsync(team.Organization.Id);
+                    if(organization == null)
+                        throw new UserFriendlyException(L("InvalidOrganizationId", team.Organization.Id));
+                    if (_session.LoggedUserPerson.OrganizationId != team.Organization.Id && _session.LoggedUserPerson.OrganizationId != team.Organization.ParentId)
+                        throw new UserFriendlyException(L("InvalidOrganizationId"));
+                    input.OrganizationId = organization.Id;
+                }
             }
 
             ObjectMapper.Map<TeamDto, Team>(input, team);
@@ -265,7 +271,7 @@ namespace Ermes.Teams
             Team team = _teamManager.GetTeamById(teamId);
             if (team == null)
                 throw new UserFriendlyException(L("InvalidEntityId", teamId, "Team"));
-            if (_session.LoggedUserPerson.OrganizationId.HasValue && _session.LoggedUserPerson.OrganizationId.Value != team.OrganizationId)
+            if (_session.LoggedUserPerson.OrganizationId.HasValue && _session.LoggedUserPerson.OrganizationId.Value != team.OrganizationId && _session.LoggedUserPerson.OrganizationId != team.Organization.ParentId)
                 throw new UserFriendlyException(L("EntityOutsideOrganization", team.Name));
 
             return team;

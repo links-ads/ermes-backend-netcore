@@ -78,6 +78,7 @@
     "CategoryImportIndexMustBeFirst": "Indeksitaulukon on oltava ensimmäisenä",
     "MissingField": "Missing field: {0}",
     "TimeWindowSizeError": "Reduce the size of the Time window",
-    "TimeWindowLimitError": "End date must be greater than Start date"
+    "TimeWindowLimitError": "End date must be greater than Start date",
+    "InvalidParentId": "Invalid Parent Id: {0}"
   }
 }

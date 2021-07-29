@@ -53,6 +53,9 @@ namespace Ermes.Organizations
             if (!_permissionChecker.IsGranted(_session.Roles, AppPermissions.Organizations.Organization_CanCreate))
                 throw new UserFriendlyException(L("MissingPermission", AppPermissions.Organizations.Organization_CanCreate));
 
+            if(! (await _organizationManager.CheckParent(newOrganization.ParentId)))
+                throw new UserFriendlyException(L("InvalidParentId", newOrganization.ParentId.Value));
+
             var newOrg = _objectMapper.Map<Organization>(newOrganization);
             
             var newOrgId = await _organizationManager.InsertOrganizationAsync(newOrg);
@@ -67,6 +70,9 @@ namespace Ermes.Organizations
                 if (!_permissionChecker.IsGranted(_session.Roles, AppPermissions.Organizations.Organization_CanUpdate) || _session.LoggedUserPerson.OrganizationId != updatedOrganization.Id)
                     throw new UserFriendlyException(L("MissingPermission", AppPermissions.Organizations.Organization_CanUpdate));
             }
+
+            if (!(await _organizationManager.CheckParent(updatedOrganization.ParentId)))
+                throw new UserFriendlyException(L("InvalidParentId", updatedOrganization.ParentId.Value));
 
             var org = await _organizationManager.GetOrganizationByIdAsync(updatedOrganization.Id);
 

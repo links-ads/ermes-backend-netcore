@@ -16,5 +16,7 @@ namespace Ermes.Organizations.Dto
         public string Description { get; set; }
         public string WebSite { get; set; }
         public string LogoUrl { get; set; }
+        public int? ParentId { get; set; }
+        public string ParentName { get; set; }
     }
 }
