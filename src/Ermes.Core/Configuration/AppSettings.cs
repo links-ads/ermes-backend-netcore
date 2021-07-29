@@ -13,6 +13,7 @@ namespace Ermes.Configuration
         public static class General
         {
             public const string Environment = "App.General.Environment";
+            public const string HouseOrganization = "App.General.HouseOrganization";
         }
     }
 }

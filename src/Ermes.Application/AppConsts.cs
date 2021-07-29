@@ -38,5 +38,9 @@ namespace Ermes
         /// </summary>
         public const string DefaultLanguage = "en";
 
+        public const string Ermes_Faster = "FASTER";
+        public const string Ermes_Shelter = "SHELTER";
+        public const string Ermes_Safers = "SAFERS";
+
     }
 }

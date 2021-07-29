@@ -74,7 +74,9 @@ namespace Ermes
                 var org = await _organizationManager.GetOrganizationByIdAsync(organizationId.Value);
                 if (org == null)
                     throw new UserFriendlyException(L("InvalidOrganizationId", organizationId));
-
+                
+                
+                //TODO: add here check for a self registered user
                 if (!users_CanCreateCitizenOrPersonCrossOrganization)
                 {
                     //cannot edit people belonging to other organizations without the right permission
@@ -107,6 +109,7 @@ namespace Ermes
             {
                 PersonId = person.Id,
                 IsFirstLogin = person.IsFirstLogin,
+                LegacyId = person.LegacyId,
                 User = ObjectMapper.Map<UserDto>(user)
             };
 
