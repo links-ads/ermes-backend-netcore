@@ -71,5 +71,15 @@ namespace Ermes.Categories
 
         [StringLength(MaxSubGroupKeyLength)]
         public string SubGroupKey { get; set; }
+
+        [Column("FieldType")]
+        public string FieldTypeString
+        {
+            get { return FieldType.ToString(); }
+            private set { FieldType = value.ParseEnum<FieldType>(); }
+        }
+
+        [NotMapped]
+        public FieldType FieldType { get; set; }
     }
 }

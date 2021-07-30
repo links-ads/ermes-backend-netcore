@@ -52,6 +52,8 @@
     <Compile Include="Migrations\20210720080458_Organization_Parent.Designer.cs" />
     <Compile Include="Migrations\20210729104918_Person_LegacyId_Added.cs" />
     <Compile Include="Migrations\20210729104918_Person_LegacyId_Added.Designer.cs" />
+    <Compile Include="Migrations\20210730075918_Category_FieldType_Added.cs" />
+    <Compile Include="Migrations\20210730075918_Category_FieldType_Added.Designer.cs" />
     <Compile Include="Migrations\ErmesDbContextModelSnapshot.cs" />
     <Compile Include="Migrations\Seed\ModelBuilderExtensions.cs" />
   </ItemGroup>
