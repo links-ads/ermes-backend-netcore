@@ -52,6 +52,8 @@ using io.fusionauth.domain.api;
 using Ermes.Import.Dto;
 using Ermes.Activations;
 using Ermes.Dashboard.Dto;
+using Ermes.Tips;
+using Ermes.Gamification.Dto;
 
 namespace Ermes
 {
@@ -62,6 +64,8 @@ namespace Ermes
             configuration.CreateMultiLingualMap<Activity, ActivityTranslation, ActivityDto>(context);
             configuration.CreateMultiLingualMap<Activity, ActivityTranslation, LocalizedActivityNameDto>(context);
             configuration.CreateMultiLingualMap<Category, CategoryTranslation, LocalizedCategoryValuesDto>(context);
+            configuration.CreateMultiLingualMap<Tip, TipTranslation, LocalizedTipValuesDto>(context);
+            configuration.CreateMultiLingualMap<Tip, TipTranslation, TipDto>(context);
             configuration.CreateMap<User, UserDto>()
                             .ReverseMap()
                             .ForMember(entity => entity.passwordChangeRequired, options => options.MapFrom(dto => false))

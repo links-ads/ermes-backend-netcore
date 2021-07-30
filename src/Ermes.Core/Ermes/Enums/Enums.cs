@@ -229,4 +229,27 @@ namespace Ermes.Enums
         Datetime,
         Boolean
     }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum CrisisPhaseType
+    {
+        None,
+        Prevention,
+        Preparedness,
+        Response,
+        PostEvent,
+        Environment
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum EventContextType
+    {
+        None,
+        Home,
+        Building,
+        InVehicle,
+        River,
+        Outdoor,
+        Everywhere
+    }
 }

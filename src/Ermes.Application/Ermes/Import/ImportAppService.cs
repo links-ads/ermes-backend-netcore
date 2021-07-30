@@ -36,6 +36,7 @@ using Ermes.Teams;
 using Microsoft.Extensions.Options;
 using FusionAuthNetCore;
 using io.fusionauth.domain;
+using Ermes.Tips;
 
 namespace Ermes.Import
 {
@@ -53,6 +54,7 @@ namespace Ermes.Import
         private readonly PersonManager _personManager;
         private readonly OrganizationManager _organizationManager;
         private readonly TeamManager _teamManager;
+        private readonly TipManager _tipManager;
         private readonly ErmesPermissionChecker _permissionChecker;
         private readonly IOptions<FusionAuthSettings> _fusionAuthSettings;
 
@@ -69,7 +71,8 @@ namespace Ermes.Import
             IBackgroundJobManager backgroundJobManager,
             IOptions<FusionAuthSettings> fusionAuthSettings,
             ErmesPermissionChecker permissionChecker,
-            ErmesAppSession session)
+            ErmesAppSession session,
+            TipManager tipManager)
         {
             _httpContextAccessor = httpContextAccessor;
             _appFolders = appFolders;
@@ -84,6 +87,7 @@ namespace Ermes.Import
             _teamManager = teamManager;
             _fusionAuthSettings = fusionAuthSettings;
             _permissionChecker = permissionChecker;
+            _tipManager = tipManager;
         }
 
         private async Task UploadImportSourceAndCleanup(IImportResourceContainer resourceContainer, bool success, IFormFile file, String tempFilePath)
@@ -234,7 +238,7 @@ namespace Ermes.Import
 
         [OpenApiOperation("Import Categories",
            @"
-                Import (creating or updating) a list of activities and relative translations.
+                Import (creating or updating) a list of categories and relative translations.
                 Input: attach as form-data an excel (.xls or .xlsx) file with the correct format
                 Output: An import result dto, containing a summary of insertions and updates
 s            "
@@ -283,6 +287,28 @@ s            "
 
                 return ObjectMapper.Map<ImportResultDto>(result);
             }, new ImportUsersResourceContainer(), AcceptedUsersSourceMimeTypes);
+        }
+
+        #endregion
+
+        #region Tips
+
+        private static readonly string[] AcceptedTipSourceMimeTypes = { MimeTypeNames.ApplicationVndMsExcel, MimeTypeNames.ApplicationVndOpenxmlformatsOfficedocumentSpreadsheetmlSheet };
+
+        [OpenApiOperation("Import Tips",
+           @"
+                Import (creating or updating) a list of tips and relative translations.
+                Input: attach as form-data an excel (.xls or .xlsx) file with the correct format
+                Output: An import result dto, containing a summary of insertions and updates
+s            "
+       )]
+        [ErmesAuthorize(AppPermissions.Imports.Import_Tips)]
+        public virtual async Task<ImportResultDto> ImportTips(IFormFile file)
+        {
+            return await LoadFileAndImport((filename, contentType) =>
+            {
+                return TipsImporter.ImportTipsAsync(filename, contentType, _tipManager, _localizer, CurrentUnitOfWork);
+            }, new ImportTipsResourceContainer(), AcceptedTipSourceMimeTypes);
         }
 
         #endregion

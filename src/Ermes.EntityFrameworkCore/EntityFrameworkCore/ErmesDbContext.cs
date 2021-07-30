@@ -29,6 +29,7 @@ using Ermes.EntityHistory;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Collections.Generic;
+using Ermes.Tips;
 
 namespace Ermes.EntityFrameworkCore
 {
@@ -57,6 +58,8 @@ namespace Ermes.EntityFrameworkCore
         public virtual DbSet<SplitEntityChange> EntityChange { get; set; }
         public virtual DbSet<SplitEntityChangeSet> EntityChangeSet { get; set; }
         public virtual DbSet<SplitEntityPropertyChange> EntityPropertyChange { get; set; }
+        public virtual DbSet<Tip> Tips { get; set; }
+        public virtual DbSet<TipTranslation> TipTranslations { get; set; }
         public IEntityHistoryHelper EntityHistoryHelper { get; set; }
 
         private readonly ErmesLocalizationHelper _localizer;
@@ -102,7 +105,7 @@ namespace Ermes.EntityFrameworkCore
             modelBuilder.Entity<Role>().HasIndex(r => r.Name).IsUnique(true);
             modelBuilder.Entity<Activity>().HasIndex(a => a.ShortName).IsUnique(true);
             modelBuilder.Entity<OrganizationCompetenceArea>().HasIndex(oca => new { oca.OrganizationId, oca.CompetenceAreaId }).IsUnique(true);
-
+            modelBuilder.Entity<Tip>().HasIndex(i => i.Code).IsUnique();
             #region EntityHistory
             modelBuilder.Entity<SplitEntityChange>().HasMany(e => e.PropertyChanges).WithOne().HasForeignKey(e => e.EntityChangeId);
             modelBuilder.Entity<SplitEntityChange>().HasIndex(e => e.EntityChangeSetId);

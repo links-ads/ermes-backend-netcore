@@ -16,6 +16,7 @@ namespace Ermes.Authorization
             public const string Import_Activities = "Import.Activities";
             public const string Import_CompetenceArea = "Import.CompetenceArea";
             public const string Import_Categories = "Import.Categories";
+            public const string Import_Tips = "Import.Tips";
             public const string Import_Users = "Import.Users";
         }
 
