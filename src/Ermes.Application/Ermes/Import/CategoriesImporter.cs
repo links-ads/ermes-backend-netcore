@@ -177,6 +177,7 @@ namespace Ermes.Import
                         cat.TargetKey = row.GetEnum<TargetType>("Target Key");
                         cat.GroupKey = row.GetString("Group Key");
                         cat.SubGroupKey = row.GetString("SubGroup Key");
+                        cat.FieldType = row.GetEnum<FieldType>("Field Type");
 
                         await categoryManager.InsertOrUpdateCategoryAsync(cat);
                         context.SaveChanges();

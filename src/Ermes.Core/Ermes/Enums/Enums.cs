@@ -218,4 +218,15 @@ namespace Ermes.Enums
         Audio,
         File
     }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum FieldType
+    {
+        None,
+        Int,
+        Decimal,
+        String,
+        Datetime,
+        Boolean
+    }
 }
