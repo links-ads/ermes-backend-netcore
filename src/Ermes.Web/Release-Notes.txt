@@ -1,4 +1,8 @@
 Ver.
+--------------------------
+
+
+Ver. 2.0.0 - 2021-07-30
 ---------------------------
 - Bugfix - Set default role for new users (#33)
 - Bugfix - Search filter case insensitive (#35)
