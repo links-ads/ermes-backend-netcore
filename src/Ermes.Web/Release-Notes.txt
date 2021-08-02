@@ -1,6 +1,6 @@
 Ver.
 --------------------------
-
+- Feature - Tips management added (migration added)(#27)
 
 Ver. 2.0.0 - 2021-07-30
 ---------------------------
