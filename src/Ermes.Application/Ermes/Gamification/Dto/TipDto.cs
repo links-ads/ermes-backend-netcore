@@ -10,5 +10,6 @@ namespace Ermes.Gamification.Dto
         public string Text { get; set; }
         public string CrisisPhase { get; set; }
         public string EventContext { get; set; }
+        public string Hazard { get; set; }
     }
 }
