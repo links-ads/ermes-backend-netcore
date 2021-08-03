@@ -55,5 +55,6 @@ namespace Ermes.Tips
         public string Url { get; set; }
 
         public virtual ICollection<TipTranslation> Translations { get; set; }
+        public virtual ICollection<Quiz> Quizzes { get; set; }
     }
 }

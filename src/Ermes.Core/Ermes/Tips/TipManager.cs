@@ -11,7 +11,8 @@ namespace Ermes.Tips
 {
     public class TipManager : DomainService
     {
-        public IQueryable<Tip> Tips { get { return TipRepository.GetAllIncluding(c => c.Translations); } }
+        public IQueryable<Tip> Tips { get { return TipRepository.GetAll().Include(c => c.Translations).Include(t => t.Quizzes).ThenInclude(q => q.Translations); } }
+        //public IQueryable<Tip> Tips { get { return TipRepository.GetAllIncluding(c => c.Translations); } }
         protected IRepository<Tip> TipRepository { get; set; }
         public IQueryable<TipTranslation> TipsTranslation { get { return TipTranslationRepository.GetAllIncluding(ct => ct.Core); } }
         protected IRepository<TipTranslation> TipTranslationRepository { get; set; }

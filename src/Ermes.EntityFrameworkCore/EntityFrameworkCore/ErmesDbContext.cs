@@ -114,11 +114,19 @@ namespace Ermes.EntityFrameworkCore
             modelBuilder.Entity<TipTranslation>().HasIndex(i => new { i.CoreId, i.Language }).IsUnique();
             modelBuilder.Entity<Quiz>()
                 .HasOne<Tip>(q => q.Tip)
-                .WithOne()
-                .HasPrincipalKey<Tip>(t => t.Code)
-                .HasForeignKey<Quiz>(t => t.TipCode)
+                .WithMany(t => t.Quizzes)
+                .HasPrincipalKey(t => t.Code)
+                .HasForeignKey(t => t.TipCode)
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            //modelBuilder.Entity<Tip>()
+            //    .HasMany<Quiz>(t => t.Quizzes)
+            //    .WithOne()
+            //    .HasPrincipalKey(t => t.Code)
+            //    .HasForeignKey(q => q.TipCode)
+            //    .IsRequired(false)
+            //    .OnDelete(DeleteBehavior.Restrict);
 
             #region EntityHistory
             modelBuilder.Entity<SplitEntityChange>().HasMany(e => e.PropertyChanges).WithOne().HasForeignKey(e => e.EntityChangeId);
