@@ -1,5 +1,6 @@
 ﻿using Abp.Application.Services.Dto;
 using Abp.Linq.Extensions;
+using Ermes.Answers;
 using Ermes.Attributes;
 using Ermes.Dto.Datatable;
 using Ermes.Gamification.Dto;
@@ -18,13 +19,16 @@ namespace Ermes.Gamification
     {
         private readonly TipManager _tipManager;
         private readonly QuizManager _quizManager;
+        private readonly AnswerManager _answerManager;
         public GamificationAppService(
                 TipManager tipManager,
-                QuizManager quizManager
+                QuizManager quizManager,
+                AnswerManager answerManager
             )
         {
             _tipManager = tipManager;
             _quizManager = quizManager;
+            _answerManager = answerManager;
         }
 
         #region Private
@@ -85,6 +89,29 @@ namespace Ermes.Gamification
             result.Items = ObjectMapper.Map<List<QuizDto>>(items);
             return result;
         }
+
+        private async Task<PagedResultDto<AnswerDto>> InternalGetAnswers(GetAnswersInput input)
+        {
+            PagedResultDto<AnswerDto> result = new PagedResultDto<AnswerDto>();
+            IQueryable<Answer> query = _answerManager.Answers;
+
+            result.TotalCount = await query.CountAsync();
+
+            if (input?.Order != null && input.Order.Count == 0)
+            {
+                query = query.OrderByDescending(a => a.Code);
+                query = query.PageBy(input);
+            }
+            else
+            {
+                query = query.DTOrderedBy(input)
+                    .PageBy(input);
+            }
+
+            var items = await query.ToListAsync();
+            result.Items = ObjectMapper.Map<List<AnswerDto>>(items);
+            return result;
+        }
         #endregion
 
 
@@ -99,6 +126,12 @@ namespace Ermes.Gamification
         {
             PagedResultDto<QuizDto> result = await InternalGetQuizzes(input);
             return new DTResult<QuizDto>(input.Draw, result.TotalCount, result.Items.Count, result.Items.ToList());
+        }
+
+        public virtual async Task<DTResult<AnswerDto>> GetAnswers(GetAnswersInput input)
+        {
+            PagedResultDto<AnswerDto> result = await InternalGetAnswers(input);
+            return new DTResult<AnswerDto>(input.Draw, result.TotalCount, result.Items.Count, result.Items.ToList());
         }
     }
 }

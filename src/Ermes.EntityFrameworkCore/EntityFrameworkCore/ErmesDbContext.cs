@@ -31,6 +31,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Collections.Generic;
 using Ermes.Tips;
 using Ermes.Quizzes;
+using Ermes.Answers;
 
 namespace Ermes.EntityFrameworkCore
 {
@@ -62,7 +63,9 @@ namespace Ermes.EntityFrameworkCore
         public virtual DbSet<Tip> Tips { get; set; }
         public virtual DbSet<TipTranslation> TipTranslations { get; set; }
         public virtual DbSet<Quiz> Quizzes { get; set; }
-        public virtual DbSet<QuizTranslation> QuizTranslations { get; set; }
+        public virtual DbSet<QuizTranslation> QuizTranslations { get; set; }        
+        public virtual DbSet<Answer> Answers { get; set; }
+        public virtual DbSet<AnswerTranslation> AnswerTranslations { get; set; }
         public IEntityHistoryHelper EntityHistoryHelper { get; set; }
 
         private readonly ErmesLocalizationHelper _localizer;
@@ -110,8 +113,10 @@ namespace Ermes.EntityFrameworkCore
             modelBuilder.Entity<OrganizationCompetenceArea>().HasIndex(oca => new { oca.OrganizationId, oca.CompetenceAreaId }).IsUnique(true);
             modelBuilder.Entity<Tip>().HasIndex(i => i.Code).IsUnique();
             modelBuilder.Entity<Quiz>().HasIndex(i => i.Code).IsUnique();
+            modelBuilder.Entity<Answer>().HasIndex(i => i.Code).IsUnique();
             modelBuilder.Entity<QuizTranslation>().HasIndex(i => new { i.CoreId, i.Language }).IsUnique();
             modelBuilder.Entity<TipTranslation>().HasIndex(i => new { i.CoreId, i.Language }).IsUnique();
+            modelBuilder.Entity<AnswerTranslation>().HasIndex(i => new { i.CoreId, i.Language }).IsUnique();
             modelBuilder.Entity<Quiz>()
                 .HasOne<Tip>(q => q.Tip)
                 .WithMany(t => t.Quizzes)
@@ -120,13 +125,13 @@ namespace Ermes.EntityFrameworkCore
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            //modelBuilder.Entity<Tip>()
-            //    .HasMany<Quiz>(t => t.Quizzes)
-            //    .WithOne()
-            //    .HasPrincipalKey(t => t.Code)
-            //    .HasForeignKey(q => q.TipCode)
-            //    .IsRequired(false)
-            //    .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Answer>()
+                .HasOne<Quiz>(a => a.Quiz)
+                .WithMany(t => t.Answers)
+                .HasPrincipalKey(q => q.Code)
+                .HasForeignKey(a => a.QuizCode)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
 
             #region EntityHistory
             modelBuilder.Entity<SplitEntityChange>().HasMany(e => e.PropertyChanges).WithOne().HasForeignKey(e => e.EntityChangeId);

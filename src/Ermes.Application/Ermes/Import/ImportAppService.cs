@@ -38,6 +38,7 @@ using FusionAuthNetCore;
 using io.fusionauth.domain;
 using Ermes.Tips;
 using Ermes.Quizzes;
+using Ermes.Answers;
 
 namespace Ermes.Import
 {
@@ -57,6 +58,7 @@ namespace Ermes.Import
         private readonly TeamManager _teamManager;
         private readonly TipManager _tipManager;
         private readonly QuizManager _quizManager;
+        private readonly AnswerManager _answerManager;
         private readonly ErmesPermissionChecker _permissionChecker;
         private readonly IOptions<FusionAuthSettings> _fusionAuthSettings;
 
@@ -75,7 +77,8 @@ namespace Ermes.Import
             ErmesPermissionChecker permissionChecker,
             ErmesAppSession session,
             TipManager tipManager,
-            QuizManager quizManager)
+            QuizManager quizManager,
+            AnswerManager answerManager)
         {
             _httpContextAccessor = httpContextAccessor;
             _appFolders = appFolders;
@@ -92,6 +95,7 @@ namespace Ermes.Import
             _permissionChecker = permissionChecker;
             _tipManager = tipManager;
             _quizManager = quizManager;
+            _answerManager = answerManager;
         }
 
         private async Task UploadImportSourceAndCleanup(IImportResourceContainer resourceContainer, bool success, IFormFile file, String tempFilePath)
@@ -320,9 +324,9 @@ s            "
         #region Quizzes
 
 
-        [OpenApiOperation("Import Tips",
+        [OpenApiOperation("Import Quizzes",
            @"
-                Import (creating or updating) a list of tips and relative translations.
+                Import (creating or updating) a list of quizzes and relative translations.
                 Input: attach as form-data an excel (.xls or .xlsx) file with the correct format
                 Output: An import result dto, containing a summary of insertions and updates
 s            "
@@ -334,6 +338,26 @@ s            "
             {
                 return QuizzesImporter.ImportQuizzesAsync(filename, contentType, _quizManager, _localizer, CurrentUnitOfWork);
             }, new ImportQuizzesResourceContainer(), AcceptedGamificationSourceMimeTypes);
+        }
+
+        #endregion
+
+        #region Answers
+
+        [OpenApiOperation("Import Answers",
+           @"
+                Import (creating or updating) a list of answers and relative translations.
+                Input: attach as form-data an excel (.xls or .xlsx) file with the correct format
+                Output: An import result dto, containing a summary of insertions and updates
+s            "
+       )]
+        [ErmesAuthorize(AppPermissions.Imports.Import_Gamification)]
+        public virtual async Task<ImportResultDto> ImportAnswers(IFormFile file)
+        {
+            return await LoadFileAndImport((filename, contentType) =>
+            {
+                return AnswersImporter.ImportAnswersAsync(filename, contentType, _answerManager, _localizer, CurrentUnitOfWork);
+            }, new ImportAnswersResourceContainer(), AcceptedGamificationSourceMimeTypes);
         }
 
         #endregion

@@ -11,7 +11,12 @@ namespace Ermes.Quizzes
 {
     public class QuizManager: DomainService
     {
-        public IQueryable<Quiz> Quizzes { get { return QuizRepository.GetAll().Include(c => c.Translations).Include(q => q.Tip).ThenInclude(t => t.Translations); } }
+        public IQueryable<Quiz> Quizzes { get { return QuizRepository
+                                                        .GetAll()
+                                                        .Include(c => c.Translations)
+                                                        .Include(c => c.Answers)
+                                                        .ThenInclude(a => a.Translations)
+                                                        .Include(q => q.Tip).ThenInclude(t => t.Translations); } }
         protected IRepository<Quiz> QuizRepository { get; set; }
         public IQueryable<QuizTranslation> QuizTranslations { get { return QuizTranslationRepository.GetAllIncluding(ct => ct.Core); } }
         protected IRepository<QuizTranslation> QuizTranslationRepository { get; set; }

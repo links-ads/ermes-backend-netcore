@@ -12,5 +12,6 @@ namespace Ermes.Gamification.Dto
         public string Hazard { get; set; }
         public string Difficulty { get; set; }
         public TipDto Tip { get; set; }
+        public List<AnswerDto> Answers { get; set; }
     }
 }
