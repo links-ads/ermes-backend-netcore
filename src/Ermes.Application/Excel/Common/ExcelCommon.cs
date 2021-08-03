@@ -36,6 +36,14 @@ namespace Ermes.Excel.Common
             {
                 return GetString(columnName).ParseEnum<T>();
             }
+            bool GetBoolean(string columnName)
+            {
+                string value = GetString(columnName);
+                if (!Boolean.TryParse(value, out bool result))
+                    return value == "1";
+                else
+                    return result;
+            }
         }
 
         #region Excel

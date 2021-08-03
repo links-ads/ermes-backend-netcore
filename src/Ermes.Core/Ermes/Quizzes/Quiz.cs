@@ -1,4 +1,5 @@
 ﻿using Abp.Domain.Entities;
+using Ermes.Answers;
 using Ermes.Enums;
 using Ermes.Helpers;
 using Ermes.Tips;
@@ -67,6 +68,7 @@ namespace Ermes.Quizzes
         [NotMapped]
         public DifficultyType DifficultyKey { get; set; }
 
+        public virtual ICollection<Answer> Answers { get; set; }
         public virtual ICollection<QuizTranslation> Translations { get; set; }
     }
 }

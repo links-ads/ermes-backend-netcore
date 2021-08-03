@@ -20,6 +20,7 @@ namespace Ermes.Resources
         private const string ImportCategories_Container_Name = "import-categories";
         private const string ImportTips_Container_Name = "import-tips";
         private const string ImportQuizzes_Container_Name = "import-quizzes";
+        private const string ImportAnswers_Container_Name = "import-answers";
         private const string ImportUsers_Container_Name = "import-users";
         private static string baseResourcesUrl = string.Empty;
         private static readonly Lazy<IAzureConnectionProvider> _connectionProvider;
@@ -120,21 +121,24 @@ namespace Ermes.Resources
         {
             public string ContainerName { get { return ImportUsers_Container_Name; } }
             public string FileNameBase { get { return "users-"; } }
-
         }
 
         public class ImportTipsResourceContainer : IImportResourceContainer
         {
             public string ContainerName { get { return ImportTips_Container_Name; } }
             public string FileNameBase { get { return "tips-"; } }
-
         }
 
         public class ImportQuizzesResourceContainer : IImportResourceContainer
         {
             public string ContainerName { get { return ImportQuizzes_Container_Name; } }
             public string FileNameBase { get { return "quizzes-"; } }
+        }
 
+        public class ImportAnswersResourceContainer : IImportResourceContainer
+        {
+            public string ContainerName { get { return ImportAnswers_Container_Name; } }
+            public string FileNameBase { get { return "answers-"; } }
         }
 
         private static string GetBaseResourcesUrl()

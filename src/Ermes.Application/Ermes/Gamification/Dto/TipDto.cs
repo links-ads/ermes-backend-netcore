@@ -6,6 +6,7 @@ namespace Ermes.Gamification.Dto
 {
     public class TipDto
     {
+        public string Code { get; set; }
         public string Title { get; set; }
         public string Text { get; set; }
         public string CrisisPhase { get; set; }
