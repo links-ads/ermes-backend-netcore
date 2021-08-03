@@ -252,4 +252,12 @@ namespace Ermes.Enums
         Outdoor,
         Everywhere
     }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum DifficultyType
+    {
+        Low,
+        Medium,
+        High
+    }
 }

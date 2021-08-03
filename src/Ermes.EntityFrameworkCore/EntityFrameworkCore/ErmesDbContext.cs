@@ -30,6 +30,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Collections.Generic;
 using Ermes.Tips;
+using Ermes.Quizzes;
 
 namespace Ermes.EntityFrameworkCore
 {
@@ -60,6 +61,8 @@ namespace Ermes.EntityFrameworkCore
         public virtual DbSet<SplitEntityPropertyChange> EntityPropertyChange { get; set; }
         public virtual DbSet<Tip> Tips { get; set; }
         public virtual DbSet<TipTranslation> TipTranslations { get; set; }
+        public virtual DbSet<Quiz> Quizzes { get; set; }
+        public virtual DbSet<QuizTranslation> QuizTranslations { get; set; }
         public IEntityHistoryHelper EntityHistoryHelper { get; set; }
 
         private readonly ErmesLocalizationHelper _localizer;
@@ -106,6 +109,17 @@ namespace Ermes.EntityFrameworkCore
             modelBuilder.Entity<Activity>().HasIndex(a => a.ShortName).IsUnique(true);
             modelBuilder.Entity<OrganizationCompetenceArea>().HasIndex(oca => new { oca.OrganizationId, oca.CompetenceAreaId }).IsUnique(true);
             modelBuilder.Entity<Tip>().HasIndex(i => i.Code).IsUnique();
+            modelBuilder.Entity<Quiz>().HasIndex(i => i.Code).IsUnique();
+            modelBuilder.Entity<QuizTranslation>().HasIndex(i => new { i.CoreId, i.Language }).IsUnique();
+            modelBuilder.Entity<TipTranslation>().HasIndex(i => new { i.CoreId, i.Language }).IsUnique();
+            modelBuilder.Entity<Quiz>()
+                .HasOne<Tip>(q => q.Tip)
+                .WithOne()
+                .HasPrincipalKey<Tip>(t => t.Code)
+                .HasForeignKey<Quiz>(t => t.TipCode)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
+
             #region EntityHistory
             modelBuilder.Entity<SplitEntityChange>().HasMany(e => e.PropertyChanges).WithOne().HasForeignKey(e => e.EntityChangeId);
             modelBuilder.Entity<SplitEntityChange>().HasIndex(e => e.EntityChangeSetId);

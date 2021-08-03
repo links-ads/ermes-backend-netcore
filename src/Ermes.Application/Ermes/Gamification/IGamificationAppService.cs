@@ -11,5 +11,6 @@ namespace Ermes.Gamification
     public interface IGamificationAppService: IApplicationService
     {
         Task<DTResult<TipDto>> GetTips(GetTipsInput input);
+        Task<DTResult<QuizDto>> GetQuizzes(GetQuizzesInput input);
     }
 }

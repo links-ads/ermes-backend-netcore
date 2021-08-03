@@ -1,23 +1,27 @@
 ﻿using Abp.Domain.Entities;
 using Ermes.Enums;
 using Ermes.Helpers;
-using Ermes.Quizzes;
+using Ermes.Tips;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
-namespace Ermes.Tips
+namespace Ermes.Quizzes
 {
-    [Table("tips")]
-    public class Tip : Entity, IMultiLingualEntity<TipTranslation>
+    [Table("quizzes")]
+    public class Quiz : Entity, IMultiLingualEntity<QuizTranslation>
     {
         public const int MaxCodeLength = 10;
 
         [Required]
         [StringLength(MaxCodeLength)]
         public string Code { get; set; }
+
+
+        public virtual Tip Tip { get; set; }
+        public string TipCode { get; set; }
 
         [Required]
         [Column("Hazard")]
@@ -52,8 +56,18 @@ namespace Ermes.Tips
         [NotMapped]
         public EventContextType EventContextKey { get; set; }
 
-        public string Url { get; set; }
+        [Required]
+        [Column("Difficulty")]
+        public string DifficultyKeyString
+        {
+            get { return DifficultyKey.ToString(); }
+            private set { DifficultyKey = value.ParseEnum<DifficultyType>(); }
+        }
 
-        public virtual ICollection<TipTranslation> Translations { get; set; }
+        [NotMapped]
+        public DifficultyType DifficultyKey { get; set; }
+
+        public virtual ICollection<QuizTranslation> Translations { get; set; }
+
     }
 }

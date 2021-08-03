@@ -37,6 +37,7 @@ using Microsoft.Extensions.Options;
 using FusionAuthNetCore;
 using io.fusionauth.domain;
 using Ermes.Tips;
+using Ermes.Quizzes;
 
 namespace Ermes.Import
 {
@@ -55,6 +56,7 @@ namespace Ermes.Import
         private readonly OrganizationManager _organizationManager;
         private readonly TeamManager _teamManager;
         private readonly TipManager _tipManager;
+        private readonly QuizManager _quizManager;
         private readonly ErmesPermissionChecker _permissionChecker;
         private readonly IOptions<FusionAuthSettings> _fusionAuthSettings;
 
@@ -72,7 +74,8 @@ namespace Ermes.Import
             IOptions<FusionAuthSettings> fusionAuthSettings,
             ErmesPermissionChecker permissionChecker,
             ErmesAppSession session,
-            TipManager tipManager)
+            TipManager tipManager,
+            QuizManager quizManager)
         {
             _httpContextAccessor = httpContextAccessor;
             _appFolders = appFolders;
@@ -88,6 +91,7 @@ namespace Ermes.Import
             _fusionAuthSettings = fusionAuthSettings;
             _permissionChecker = permissionChecker;
             _tipManager = tipManager;
+            _quizManager = quizManager;
         }
 
         private async Task UploadImportSourceAndCleanup(IImportResourceContainer resourceContainer, bool success, IFormFile file, String tempFilePath)
@@ -291,9 +295,9 @@ s            "
 
         #endregion
 
-        #region Tips
+        private static readonly string[] AcceptedGamificationSourceMimeTypes = { MimeTypeNames.ApplicationVndMsExcel, MimeTypeNames.ApplicationVndOpenxmlformatsOfficedocumentSpreadsheetmlSheet };
 
-        private static readonly string[] AcceptedTipSourceMimeTypes = { MimeTypeNames.ApplicationVndMsExcel, MimeTypeNames.ApplicationVndOpenxmlformatsOfficedocumentSpreadsheetmlSheet };
+        #region Tips
 
         [OpenApiOperation("Import Tips",
            @"
@@ -302,13 +306,34 @@ s            "
                 Output: An import result dto, containing a summary of insertions and updates
 s            "
        )]
-        [ErmesAuthorize(AppPermissions.Imports.Import_Tips)]
+        [ErmesAuthorize(AppPermissions.Imports.Import_Gamification)]
         public virtual async Task<ImportResultDto> ImportTips(IFormFile file)
         {
             return await LoadFileAndImport((filename, contentType) =>
             {
                 return TipsImporter.ImportTipsAsync(filename, contentType, _tipManager, _localizer, CurrentUnitOfWork);
-            }, new ImportTipsResourceContainer(), AcceptedTipSourceMimeTypes);
+            }, new ImportTipsResourceContainer(), AcceptedGamificationSourceMimeTypes);
+        }
+
+        #endregion
+
+        #region Quizzes
+
+
+        [OpenApiOperation("Import Tips",
+           @"
+                Import (creating or updating) a list of tips and relative translations.
+                Input: attach as form-data an excel (.xls or .xlsx) file with the correct format
+                Output: An import result dto, containing a summary of insertions and updates
+s            "
+       )]
+        [ErmesAuthorize(AppPermissions.Imports.Import_Gamification)]
+        public virtual async Task<ImportResultDto> ImportQuizzes(IFormFile file)
+        {
+            return await LoadFileAndImport((filename, contentType) =>
+            {
+                return QuizzesImporter.ImportQuizzesAsync(filename, contentType, _quizManager, _localizer, CurrentUnitOfWork);
+            }, new ImportQuizzesResourceContainer(), AcceptedGamificationSourceMimeTypes);
         }
 
         #endregion

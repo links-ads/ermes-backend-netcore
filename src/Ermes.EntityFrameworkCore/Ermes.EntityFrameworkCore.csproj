@@ -56,6 +56,8 @@
     <Compile Include="Migrations\20210730075918_Category_FieldType_Added.Designer.cs" />
     <Compile Include="Migrations\20210730121437_Tips_Added.cs" />
     <Compile Include="Migrations\20210730121437_Tips_Added.Designer.cs" />
+    <Compile Include="Migrations\20210802154253_Quizzes_Added.cs" />
+    <Compile Include="Migrations\20210802154253_Quizzes_Added.Designer.cs" />
     <Compile Include="Migrations\ErmesDbContextModelSnapshot.cs" />
     <Compile Include="Migrations\Seed\ModelBuilderExtensions.cs" />
   </ItemGroup>
