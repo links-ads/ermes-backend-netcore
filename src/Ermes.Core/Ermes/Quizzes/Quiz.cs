@@ -68,6 +68,5 @@ namespace Ermes.Quizzes
         public DifficultyType DifficultyKey { get; set; }
 
         public virtual ICollection<QuizTranslation> Translations { get; set; }
-
     }
 }
