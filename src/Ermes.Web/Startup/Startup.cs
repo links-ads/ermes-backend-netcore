@@ -62,6 +62,7 @@ namespace Ermes.Web.Startup
             }).AddNewtonsoftJson(options =>
             {
                 options.SerializerSettings.Converters.Add(new GeometryJsonConverter());
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
             });
 
             AuthConfigurer.Configure(services, _appConfiguration);

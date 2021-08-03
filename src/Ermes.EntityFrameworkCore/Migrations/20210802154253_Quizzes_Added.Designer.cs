@@ -5,6 +5,7 @@ using Ermes.EntityFrameworkCore;
 using Ermes.Reports;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -13,9 +14,10 @@ using NpgsqlTypes;
 namespace Ermes.Migrations
 {
     [DbContext(typeof(ErmesDbContext))]
-    partial class ErmesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210802154253_Quizzes_Added")]
+    partial class Quizzes_Added
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -823,7 +825,8 @@ namespace Ermes.Migrations
                     b.HasIndex("Code")
                         .IsUnique();
 
-                    b.HasIndex("TipCode");
+                    b.HasIndex("TipCode")
+                        .IsUnique();
 
                     b.ToTable("quizzes");
                 });
@@ -1345,9 +1348,9 @@ namespace Ermes.Migrations
             modelBuilder.Entity("Ermes.Quizzes.Quiz", b =>
                 {
                     b.HasOne("Ermes.Tips.Tip", "Tip")
-                        .WithMany("Quizzes")
-                        .HasForeignKey("TipCode")
-                        .HasPrincipalKey("Code")
+                        .WithOne()
+                        .HasForeignKey("Ermes.Quizzes.Quiz", "TipCode")
+                        .HasPrincipalKey("Ermes.Tips.Tip", "Code")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 

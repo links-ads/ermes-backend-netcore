@@ -5,6 +5,7 @@ using Ermes.EntityFrameworkCore;
 using Ermes.Reports;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -13,9 +14,10 @@ using NpgsqlTypes;
 namespace Ermes.Migrations
 {
     [DbContext(typeof(ErmesDbContext))]
-    partial class ErmesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210730121437_Tips_Added")]
+    partial class Tips_Added
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -783,92 +785,6 @@ namespace Ermes.Migrations
                     b.ToTable("preferences");
                 });
 
-            modelBuilder.Entity("Ermes.Quizzes.Quiz", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasColumnType("character varying(10)")
-                        .HasMaxLength(10);
-
-                    b.Property<string>("CrisisPhaseKeyString")
-                        .IsRequired()
-                        .HasColumnName("CrisisPhase")
-                        .HasColumnType("text");
-
-                    b.Property<string>("DifficultyKeyString")
-                        .IsRequired()
-                        .HasColumnName("Difficulty")
-                        .HasColumnType("text");
-
-                    b.Property<string>("EventContextKeyString")
-                        .IsRequired()
-                        .HasColumnName("EventContext")
-                        .HasColumnType("text");
-
-                    b.Property<string>("HazardString")
-                        .IsRequired()
-                        .HasColumnName("Hazard")
-                        .HasColumnType("text");
-
-                    b.Property<string>("TipCode")
-                        .HasColumnType("character varying(10)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Code")
-                        .IsUnique();
-
-                    b.HasIndex("TipCode");
-
-                    b.ToTable("quizzes");
-                });
-
-            modelBuilder.Entity("Ermes.Quizzes.QuizTranslation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<int>("CoreId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("CrisisPhase")
-                        .IsRequired()
-                        .HasColumnType("character varying(50)")
-                        .HasMaxLength(50);
-
-                    b.Property<string>("Difficulty")
-                        .IsRequired()
-                        .HasColumnType("character varying(50)")
-                        .HasMaxLength(50);
-
-                    b.Property<string>("EventContext")
-                        .IsRequired()
-                        .HasColumnType("character varying(50)")
-                        .HasMaxLength(50);
-
-                    b.Property<string>("Language")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Text")
-                        .IsRequired()
-                        .HasColumnType("character varying(1000)")
-                        .HasMaxLength(1000);
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CoreId", "Language")
-                        .IsUnique();
-
-                    b.ToTable("quiz_translations");
-                });
-
             modelBuilder.Entity("Ermes.ReportRequests.ReportRequest", b =>
                 {
                     b.Property<int>("Id")
@@ -1127,8 +1043,7 @@ namespace Ermes.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CoreId", "Language")
-                        .IsUnique();
+                    b.HasIndex("CoreId");
 
                     b.ToTable("tip_translations");
                 });
@@ -1339,24 +1254,6 @@ namespace Ermes.Migrations
                         .WithOne()
                         .HasForeignKey("Ermes.Preferences.Preference", "PreferenceOwnerId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Ermes.Quizzes.Quiz", b =>
-                {
-                    b.HasOne("Ermes.Tips.Tip", "Tip")
-                        .WithMany("Quizzes")
-                        .HasForeignKey("TipCode")
-                        .HasPrincipalKey("Code")
-                        .OnDelete(DeleteBehavior.Restrict);
-                });
-
-            modelBuilder.Entity("Ermes.Quizzes.QuizTranslation", b =>
-                {
-                    b.HasOne("Ermes.Quizzes.Quiz", "Core")
-                        .WithMany("Translations")
-                        .HasForeignKey("CoreId")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
