@@ -208,6 +208,7 @@ namespace Ermes.Web.Controllers
                     if (cat == null)
                         return "InvalidCategory";
 
+                    bool res;
                     switch (cat.Type)
                     {
                         case CategoryType.Range:
@@ -216,11 +217,43 @@ namespace Ermes.Web.Controllers
                                 return "InvalidCategoryRangeValue";
                             break;
                         case CategoryType.Numeric:
-                            var res = float.TryParse(item.Value, out float numericValue);
-                            if (!res)
-                                return "InvalidCategoryNumericValue";
-                            if (cat.MinValue > numericValue || cat.MaxValue < numericValue)
-                                return "InvalidCategoryNumericValue";
+                            switch (cat.FieldType)
+                            {
+                                case FieldType.None:
+                                    break;
+                                case FieldType.Int:
+                                    res = int.TryParse(item.Value, out int intValue);
+                                    if (!res)
+                                        return "InvalidCategoryNumericIntValue";
+                                    if (int.Parse(cat.MinValue) > intValue || int.Parse(cat.MaxValue) < intValue)
+                                        return "InvalidCategoryNumericIntValue";
+                                    break;
+                                case FieldType.Decimal:
+                                    res = decimal.TryParse(item.Value, out decimal decimalValue);
+                                    if (!res)
+                                        return "InvalidCategoryNumericDecimalValue";
+                                    if (decimal.Parse(cat.MinValue) > decimalValue || decimal.Parse(cat.MaxValue) < decimalValue)
+                                        return "InvalidCategoryNumericDecimalValue";
+                                    break;
+                                case FieldType.String:
+                                    break;
+                                case FieldType.Datetime:
+                                    res = DateTime.TryParse(item.Value, out DateTime dateValue);
+                                    if (!res)
+                                        return "InvalidCategoryNumericDateValue";
+                                    if (DateTime.Parse(cat.MinValue) > dateValue || DateTime.Parse(cat.MaxValue) < dateValue)
+                                        return "InvalidCategoryNumericDateValue";
+                                    break;
+                                case FieldType.Boolean:
+                                    res = bool.TryParse(item.Value, out bool boolValue);
+                                    if (!res)
+                                        return "InvalidCategoryNumericBoolValue";
+                                    if (bool.Parse(cat.MinValue) != boolValue && bool.Parse(cat.MaxValue) != boolValue)
+                                        return "InvalidCategoryNumericBoolValue";
+                                    break;
+                                default:
+                                    break;
+                            }
                             break;
                         default:
                             break;

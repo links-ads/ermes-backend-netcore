@@ -24,8 +24,8 @@ namespace Ermes.Reports.Dto
         public string Code { get; set; }
         public string GroupCode { get; set; }
         public string UnitOfMeasure { get; set; }
-        public int MinValue { get; set; }
-        public int MaxValue { get; set; }
+        public string MinValue { get; set; }
+        public string MaxValue { get; set; }
         public string[] Values { get; set; }
         public string GroupIcon { get; set; }
         public FieldType FieldType { get; set; }

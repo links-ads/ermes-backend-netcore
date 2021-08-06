@@ -80,8 +80,8 @@ namespace Ermes.Import
                         cat.Code = row.GetString("Code");
                         cat.GroupCode = row.GetString("GroupCode");
                         cat.Hazard = row.GetEnum<HazardType>("Hazard");
-                        cat.MaxValue = row.GetInt("Max Value");
-                        cat.MinValue = row.GetInt("Min Value");
+                        cat.MaxValue = row.GetString("Max Value");
+                        cat.MinValue = row.GetString("Min Value");
                         cat.Type = row.GetEnum<CategoryType>("Type");
                         cat.GroupIcon = row.GetString("Group Icon");
                         cat.TargetKey = row.GetEnum<TargetType>("Target Key");
