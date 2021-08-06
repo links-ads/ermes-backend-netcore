@@ -1,5 +1,9 @@
 Ver.
 --------------------------
+
+
+Ver. 2.1.0 - 2021-08-05
+--------------------------
 - Feature - Tips management added (migration added)(#27)
 - Feature - Quizzes management added (migration added)(#41)
 - Feature - Answers management added (migration added)(#42)
