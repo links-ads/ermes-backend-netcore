@@ -91,7 +91,7 @@ namespace Ermes.GeoJson
         //}
 
 
-        public string GetGeoJsonCollection(DateTime StartDate, DateTime EndDate, Geometry BoundingBox, List<EntityType> entityTypes, int[] organizationIdList, List<ActionStatusType> statusTypes, int[] activityIds, int srid, string Language = "it")
+        public string GetGeoJsonCollection(DateTime StartDate, DateTime EndDate, Geometry BoundingBox, List<EntityType> entityTypes, int[] organizationIdList, List<ActionStatusType> statusTypes, int[] activityIds, List<HazardType> hazardTypes, List<GeneralStatus> reportStatusTypes, List<MissionStatusType> missionStatusTypes, int srid, string Language = "it")
         {
             ErmesDbContext context = _dbContextProvider.GetDbContext();
             using (var command = context.Database.GetDbConnection().CreateCommand())
@@ -118,7 +118,10 @@ namespace Ermes.GeoJson
                         null as ""extensionData"",
 	                    p.""Username"" as ""creator"",
                         null as ""statusFilter"",
-                        0 as ""activityFilter""
+                        0 as ""activityFilter"",
+                        null as ""hazardFilter"",
+                        null as ""reportStatusFilter"",
+                        m.""CurrentStatus"" as ""missionStatusFilter""
                     from public.missions m
                     left join public.organizations o on o.""Id"" = m.""OrganizationId""
                     join public.persons p on p.""Id"" = m.""CreatorUserId""
@@ -139,7 +142,10 @@ namespace Ermes.GeoJson
                         null as ""extensionData"",
                         p.""Username"" as ""creator"",
                         null as ""statusFilter"",
-                        0 as ""activityFilter""
+                        0 as ""activityFilter"",
+                        null as ""hazardFilter"",
+                        null as ""reportStatusFilter"",
+                        null as ""missionStatusFilter""
                     from public.communications c
                     join public.persons p on p.""Id"" = c.""CreatorUserId""
                     left join public.organizations o on o.""Id"" = p.""OrganizationId""
@@ -160,7 +166,10 @@ namespace Ermes.GeoJson
                         null as ""extensionData"",
                         p.""Username"" as ""creator"",
                         null as ""statusFilter"",
-                        0 as ""activityFilter""
+                        0 as ""activityFilter"",
+                        r.""Hazard"" as ""hazardFilter"",
+                        r.""Status"" as ""reportStatusFilter"",
+                        null as ""missionStatusFilter""
                     from public.reports r 
                     join public.persons p on p.""Id"" = r.""CreatorUserId""
                     left join public.organizations o on o.""Id"" = p.""OrganizationId""
@@ -181,7 +190,10 @@ namespace Ermes.GeoJson
                         null as ""extensionData"",
                         p.""Username"" as ""creator"",
                         null as ""statusFilter"",
-                        0 as ""activityFilter""
+                        0 as ""activityFilter"",
+                        null as ""hazardFilter"",
+                        null as ""reportStatusFilter"",
+                        null as ""missionStatusFilter""
                     from public.reportrequests r2 
                     join public.persons p on p.""Id"" = r2.""CreatorUserId""
                     left join public.organizations o on o.""Id"" = p.""OrganizationId""
@@ -202,7 +214,10 @@ namespace Ermes.GeoJson
                         pa.""CurrentExtensionData""::text as ""extensionData"",
 	                    p.""Username"" as ""creator"",
                         pa.""CurrentStatus"" as ""statusFilter"",
-                        coalesce(a.""ParentId"", a.""Id"") as ""activityFilter""
+                        coalesce(a.""ParentId"", a.""Id"") as ""activityFilter"",
+                        null as ""hazardFilter"",
+                        null as ""reportStatusFilter"",
+                        null as ""missionStatusFilter""
                         FROM (
 	                        SELECT pa2.""PersonId"", MAX(pa2.""Timestamp"") as ""MaxTime""
                             FROM person_actions pa2
@@ -276,6 +291,36 @@ namespace Ermes.GeoJson
                     var p = new NpgsqlParameter("@activityIds", NpgsqlDbType.Array | NpgsqlDbType.Integer)
                     {
                         Value = activityIds
+                    };
+                    command.Parameters.Add(p);
+                }
+
+                if (hazardTypes != null && hazardTypes.Count > 0)
+                {
+                    command.CommandText += @" and (tmp.""hazardFilter"" is null or tmp.""hazardFilter"" = any(array[@hazardTypes]))";
+                    var p = new NpgsqlParameter("@hazardTypes", NpgsqlDbType.Array | NpgsqlDbType.Text)
+                    {
+                        Value = hazardTypes.Select(a => a.ToString()).ToArray()
+                    };
+                    command.Parameters.Add(p);
+                }
+
+                if (reportStatusTypes != null && reportStatusTypes.Count > 0)
+                {
+                    command.CommandText += @" and (tmp.""reportStatusFilter"" is null or tmp.""reportStatusFilter"" = any(array[@reportStatusTypes]))";
+                    var p = new NpgsqlParameter("@reportStatusTypes", NpgsqlDbType.Array | NpgsqlDbType.Text)
+                    {
+                        Value = reportStatusTypes.Select(a => a.ToString()).ToArray()
+                    };
+                    command.Parameters.Add(p);
+                }
+
+                if (missionStatusTypes != null && missionStatusTypes.Count > 0)
+                {
+                    command.CommandText += @" and (tmp.""missionStatusFilter"" is null or tmp.""missionStatusFilter"" = any(array[@missionStatusTypes]))";
+                    var p = new NpgsqlParameter("@missionStatusTypes", NpgsqlDbType.Array | NpgsqlDbType.Text)
+                    {
+                        Value = missionStatusTypes.Select(a => a.ToString()).ToArray()
                     };
                     command.Parameters.Add(p);
                 }

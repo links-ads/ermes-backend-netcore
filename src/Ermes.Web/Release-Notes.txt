@@ -1,7 +1,10 @@
 Ver.
 --------------------------
-- Feature - Category min/max value as string (migration added)(#44)
+- Feature - Filter update for GetFeatureCollections (#43)
 
+Ver. 2.1.1 - 2021-08-06
+--------------------------
+- Feature - Category min/max value as string (migration added)(#44)
 
 Ver. 2.1.0 - 2021-08-05
 --------------------------
