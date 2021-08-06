@@ -14,6 +14,9 @@ namespace Ermes.GeoJson.Dto
         public PointPosition SouthWestBoundary { get; set; }
         public List<EntityType> EntityTypes { get; set; }
         public List<ActionStatusType> StatusTypes { get; set; }
+        public List<HazardType> HazardTypes { get; set; }
+        public List<GeneralStatus> ReportStatusTypes { get; set; }
+        public List<MissionStatusType> MissionStatusTypes { get; set; }
         public List<int> ActivityIds { get; set; }
     }
 
