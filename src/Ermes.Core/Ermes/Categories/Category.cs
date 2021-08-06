@@ -49,8 +49,8 @@ namespace Ermes.Categories
         public ICollection<CategoryTranslation> Translations { get; set; }
 
         #region Numeric
-        public int MinValue { get; set; }
-        public int MaxValue { get; set; }
+        public string MinValue { get; set; }
+        public string MaxValue { get; set; }
         #endregion
 
         public string GroupIcon { get; set; }

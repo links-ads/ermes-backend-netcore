@@ -62,6 +62,8 @@
     <Compile Include="Migrations\20210803093952_Tip_Quizzes_RelationshipAdded.Designer.cs" />
     <Compile Include="Migrations\20210803104628_Answers_Added.cs" />
     <Compile Include="Migrations\20210803104628_Answers_Added.Designer.cs" />
+    <Compile Include="Migrations\20210806075400_Category_Constraints_string.cs" />
+    <Compile Include="Migrations\20210806075400_Category_Constraints_string.Designer.cs" />
     <Compile Include="Migrations\ErmesDbContextModelSnapshot.cs" />
     <Compile Include="Migrations\Seed\ModelBuilderExtensions.cs" />
   </ItemGroup>
