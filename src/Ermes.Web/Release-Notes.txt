@@ -1,4 +1,7 @@
 Ver.
+-------------------------
+
+Ver. 2.1.2 - 2021-08-06
 --------------------------
 - Feature - Filter update for GetFeatureCollections (#43)
 
