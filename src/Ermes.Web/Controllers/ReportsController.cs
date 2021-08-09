@@ -153,7 +153,7 @@ namespace Ermes.Web.Controllers
         private async Task<ReportDto> CreateReportAsync(ReportDto reportDto, IFormFileCollection media = null)
         {
             var tuple = await CheckReportValidityAsync(reportDto);
-            if (!tuple.Item1.IsNullOrWhiteSpace())
+            if (tuple != null && !tuple.Item1.IsNullOrWhiteSpace())
                 throw new UserFriendlyException(L(tuple.Item1, tuple.Item2));
 
             var report = ObjectMapper.Map<Report>(reportDto);
@@ -222,9 +222,10 @@ namespace Ermes.Web.Controllers
                                 case FieldType.None:
                                     break;
                                 case FieldType.Int:
-                                    res = int.TryParse(item.Value, out int intValue);
-                                    if (!res)
-                                        return new Tuple<string, string>("InvalidCategoryNumericValue", item.Value);
+                                    res = decimal.TryParse(item.Value, out decimal tmpValue);
+                                    if(!res)
+                                        new Tuple<string, string>("InvalidCategoryNumericValue", item.Value);
+                                    int intValue = (int)Math.Floor(tmpValue);
                                     if (int.Parse(cat.MinValue) > intValue || int.Parse(cat.MaxValue) < intValue)
                                         return new Tuple<string, string>("InvalidCategoryNumericValue", item.Value);
                                     break;
