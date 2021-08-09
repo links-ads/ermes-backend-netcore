@@ -101,9 +101,9 @@ namespace Ermes.Web.Controllers
         private async Task<ReportDto> UpdateReportAsync(ReportDto reportDto, IFormFileCollection media = null)
         {
 
-            string message = await CheckReportValidityAsync(reportDto);
-            if (!message.IsNullOrWhiteSpace())
-                throw new UserFriendlyException(L(message));
+            var tuple = await CheckReportValidityAsync(reportDto);
+            if (!tuple.Item1.IsNullOrWhiteSpace())
+                throw new UserFriendlyException(L(tuple.Item1, tuple.Item2));
 
             var report = await _reportManager.GetReportByIdAsync(reportDto.Id);
             if (report == null)
@@ -152,9 +152,9 @@ namespace Ermes.Web.Controllers
 
         private async Task<ReportDto> CreateReportAsync(ReportDto reportDto, IFormFileCollection media = null)
         {
-            string message = await CheckReportValidityAsync(reportDto);
-            if (!message.IsNullOrWhiteSpace())
-                throw new UserFriendlyException(L(message));
+            var tuple = await CheckReportValidityAsync(reportDto);
+            if (!tuple.Item1.IsNullOrWhiteSpace())
+                throw new UserFriendlyException(L(tuple.Item1, tuple.Item2));
 
             var report = ObjectMapper.Map<Report>(reportDto);
 
@@ -179,13 +179,13 @@ namespace Ermes.Web.Controllers
             return res;
         }
 
-        private async Task<string> CheckReportValidityAsync(ReportDto report)
+        private async Task<Tuple<string, string>> CheckReportValidityAsync(ReportDto report)
         {
             if (report.Location == null)
-                return "InvalidLocation";
+                return new Tuple<string, string>("InvalidLocation", "null");
 
             if (report.Timestamp == DateTime.MinValue)
-                return "InvalidTimestamp";
+                return new Tuple<string, string>("InvalidTimestamp", report.Timestamp.ToString());
 
             if (report.RelativeMissionId.HasValue && report.RelativeMissionId.Value > 0)
             {
@@ -206,7 +206,7 @@ namespace Ermes.Web.Controllers
                 {
                     var cat = await _categoryManager.GetCategoryByIdAsync(item.CategoryId);
                     if (cat == null)
-                        return "InvalidCategory";
+                        return new Tuple<string, string>("InvalidCategory", "null");
 
                     bool res;
                     switch (cat.Type)
@@ -214,7 +214,7 @@ namespace Ermes.Web.Controllers
                         case CategoryType.Range:
                             var localizedValues = ObjectMapper.Map<LocalizedCategoryValuesDto>(cat);
                             if (!localizedValues.Values.Contains(item.Value))
-                                return "InvalidCategoryRangeValue";
+                                return new Tuple<string, string>("InvalidCategoryRangeValue", item.Value);
                             break;
                         case CategoryType.Numeric:
                             switch (cat.FieldType)
@@ -224,32 +224,32 @@ namespace Ermes.Web.Controllers
                                 case FieldType.Int:
                                     res = int.TryParse(item.Value, out int intValue);
                                     if (!res)
-                                        return "InvalidCategoryNumericIntValue";
+                                        return new Tuple<string, string>("InvalidCategoryNumericValue", item.Value);
                                     if (int.Parse(cat.MinValue) > intValue || int.Parse(cat.MaxValue) < intValue)
-                                        return "InvalidCategoryNumericIntValue";
+                                        return new Tuple<string, string>("InvalidCategoryNumericValue", item.Value);
                                     break;
                                 case FieldType.Decimal:
                                     res = decimal.TryParse(item.Value, out decimal decimalValue);
                                     if (!res)
-                                        return "InvalidCategoryNumericDecimalValue";
+                                        return new Tuple<string, string>("InvalidCategoryNumericValue", item.Value);
                                     if (decimal.Parse(cat.MinValue) > decimalValue || decimal.Parse(cat.MaxValue) < decimalValue)
-                                        return "InvalidCategoryNumericDecimalValue";
+                                        return new Tuple<string, string>("InvalidCategoryNumericValue", item.Value);
                                     break;
                                 case FieldType.String:
                                     break;
                                 case FieldType.Datetime:
                                     res = DateTime.TryParse(item.Value, out DateTime dateValue);
                                     if (!res)
-                                        return "InvalidCategoryNumericDateValue";
+                                        return new Tuple<string, string>("InvalidCategoryNumericValue", item.Value);
                                     if (DateTime.Parse(cat.MinValue) > dateValue || DateTime.Parse(cat.MaxValue) < dateValue)
-                                        return "InvalidCategoryNumericDateValue";
+                                        return new Tuple<string, string>("InvalidCategoryNumericValue", item.Value);
                                     break;
                                 case FieldType.Boolean:
                                     res = bool.TryParse(item.Value, out bool boolValue);
                                     if (!res)
-                                        return "InvalidCategoryNumericBoolValue";
+                                        return new Tuple<string, string>("InvalidCategoryNumericValue", item.Value);
                                     if (bool.Parse(cat.MinValue) != boolValue && bool.Parse(cat.MaxValue) != boolValue)
-                                        return "InvalidCategoryNumericBoolValue";
+                                        return new Tuple<string, string>("InvalidCategoryNumericValue", item.Value);
                                     break;
                                 default:
                                     break;
