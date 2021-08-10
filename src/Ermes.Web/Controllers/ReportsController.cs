@@ -102,7 +102,7 @@ namespace Ermes.Web.Controllers
         {
 
             var tuple = await CheckReportValidityAsync(reportDto);
-            if (!tuple.Item1.IsNullOrWhiteSpace())
+            if (tuple != null && !tuple.Item1.IsNullOrWhiteSpace())
                 throw new UserFriendlyException(L(tuple.Item1, tuple.Item2));
 
             var report = await _reportManager.GetReportByIdAsync(reportDto.Id);
