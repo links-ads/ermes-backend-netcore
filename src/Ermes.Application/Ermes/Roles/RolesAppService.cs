@@ -112,7 +112,7 @@ namespace Ermes.Roles
             return true;
         }
 
-        [ErmesAuthorize(AppPermissions.Backoffice)]
+        
         public virtual async Task<bool> SyncRolesFromFusionAuth()
         {
             List<Role> list = await _permissionManager.GetRolesAsync();
