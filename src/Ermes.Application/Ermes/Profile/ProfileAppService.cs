@@ -12,6 +12,7 @@ using Ermes.Dto.Datatable;
 using Ermes.Linq.Extensions;
 using Ermes.Missions;
 using Ermes.Organizations;
+using Ermes.Organizations.Dto;
 using Ermes.Persons;
 using Ermes.Profile.Dto;
 using Ermes.Roles;
@@ -63,6 +64,29 @@ namespace Ermes.Profile
         }
 
         #region Private
+        private async Task<PagedResultDto<OrganizationDto>> InternalGetOrganizations(GetOrganizationsInput input)
+        {
+            PagedResultDto<OrganizationDto> result = new PagedResultDto<OrganizationDto>();
+            var query = _organizationManager.Organizations;
+            result.TotalCount = await query.CountAsync();
+
+            if (input?.Order != null && input.Order.Count == 0)
+            {
+                query = query.OrderBy(a => a.Name);
+                query = query.PageBy(input);
+            }
+            else
+            {
+                query = query
+                        .DTOrderedBy(input)
+                        .PageBy(input);
+            }
+
+            var items = await query.ToListAsync();
+            result.Items = ObjectMapper.Map<List<OrganizationDto>>(items);
+            return result;
+        }
+
         private async Task<PagedResultDto<PersonDto>> InternalGetOrganizationMemebers(GetOrganizationMembersInput input, bool filterByOrganization = true)
         {
             PagedResultDto<PersonDto> result = new PagedResultDto<PersonDto>();
@@ -309,5 +333,11 @@ namespace Ermes.Profile
         //    var user = await UpdateUserInternalAsync(ObjectMapper.Map<UserDto>(userToUpdate), _fusionAuthSettings);
         //    return user != null;
         //}
+
+        public virtual async Task<DTResult<OrganizationDto>> GetOrganizations(GetOrganizationsInput input)
+        {
+            PagedResultDto<OrganizationDto> result = await InternalGetOrganizations(input);
+            return new DTResult<OrganizationDto>(0, result.TotalCount, result.Items.Count, result.Items.ToList());
+        }
     }
 }

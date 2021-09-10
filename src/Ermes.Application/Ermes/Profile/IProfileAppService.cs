@@ -1,6 +1,7 @@
 ﻿using Abp.Application.Services;
 using Ermes.Dto;
 using Ermes.Dto.Datatable;
+using Ermes.Organizations.Dto;
 using Ermes.Profile.Dto;
 using System.Threading.Tasks;
 
@@ -15,6 +16,7 @@ namespace Profile
         Task<bool> DeleteProfile(IdInput<int> input);
         Task<bool> UpdateRegistrationToken(UpdateRegistrationTokenInput input);
         Task<DTResult<PersonDto>> GetOrganizationMembers(GetOrganizationMembersInput input);
+        Task<DTResult<OrganizationDto>> GetOrganizations(GetOrganizationsInput input);
         ///TDB
         ///GetRemoteSettings
         ///UpdateRemoteSettings
