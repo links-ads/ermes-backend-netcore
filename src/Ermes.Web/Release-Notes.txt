@@ -1,5 +1,9 @@
 Ver.
 -------------------------
+
+
+Ver. 2.2.0 - 2021-09-13
+-------------------------
 - Feature - Spanish language support added (#46)
 - Feature - GetOrganization api added to ts-sdk (#47)
 
