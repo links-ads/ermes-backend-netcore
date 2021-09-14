@@ -1,6 +1,6 @@
 Ver.
 -------------------------
-
+- Feature - Organization name prop added to CommunicationDto class (#48)
 
 Ver. 2.2.0 - 2021-09-13
 -------------------------
