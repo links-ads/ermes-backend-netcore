@@ -1,5 +1,6 @@
 ﻿using Ermes.Dto;
 using Ermes.Dto.Spatial;
+using Ermes.Organizations.Dto;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -14,5 +15,6 @@ namespace Ermes.Communications.Dto
         public string Message { get; set; }
         public RangeDto<DateTime> Duration { get; set; }
         public PointPosition Centroid { get; set; }
+        public string OrganizationName { get; set; }
     }
 }
