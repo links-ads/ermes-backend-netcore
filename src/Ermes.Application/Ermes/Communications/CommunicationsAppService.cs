@@ -104,7 +104,7 @@ namespace Ermes.Communications
         private async Task<Communication> CreateCommunicationAsync(FeatureDto<CommunicationDto> featureDto)
         {
             var newCommunication = ObjectMapper.Map<Communication>(featureDto.Properties);
-            if (featureDto.FullGeometry.IsValid)
+            if (featureDto.FullGeometry != null && featureDto.FullGeometry.IsValid)
                 newCommunication.AreaOfInterest = featureDto.FullGeometry;
             else
                 throw new UserFriendlyException(L("InvalidAOI"));
@@ -129,7 +129,7 @@ namespace Ermes.Communications
             var comm = await GetCommunicationAsync(communicationDto.Id);
             if (comm == null)
                 throw new UserFriendlyException(L("InvalidCommunicationId", communicationDto.Id));
-            if (featureDto.FullGeometry.IsValid)
+            if (featureDto.FullGeometry != null && featureDto.FullGeometry.IsValid)
                 comm.AreaOfInterest = featureDto.FullGeometry;
             else
                 throw new UserFriendlyException(L("InvalidAOI"));
