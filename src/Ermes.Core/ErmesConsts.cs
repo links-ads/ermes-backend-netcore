@@ -33,5 +33,10 @@
             public const int startingHour = 0;
             public const string startingCron = "0 0 * * *";
         }
+
+        public class EntityCode
+        {
+            public const string MapReqeust = "mr";
+        }
     }
 }

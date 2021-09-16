@@ -56,6 +56,7 @@ using Ermes.Tips;
 using Ermes.Gamification.Dto;
 using Ermes.Quizzes;
 using Ermes.Answers;
+using Ermes.MapRequests.Dto;
 
 namespace Ermes
 {
@@ -227,6 +228,12 @@ namespace Ermes
                            .ForMember(entity => entity.Location, options => options.MapFrom(l => l.Latitude.HasValue && l.Longitude.HasValue ? new Point(l.Longitude.Value, l.Latitude.Value) : null))
                            .ForMember(entity => entity.CurrentActivityId, options => options.MapFrom(l => l.ActivityId));
             configuration.CreateMap<ImportResultDto, ImportUsersDto>().ReverseMap();
+            configuration.CreateMap<MapRequests.MapRequest, MapRequestDto>()
+                            .ForMember(dto => dto.Centroid, options => options.MapFrom(b => new PointPosition(b.AreaOfInterest.Centroid.X, b.AreaOfInterest.Centroid.Y)))
+                            .AfterMap((src, dest) => dest.Duration.LowerBound = dest.Duration.LowerBound.ToUniversalTime())
+                            .AfterMap((src, dest) => dest.Duration.UpperBound = dest.Duration.UpperBound.ToUniversalTime())
+                            .ReverseMap()
+                            .ForMember(entity => entity.Code, options => options.Ignore());
             #region GeoJsons
             configuration.CreateMap<Communication, FeatureDto<GeoJsonItem>>()
                             .ForMember(fd => fd.Geometry, options => options.MapFrom(c => new GeoJsonWriter().Write(c.AreaOfInterest)))

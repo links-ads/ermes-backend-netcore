@@ -260,4 +260,23 @@ namespace Ermes.Enums
         Medium,
         High
     }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum LayerType
+    {
+        BurnedArea,
+        Delineation,
+        Forecast,
+        Nowcast,
+        RiskMap
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum MapRequestStatusType
+    {
+        RequestSubmitted,
+        ContentAvailable,
+        ContentNotAvailable,
+        Canceled
+    }
 }

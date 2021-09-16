@@ -20,6 +20,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Abp;
 using Ermes.Activations;
+using Ermes.MapRequests;
 
 namespace Ermes.GeoJson
 {
@@ -57,6 +58,13 @@ namespace Ermes.GeoJson
             return _dbContextProvider.GetDbContext()
                 .ReportRequests
                 .FromSqlInterpolated($"SELECT * FROM reportrequests WHERE ST_INTERSECTS(\"AreaOfInterest\", {boundingBox}) and tsrange({startDate},{endDate}) && \"Duration\"");
+        }
+
+        public IQueryable<MapRequest> GetMapRequests(DateTime startDate, DateTime endDate, Geometry boundingBox)
+        {
+            return _dbContextProvider.GetDbContext()
+                .MapRequests
+                .FromSqlInterpolated($"SELECT * FROM map_requests WHERE ST_INTERSECTS(\"AreaOfInterest\", {boundingBox}) and tsrange({startDate},{endDate}) && \"Duration\"");
         }
 
         public IQueryable<PersonActionTracking> GetPersonActionTrackings(DateTime startDate, DateTime endDate, Geometry boundingBox)

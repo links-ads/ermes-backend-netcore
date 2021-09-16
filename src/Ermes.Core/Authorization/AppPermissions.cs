@@ -38,6 +38,12 @@ namespace Ermes.Authorization
             public const string Mission_CanSeeCrossOrganization = "Missions.CanSeeCrossOrganization";
         }
 
+        public static class MapRequests
+        {
+            public const string MapRequest = "MapRequests";
+            public const string MapRequest_CanSeeCrossOrganization = "MapRequests.CanSeeCrossOrganization";
+        }
+
         public static class Reports
         {
             public const string Report = "Reports";
