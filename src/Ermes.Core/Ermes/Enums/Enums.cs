@@ -168,6 +168,7 @@ namespace Ermes.Enums
     public enum EntityType
     {
         Communication = 0,
+        MapRequest = 5,
         Mission = 10,
         ReportRequest = 20,
         Other = 30,
@@ -175,7 +176,7 @@ namespace Ermes.Enums
         PersonActionTracking = 60,
         PersonActionStatus = 70,
         PersonActionActivity = 80,
-        Person = 90
+        Person = 90,
     }
 
     [JsonConverter(typeof(StringEnumConverter))]

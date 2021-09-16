@@ -17,6 +17,8 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Ermes.Actions.Dto;
 using Microsoft.EntityFrameworkCore;
+using Ermes.MapRequests;
+using Ermes.MapRequests.Dto;
 
 namespace Ermes.EventHandlers
 {
@@ -199,6 +201,21 @@ namespace Ermes.EventHandlers
         public virtual async Task HandleEventAsync(NotificationEvent<ReportNotificationDto> eventData)
         {
             await _notifierService.SendBusNotification(eventData.CreatorId, eventData.EntityId, eventData.Content, eventData.Action, EntityType.Report);
+        }
+    }
+
+    public class MapRequestNotificationEventHandler : IAsyncEventHandler<NotificationEvent<MapRequestNotificationDto>>, ITransientDependency
+    {
+        private readonly NotifierService _notifierService;
+        public MapRequestNotificationEventHandler(NotifierService notifierService)
+        {
+            _notifierService = notifierService;
+        }
+
+        [UnitOfWork]
+        public virtual async Task HandleEventAsync(NotificationEvent<MapRequestNotificationDto> eventData)
+        {
+            await _notifierService.SendBusNotification(eventData.CreatorId, eventData.EntityId, eventData.Content, eventData.Action, EntityType.MapRequest);
         }
     }
 }

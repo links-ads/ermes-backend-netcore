@@ -8,6 +8,7 @@ namespace Ermes.Helpers
 {
     public static class NotificationNameHelper
     {
+        //TODO: must be updated according to the reference ERMES project
         public static string GetBusTopicName(EntityType type, EntityWriteAction action)
         {
             return "mm." + type.ToString().ToLowerInvariant();
