@@ -1,8 +1,8 @@
-Ver.
+Ver. 2.3.0 - 2021-09-16
 -------------------------
 - Feature - MapRequest management added (migration added) (#45)
 
-Ver. 2.2.1 - 2021-19.14
+Ver. 2.2.1 - 2021-09.14
 -------------------------
 - Feature - Organization name prop added to CommunicationDto class (#48)
 
