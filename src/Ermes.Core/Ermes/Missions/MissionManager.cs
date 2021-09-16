@@ -66,7 +66,7 @@ namespace Ermes.Missions
         {
             return MissionRepository.GetAll()
                 .Where(m => m.CoordinatorPersonId == person.Id || m.CoordinatorTeamId == person.TeamId || (!m.CoordinatorPersonId.HasValue && !m.CoordinatorTeamId.HasValue && m.OrganizationId == person.OrganizationId))
-                .Where(m => m.CurrentStatusString == Enums.MissionStatusType.Created.ToString() || m.CurrentStatusString == Enums.MissionStatusType.TakenInCharge.ToString())
+                .Where(m => m.CurrentStatusString == MissionStatusType.Created.ToString() || m.CurrentStatusString == MissionStatusType.TakenInCharge.ToString())
                 .ToList();
         }
 
@@ -76,6 +76,5 @@ namespace Ermes.Missions
             return Missions
                     .Where(m => m.Duration.Overlaps(range));
         }
-
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Abp.Linq.Extensions;
 using Ermes.Communications;
 using Ermes.Interfaces;
+using Ermes.MapRequests;
 using Ermes.Missions;
 using Ermes.Organizations;
 using Ermes.Persons;
@@ -53,6 +54,8 @@ namespace Ermes.Linq.Extensions
                 return new CommunicationDataOwnershipResolver().Resolve(query as IQueryable<Communication>, organizationIdList, person) as IQueryable<T>;
             else if (typeof(T) == typeof(Team))
                 return new TeamDataOwnershipResolver().Resolve(query as IQueryable<Team>, organizationIdList, person) as IQueryable<T>;
+            else if (typeof(T) == typeof(MapRequest))
+                return new MapRequestDataOwnershipResolver().Resolve(query as IQueryable<MapRequest>, organizationIdList, person) as IQueryable<T>;
 
             return query;
         }
@@ -177,6 +180,22 @@ namespace Ermes.Linq.Extensions
                         .Where(t => organizationIdList.Contains(t.OrganizationId) || (t.Organization.ParentId.HasValue && organizationIdList.Contains(t.Organization.ParentId.Value)));
 
                 return query;
+            }
+        }
+
+        private class MapRequestDataOwnershipResolver : IDataOwnershipResolver<MapRequest>
+        {
+            public IQueryable<MapRequest> Resolve(IQueryable<MapRequest> query, List<int> organizationIdList, IPersonBase person)
+            {
+                return organizationIdList == null
+                        ? query
+                        : query
+                        .Where(r =>
+                            //Organization visibility
+                            (r.Creator.OrganizationId.HasValue && organizationIdList.Contains(r.Creator.OrganizationId.Value)) ||
+                            //Organization hierarchy
+                            (r.Creator.Organization.ParentId.HasValue && organizationIdList.Contains(r.Creator.Organization.ParentId.Value))
+                        );
             }
         }
         #endregion

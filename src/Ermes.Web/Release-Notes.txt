@@ -1,6 +1,6 @@
 Ver.
 -------------------------
-
+- Feature - MapRequest management added (migration added) (#45)
 
 Ver. 2.2.1 - 2021-19.14
 -------------------------

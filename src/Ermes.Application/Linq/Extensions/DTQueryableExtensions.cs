@@ -2,6 +2,7 @@
 using Ermes.Communications;
 using Ermes.Dto;
 using Ermes.Dto.Datatable;
+using Ermes.MapRequests;
 using Ermes.Missions;
 using Ermes.Notifications;
 using Ermes.Organizations;
@@ -62,6 +63,8 @@ namespace Ermes.Linq.Extensions
                 return new CommunicationLinqFilterResolver().Resolve(query as IQueryable<Communication>, search) as IQueryable<T>;
             if (typeof(T) == typeof(Notification))
                 return new NotificationLinqFilterResolver().Resolve(query as IQueryable<Notification>, search) as IQueryable<T>;
+            if (typeof(T) == typeof(MapRequest))
+                return new MapRequestLinqFilterResolver().Resolve(query as IQueryable<MapRequest>, search) as IQueryable<T>;
 
             return query;
         }
@@ -83,6 +86,8 @@ namespace Ermes.Linq.Extensions
                 return new CommunicationLinqOrderResolver().Resolve(query as IQueryable<Communication>, order) as IQueryable<T>;
             if (typeof(T) == typeof(Notification))
                 return new NotificationLinqOrderResolver().Resolve(query as IQueryable<Notification>, order) as IQueryable<T>;
+            if (typeof(T) == typeof(MapRequest))
+                return new MapRequestLinqOrderResolver().Resolve(query as IQueryable<MapRequest>, order) as IQueryable<T>;
 
             return query;
         }
@@ -239,6 +244,29 @@ namespace Ermes.Linq.Extensions
                     predicate = predicate.Or(p => p.EntityString.ToLower().Contains(search.Value));
                     predicate = predicate.Or(p => p.Message.ToLower().Contains(search.Value));
                     predicate = predicate.Or(p => p.StatusString.ToLower().Contains(search.Value));
+                }
+
+                return query.Where(predicate);
+
+            }
+        }
+
+        private class MapRequestLinqFilterResolver : ILinqFilterResolver<MapRequest>
+        {
+            public IQueryable<MapRequest> Resolve(IQueryable<MapRequest> query, DTSearch search)
+            {
+
+                var predicate = PredicateBuilder.New<MapRequest>(false);
+                if (search.Regex)
+                {
+                    ///TBD
+                }
+                else
+                {
+                    predicate = predicate.Or(p => p.Code != null && p.Code.ToLower().Contains(search.Value));
+                    predicate = predicate.Or(p => p.StatusString.ToLower().Contains(search.Value));
+                    predicate = predicate.Or(p => p.HazardString.ToLower().Contains(search.Value));
+                    predicate = predicate.Or(p => p.LayerString.ToLower().Contains(search.Value));
                 }
 
                 return query.Where(predicate);
@@ -501,6 +529,38 @@ namespace Ermes.Linq.Extensions
                 // At least one order criteria is needed
                 if (firstOrderClause)
                     query = query.OrderBy(a => a.Timestamp);
+
+                return query;
+            }
+        }
+
+        private class MapRequestLinqOrderResolver : ILinqOrderResolver<MapRequest>
+        {
+            public IQueryable<MapRequest> Resolve(IQueryable<MapRequest> query, List<DTOrder> order)
+            {
+                bool firstOrderClause = true;
+
+                foreach (var item in order)
+                {
+                    ListSortDirection direction = item.Dir == DTOrderDir.ASC ? ListSortDirection.Ascending : ListSortDirection.Descending;
+                    switch (item.Column.ToLower())
+                    {
+                        case "code":
+                            query = query.OrderBy(a => a.Code, direction, firstOrderClause);
+                            firstOrderClause = false;
+                            break;
+                        case "duration":
+                            query = query.OrderBy(a => a.Duration.LowerBound, direction, firstOrderClause);
+                            firstOrderClause = false;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                // At least one order criteria is needed
+                if (firstOrderClause)
+                    query = query.OrderBy(a => a.Duration.LowerBound);
 
                 return query;
             }

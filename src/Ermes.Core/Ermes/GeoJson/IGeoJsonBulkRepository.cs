@@ -2,6 +2,7 @@
 using Ermes.Activations;
 using Ermes.Communications;
 using Ermes.Enums;
+using Ermes.MapRequests;
 using Ermes.Missions;
 using Ermes.Persons;
 using Ermes.ReportRequests;
@@ -21,6 +22,7 @@ namespace Ermes.GeoJson
         public IQueryable<Mission> GetMissions(DateTime startDate, DateTime endDate, Geometry boundingBox);
         public IQueryable<Report> GetReports(DateTime startDate, DateTime endDate, Geometry boundingBox);
         public IQueryable<ReportRequest> GetReportRequests(DateTime startDate, DateTime endDate, Geometry boundingBox);
+        public IQueryable<MapRequest> GetMapRequests(DateTime startDate, DateTime endDate, Geometry boundingBox);
         public IQueryable<PersonActionTracking> GetPersonActionTrackings(DateTime startDate, DateTime endDate, Geometry boundingBox);
         public IQueryable<PersonActionStatus> GetPersonActionStatuses(DateTime startDate, DateTime endDate, Geometry boundingBox);
         public IQueryable<PersonActionActivity> GetPersonActionActivities(DateTime startDate, DateTime endDate, Geometry boundingBox);

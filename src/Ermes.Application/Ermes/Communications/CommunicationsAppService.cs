@@ -54,7 +54,7 @@ namespace Ermes.Communications
             if (comm == null)
                 throw new UserFriendlyException(L("InvalidCommunicationId", commId));
 
-            if (comm.Creator.OrganizationId != _session.LoggedUserPerson.OrganizationId)
+            if (comm.Creator.OrganizationId != _session.LoggedUserPerson.OrganizationId && comm.Creator.Organization.ParentId.HasValue && comm.Creator.Organization.ParentId.Value != _session.LoggedUserPerson.OrganizationId)
                 throw new UserFriendlyException(L("EntityOutsideOrganization"));
 
             return comm;
@@ -181,7 +181,7 @@ namespace Ermes.Communications
         [OpenApiOperation("Create or Update a Communication",
             @"
                 Input: GeoJson feature, with CommunicationDto element in Properties field
-                If the input contains an Id > 0, an update is performed, otherwise a new entityy is created
+                If the input contains an Id > 0, an update is performed, otherwise a new entity is created
                 Output: the Id the communication that has been created/updated
                 This operation will trigger notifications. The body of the notification contains the message of the communication
             "
