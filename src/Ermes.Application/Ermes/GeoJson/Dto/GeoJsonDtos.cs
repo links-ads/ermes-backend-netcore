@@ -13,10 +13,15 @@ namespace Ermes.GeoJson.Dto
         public PointPosition NorthEastBoundary { get; set; }
         public PointPosition SouthWestBoundary { get; set; }
         public List<EntityType> EntityTypes { get; set; }
+        //For Report status filter
         public List<ActionStatusType> StatusTypes { get; set; }
+        //For Report hazard filter
         public List<HazardType> HazardTypes { get; set; }
         public List<GeneralStatus> ReportStatusTypes { get; set; }
         public List<MissionStatusType> MissionStatusTypes { get; set; }
+        public List<HazardType> MapRequestHazardTypes { get; set; }
+        public List<LayerType> MapRequestLayerTypes { get; set; }
+        public List<MapRequestStatusType> MapRequestStatusTypes { get; set; }
         public List<int> ActivityIds { get; set; }
     }
 

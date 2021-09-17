@@ -168,6 +168,7 @@ namespace Ermes.Enums
     public enum EntityType
     {
         Communication = 0,
+        MapRequest = 5,
         Mission = 10,
         ReportRequest = 20,
         Other = 30,

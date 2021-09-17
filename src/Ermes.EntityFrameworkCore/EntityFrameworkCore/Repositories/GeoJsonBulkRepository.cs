@@ -99,7 +99,23 @@ namespace Ermes.GeoJson
         //}
 
 
-        public string GetGeoJsonCollection(DateTime StartDate, DateTime EndDate, Geometry BoundingBox, List<EntityType> entityTypes, int[] organizationIdList, List<ActionStatusType> statusTypes, int[] activityIds, List<HazardType> hazardTypes, List<GeneralStatus> reportStatusTypes, List<MissionStatusType> missionStatusTypes, int srid, string Language = "it")
+        public string GetGeoJsonCollection(
+            DateTime StartDate,
+            DateTime EndDate,
+            Geometry BoundingBox,
+            List<EntityType> entityTypes,
+            int[] organizationIdList,
+            List<ActionStatusType> statusTypes,
+            int[] activityIds,
+            List<HazardType> hazardTypes,
+            List<GeneralStatus> reportStatusTypes,
+            List<MissionStatusType> missionStatusTypes,
+            List<HazardType> mapRequestHazardTypes,
+            List<LayerType> mapRequestLayerTypes,
+            List<MapRequestStatusType> mapRequestStatusTypes,
+            int srid,
+            string Language = "it"
+            )
         {
             ErmesDbContext context = _dbContextProvider.GetDbContext();
             using (var command = context.Database.GetDbConnection().CreateCommand())
@@ -129,7 +145,10 @@ namespace Ermes.GeoJson
                         0 as ""activityFilter"",
                         null as ""hazardFilter"",
                         null as ""reportStatusFilter"",
-                        m.""CurrentStatus"" as ""missionStatusFilter""
+                        m.""CurrentStatus"" as ""missionStatusFilter"",
+                        null as ""mapRequestHazardFilter"",
+                        null as ""mapRequestStatusFilter"",
+                        null as ""mapRequestLayerFilter""
                     from public.missions m
                     left join public.organizations o on o.""Id"" = m.""OrganizationId""
                     join public.persons p on p.""Id"" = m.""CreatorUserId""
@@ -153,7 +172,10 @@ namespace Ermes.GeoJson
                         0 as ""activityFilter"",
                         null as ""hazardFilter"",
                         null as ""reportStatusFilter"",
-                        null as ""missionStatusFilter""
+                        null as ""missionStatusFilter"",
+                        null as ""mapRequestHazardFilter"",
+                        null as ""mapRequestStatusFilter"",
+                        null as ""mapRequestLayerFilter""
                     from public.communications c
                     join public.persons p on p.""Id"" = c.""CreatorUserId""
                     left join public.organizations o on o.""Id"" = p.""OrganizationId""
@@ -177,7 +199,10 @@ namespace Ermes.GeoJson
                         0 as ""activityFilter"",
                         r.""Hazard"" as ""hazardFilter"",
                         r.""Status"" as ""reportStatusFilter"",
-                        null as ""missionStatusFilter""
+                        null as ""missionStatusFilter"",
+                        null as ""mapRequestHazardFilter"",
+                        null as ""mapRequestStatusFilter"",
+                        null as ""mapRequestLayerFilter""
                     from public.reports r 
                     join public.persons p on p.""Id"" = r.""CreatorUserId""
                     left join public.organizations o on o.""Id"" = p.""OrganizationId""
@@ -201,9 +226,39 @@ namespace Ermes.GeoJson
                         0 as ""activityFilter"",
                         null as ""hazardFilter"",
                         null as ""reportStatusFilter"",
-                        null as ""missionStatusFilter""
+                        null as ""missionStatusFilter"",
+                        null as ""mapRequestHazardFilter"",
+                        null as ""mapRequestStatusFilter"",
+                        null as ""mapRequestLayerFilter""
                     from public.reportrequests r2 
                     join public.persons p on p.""Id"" = r2.""CreatorUserId""
+                    left join public.organizations o on o.""Id"" = p.""OrganizationId""
+                    union
+                    select 
+                        mr.""Id"" as ""id"",
+                        mr.""Code"" as ""details"", 
+                        to_char(lower(mr.""Duration""), 'YYYY-MM-DD""T""HH24:MI:SSZ') as ""startDate"", 
+                        to_char(upper(mr.""Duration""), 'YYYY-MM-DD""T""HH24:MI:SSZ') as ""endDate"", 
+                        lower(mr.""Duration"") as ""startDateFilter"", 
+                        upper(mr.""Duration"") as ""endDateFilter"", 
+                        'MapRequest' as ""type"", 
+                        ST_CENTROID(mr.""AreaOfInterest"") as ""location"", 
+                        mr.""Status"" as ""status"",
+                        o.""Id"" as ""organizationId"",
+                        o.""Name"" as ""organizationName"",
+                        o.""ParentId"" as ""organizationParentId"",
+                        null as ""extensionData"",
+                        p.""Username"" as ""creator"",
+                        null as ""statusFilter"",
+                        0 as ""activityFilter"",
+                        null as ""hazardFilter"",
+                        null as ""reportStatusFilter"",
+                        null as ""missionStatusFilter"",
+                        mr.""Hazard"" as ""mapRequestHazardFilter"",
+                        mr.""Status"" as ""mapRequestStatusFilter"",
+                        mr.""Layer"" as ""mapRequestLayerFilter""
+                    from public.map_requests mr
+                    join public.persons p on p.""Id"" = mr.""CreatorUserId""
                     left join public.organizations o on o.""Id"" = p.""OrganizationId""
                     union
                     SELECT 
@@ -225,7 +280,10 @@ namespace Ermes.GeoJson
                         coalesce(a.""ParentId"", a.""Id"") as ""activityFilter"",
                         null as ""hazardFilter"",
                         null as ""reportStatusFilter"",
-                        null as ""missionStatusFilter""
+                        null as ""missionStatusFilter"",
+                        null as ""mapRequestHazardFilter"",
+                        null as ""mapRequestStatusFilter"",
+                        null as ""mapRequestLayerFilter""
                         FROM (
 	                        SELECT pa2.""PersonId"", MAX(pa2.""Timestamp"") as ""MaxTime""
                             FROM person_actions pa2
@@ -333,6 +391,36 @@ namespace Ermes.GeoJson
                     command.Parameters.Add(p);
                 }
 
+                if (mapRequestHazardTypes != null && mapRequestHazardTypes.Count > 0)
+                {
+                    command.CommandText += @" and (tmp.""mapRequestHazardFilter"" is null or tmp.""mapRequestHazardFilter"" = any(array[@mapRequestHazardTypes]))";
+                    var p = new NpgsqlParameter("@mapRequestHazardTypes", NpgsqlDbType.Array | NpgsqlDbType.Text)
+                    {
+                        Value = mapRequestHazardTypes.Select(a => a.ToString()).ToArray()
+                    };
+                    command.Parameters.Add(p);
+                }
+
+                if (mapRequestLayerTypes != null && mapRequestLayerTypes.Count > 0)
+                {
+                    command.CommandText += @" and (tmp.""mapRequestLayerFilter"" is null or tmp.""mapRequestLayerFilter"" = any(array[@mapRequestLayerTypes]))";
+                    var p = new NpgsqlParameter("@mapRequestLayerTypes", NpgsqlDbType.Array | NpgsqlDbType.Text)
+                    {
+                        Value = mapRequestLayerTypes.Select(a => a.ToString()).ToArray()
+                    };
+                    command.Parameters.Add(p);
+                }
+
+                if (mapRequestStatusTypes != null && mapRequestStatusTypes.Count > 0)
+                {
+                    command.CommandText += @" and (tmp.""mapRequestStatusFilter"" is null or tmp.""mapRequestStatusFilter"" = any(array[@mapRequestStatusTypes]))";
+                    var p = new NpgsqlParameter("@mapRequestStatusTypes", NpgsqlDbType.Array | NpgsqlDbType.Text)
+                    {
+                        Value = mapRequestStatusTypes.Select(a => a.ToString()).ToArray()
+                    };
+                    command.Parameters.Add(p);
+                }
+
                 using (var result = command.ExecuteReader())
                 {
                     if (result.Read())
@@ -340,9 +428,7 @@ namespace Ermes.GeoJson
                     else
                         return null;
                 }
-
             }
-
         }
 
         public string GetPersonActions(DateTime startDate, DateTime endDate, int[] organizationIdList, List<ActionStatusType> statusTypes, int[] activityIds, Geometry boundingBox, string search = "", string language = "it")

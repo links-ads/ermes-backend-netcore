@@ -1,3 +1,7 @@
+Ver.
+------------------------
+- Feature - MapRequest management in GetFeatureCollection api (#50)
+
 Ver. 2.3.0 - 2021-09-16
 -------------------------
 - Feature - MapRequest management added (migration added) (#45)
