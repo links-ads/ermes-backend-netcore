@@ -230,6 +230,8 @@ namespace Ermes
             configuration.CreateMap<ImportResultDto, ImportUsersDto>().ReverseMap();
             configuration.CreateMap<MapRequests.MapRequest, MapRequestDto>()
                             .ForMember(dto => dto.Centroid, options => options.MapFrom(b => new PointPosition(b.AreaOfInterest.Centroid.X, b.AreaOfInterest.Centroid.Y)))
+                            .ForMember(dto => dto.Organization, options => options.MapFrom(b => b.Creator.Organization))
+                            .ForMember(dto => dto.Username, options => options.MapFrom(b => b.Creator.Username))
                             .AfterMap((src, dest) => dest.Duration.LowerBound = dest.Duration.LowerBound.ToUniversalTime())
                             .AfterMap((src, dest) => dest.Duration.UpperBound = dest.Duration.UpperBound.ToUniversalTime())
                             .ReverseMap()

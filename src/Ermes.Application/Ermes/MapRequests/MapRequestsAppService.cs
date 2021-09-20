@@ -49,7 +49,7 @@ namespace Ermes.MapRequests
         {
             var mapReq = await _mapRequestManager.GetMapRequestByIdAsync(mapRequestId);
             if (mapReq == null)
-                throw new UserFriendlyException(L("InvalidCommunicationId", mapRequestId));
+                throw new UserFriendlyException(L("InvalidEntityId", "MapRequest", mapRequestId));
 
             if (mapReq.Creator.OrganizationId != _session.LoggedUserPerson.OrganizationId && mapReq.Creator.Organization.ParentId.HasValue && mapReq.Creator.Organization.ParentId.Value != _session.LoggedUserPerson.OrganizationId)
                 throw new UserFriendlyException(L("EntityOutsideOrganization"));
