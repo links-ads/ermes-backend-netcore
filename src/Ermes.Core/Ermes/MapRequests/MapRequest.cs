@@ -58,6 +58,6 @@ namespace Ermes.MapRequests
         public string ErrorMessage { get; set; }
 
         [ForeignKey("CreatorUserId")]
-        public Person Creator { get; set; }
+        public virtual Person Creator { get; set; }
     }
 }

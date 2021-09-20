@@ -1,6 +1,7 @@
 ﻿using Ermes.Dto;
 using Ermes.Dto.Spatial;
 using Ermes.Enums;
+using Ermes.Organizations.Dto;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -19,5 +20,7 @@ namespace Ermes.MapRequests.Dto
         public int DataTypeId { get; set; }
         public MapRequestStatusType Status { get; set; }
         public string ErrorMessage { get; set; }
+        public OrganizationDto Organization { get; set; }
+        public string Username { get; set; }
     }
 }
