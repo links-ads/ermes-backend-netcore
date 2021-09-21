@@ -358,10 +358,29 @@ namespace Ermes.Reports
             var report = await _reportManager.GetReportByIdAsync(input.Id);
             if (report == null)
                 throw new UserFriendlyException(L("InvalidReportId", input.Id));
+            
             //report can be created by citizens
             //they won't have an organizationId associated
-            if (report.Creator.OrganizationId.HasValue && report.Creator.OrganizationId.Value != _session.LoggedUserPerson.OrganizationId)
+            var hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Reports.Report_CanSeeCrossOrganization);
+            if (!hasPermission)
+            {
+                //Father Org can see child contents
+                //false the contrary
+                if (
+                    report.Creator.OrganizationId.HasValue && 
+                    (
+                        report.Creator.OrganizationId.Value != _session.LoggedUserPerson.OrganizationId &&
+                        (
+                            !report.Creator.Organization.ParentId.HasValue ||
+                            (
+                                report.Creator.Organization.ParentId.HasValue && 
+                                report.Creator.Organization.ParentId.Value != _session.LoggedUserPerson.OrganizationId
+                            )
+                        )
+                    )
+                )
                 throw new UserFriendlyException(L("EntityOutsideOrganization"));
+            }
 
             var properties = ObjectMapper.Map<ReportDto>(report);
             properties.IsEditable = (report.CreatorUserId == _session.UserId);
