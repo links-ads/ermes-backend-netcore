@@ -271,8 +271,12 @@ namespace Ermes.Teams
             Team team = _teamManager.GetTeamById(teamId);
             if (team == null)
                 throw new UserFriendlyException(L("InvalidEntityId", teamId, "Team"));
-            if (_session.LoggedUserPerson.OrganizationId.HasValue && _session.LoggedUserPerson.OrganizationId.Value != team.OrganizationId && _session.LoggedUserPerson.OrganizationId != team.Organization.ParentId)
-                throw new UserFriendlyException(L("EntityOutsideOrganization", team.Name));
+            var hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Teams.Team_CanViewAll);
+            if (!hasPermission)
+            {
+                if (_session.LoggedUserPerson.OrganizationId.HasValue && _session.LoggedUserPerson.OrganizationId.Value != team.OrganizationId && _session.LoggedUserPerson.OrganizationId != team.Organization.ParentId)
+                    throw new UserFriendlyException(L("EntityOutsideOrganization", team.Name));
+            }
 
             return team;
         }

@@ -193,6 +193,23 @@ namespace Ermes.MapRequests
         public virtual async Task<GetEntityByIdOutput<MapRequestDto>> GetMapRequestById(GetEntityByIdInput<int> input)
         {
             var mr = await GetMapRequestAsync(input.Id);
+            var hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.MapRequests.MapRequest_CanSeeCrossOrganization);
+            if(!hasPermission)
+            {
+                //Father Org can see child contents
+                //false the contrary
+                if (
+                        mr.Creator.OrganizationId != _session.LoggedUserPerson.OrganizationId &&
+                        (
+                            !mr.Creator.Organization.ParentId.HasValue ||
+                            (
+                                mr.Creator.Organization.ParentId.HasValue &&
+                                mr.Creator.Organization.ParentId.Value != _session.LoggedUserPerson.OrganizationId
+                            )
+                        )
+                    )
+                    throw new UserFriendlyException(L("EntityOutsideOrganization"));
+            }
             var writer = new GeoJsonWriter();
             var res = new GetEntityByIdOutput<MapRequestDto>()
             {
