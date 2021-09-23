@@ -9,6 +9,7 @@ using Abp.Authorization;
 using Ermes.Authorization;
 using Abp.SocialMedia;
 using Abp.CsiServices;
+using Abp.Importer;
 
 namespace Ermes
 {
@@ -16,7 +17,8 @@ namespace Ermes
         typeof(ErmesCoreModule), 
         typeof(AbpAutoMapperModule),
         typeof(AbpSocialMediaModule),
-        typeof(AbpCsiModule))]
+        typeof(AbpCsiModule),
+        typeof(AbpImporterModule))]
     public class ErmesApplicationModule : AbpModule
     {
         public override void PreInitialize()
