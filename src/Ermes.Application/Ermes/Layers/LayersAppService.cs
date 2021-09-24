@@ -31,7 +31,7 @@ namespace Ermes.Layers
                 Exception: Importer service not available
             "
         )]
-        public async Task<List<string>> GetLayers(GetLayersInput input)
+        public virtual async Task<List<string>> GetLayers(GetLayersInput input)
         {
             input.Start = input.Start == null ? DateTime.MinValue : input.Start;
             input.End = input.End == null ? DateTime.MaxValue : input.End;
