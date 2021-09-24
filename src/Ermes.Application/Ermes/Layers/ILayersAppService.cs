@@ -1,4 +1,5 @@
 ﻿using Ermes.Interfaces;
+using Ermes.Layers.Dto;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,6 +9,6 @@ namespace Ermes.Layers
 {
     public interface ILayersAppService: IBackofficeApi
     {
-        Task<List<string>> GetLayers();
+        Task<List<string>> GetLayers(GetLayersInput input);
     }
 }

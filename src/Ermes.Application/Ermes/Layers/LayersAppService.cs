@@ -1,6 +1,8 @@
 ﻿using Abp.Importer;
 using Ermes.Attributes;
 using Ermes.Authorization;
+using Ermes.Layers.Dto;
+using Newtonsoft.Json;
 using NSwag.Annotations;
 using System;
 using System.Collections.Generic;
@@ -29,10 +31,13 @@ namespace Ermes.Layers
                 Exception: Importer service not available
             "
         )]
-        public virtual async Task<List<string>> GetLayers()
+        public async Task<List<string>> GetLayers(GetLayersInput input)
         {
+            input.Start = input.Start == null ? DateTime.MinValue : input.Start;
+            input.End = input.End == null ? DateTime.MaxValue : input.End;
             //TODO: results need to joined with layer definition
-            return await _importerMananger.GetLayers();
+            var res = await _importerMananger.GetLayers(input.DataTypeIds, input.Bbox, input.Start.Value, input.End.Value);
+            return JsonConvert.DeserializeObject<List<string>>(res.ToString());
         }
     }
 }

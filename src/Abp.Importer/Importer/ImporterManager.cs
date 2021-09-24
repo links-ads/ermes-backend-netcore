@@ -1,70 +1,36 @@
-﻿using Abp.Importer.Configuration;
-using Abp.Importer.Dto;
-using Abp.UI;
-using Newtonsoft.Json;
+﻿using Abp.Importer.Api;
+using Abp.Importer.Client;
+using Abp.Importer.Configuration;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Abp.Importer
 {
     public class ImporterManager : IImporterManager
     {
-        private static HttpClient ImporterClient;
         private readonly IImporterConnectionProvider _connectionProvider;
 
         public ImporterManager(IImporterConnectionProvider connectionProvider)
         {
             _connectionProvider = connectionProvider;
-            GetImporterClient();
+            Configure();
         }
 
-        private void GetImporterClient()
+        private void Configure()
         {
-            HttpClient client = new HttpClient();
-            client.DefaultRequestHeaders.Add(_connectionProvider.GetHeaderName(), _connectionProvider.GetApiKey());
-            client.BaseAddress = new Uri(_connectionProvider.GetBaseUrl());
-            ImporterClient = client;
-            return;
+            var apiKeyDict = new Dictionary<string, string>
+            {
+                { _connectionProvider.GetHeaderName(), _connectionProvider.GetApiKey() }
+            };
+            GlobalConfiguration.Instance = new GlobalConfiguration(new Dictionary<string, string>(), apiKeyDict, new Dictionary<string, string>(), _connectionProvider.GetBaseUrl());
         }
 
-        public async Task<List<string>> GetLayers()
+        public async Task<object> GetLayers(List<string> datatype_ids, string bbox, DateTime start, DateTime end)
         {
-            if (ImporterClient == null)
-                GetImporterClient();
-
-            Uri uri = new Uri(ImporterClient.BaseAddress + "/layers");
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
-            HttpResponseMessage response = null;
-            try
-            {
-                response = await ImporterClient.SendAsync(request);
-            }
-            catch (Exception ex)
-            {
-                throw new UserFriendlyException(ex.Message);
-            }
-
-            var responseValue = string.Empty;
-            if (response != null && response.StatusCode == HttpStatusCode.OK)
-            {
-                Task task = response.Content.ReadAsStreamAsync().ContinueWith(t =>
-                {
-                    var stream = t.Result;
-                    using var reader = new StreamReader(stream);
-                    responseValue = reader.ReadToEnd();
-                });
-
-                task.Wait();
-
-                return JsonConvert.DeserializeObject<List<string>>(responseValue);
-            }
-            else
-                throw new UserFriendlyException("ImporterNotAvailable");
+            var api = new DashboardApi();
+            return await api.GetLayersLayersGetAsync(datatype_ids, bbox, start, end);
         }
     }
 }
