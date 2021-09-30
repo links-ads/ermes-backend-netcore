@@ -6,17 +6,25 @@ namespace Abp.CsiServices.Csi.Dto
 {
     public class SearchVolontarioOutput
     {
-        public int codEsitoElaborazione { get; set; }
-        public EsitoElaborazioneType EsiteElaborazione
+        public string ProcessedCode { get; set; }
+        public ProcessedCodeType ProcessedCodeTypeEnum
         {
             get {
-                return (EsitoElaborazioneType)codEsitoElaborazione;
+                return ProcessedCode switch
+                {
+                    "0001" => ProcessedCodeType.ElaborazioneTerminataCorretamente,
+                    "0005" => ProcessedCodeType.CampoObbligatorioNonPresente,
+                    "0010" => ProcessedCodeType.ErroreParametriInput,
+                    "0022" => ProcessedCodeType.SistemaDiMateriaChiamanteNonEsistente,
+                    "0030" => ProcessedCodeType.VolontarioNonEsistente,
+                    _ => ProcessedCodeType.SistemaDiMateriaChiamanteNonEsistente,
+                };
             }
         }
-        public string descrEsitoElaborazione { get; set; }
-        public int IDpersona { get; set; }
+        public string DescriptionOutcome { get; set; }
+        public int VolterId { get; set; }
         
-        public enum EsitoElaborazioneType
+        public enum ProcessedCodeType
         {
             ElaborazioneTerminataCorretamente = 1,
             CampoObbligatorioNonPresente = 5,
