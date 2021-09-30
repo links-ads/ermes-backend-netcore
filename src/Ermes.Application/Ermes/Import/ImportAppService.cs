@@ -39,6 +39,7 @@ using io.fusionauth.domain;
 using Ermes.Tips;
 using Ermes.Quizzes;
 using Ermes.Answers;
+using Ermes.Layers;
 
 namespace Ermes.Import
 {
@@ -59,6 +60,7 @@ namespace Ermes.Import
         private readonly TipManager _tipManager;
         private readonly QuizManager _quizManager;
         private readonly AnswerManager _answerManager;
+        private readonly LayerManager _layerManager;
         private readonly ErmesPermissionChecker _permissionChecker;
         private readonly IOptions<FusionAuthSettings> _fusionAuthSettings;
 
@@ -78,6 +80,7 @@ namespace Ermes.Import
             ErmesAppSession session,
             TipManager tipManager,
             QuizManager quizManager,
+            LayerManager layerManager,
             AnswerManager answerManager)
         {
             _httpContextAccessor = httpContextAccessor;
@@ -96,6 +99,7 @@ namespace Ermes.Import
             _tipManager = tipManager;
             _quizManager = quizManager;
             _answerManager = answerManager;
+            _layerManager = layerManager;
         }
 
         private async Task UploadImportSourceAndCleanup(IImportResourceContainer resourceContainer, bool success, IFormFile file, String tempFilePath)
@@ -295,6 +299,26 @@ s            "
 
                 return ObjectMapper.Map<ImportResultDto>(result);
             }, new ImportUsersResourceContainer(), AcceptedUsersSourceMimeTypes);
+        }
+
+        #endregion
+
+        #region Layers
+
+        [OpenApiOperation("Import Layers",
+           @"
+                Import (creating or updating) a list of layer and relative translations.
+                Input: attach as form-data an excel (.xls or .xlsx) file with the correct format
+                Output: An import result dto, containing a summary of insertions and updates
+s            "
+       )]
+        [ErmesAuthorize(AppPermissions.Imports.Import_Layers)]
+        public virtual async Task<ImportResultDto> ImportLayers(IFormFile file)
+        {
+            return await LoadFileAndImport((filename, contentType) =>
+            {
+                return LayersImporter.ImportLayersAsync(filename, contentType, _layerManager, _localizer, CurrentUnitOfWork);
+            }, new ImportLayersResourceContainer(), AcceptedCategorySourceMimeTypes);
         }
 
         #endregion

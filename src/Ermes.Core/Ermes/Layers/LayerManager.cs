@@ -26,5 +26,25 @@ namespace Ermes.Layers
         {
             return await Layers.ToListAsync();
         }
+
+        public async Task<Layer> GetLayerByDataTypeIdAsync(int dataTypeId)
+        {
+            return await Layers.SingleOrDefaultAsync(l => l.DataTypeId == dataTypeId);
+        }
+
+        public async Task InsertOrUpdateLayerAsync(Layer layer)
+        {
+            await LayerRepository.InsertOrUpdateAsync(layer);
+        }
+
+        public async Task<LayerTranslation> GetLayerTranslationByCoreIdLanguageAsync(int coreId, string language)
+        {
+            return await LayersTranslation.SingleOrDefaultAsync(a => a.CoreId == coreId && a.Language == language);
+        }
+
+        public async Task InsertOrUpdateLayerTranslationAsync(LayerTranslation translation)
+        {
+            await LayerTranslationRepository.InsertOrUpdateAsync(translation);
+        }
     }
 }
