@@ -15,12 +15,22 @@ namespace Ermes.Layers
     public class LayersAppService : ErmesAppServiceBase, ILayersAppService
     {
         private readonly IImporterManager _importerMananger;
-        public LayersAppService(IImporterManager importerMananger)
+        private readonly LayerManager _layerManager;
+        public LayersAppService(IImporterManager importerMananger, LayerManager layerManager)
         {
             _importerMananger = importerMananger;
+            _layerManager = layerManager;
         }
 
-        [OpenApiOperation("Get list of layers",
+        [ErmesIgnoreApi(true)]
+        [OpenApiOperation("Get static definition of layer list")]
+        public virtual async Task<List<LayerDto>> GetLayerDefinition()
+        {
+            var layers = await _layerManager.GetLayerDefinitionAsync();
+            return ObjectMapper.Map<List<LayerDto>>(layers);
+        }
+
+        [OpenApiOperation("Get list of available layers on Importer Module",
             @"
                 Input: use the following properties to filter result list:
                     - Start: start date

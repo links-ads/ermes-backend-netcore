@@ -141,5 +141,16 @@ namespace Ermes.Users
                 Profile = await GetProfileInternal(person, currentUser, _personManager, _missionManager)
             };
         }
+
+        //[OpenApiOperation("Create User",
+        //    @"
+        //        BirthDate format: yyyy-mm-dd
+        //    "
+        //)]
+        //public async Task RegisterUser(RegisterUserEventInput input)
+        //{
+        //    Logger.Info("-------------- WebHook works fine! ---------------------");
+        //    return;
+        //}
     }
 }

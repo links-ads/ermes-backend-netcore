@@ -57,6 +57,8 @@ using Ermes.Gamification.Dto;
 using Ermes.Quizzes;
 using Ermes.Answers;
 using Ermes.MapRequests.Dto;
+using Ermes.Layers;
+using Ermes.Layers.Dto;
 
 namespace Ermes
 {
@@ -70,6 +72,7 @@ namespace Ermes
             configuration.CreateMultiLingualMap<Tip, TipTranslation, TipDto>(context);
             configuration.CreateMultiLingualMap<Quiz, QuizTranslation, QuizDto>(context);
             configuration.CreateMultiLingualMap<Answer, AnswerTranslation, AnswerDto>(context);
+            configuration.CreateMultiLingualMap<Layer, LayerTranslation, LayerDto>(context);
             configuration.CreateMap<User, UserDto>()
                             .ReverseMap()
                             .ForMember(entity => entity.passwordChangeRequired, options => options.MapFrom(dto => false))
