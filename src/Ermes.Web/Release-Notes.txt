@@ -1,7 +1,11 @@
 Ver.
 ------------------------
-- BugFix - GetEntityById permission and visibility fix (#51)
+
+
+Ver. 2.3.1 - 2021-09-23
+------------------------
 - Feature - MapRequest management in GetFeatureCollection api (#50)
+- BugFix - GetEntityById permission and visibility fix (#51)
 
 Ver. 2.3.0 - 2021-09-16
 -------------------------
