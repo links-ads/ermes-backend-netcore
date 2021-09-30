@@ -20,6 +20,7 @@ namespace Abp.CsiServices.Csi
         private readonly ICsiConnectionProvider _connectionProvider;
         private static HttpClient CsiClient;
         private readonly ILogger Logger;
+        private const string SUBJECT_CODE = "FAS";
 
         public CsiManager(ICsiConnectionProvider connectionProvider, ILogger<CsiManager> logger)
         {
@@ -33,45 +34,53 @@ namespace Abp.CsiServices.Csi
             HttpClient client = new HttpClient();
             var byteArray = Encoding.ASCII.GetBytes(string.Format("{0}:{1}", _connectionProvider.GetUsername(), _connectionProvider.GetPassword()));
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             client.BaseAddress = new Uri(_connectionProvider.GetBaseUrl());
             return client;
         }
 
         public async Task<int> SearchVolontarioAsync(string taxCode)
         {
-            var builder = new UriBuilder(CsiClient.BaseAddress + "/searchvolontario");
-            var query = HttpUtility.ParseQueryString(builder.Query);
-            query["CodiceMateria"] = "1";
-            query["CodFiscaleVolontario"] = taxCode;
-            builder.Query = query.ToString();
-            string url = builder.ToString();
+            //CSI service only accepts HTTP GET request with params in the body
+            //there's no possibility to use query string params
 
-            return 5;
-            //HttpResponseMessage response = await CsiClient.GetAsync(url);
-            //var responseValue = string.Empty;
-            //if (response != null && response.StatusCode == HttpStatusCode.OK)
-            //{
-            //    Task task = response.Content.ReadAsStreamAsync().ContinueWith(t =>
-            //    {
-            //        var stream = t.Result;
-            //        using var reader = new StreamReader(stream);
-            //        responseValue = reader.ReadToEnd();
-            //    });
+            var builder = new UriBuilder(CsiClient.BaseAddress + "/SearchVolontario");
+            string requestBody = JsonConvert.SerializeObject(new SearchVolontarioInput()
+            {
+                subjectCode = SUBJECT_CODE,
+                fiscalCodeVoluntary = taxCode
+            });
 
-            //    task.Wait();
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(builder.ToString()),
+                Content =  new StringContent(requestBody, Encoding.UTF8, "application/json")
+            };
+            
+            HttpResponseMessage response = await CsiClient.SendAsync(request);
+            var responseValue = string.Empty;
+            if (response != null && response.StatusCode == HttpStatusCode.OK)
+            {
+                Task task = response.Content.ReadAsStreamAsync().ContinueWith(t =>
+                {
+                    var stream = t.Result;
+                    using var reader = new StreamReader(stream);
+                    responseValue = reader.ReadToEnd();
+                });
 
-            //    var result = JsonConvert.DeserializeObject<SearchVolontarioOutput>(responseValue);
-            //    if (result.EsiteElaborazione == SearchVolontarioOutput.EsitoElaborazioneType.ElaborazioneTerminataCorretamente)
-            //        return result.codEsitoElaborazione;
-            //    else
-            //    {
-            //        Logger.LogError($"################CSI Service error: {result.codEsitoElaborazione}");
-            //        return -1;
+                task.Wait();
 
-            //    }
-            //}
-            //else
-            //    throw new UserFriendlyException("CsiNotAvailable");
+                var result = JsonConvert.DeserializeObject<SearchVolontarioOutput>(responseValue);
+                if (result.ProcessedCodeTypeEnum == SearchVolontarioOutput.ProcessedCodeType.ElaborazioneTerminataCorretamente)
+                    return result.VolterId;
+                else
+                    Logger.LogError($"################ CSI Service error {result.ProcessedCode}: {result.DescriptionOutcome}");
+            }
+            else
+                Logger.LogError($"################ CSI Service not available");
+
+            return -1;
         }
     }
 }
