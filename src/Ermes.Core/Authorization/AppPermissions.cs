@@ -18,6 +18,7 @@ namespace Ermes.Authorization
             public const string Import_Categories = "Import.Categories";
             public const string Import_Gamification = "Import.Gamification";
             public const string Import_Users = "Import.Users";
+            public const string Import_Layers = "Import.Layers";
         }
 
         public static class Organizations

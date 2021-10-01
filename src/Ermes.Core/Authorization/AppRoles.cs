@@ -21,6 +21,7 @@ namespace Ermes.Authorization
             AppPermissions.Imports.Import_Categories,
             AppPermissions.Imports.Import_Gamification,
             AppPermissions.Imports.Import_Users,
+            AppPermissions.Imports.Import_Layers,
             AppPermissions.Organizations.Organization,
             AppPermissions.Organizations.Organization_CanViewAll,
             AppPermissions.Organizations.Organization_CanCreate,

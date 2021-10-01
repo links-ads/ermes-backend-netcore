@@ -9,6 +9,8 @@ namespace Ermes.Layers
 {
     public interface ILayersAppService: IBackofficeApi
     {
-        Task<List<string>> GetLayers(GetLayersInput input);
+        Task<GetLayersOutput> GetLayers(GetLayersInput input);
+
+        Task<List<LayerDto>> GetLayerDefinition();
     }
 }
