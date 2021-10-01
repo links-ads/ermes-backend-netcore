@@ -1,4 +1,5 @@
 ﻿using Abp.Importer;
+using Abp.UI;
 using Ermes.Attributes;
 using Ermes.Authorization;
 using Ermes.Layers.Dto;
@@ -6,6 +7,7 @@ using Newtonsoft.Json;
 using NSwag.Annotations;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -22,7 +24,6 @@ namespace Ermes.Layers
             _layerManager = layerManager;
         }
 
-        [ErmesIgnoreApi(true)]
         [OpenApiOperation("Get static definition of layer list")]
         public virtual async Task<List<LayerDto>> GetLayerDefinition()
         {
@@ -41,13 +42,52 @@ namespace Ermes.Layers
                 Exception: Importer service not available
             "
         )]
-        public virtual async Task<List<string>> GetLayers(GetLayersInput input)
+        public virtual async Task<GetLayersOutput> GetLayers(GetLayersInput input)
         {
+            var result = new GetLayersOutput();
             input.Start = input.Start == null ? DateTime.MinValue : input.Start;
             input.End = input.End == null ? DateTime.MaxValue : input.End;
-            //TODO: results need to joined with layer definition
-            var res = await _importerMananger.GetLayers(input.DataTypeIds, input.Bbox, input.Start.Value, input.End.Value);
-            return JsonConvert.DeserializeObject<List<string>>(res.ToString());
+            try
+            {
+                //1) Get available list of layers from Importer Module
+                //2) Join this list with layer definition
+                //3) Group the result by GroupKey and SubGroupKey
+                var res = await _importerMananger.GetLayers(input.DataTypeIds, input.Bbox, input.Start.Value, input.End.Value);
+                var availableLayers = JsonConvert.DeserializeObject<List<string>>(res.ToString());
+                var availableLayersInt = availableLayers.Select(a => int.Parse(a.Split("_").FirstOrDefault())).ToList();
+                var layerDefinition = await _layerManager.GetLayerDefinitionAsync();
+
+                var joinedLayerList = layerDefinition.Join(
+                            availableLayersInt,
+                            a => a.DataTypeId,
+                            b => b,
+                            (a, b) => a
+                        )
+                    .ToList();
+
+                result.LayerGroups =
+                    joinedLayerList
+                    .Select(a => ObjectMapper.Map<LayerDto>(a))
+                    .GroupBy(a => new { a.GroupKey, a.Group })
+                    .Select(a => new LayerGroupDto()
+                    {
+                        GroupKey = a.Key.GroupKey,
+                        Group = a.Key.Group,
+                        SubGroups = a.ToList().GroupBy(b => new { b.SubGroupKey, b.SubGroup }).Select(c => new LayerSubGroupDto()
+                        {
+                            SubGroupKey = c.Key.SubGroupKey,
+                            SubGroup = c.Key.SubGroup,
+                            Layers = c.ToList()
+                        }).ToList()
+                    })
+                    .ToList();
+            }
+            catch(Exception e)
+            {
+                Logger.ErrorFormat("#####Importer module not available: {0}", e.Message);
+            }
+
+            return result;
         }
     }
 }
