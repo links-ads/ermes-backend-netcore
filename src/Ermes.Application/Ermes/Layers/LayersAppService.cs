@@ -54,33 +54,40 @@ namespace Ermes.Layers
                 //3) Group the result by GroupKey and SubGroupKey
                 var res = await _importerMananger.GetLayers(input.DataTypeIds, input.Bbox, input.Start.Value, input.End.Value);
                 var availableLayers = JsonConvert.DeserializeObject<List<string>>(res.ToString());
-                var availableLayersInt = availableLayers.Select(a => int.Parse(a.Split("_").FirstOrDefault())).ToList();
                 var layerDefinition = await _layerManager.GetLayerDefinitionAsync();
 
-                var joinedLayerList = layerDefinition.Join(
-                            availableLayersInt,
-                            a => a.DataTypeId,
-                            b => b,
-                            (a, b) => a
-                        )
-                    .ToList();
+                try
+                {
+                    var joinedLayerList = layerDefinition.Join(
+                                availableLayers.Select(a => new { DataTypeId = int.Parse(a.Split("_").First().Split(":").ElementAt(1)), FullName = a }).ToList(),
+                                a => a.DataTypeId,
+                                b => b.DataTypeId,
+                                (a, b) => new { Props = a, b.FullName }
+                            )
+                        .ToList();
 
-                result.LayerGroups =
-                    joinedLayerList
-                    .Select(a => ObjectMapper.Map<LayerDto>(a))
-                    .GroupBy(a => new { a.GroupKey, a.Group })
-                    .Select(a => new LayerGroupDto()
-                    {
-                        GroupKey = a.Key.GroupKey,
-                        Group = a.Key.Group,
-                        SubGroups = a.ToList().GroupBy(b => new { b.SubGroupKey, b.SubGroup }).Select(c => new LayerSubGroupDto()
+                    result.LayerGroups =
+                        joinedLayerList
+                        .Select(a => new { Props = ObjectMapper.Map<LayerDto>(a.Props), a.FullName })
+                        .Select(a => { a.Props.FullName = a.FullName; return a.Props; })
+                        .GroupBy(a => new { a.GroupKey, a.Group })
+                        .Select(a => new LayerGroupDto()
                         {
-                            SubGroupKey = c.Key.SubGroupKey,
-                            SubGroup = c.Key.SubGroup,
-                            Layers = c.ToList()
-                        }).ToList()
-                    })
-                    .ToList();
+                            GroupKey = a.Key.GroupKey,
+                            Group = a.Key.Group,
+                            SubGroups = a.ToList().GroupBy(b => new { b.SubGroupKey, b.SubGroup }).Select(c => new LayerSubGroupDto()
+                            {
+                                SubGroupKey = c.Key.SubGroupKey,
+                                SubGroup = c.Key.SubGroup,
+                                Layers = c.ToList()
+                            }).ToList()
+                        })
+                        .ToList();
+                }
+                catch(Exception e)
+                {
+                    throw new UserFriendlyException("MalformedLayerName");
+                }
             }
             catch(Exception e)
             {

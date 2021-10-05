@@ -1,5 +1,9 @@
 Ver.
 ------------------------
+
+
+Ver. 2.4.0 - 2021-10-01
+------------------------
 - Feature - Importer module added (#52)
 - Feature - Layers definition and GetLayers function implementation (migration added)(#53)
 
