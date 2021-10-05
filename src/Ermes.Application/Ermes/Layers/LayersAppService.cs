@@ -8,7 +8,6 @@ using NSwag.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Ermes.Layers
@@ -25,10 +24,28 @@ namespace Ermes.Layers
         }
 
         [OpenApiOperation("Get static definition of layer list")]
-        public virtual async Task<List<LayerDto>> GetLayerDefinition()
+        public virtual async Task<GetLayersOutput> GetLayerDefinition()
         {
+            var result = new GetLayersOutput();
             var layers = await _layerManager.GetLayerDefinitionAsync();
-            return ObjectMapper.Map<List<LayerDto>>(layers);
+            result.LayerGroups =
+                        layers
+                        .Select(a => ObjectMapper.Map<LayerDto>(a))
+                        .GroupBy(a => new { a.GroupKey, a.Group })
+                        .Select(a => new LayerGroupDto()
+                        {
+                            GroupKey = a.Key.GroupKey,
+                            Group = a.Key.Group,
+                            SubGroups = a.ToList().GroupBy(b => new { b.SubGroupKey, b.SubGroup }).Select(c => new LayerSubGroupDto()
+                            {
+                                SubGroupKey = c.Key.SubGroupKey,
+                                SubGroup = c.Key.SubGroup,
+                                Layers = c.ToList()
+                            }).ToList()
+                        })
+                        .ToList();
+
+            return result;
         }
 
         [OpenApiOperation("Get list of available layers on Importer Module",

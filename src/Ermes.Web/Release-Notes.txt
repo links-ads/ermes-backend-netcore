@@ -2,6 +2,10 @@ Ver.
 ------------------------
 
 
+Ver. 2.4.1 - 2021-10-05
+------------------------
+- Feature - LayerDto and GetLayerDefinition API update
+
 Ver. 2.4.0 - 2021-10-01
 ------------------------
 - Feature - Importer module added (#52)
