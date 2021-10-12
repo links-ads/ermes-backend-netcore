@@ -8,7 +8,6 @@ using NSwag.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Ermes.Layers
@@ -25,10 +24,28 @@ namespace Ermes.Layers
         }
 
         [OpenApiOperation("Get static definition of layer list")]
-        public virtual async Task<List<LayerDto>> GetLayerDefinition()
+        public virtual async Task<GetLayersOutput> GetLayerDefinition()
         {
+            var result = new GetLayersOutput();
             var layers = await _layerManager.GetLayerDefinitionAsync();
-            return ObjectMapper.Map<List<LayerDto>>(layers);
+            result.LayerGroups =
+                        layers
+                        .Select(a => ObjectMapper.Map<LayerDto>(a))
+                        .GroupBy(a => new { a.GroupKey, a.Group })
+                        .Select(a => new LayerGroupDto()
+                        {
+                            GroupKey = a.Key.GroupKey,
+                            Group = a.Key.Group,
+                            SubGroups = a.ToList().GroupBy(b => new { b.SubGroupKey, b.SubGroup }).Select(c => new LayerSubGroupDto()
+                            {
+                                SubGroupKey = c.Key.SubGroupKey,
+                                SubGroup = c.Key.SubGroup,
+                                Layers = c.ToList()
+                            }).ToList()
+                        })
+                        .ToList();
+
+            return result;
         }
 
         [OpenApiOperation("Get list of available layers on Importer Module",
@@ -59,17 +76,17 @@ namespace Ermes.Layers
                 try
                 {
                     var joinedLayerList = layerDefinition.Join(
-                                availableLayers.Select(a => new { DataTypeId = int.Parse(a.Split("_").First().Split(":").ElementAt(1)), FullName = a }).ToList(),
+                                availableLayers.Select(a => new { DataTypeId = int.Parse(a.Split("_").First().Split(":").ElementAt(1)), FullName = a }).GroupBy(l => l.DataTypeId).ToList(),
                                 a => a.DataTypeId,
-                                b => b.DataTypeId,
-                                (a, b) => new { Props = a, b.FullName }
+                                b => b.Key,
+                                (a, b) => new { Layer = a, LayerGroup = b }
                             )
                         .ToList();
 
                     result.LayerGroups =
                         joinedLayerList
-                        .Select(a => new { Props = ObjectMapper.Map<LayerDto>(a.Props), a.FullName })
-                        .Select(a => { a.Props.FullName = a.FullName; return a.Props; })
+                        .Select(a => new { LayerDto = ObjectMapper.Map<LayerDto>(a.Layer), a.LayerGroup })
+                        .Select(a => { a.LayerDto.Tiles = a.LayerGroup.Select(p => p.FullName).ToList(); return a.LayerDto; })
                         .GroupBy(a => new { a.GroupKey, a.Group })
                         .Select(a => new LayerGroupDto()
                         {
