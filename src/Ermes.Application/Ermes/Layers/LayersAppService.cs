@@ -76,17 +76,17 @@ namespace Ermes.Layers
                 try
                 {
                     var joinedLayerList = layerDefinition.Join(
-                                availableLayers.Select(a => new { DataTypeId = int.Parse(a.Split("_").First().Split(":").ElementAt(1)), FullName = a }).ToList(),
+                                availableLayers.Select(a => new { DataTypeId = int.Parse(a.Split("_").First().Split(":").ElementAt(1)), FullName = a }).GroupBy(l => l.DataTypeId).ToList(),
                                 a => a.DataTypeId,
-                                b => b.DataTypeId,
-                                (a, b) => new { Props = a, b.FullName }
+                                b => b.Key,
+                                (a, b) => new { Layer = a, LayerGroup = b }
                             )
                         .ToList();
 
                     result.LayerGroups =
                         joinedLayerList
-                        .Select(a => new { Props = ObjectMapper.Map<LayerDto>(a.Props), a.FullName })
-                        .Select(a => { a.Props.FullName = a.FullName; return a.Props; })
+                        .Select(a => new { LayerDto = ObjectMapper.Map<LayerDto>(a.Layer), a.LayerGroup })
+                        .Select(a => { a.LayerDto.Tiles = a.LayerGroup.Select(p => p.FullName).ToList(); return a.LayerDto; })
                         .GroupBy(a => new { a.GroupKey, a.Group })
                         .Select(a => new LayerGroupDto()
                         {
