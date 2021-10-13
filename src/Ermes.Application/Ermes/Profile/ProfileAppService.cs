@@ -212,22 +212,22 @@ namespace Ermes.Profile
             var rolesToAssign = await GetRolesAndCheckOrganizationAndTeam(input.User.Roles, input.OrganizationId, input.TeamId, input.PersonId, _personManager, _organizationManager, _teamManager, _session, _permissionChecker);
             var user = await UpdateUserInternalAsync(input.User, _fusionAuthSettings, rolesToAssign.Select(r => r.Name).ToList());
 
-            int? legacyId;
-            if(
-                _ermesSettings.Value != null && 
-                _ermesSettings.Value.ErmesProject == AppConsts.Ermes_Faster &&
-                input.OrganizationId.HasValue
-            )
-            {
-                var refOrg = await _organizationManager.GetOrganizationByIdAsync(input.OrganizationId.Value);
-                var housePartner = await SettingManager.GetSettingValueAsync(AppSettings.General.HouseOrganization);
-                if (refOrg.Name == housePartner || (refOrg.ParentId.HasValue && refOrg.Parent.Name == housePartner))
-                {
-                    legacyId = await _csiManager.SearchVolontarioAsync(input.TaxCode);
-                    if (legacyId.HasValue && legacyId.Value >= 0)
-                        person.LegacyId = legacyId;
-                }
-            }
+            //int? legacyId;
+            //if(
+            //    _ermesSettings.Value != null && 
+            //    _ermesSettings.Value.ErmesProject == AppConsts.Ermes_Faster &&
+            //    input.OrganizationId.HasValue
+            //)
+            //{
+            //    var refOrg = await _organizationManager.GetOrganizationByIdAsync(input.OrganizationId.Value);
+            //    var housePartner = await SettingManager.GetSettingValueAsync(AppSettings.General.HouseOrganization);
+            //    if (refOrg.Name == housePartner || (refOrg.ParentId.HasValue && refOrg.Parent.Name == housePartner))
+            //    {
+            //        legacyId = await _csiManager.SearchVolontarioAsync(input.TaxCode);
+            //        if (legacyId.HasValue && legacyId.Value >= 0)
+            //            person.LegacyId = legacyId;
+            //    }
+            //}
 
             person = await CreateOrUpdatePersonInternalAsync(person, user, input.OrganizationId, input.TeamId, input.IsFirstLogin, rolesToAssign, _personManager);
 
