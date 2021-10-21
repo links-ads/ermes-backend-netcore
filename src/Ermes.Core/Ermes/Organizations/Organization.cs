@@ -66,5 +66,7 @@ namespace Ermes.Organizations
         [ForeignKey("ParentId")]
         public virtual Organization Parent { get; set; }
         public virtual int? ParentId { get; set; }
+
+        public bool MembersHaveTaxCode { get; set; }
     }
 }
