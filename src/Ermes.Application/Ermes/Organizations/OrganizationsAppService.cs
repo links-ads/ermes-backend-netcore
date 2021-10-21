@@ -67,7 +67,10 @@ namespace Ermes.Organizations
         {
             if (!_permissionChecker.IsGranted(_session.Roles, AppPermissions.Organizations.Organization_CanUpdateAll))
             {
-                if (!_permissionChecker.IsGranted(_session.Roles, AppPermissions.Organizations.Organization_CanUpdate) || _session.LoggedUserPerson.OrganizationId != updatedOrganization.Id)
+                if (
+                    !_permissionChecker.IsGranted(_session.Roles, AppPermissions.Organizations.Organization_CanUpdate) ||
+                    (_session.LoggedUserPerson.OrganizationId != updatedOrganization.Id && _session.LoggedUserPerson.OrganizationId != updatedOrganization.ParentId)
+                    )
                     throw new UserFriendlyException(L("MissingPermission", AppPermissions.Organizations.Organization_CanUpdate));
             }
 
