@@ -18,5 +18,6 @@ namespace Ermes.Organizations.Dto
         public string LogoUrl { get; set; }
         public int? ParentId { get; set; }
         public string ParentName { get; set; }
+        public bool MembersHaveTaxCode { get; set; }
     }
 }

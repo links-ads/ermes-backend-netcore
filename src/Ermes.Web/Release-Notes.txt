@@ -1,6 +1,6 @@
 Ver.
 ------------------------
-
+- Feature - Organization MembersHaveTaxCode property added (migration added)(#58)
 
 Ver. 2.4.2 - 2021-10-12
 ------------------------
