@@ -1,6 +1,6 @@
 Ver.
 ------------------------
-
+- Feature - ParentId filter in GetOrganizatins API and IsNewUser property added to Person class (migration added)(#60)
 
 Ver. 2.4.2 - 2021-10-12
 ------------------------
