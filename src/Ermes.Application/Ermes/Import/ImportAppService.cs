@@ -294,7 +294,7 @@ s            "
                     var rolesToAssgin = await _personManager.GetRolesByName(tuple.Item1.Roles);
                     //check roles, organizations, teams and permission association
                     List<Role> rolesToAssign = await GetRolesAndCheckOrganizationAndTeam(tuple.Item1.Roles, tuple.Item2.OrganizationId, tuple.Item2.TeamId, tuple.Item2.Id, _personManager, _organizationManager, _teamManager, _session, _permissionChecker);
-                    await CreateOrUpdatePersonInternalAsync(null, ObjectMapper.Map<User>(tuple.Item1), tuple.Item2.OrganizationId, tuple.Item2.TeamId, tuple.Item2.IsFirstLogin, rolesToAssign, _personManager);
+                    await CreateOrUpdatePersonInternalAsync(null, ObjectMapper.Map<User>(tuple.Item1), tuple.Item2.OrganizationId, tuple.Item2.TeamId, tuple.Item2.IsFirstLogin, tuple.Item2.IsNewUser, rolesToAssign, _personManager);
                 }
 
                 return ObjectMapper.Map<ImportResultDto>(result);

@@ -211,6 +211,7 @@ namespace Ermes.Import
                     user.Password = password;
                     user.Id = Guid.NewGuid();
                     person.FusionAuthUserGuid = user.Id;
+                    person.IsNewUser = false;
                     result.Accounts.Add(new Tuple<UserDto, Person>(user, person));
                 }
                 isFirstSheet = false;

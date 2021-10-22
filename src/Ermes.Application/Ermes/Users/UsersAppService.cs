@@ -134,7 +134,7 @@ namespace Ermes.Users
                 person = _personManager.GetPersonByFusionAuthUserGuid(currentUser.id.Value);
             }
 
-            person = await CreateOrUpdatePersonInternalAsync(person, currentUser, input.OrganizationId, input.TeamId, input.IsFirstLogin, rolesToAssign, _personManager);
+            person = await CreateOrUpdatePersonInternalAsync(person, currentUser, input.OrganizationId, input.TeamId, input.IsFirstLogin, input.IsNewUser, rolesToAssign, _personManager);
 
             return new CreateOrUpdateUserOutput()
             {

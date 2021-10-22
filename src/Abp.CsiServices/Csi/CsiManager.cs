@@ -57,28 +57,35 @@ namespace Abp.CsiServices.Csi
                 RequestUri = new Uri(builder.ToString()),
                 Content =  new StringContent(requestBody, Encoding.UTF8, "application/json")
             };
-            
-            HttpResponseMessage response = await CsiClient.SendAsync(request);
-            var responseValue = string.Empty;
-            if (response != null && response.StatusCode == HttpStatusCode.OK)
+            try
             {
-                Task task = response.Content.ReadAsStreamAsync().ContinueWith(t =>
+                HttpResponseMessage response = await CsiClient.SendAsync(request);
+                var responseValue = string.Empty;
+                if (response != null && response.StatusCode == HttpStatusCode.OK)
                 {
-                    var stream = t.Result;
-                    using var reader = new StreamReader(stream);
-                    responseValue = reader.ReadToEnd();
-                });
+                    Task task = response.Content.ReadAsStreamAsync().ContinueWith(t =>
+                    {
+                        var stream = t.Result;
+                        using var reader = new StreamReader(stream);
+                        responseValue = reader.ReadToEnd();
+                    });
 
-                task.Wait();
+                    task.Wait();
 
-                var result = JsonConvert.DeserializeObject<SearchVolontarioOutput>(responseValue);
-                if (result.ProcessedCodeTypeEnum == SearchVolontarioOutput.ProcessedCodeType.ElaborazioneTerminataCorretamente)
-                    return result.VolterId;
+                    var result = JsonConvert.DeserializeObject<SearchVolontarioOutput>(responseValue);
+                    if (result.ProcessedCodeTypeEnum == SearchVolontarioOutput.ProcessedCodeType.ElaborazioneTerminataCorretamente)
+                        return result.VolterId;
+                    else
+                        Logger.LogError($"################ CSI Service error {result.ProcessedCode}: {result.DescriptionOutcome}");
+                }
                 else
-                    Logger.LogError($"################ CSI Service error {result.ProcessedCode}: {result.DescriptionOutcome}");
+                    Logger.LogError($"################ CSI Service not available");
             }
-            else
+            catch (Exception e)
+            {
                 Logger.LogError($"################ CSI Service not available");
+                throw new UserFriendlyException("CSI service not available");
+            }
 
             return -1;
         }
