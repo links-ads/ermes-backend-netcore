@@ -220,6 +220,8 @@ namespace Ermes
 
             //Delete old associations
             await _personManager.DeletePersonRolesAsync(personId);
+            await CurrentUnitOfWork.SaveChangesAsync();
+
             // Assign roles
             foreach (Role rta in rolesToAssign)
             {
