@@ -334,7 +334,7 @@ namespace Ermes.Profile
         //    return user != null;
         //}
 
-        public virtual async Task<DTResult<OrganizationDto>> GetOrganizations(GetOrganizationsInput input)
+        public async Task<DTResult<OrganizationDto>> GetOrganizations(GetOrganizationsInput input)
         {
             PagedResultDto<OrganizationDto> result = await InternalGetOrganizations(input);
             return new DTResult<OrganizationDto>(0, result.TotalCount, result.Items.Count, result.Items.ToList());
