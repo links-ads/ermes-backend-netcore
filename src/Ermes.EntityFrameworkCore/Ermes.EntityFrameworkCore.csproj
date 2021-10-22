@@ -68,6 +68,8 @@
     <Compile Include="Migrations\20210915143626_MapRequest_Added.Designer.cs" />
     <Compile Include="Migrations\20210930151601_LayerDefinition_Added.cs" />
     <Compile Include="Migrations\20210930151601_LayerDefinition_Added.Designer.cs" />
+    <Compile Include="Migrations\20211021075001_Organization_MembersHaveTaxCode.cs" />
+    <Compile Include="Migrations\20211021075001_Organization_MembersHaveTaxCode.Designer.cs" />
     <Compile Include="Migrations\20211022093208_Person_IsNewUser_Added.cs" />
     <Compile Include="Migrations\20211022093208_Person_IsNewUser_Added.Designer.cs" />
     <Compile Include="Migrations\ErmesDbContextModelSnapshot.cs" />
