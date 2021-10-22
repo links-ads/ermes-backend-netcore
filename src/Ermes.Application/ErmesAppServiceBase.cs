@@ -109,6 +109,7 @@ namespace Ermes
             {
                 PersonId = person.Id,
                 IsFirstLogin = person.IsFirstLogin,
+                IsNewUser = person.IsNewUser,
                 LegacyId = person.LegacyId,
                 User = ObjectMapper.Map<UserDto>(user)
             };
@@ -198,7 +199,7 @@ namespace Ermes
             }
         }
 
-        protected async Task<Person> CreateOrUpdatePersonInternalAsync(Person person, User user, int? organizationId, int? teamId, bool isFirstLogin, List<Role> rolesToAssign, PersonManager _personManager)
+        protected async Task<Person> CreateOrUpdatePersonInternalAsync(Person person, User user, int? organizationId, int? teamId, bool isFirstLogin, bool isNewUser, List<Role> rolesToAssign, PersonManager _personManager)
         {
             //Manage Person on Ermes DB
             if (person == null)
@@ -213,6 +214,7 @@ namespace Ermes
             person.OrganizationId = organizationId;
             person.TeamId = teamId;
             person.IsFirstLogin = isFirstLogin;
+            person.IsNewUser = isNewUser;
 
 
             Logger.Info("Ermes: Create or update Person: " + person.Username);

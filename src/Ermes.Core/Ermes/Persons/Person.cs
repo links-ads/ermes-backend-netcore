@@ -40,8 +40,13 @@ namespace Ermes.Persons
         /// </summary>
         public string RegistrationToken { get; set; }
 
+        //True if it the first time a user logs in --> show tutorial on Chatbot
         public bool IsFirstLogin { get; set; } = true;
 
         public int? LegacyId { get; set; }
+
+        //If true, User has just fill the registration form on FusionAuth and needs to complete
+        //registration procedure on Chatbot
+        public bool IsNewUser { get; set; }
     }
 }

@@ -7,6 +7,6 @@ namespace Ermes.Organizations.Dto
 {
     public class GetOrganizationsInput : DTPagedSortedAndFilteredInputDto
     {
-        
+        public int? ParentId { get; set; }
     }
 }

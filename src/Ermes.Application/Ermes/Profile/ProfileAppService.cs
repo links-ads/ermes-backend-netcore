@@ -68,6 +68,12 @@ namespace Ermes.Profile
         {
             PagedResultDto<OrganizationDto> result = new PagedResultDto<OrganizationDto>();
             var query = _organizationManager.Organizations;
+
+            if (input != null && input.ParentId.HasValue && input.ParentId.Value > 0)
+                query = query.Where(o => o.ParentId.HasValue && o.ParentId.Value == input.ParentId.Value);
+            else
+                query = query.Where(o => !o.ParentId.HasValue);
+
             result.TotalCount = await query.CountAsync();
 
             if (input?.Order != null && input.Order.Count == 0)
@@ -212,24 +218,26 @@ namespace Ermes.Profile
             var rolesToAssign = await GetRolesAndCheckOrganizationAndTeam(input.User.Roles, input.OrganizationId, input.TeamId, input.PersonId, _personManager, _organizationManager, _teamManager, _session, _permissionChecker);
             var user = await UpdateUserInternalAsync(input.User, _fusionAuthSettings, rolesToAssign.Select(r => r.Name).ToList());
 
-            //int? legacyId;
-            //if(
-            //    _ermesSettings.Value != null && 
-            //    _ermesSettings.Value.ErmesProject == AppConsts.Ermes_Faster &&
-            //    input.OrganizationId.HasValue
-            //)
-            //{
-            //    var refOrg = await _organizationManager.GetOrganizationByIdAsync(input.OrganizationId.Value);
-            //    var housePartner = await SettingManager.GetSettingValueAsync(AppSettings.General.HouseOrganization);
-            //    if (refOrg.Name == housePartner || (refOrg.ParentId.HasValue && refOrg.Parent.Name == housePartner))
-            //    {
-            //        legacyId = await _csiManager.SearchVolontarioAsync(input.TaxCode);
-            //        if (legacyId.HasValue && legacyId.Value >= 0)
-            //            person.LegacyId = legacyId;
-            //    }
-            //}
+            int? legacyId;
+            if (
+                _ermesSettings.Value != null &&
+                _ermesSettings.Value.ErmesProject == AppConsts.Ermes_Faster &&
+                input.OrganizationId.HasValue
+            )
+            {
+                var refOrg = await _organizationManager.GetOrganizationByIdAsync(input.OrganizationId.Value);
+                var housePartner = await SettingManager.GetSettingValueAsync(AppSettings.General.HouseOrganization);
+                if (refOrg.Name == housePartner || (refOrg.ParentId.HasValue && refOrg.Parent.Name == housePartner))
+                {
+                    legacyId = await _csiManager.SearchVolontarioAsync(input.TaxCode);
+                    if (legacyId.HasValue && legacyId.Value >= 0)
+                        person.LegacyId = legacyId;
+                    else
+                        throw new UserFriendlyException(L("InvalidVolterTaxCode"));
+                }
+            }
 
-            person = await CreateOrUpdatePersonInternalAsync(person, user, input.OrganizationId, input.TeamId, input.IsFirstLogin, rolesToAssign, _personManager);
+            person = await CreateOrUpdatePersonInternalAsync(person, user, input.OrganizationId, input.TeamId, input.IsFirstLogin, input.IsNewUser, rolesToAssign, _personManager);
 
             if (user != null)
             {
@@ -334,6 +342,27 @@ namespace Ermes.Profile
         //    return user != null;
         //}
 
+
+        [OpenApiOperation("Get Organization List",
+            @"
+                This is a server-side paginated API
+                Input: use the following properties to filter result list:
+                    - Draw: Draw counter. This is used by DataTables to ensure that the Ajax returns from server-side processing requests are drawn in sequence by 
+                        DataTables (Ajax requests are asynchronous and thus can return out of sequence)
+                    - MaxResultCount: number of records that the table can display in the current draw (must be >= 0)
+                    - SkipCount: paging first record indicator. This is the start point in the current data set (0 index based - i.e. 0 is the first record)
+                    - Search: 
+                               - value: global search value
+                               - regex: true if the global filter should be treated as a regular expression for advanced searching, false otherwise
+                    - Order (is a list, for multi-column sorting):
+                                - column: name of the column to which sorting should be applied
+                                - dir: sorting direction
+                    In addition to pagination parameters, there are additional properties for organization filtering:
+                                - ParentId: id of an Organization. If null, only father organizations are returned, otherwise tue API returns the children of the specified parent
+                Output: list of OrganizationDto elements
+                N.B: this API is used by chatbot application during the startup phase --> no auth required.
+            "
+        )]
         public async Task<DTResult<OrganizationDto>> GetOrganizations(GetOrganizationsInput input)
         {
             PagedResultDto<OrganizationDto> result = await InternalGetOrganizations(input);
