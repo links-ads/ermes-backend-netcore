@@ -12,6 +12,7 @@ namespace Ermes.Reports.Dto
         public int Id { get; set; }
         public HazardType Hazard { get; set; }
         public GeneralStatus Status { get; set; }
+        public ReportContentType Content { get; set; }
         public PointPosition Location { get; set; }
         public DateTime Timestamp { get; set; }
         public List<MediaURIDto> MediaURIs { get; set; }
@@ -26,5 +27,6 @@ namespace Ermes.Reports.Dto
         public int? RelativeMissionId { get; set; }
         public List<ReportTag> Tags { get; set; }
         public List<ReportAdultInfo> AdultInfo { get; set; }
+        public bool IsPublic { get; set; }
     }
 }

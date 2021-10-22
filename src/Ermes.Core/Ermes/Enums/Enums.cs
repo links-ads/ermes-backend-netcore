@@ -280,4 +280,21 @@ namespace Ermes.Enums
         ContentNotAvailable,
         Canceled
     }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum ReportContentType
+    {
+        Submitted = 0,
+        Inappropriate = 10,
+        Inaccurate = 20,
+        Validated = 30
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum VisibilityType
+    {
+        Private = 0,
+        Public = 10,
+        All = 20,
+    }
 }

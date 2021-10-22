@@ -110,12 +110,18 @@ namespace Ermes.Reports
                 query = query.Where(a => hazardList.Contains(a.HazardString));
             }
 
+            if (input.Contents != null && input.Contents.Count > 0)
+            {
+                var contentList = input.Contents.Select(a => a.ToString()).ToList();
+                query = query.Where(a => contentList.Contains(a.ContentString));
+            }
+
             query = query.DTFilterBy(input);
 
             var person = _session.LoggedUserPerson;
             var hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Reports.Report_CanSeeCrossOrganization);
             if(!hasPermission)
-                query = query.DataOwnership(person.OrganizationId.HasValue ? new List<int>() { person.OrganizationId.Value } : null);
+                query = query.DataOwnership(person.OrganizationId.HasValue ? new List<int>() { person.OrganizationId.Value } : null, null, input.Visibility);
 
             if (input.FilterByCreator)
                 query = query.Where(r => r.CreatorUserId.HasValue && r.CreatorUserId.Value == person.Id);

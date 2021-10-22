@@ -1,6 +1,6 @@
 Ver.
 ------------------------
-
+- Feature - IsPublic and Content properties added to report (migration added)(#56)
 
 Ver. 2.5.0 - 2021-10-22
 ------------------------
