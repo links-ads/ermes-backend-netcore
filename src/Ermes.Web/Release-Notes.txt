@@ -1,5 +1,9 @@
 Ver.
 ------------------------
+- Feature - IsPublic and Content properties added to report (migration added)(#56)
+
+Ver. 2.5.0 - 2021-10-22
+------------------------
 - Feature - Organization MembersHaveTaxCode property added (migration added)(#58)
 - Feature - ParentId filter in GetOrganizatins API and IsNewUser property added to Person class (migration added)(#60)
 

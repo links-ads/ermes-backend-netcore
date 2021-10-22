@@ -1,5 +1,6 @@
 ﻿using Abp.Linq.Extensions;
 using Ermes.Communications;
+using Ermes.Enums;
 using Ermes.Interfaces;
 using Ermes.MapRequests;
 using Ermes.Missions;
@@ -25,37 +26,37 @@ namespace Ermes.Linq.Extensions
         }
 
         #region Data Ownership
-        public static IQueryable<T> DataOwnership<T>(this IQueryable<T> query, List<int> organizationIdList, IPersonBase person =null)
+        public static IQueryable<T> DataOwnership<T>(this IQueryable<T> query, List<int> organizationIdList, IPersonBase person =null, VisibilityType visibility = VisibilityType.Private)
         {
 
             if (organizationIdList == null || organizationIdList.Count == 0)
                 organizationIdList = null;
 
-            query = ResolveDataOwnership(query, organizationIdList, person);
+            query = ResolveDataOwnership(query, organizationIdList, person, visibility);
 
             return query;
         }
 
-        private static IQueryable<T> ResolveDataOwnership<T>(IQueryable<T> query, List<int> organizationIdList, IPersonBase person)
+        private static IQueryable<T> ResolveDataOwnership<T>(IQueryable<T> query, List<int> organizationIdList, IPersonBase person, VisibilityType visibility = VisibilityType.Private)
         {
             if (typeof(T) == typeof(Person))
-                return new PersonDataOwnershipResolver().Resolve(query as IQueryable<Person>, organizationIdList, person) as IQueryable<T>;
+                return new PersonDataOwnershipResolver().Resolve(query as IQueryable<Person>, organizationIdList, person, visibility) as IQueryable<T>;
             else if (typeof(T) == typeof(Mission))
-                return new MissionDataOwnershipResolver().Resolve(query as IQueryable<Mission>, organizationIdList, person) as IQueryable<T>;
+                return new MissionDataOwnershipResolver().Resolve(query as IQueryable<Mission>, organizationIdList, person, visibility) as IQueryable<T>;
             else if (typeof(T) == typeof(Report))
-                return new ReportDataOwnershipResolver().Resolve(query as IQueryable<Report>, organizationIdList, person) as IQueryable<T>;
+                return new ReportDataOwnershipResolver().Resolve(query as IQueryable<Report>, organizationIdList, person, visibility) as IQueryable<T>;
             else if (typeof(T) == typeof(ReportRequest))
-                return new ReportRequestDataOwnershipResolver().Resolve(query as IQueryable<ReportRequest>, organizationIdList, person) as IQueryable<T>;
+                return new ReportRequestDataOwnershipResolver().Resolve(query as IQueryable<ReportRequest>, organizationIdList, person, visibility) as IQueryable<T>;
             else if (typeof(T) == typeof(Organization))
-                return new OrganizationDataOwnershipResolver().Resolve(query as IQueryable<Organization>, organizationIdList, person) as IQueryable<T>;
+                return new OrganizationDataOwnershipResolver().Resolve(query as IQueryable<Organization>, organizationIdList, person, visibility) as IQueryable<T>;
             else if (typeof(T) == typeof(PersonAction))
-                return new PersonActionDataOwnershipResolver().Resolve(query as IQueryable<PersonAction>, organizationIdList, person) as IQueryable<T>;
+                return new PersonActionDataOwnershipResolver().Resolve(query as IQueryable<PersonAction>, organizationIdList, person, visibility) as IQueryable<T>;
             else if (typeof(T) == typeof(Communication))
-                return new CommunicationDataOwnershipResolver().Resolve(query as IQueryable<Communication>, organizationIdList, person) as IQueryable<T>;
+                return new CommunicationDataOwnershipResolver().Resolve(query as IQueryable<Communication>, organizationIdList, person, visibility) as IQueryable<T>;
             else if (typeof(T) == typeof(Team))
-                return new TeamDataOwnershipResolver().Resolve(query as IQueryable<Team>, organizationIdList, person) as IQueryable<T>;
+                return new TeamDataOwnershipResolver().Resolve(query as IQueryable<Team>, organizationIdList, person, visibility) as IQueryable<T>;
             else if (typeof(T) == typeof(MapRequest))
-                return new MapRequestDataOwnershipResolver().Resolve(query as IQueryable<MapRequest>, organizationIdList, person) as IQueryable<T>;
+                return new MapRequestDataOwnershipResolver().Resolve(query as IQueryable<MapRequest>, organizationIdList, person, visibility) as IQueryable<T>;
 
             return query;
         }
@@ -65,14 +66,14 @@ namespace Ermes.Linq.Extensions
         #region Data Ownership Interfaces
         private interface IDataOwnershipResolver<T>
         {
-            IQueryable<T> Resolve(IQueryable<T> query, List<int> organizationIdList, IPersonBase person);
+            IQueryable<T> Resolve(IQueryable<T> query, List<int> organizationIdList, IPersonBase person, VisibilityType visibility);
         }
         #endregion
 
         #region Data Ownership classes
         private class PersonDataOwnershipResolver : IDataOwnershipResolver<Person>
         {
-            public IQueryable<Person> Resolve(IQueryable<Person> query, List<int> organizationIdList, IPersonBase person)
+            public IQueryable<Person> Resolve(IQueryable<Person> query, List<int> organizationIdList, IPersonBase person, VisibilityType visibility)
             {
                 if(organizationIdList != null)
                     query = query
@@ -84,7 +85,7 @@ namespace Ermes.Linq.Extensions
 
         private class MissionDataOwnershipResolver : IDataOwnershipResolver<Mission>
         {
-            public IQueryable<Mission> Resolve(IQueryable<Mission> query, List<int> organizationIdList, IPersonBase person)
+            public IQueryable<Mission> Resolve(IQueryable<Mission> query, List<int> organizationIdList, IPersonBase person, VisibilityType visibility)
             {
                 return organizationIdList == null
                             ? query
@@ -97,27 +98,48 @@ namespace Ermes.Linq.Extensions
 
         private class ReportDataOwnershipResolver : IDataOwnershipResolver<Report>
         {
-            public IQueryable<Report> Resolve(IQueryable<Report> query, List<int> organizationIdList, IPersonBase person)
+            public IQueryable<Report> Resolve(IQueryable<Report> query, List<int> organizationIdList, IPersonBase person, VisibilityType visibility)
             {
-                return organizationIdList == null
-                    ? query
-                            //TODO: implement ADMIN visibility by using permission
-                            .Where(r => !r.Creator.OrganizationId.HasValue)
-                    : query
-                    .Where(r =>
-                            //Organization visibility
-                            (r.Creator.OrganizationId.HasValue && organizationIdList.Contains(r.Creator.OrganizationId.Value)) ||
-                            //Organization hierarchy
-                            (r.Creator.Organization.ParentId.HasValue && organizationIdList.Contains(r.Creator.Organization.ParentId.Value)) ||
-                            //User contents
-                            !r.Creator.OrganizationId.HasValue
-                        );
+                switch (visibility)
+                {
+                    //Only reports belonging to my Org or to children Org
+                    case VisibilityType.Private:
+                        return organizationIdList == null
+                            ? query
+                                    //TODO: implement ADMIN visibility by using permission
+                                    .Where(r => !r.Creator.OrganizationId.HasValue)
+                            : query
+                            .Where(r =>
+                                    //Organization visibility
+                                    (r.Creator.OrganizationId.HasValue && organizationIdList.Contains(r.Creator.OrganizationId.Value)) ||
+                                    //Organization hierarchy
+                                    (r.Creator.Organization.ParentId.HasValue && organizationIdList.Contains(r.Creator.Organization.ParentId.Value))
+                                );
+                    case VisibilityType.Public:
+                        //Only public reports
+                        return query.Where(r => r.IsPublic);
+                    case VisibilityType.All:
+                        return organizationIdList == null
+                            ? query
+                                    //TODO: implement ADMIN visibility by using permission
+                                    .Where(r => !r.Creator.OrganizationId.HasValue)
+                            : query
+                            .Where(r =>
+                                    //Organization visibility
+                                    (r.Creator.OrganizationId.HasValue && organizationIdList.Contains(r.Creator.OrganizationId.Value)) ||
+                                    //Organization hierarchy
+                                    (r.Creator.Organization.ParentId.HasValue && organizationIdList.Contains(r.Creator.Organization.ParentId.Value)) ||
+                                    r.IsPublic
+                                );
+                    default:
+                        return query;
+                }
             }
         }
 
         private class ReportRequestDataOwnershipResolver : IDataOwnershipResolver<ReportRequest>
         {
-            public IQueryable<ReportRequest> Resolve(IQueryable<ReportRequest> query, List<int> organizationIdList, IPersonBase person)
+            public IQueryable<ReportRequest> Resolve(IQueryable<ReportRequest> query, List<int> organizationIdList, IPersonBase person, VisibilityType visibility)
             {
                 return organizationIdList == null
                     ? query
@@ -134,7 +156,7 @@ namespace Ermes.Linq.Extensions
 
         private class OrganizationDataOwnershipResolver : IDataOwnershipResolver<Organization>
         {
-            public IQueryable<Organization> Resolve(IQueryable<Organization> query, List<int> organizationIdList, IPersonBase person)
+            public IQueryable<Organization> Resolve(IQueryable<Organization> query, List<int> organizationIdList, IPersonBase person, VisibilityType visibility)
             {
                 if(organizationIdList != null)
                     query = query
@@ -147,7 +169,7 @@ namespace Ermes.Linq.Extensions
 
         private class PersonActionDataOwnershipResolver : IDataOwnershipResolver<PersonAction>
         {
-            public IQueryable<PersonAction> Resolve(IQueryable<PersonAction> query, List<int> organizationIdList, IPersonBase person)
+            public IQueryable<PersonAction> Resolve(IQueryable<PersonAction> query, List<int> organizationIdList, IPersonBase person,  VisibilityType visibility)
             {
                 return query
                     .Where(pa => pa.Person.OrganizationId.HasValue && organizationIdList.Contains(pa.Person.OrganizationId.Value))
@@ -157,7 +179,7 @@ namespace Ermes.Linq.Extensions
 
         private class CommunicationDataOwnershipResolver : IDataOwnershipResolver<Communication>
         {
-            public IQueryable<Communication> Resolve(IQueryable<Communication> query, List<int> organizationIdList, IPersonBase person)
+            public IQueryable<Communication> Resolve(IQueryable<Communication> query, List<int> organizationIdList, IPersonBase person, VisibilityType visibility)
             {
                 return organizationIdList == null
                         ? query
@@ -173,7 +195,7 @@ namespace Ermes.Linq.Extensions
 
         private class TeamDataOwnershipResolver : IDataOwnershipResolver<Team>
         {
-            public IQueryable<Team> Resolve(IQueryable<Team> query, List<int> organizationIdList, IPersonBase person)
+            public IQueryable<Team> Resolve(IQueryable<Team> query, List<int> organizationIdList, IPersonBase person, VisibilityType visibility)
             {
                 if(organizationIdList != null)
                 query =  query
@@ -185,7 +207,7 @@ namespace Ermes.Linq.Extensions
 
         private class MapRequestDataOwnershipResolver : IDataOwnershipResolver<MapRequest>
         {
-            public IQueryable<MapRequest> Resolve(IQueryable<MapRequest> query, List<int> organizationIdList, IPersonBase person)
+            public IQueryable<MapRequest> Resolve(IQueryable<MapRequest> query, List<int> organizationIdList, IPersonBase person, VisibilityType visibility)
             {
                 return organizationIdList == null
                         ? query

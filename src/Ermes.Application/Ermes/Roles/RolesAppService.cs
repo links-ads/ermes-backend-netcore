@@ -189,6 +189,7 @@ namespace Ermes.Roles
         {
             //step 1) delete current role-permission associations
             await _permissionManager.DeleteAllPermissionsAsync();
+            await CurrentUnitOfWork.SaveChangesAsync();
 
             //step 2) create new role-permission associations
             var permList = AppRoles.ADMINISTRATOR_PERMISSION_LIST;
@@ -212,6 +213,8 @@ namespace Ermes.Roles
             {
                 await _permissionManager.AssignPermissionToRoleAsync(new ErmesPermission(perm, role.Id));
             }
+
+            await CurrentUnitOfWork.SaveChangesAsync();
 
             return true;
         }
