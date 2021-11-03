@@ -19,5 +19,6 @@ namespace Ermes.Organizations.Dto
         public int? ParentId { get; set; }
         public string ParentName { get; set; }
         public bool MembersHaveTaxCode { get; set; }
+        public bool HasChildren { get; set; }
     }
 }
