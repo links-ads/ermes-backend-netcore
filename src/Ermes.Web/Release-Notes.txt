@@ -1,6 +1,7 @@
 Ver.
 ------------------------
 - Feature - IsPublic and Content properties added to report (migration added)(#56)
+- Feature - HasChildren prop added to OrganizationDto class (#61)
 
 Ver. 2.5.0 - 2021-10-22
 ------------------------
