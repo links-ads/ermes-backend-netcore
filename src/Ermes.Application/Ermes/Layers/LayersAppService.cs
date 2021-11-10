@@ -76,7 +76,7 @@ namespace Ermes.Layers
                         'items': 
                             [
                               {
-                               'dataTypeId': 33106,
+                               'dataType_Id': 33106,
                                'details': [
                                {   
                                   'name': 'ermes:33106_df5a9ca2-beb3-450e-aee5-8eecdfc224f3',
@@ -89,7 +89,7 @@ namespace Ermes.Layers
                               ]
                             },
                               {
-                               'dataTypeId': 33102,
+                               'dataType_Id': 33102,
                                'details': [
                                {   
                                   'name': 'ermes:33106_df5a9ca2-beb3-450e-aee5-8eecdfc224f3',
@@ -119,7 +119,7 @@ namespace Ermes.Layers
                     //        )
                     //    .ToList();
                     var joinedLayerList = layerDefinition.Join(
-                                availableLayers.Items.Select(a => new { DataTypeId = a.DataTypeId, a.Details }).ToList(),
+                                availableLayers.Items.Select(a => new { DataTypeId = a.DataType_Id, a.Details }).ToList(),
                                 a => a.DataTypeId,
                                 b => b.DataTypeId,
                                 (a, b) => new { Layer = a, b.Details }
