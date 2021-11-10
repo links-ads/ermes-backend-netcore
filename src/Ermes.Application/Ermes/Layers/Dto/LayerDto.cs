@@ -15,6 +15,6 @@ namespace Ermes.Layers.Dto
         public string SubGroupKey { get; set; }
         public string Name { get; set; }
         public string PartnerName { get; set; }
-        public List<string> Tiles { get; set; }
+        public List<LayerDetailsDto> Details { get; set; }
     }
 }
