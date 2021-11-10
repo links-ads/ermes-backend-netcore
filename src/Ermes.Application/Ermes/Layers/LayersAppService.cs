@@ -69,24 +69,85 @@ namespace Ermes.Layers
                 //1) Get available list of layers from Importer Module
                 //2) Join this list with layer definition
                 //3) Group the result by GroupKey and SubGroupKey
-                var res = await _importerMananger.GetLayers(input.DataTypeIds, input.Bbox, input.Start.Value, input.End.Value);
-                var availableLayers = JsonConvert.DeserializeObject<List<string>>(res.ToString());
+                //var res = await _importerMananger.GetLayers(input.DataTypeIds, input.Bbox, input.Start.Value, input.End.Value);
+
+                var res = @"
+                    {
+                        'items': 
+                            [
+                              {
+                               'dataTypeId': 33106,
+                               'details': [
+                               {   
+                                  'name': 'ermes:33106_df5a9ca2-beb3-450e-aee5-8eecdfc224f3',
+                                  'timestamps': ['2021-10-01T00:00:00.0Z', '2021-10-01T01:00:00.0Z','2021-10-01T02:00:00.0Z', '2021-10-01T06:00:00.0Z'] 
+                                },
+                               {
+                                  'name': 'ermes:33106_fdg453v3-hj89-j98jh-joi-hoiuh9h89u90',
+                                  'timestamps': ['2021-10-02T00:00:00.0Z','2021-10-02T01:00:00.0Z','2021-10-02T02:00:00.0Z'] 
+                                }
+                              ]
+                            },
+                              {
+                               'dataTypeId': 33102,
+                               'details': [
+                               {   
+                                  'name': 'ermes:33106_df5a9ca2-beb3-450e-aee5-8eecdfc224f3',
+                                  'timestamps': ['2021-10-01T00:00:00.0Z','2021-10-01T01:00:00.0Z','2021-10-01T02:00:00.0Z']
+                                },
+                               {
+                                  'name': 'ermes:33106_fdg453v3-hj89-j98jh-joi-hoiuh9h89u90',
+                                  'timestamps': ['2021-10-02T00:00:00.0Z','2021-10-02T01:00:00.0Z','2021-10-02T02:00:00.0Z', '2021-10-02T05:00:00.0Z']
+                                }
+                              ]
+                             }
+                           ]
+                    }";
+
+
+                //var availableLayers = JsonConvert.DeserializeObject<List<string>>(res.ToString());
+                var availableLayers = JsonConvert.DeserializeObject<ImporterLayerList>(res.ToString());
                 var layerDefinition = await _layerManager.GetLayerDefinitionAsync();
 
                 try
                 {
+                    //var joinedLayerList = layerDefinition.Join(
+                    //            availableLayers.Select(a => new { DataTypeId = int.Parse(a.Split("_").First().Split(":").ElementAt(1)), FullName = a }).GroupBy(l => l.DataTypeId).ToList(),
+                    //            a => a.DataTypeId,
+                    //            b => b.Key,
+                    //            (a, b) => new { Layer = a, LayerGroup = b }
+                    //        )
+                    //    .ToList();
                     var joinedLayerList = layerDefinition.Join(
-                                availableLayers.Select(a => new { DataTypeId = int.Parse(a.Split("_").First().Split(":").ElementAt(1)), FullName = a }).GroupBy(l => l.DataTypeId).ToList(),
+                                availableLayers.Items.Select(a => new { DataTypeId = a.DataTypeId, a.Details }).ToList(),
                                 a => a.DataTypeId,
-                                b => b.Key,
-                                (a, b) => new { Layer = a, LayerGroup = b }
+                                b => b.DataTypeId,
+                                (a, b) => new { Layer = a, b.Details }
                             )
                         .ToList();
 
+                    //result.LayerGroups =
+                    //    joinedLayerList
+                    //    .Select(a => new { LayerDto = ObjectMapper.Map<LayerDto>(a.Layer), a.LayerGroup })
+                    //    .Select(a => { a.LayerDto.Tiles = a.LayerGroup.Select(p => p.FullName).ToList(); return a.LayerDto; })
+                    //    .GroupBy(a => new { a.GroupKey, a.Group })
+                    //    .Select(a => new LayerGroupDto()
+                    //    {
+                    //        GroupKey = a.Key.GroupKey,
+                    //        Group = a.Key.Group,
+                    //        SubGroups = a.ToList().GroupBy(b => new { b.SubGroupKey, b.SubGroup }).Select(c => new LayerSubGroupDto()
+                    //        {
+                    //            SubGroupKey = c.Key.SubGroupKey,
+                    //            SubGroup = c.Key.SubGroup,
+                    //            Layers = c.ToList()
+                    //        }).ToList()
+                    //    })
+                    //    .ToList();
+
                     result.LayerGroups =
                         joinedLayerList
-                        .Select(a => new { LayerDto = ObjectMapper.Map<LayerDto>(a.Layer), a.LayerGroup })
-                        .Select(a => { a.LayerDto.Tiles = a.LayerGroup.Select(p => p.FullName).ToList(); return a.LayerDto; })
+                        .Select(a => new { LayerDto = ObjectMapper.Map<LayerDto>(a.Layer), a.Details })
+                        .Select(a => { a.LayerDto.Details = a.Details; return a.LayerDto; })
                         .GroupBy(a => new { a.GroupKey, a.Group })
                         .Select(a => new LayerGroupDto()
                         {
@@ -101,7 +162,7 @@ namespace Ermes.Layers
                         })
                         .ToList();
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     throw new UserFriendlyException("MalformedLayerName");
                 }
