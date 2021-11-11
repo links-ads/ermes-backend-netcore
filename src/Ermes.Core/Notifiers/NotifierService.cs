@@ -1,34 +1,32 @@
-﻿using Abp.Domain.Services;
-using Abp.Extensions;
+﻿using Abp.Extensions;
 using Ermes.Enums;
 using Ermes.Notifications;
-using Ermes.Notifiers;
 using Ermes.Persons;
 using Ermes.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 
 namespace Ermes.Notifiers
 {
     public class NotifierService : ErmesDomainServiceBase
     {
         private readonly INotifierBase _notifierBase;
-        private readonly PersonManager _personManager;
         private readonly NotificationManager _notificationManager;
+        private readonly IOptions<ErmesSettings> _ermesSettings;
 
         public NotifierService(
                 INotifierBase notifierBase,
-                PersonManager personManager,
-                NotificationManager notificationManager)
+                NotificationManager notificationManager,
+                IOptions<ErmesSettings> ermesSettings)
         {
             _notifierBase = notifierBase;
-            _personManager = personManager;
             _notificationManager = notificationManager;
+            _ermesSettings = ermesSettings;
         }
 
         public async Task SendBusNotification<T>(long creatorId, int entityId, T content, EntityWriteAction action, EntityType entityType)
@@ -47,7 +45,7 @@ namespace Ermes.Notifiers
 
             try
             {
-                await _notifierBase.SendBusNotificationAsync(NotificationNameHelper.GetBusTopicName(entityType, action), serializedPayload);
+                await _notifierBase.SendBusNotificationAsync(NotificationNameHelper.GetBusTopicName(entityType, action, _ermesSettings.Value.ErmesProject), serializedPayload);
             }
             catch (Exception ex)
             {

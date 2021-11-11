@@ -8,9 +8,21 @@ namespace Ermes.Helpers
 {
     public static class NotificationNameHelper
     {
-        public static string GetBusTopicName(EntityType type, EntityWriteAction action)
+        public static string GetBusTopicName(EntityType type, EntityWriteAction action, string projectName)
         {
-            return "mm." + type.ToString().ToLowerInvariant();
+            string topicName = "mm." + type.ToString().ToLowerInvariant();
+            switch (projectName)
+            {
+                case "FASTER":
+                    break;
+                case "SAFERS":
+                case "SHELTER":
+                    topicName += "." + action.ToString().ToLowerInvariant();
+                    break;
+                default:
+                    break;
+            }
+            return  topicName;
         }
 
         public static string GetNotificationName(EntityType type, EntityWriteAction action)
