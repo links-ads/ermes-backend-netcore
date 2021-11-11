@@ -126,7 +126,7 @@ namespace Ermes.Layers
                     //        )
                     //    .ToList();
                     var joinedLayerList = layerDefinition.Join(
-                                availableLayers.Items.Select(a => new { DataTypeId = a.DataTypeId, a.Details }).ToList(),
+                                availableLayers.Items.Select(a => new { DataTypeId = a.DataType_Id, a.Details }).ToList(),
                                 a => a.DataTypeId,
                                 b => b.DataTypeId,
                                 (a, b) => new { Layer = a, b.Details }
