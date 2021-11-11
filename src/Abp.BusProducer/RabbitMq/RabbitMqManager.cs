@@ -24,19 +24,21 @@ namespace Abp.BusProducer.RabbitMq
                 VirtualHost = _busConfigurationProvider.GetVirtualHost(),
                 UserName = _busConfigurationProvider.GetUsername(),
                 Password = _busConfigurationProvider.GetPassword(),
-                Ssl = new SslOption(_busConfigurationProvider.GetHostname(), enabled: true)
+                Ssl = new SslOption(
+                    _busConfigurationProvider.GetHostname(),
+                    enabled: true
+                )
             };
         }
 
         public async Task<bool> Publish(string routingKey, string message)
         {
-            if(string.IsNullOrWhiteSpace(routingKey))
-                routingKey = "Chatbot";
+            if (string.IsNullOrWhiteSpace(routingKey))
+                return false;
             using (var connection = factory.CreateConnection())
             {
                 using var channel = connection.CreateModel();
                 string exchange = _busConfigurationProvider.GetExchange();
-                channel.ExchangeDeclare(exchange, "topic", true, false);
                 var body = Encoding.UTF8.GetBytes(message);
 
                 channel.BasicPublish(exchange: exchange,

@@ -10,6 +10,5 @@ namespace Abp.BusProducer.Configuration
         int GetPort();
         string GetVirtualHost();
         string GetExchange();
-        string GetQueue();
     }
 }

@@ -67,13 +67,5 @@ namespace Abp.BusProducer.Configuration
 
             return _busSettings.Value.Exchange;
         }
-
-        public string GetQueue()
-        {
-            if (_busSettings == null || _busSettings.Value == null || String.IsNullOrWhiteSpace(_busSettings.Value.Queue))
-                throw new ConfigurationErrorsException("A Queue string is expected for Bus configuration");
-
-            return _busSettings.Value.Queue;
-        }
     }
 }
