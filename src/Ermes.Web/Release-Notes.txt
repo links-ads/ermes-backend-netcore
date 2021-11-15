@@ -1,6 +1,8 @@
 Ver.
 ------------------------
 - Bugfix - Report creation procedure fix (#64)
+- Feature - GetLayers fixed example updated (#62)
+- Feature - Message on Rabbit bus every time a new entity is created (#63)
 
 
 Ver. 2.6.1 2021-11-10
