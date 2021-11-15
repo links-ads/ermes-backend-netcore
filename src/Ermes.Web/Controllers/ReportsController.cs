@@ -7,6 +7,7 @@ using Abp.IO.Extensions;
 using Abp.UI;
 using Ermes;
 using Ermes.Attributes;
+using Ermes.Authorization;
 using Ermes.Categories;
 using Ermes.Enums;
 using Ermes.EventHandlers;
@@ -162,7 +163,7 @@ namespace Ermes.Web.Controllers
             report.Timestamp = reportDto.Timestamp;
 
             //citizens' report are public by default
-            report.IsPublic = !report.Creator.OrganizationId.HasValue;
+            report.IsPublic = _session.Roles != null && _session.Roles.Contains(AppRoles.CITIZEN);
             //Need Id here, so that I can create Azure Report container
             report.Id = await _reportManager.InsertReportAsync(report);
 

@@ -1,5 +1,10 @@
 Ver.
 ------------------------
+- Bugfix - Report creation procedure fix (#64)
+
+
+Ver. 2.6.1 2021-11-10
+------------------------
 - Feature - IsPublic and Content properties added to report (migration added)(#56)
 - Feature - HasChildren prop added to OrganizationDto class (#61)
 - Feature - GetLayers update for NetCdf support (#62)
