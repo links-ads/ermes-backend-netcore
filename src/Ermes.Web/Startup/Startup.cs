@@ -29,8 +29,8 @@ using Abp.BusConsumer.Kafka;
 using Abp.BusConsumer.RabbitMq;
 using Abp.AzureCognitiveServices;
 using Abp.SocialMedia;
-using Abp.CsiServices;
 using Abp.Importer;
+using Ermes.ExternalServices.Csi.Configuration;
 
 namespace Ermes.Web.Startup
 {
@@ -92,7 +92,7 @@ namespace Ermes.Web.Startup
             services.Configure<ErmesSettings>(
                 _appConfiguration.GetSection("App")
             );
-            services.Configure<AbpCsiSettings>(
+            services.Configure<CsiSettings>(
                 _appConfiguration.GetSection("Csi")
             );
             services.Configure<AbpImporterSettings>(

@@ -11,7 +11,6 @@
     <RootNamespace>Ermes</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Abp.CsiServices\Abp.CsiServices.csproj" />
     <ProjectReference Include="..\Abp.Importer\Abp.Importer.csproj" />
     <ProjectReference Include="..\Abp.SocialMedia\Abp.SocialMedia.csproj" />
     <ProjectReference Include="..\Ermes.Core\Ermes.Core.csproj" />

@@ -297,4 +297,26 @@ namespace Ermes.Enums
         Public = 10,
         All = 20,
     }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum VolterOperationType
+    {
+        Registration,
+        OpenOperation,
+        CloseOperation
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum ProcessedCodeType
+    {
+        ElaborazioneTerminataCorretamente = 1,
+        CampoObbligatorioNonPresente = 5,
+        ErroreParametriInput = 10,
+        SistemaDiMateriaChiamanteNonEsistente = 22,
+        VolontarioNonEsistente = 30,
+        CompitoNonEsistente = 31,
+        InsertOUpdateFallito = 33,
+        EventoNonEsistente = 38,
+        TrovatiPiuInterventiAperti = 39
+    }
 }

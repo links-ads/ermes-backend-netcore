@@ -8,16 +8,15 @@ using Ermes.Attributes;
 using Abp.Authorization;
 using Ermes.Authorization;
 using Abp.SocialMedia;
-using Abp.CsiServices;
 using Abp.Importer;
+using Ermes.ExternalServices.Csi.Configuration;
 
 namespace Ermes
 {
     [DependsOn(
         typeof(ErmesCoreModule), 
         typeof(AbpAutoMapperModule),
-        typeof(AbpSocialMediaModule),
-        typeof(AbpCsiModule),
+        typeof(AbpSocialMediaModule),        
         typeof(AbpImporterModule))]
     public class ErmesApplicationModule : AbpModule
     {
@@ -34,6 +33,8 @@ namespace Ermes
                     IocManager.Resolve<ISettingManager>()
                 ));
             });
+
+            IocManager.Register<ICsiConnectionProvider, CsiConnectionProvider>();
         }
         public override void Initialize()
         {
