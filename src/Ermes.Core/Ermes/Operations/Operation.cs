@@ -82,24 +82,24 @@ namespace Ermes.Operations
 
     public interface IVolterAction
     {
-        public string SubjectCode { get; set; }
+        public string subjectCode { get; set; }
     }
 
     public class Registration: IVolterAction
     {
-        public string SubjectCode { get; set; }
-        public string FiscalCodeVoluntary { get; set; }
+        public string subjectCode { get; set; }
+        public string fiscalCodeVoluntary { get; set; }
     }
 
     public class Intervention : IVolterAction
     {
-        public string SubjectCode { get; set; }
-        public string Latitude { get; set; }
-        public string Longitude { get; set; }
-        public string VolterID { get; set; }
-        public string VoluntaryActivity { get; set; }
-        public DateTime MissionDate { get; set; }
-        public string Status { get; set; }
-        public string OperationId { get; set; }
+        public string subjectCode { get; set; }
+        public string latitude { get; set; }
+        public string longitude { get; set; }
+        public string volterID { get; set; }
+        public string voluntaryActivity { get; set; }
+        public DateTime missionDate { get; set; }
+        public string atatus { get; set; }
+        public string operationId { get; set; }
     }
 }

@@ -47,8 +47,8 @@ namespace Ermes.ExternalServices.Csi
             var builder = new UriBuilder(CsiClient.BaseAddress + "/SearchVolontario");
             string requestBody = JsonConvert.SerializeObject(new Registration()
             {
-                SubjectCode = SUBJECT_CODE,
-                FiscalCodeVoluntary = taxCode
+                subjectCode = SUBJECT_CODE,
+                fiscalCodeVoluntary = taxCode
             });
 
             var request = new HttpRequestMessage
