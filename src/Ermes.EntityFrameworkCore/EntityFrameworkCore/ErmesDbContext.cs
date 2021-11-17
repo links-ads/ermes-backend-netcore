@@ -34,6 +34,7 @@ using Ermes.Quizzes;
 using Ermes.Answers;
 using Ermes.MapRequests;
 using Ermes.Layers;
+using Ermes.Operations;
 
 namespace Ermes.EntityFrameworkCore
 {
@@ -71,6 +72,7 @@ namespace Ermes.EntityFrameworkCore
         public virtual DbSet<MapRequest> MapRequests { get; set; }
         public virtual DbSet<Layer> Layers { get; set; }
         public virtual DbSet<LayerTranslation> LayerTranslations { get; set; }
+        public virtual DbSet<Operation> Operations { get; set; }
         public IEntityHistoryHelper EntityHistoryHelper { get; set; }
 
         private readonly ErmesLocalizationHelper _localizer;

@@ -74,6 +74,8 @@
     <Compile Include="Migrations\20211022093208_Person_IsNewUser_Added.Designer.cs" />
     <Compile Include="Migrations\20211022144729_Report_Public_Contents_Added.cs" />
     <Compile Include="Migrations\20211022144729_Report_Public_Contents_Added.Designer.cs" />
+    <Compile Include="Migrations\20211117090126_Operations_added.cs" />
+    <Compile Include="Migrations\20211117090126_Operations_added.Designer.cs" />
     <Compile Include="Migrations\ErmesDbContextModelSnapshot.cs" />
     <Compile Include="Migrations\Seed\ModelBuilderExtensions.cs" />
   </ItemGroup>

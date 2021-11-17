@@ -1,5 +1,5 @@
 ﻿using Abp.Application.Services.Dto;
-using Abp.CsiServices.Csi;
+using Abp.Domain.Uow;
 using Abp.Extensions;
 using Abp.Linq.Extensions;
 using Abp.UI;
@@ -9,6 +9,7 @@ using Ermes.Authorization;
 using Ermes.Configuration;
 using Ermes.Dto;
 using Ermes.Dto.Datatable;
+using Ermes.ExternalServices.Csi;
 using Ermes.Linq.Extensions;
 using Ermes.Missions;
 using Ermes.Organizations;
@@ -208,7 +209,7 @@ namespace Ermes.Profile
             Output: the profile with updated information
             "
         )]
-        
+        [UnitOfWork(false)]
         public virtual async Task<UpdateProfileOutput> UpdateProfile(UpdateProfileInput input)
         {
             if (input.User.Timezone == null || input.User.Timezone.Length < 2)
@@ -229,16 +230,19 @@ namespace Ermes.Profile
                 var housePartner = await SettingManager.GetSettingValueAsync(AppSettings.General.HouseOrganization);
                 if (refOrg.Name == housePartner || (refOrg.ParentId.HasValue && refOrg.Parent.Name == housePartner))
                 {
-                    legacyId = await _csiManager.SearchVolontarioAsync(input.TaxCode);
+                    legacyId = await _csiManager.SearchVolontarioAsync(input.TaxCode, person.Id);
                     if (legacyId.HasValue && legacyId.Value >= 0)
                         person.LegacyId = legacyId;
                     else
+                    {
+                        await CurrentUnitOfWork.SaveChangesAsync();
                         throw new UserFriendlyException(L("InvalidVolterTaxCode"));
+                    }
                 }
             }
 
             person = await CreateOrUpdatePersonInternalAsync(person, user, input.OrganizationId, input.TeamId, input.IsFirstLogin, input.IsNewUser, rolesToAssign, _personManager);
-
+            await CurrentUnitOfWork.SaveChangesAsync();
             if (user != null)
             {
                 return new UpdateProfileOutput()
