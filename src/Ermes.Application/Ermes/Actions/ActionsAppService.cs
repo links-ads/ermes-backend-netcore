@@ -129,7 +129,6 @@ namespace Ermes.Actions
                 Output: the actions that has been created
             "
         )]
-        [UnitOfWork(false)]
         public virtual async Task<CreatePersonActionOutput> CreatePersonAction(CreatePersonActionInput input)
         {
             var res = new CreatePersonActionOutput();
@@ -225,8 +224,7 @@ namespace Ermes.Actions
             return res;
         }
 
-        [UnitOfWork(false)]
-        protected virtual async Task CreateInterventionAsync(long personId, double latitude, double longitude, string activityName, DateTime timestamp, ActionStatusType status)
+        protected async Task CreateInterventionAsync(long personId, double latitude, double longitude, string activityName, DateTime timestamp, ActionStatusType status)
         {
             var person = await _personManager.GetPersonByIdAsync(personId);
             /*
@@ -256,8 +254,7 @@ namespace Ermes.Actions
                 }
                 else
                 {
-                    await CurrentUnitOfWork.SaveChangesAsync();
-                    throw new UserFriendlyException(L("InvalidVolterOperationId"));
+                    Logger.ErrorFormat("####CreateInterventionAsync failed for personId:{0} at Timestamp {1}", personId, timestamp);
                 }
             }
         }

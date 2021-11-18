@@ -110,27 +110,26 @@ namespace Ermes.ExternalServices.Csi
             try
             {
                 using CancellationTokenSource tokenSource = new CancellationTokenSource(4000);
-                //HttpResponseMessage response = await CsiClient.SendAsync(request, cancellationToken: tokenSource.Token);
-                HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK);
+                HttpResponseMessage response = await CsiClient.SendAsync(request, cancellationToken: tokenSource.Token);
                 var responseValue = string.Empty;
                 if (response != null && response.StatusCode == HttpStatusCode.OK)
                 {
-                    //Task task = response.Content.ReadAsStreamAsync().ContinueWith(t =>
-                    //{
-                    //    var stream = t.Result;
-                    //    using var reader = new StreamReader(stream);
-                    //    responseValue = reader.ReadToEnd();
-                    //});
-
-                    //task.Wait();
-
-                    //var result = JsonConvert.DeserializeObject<VolterResponse>(responseValue);
-                    var result = new VolterResponse()
+                    Task task = response.Content.ReadAsStreamAsync().ContinueWith(t =>
                     {
-                        DescriptionOutcome = "Elaborazione terminata correttamente",
-                        ProcessedCode = "0001",
-                        VolterId = 198061
-                    };
+                        var stream = t.Result;
+                        using var reader = new StreamReader(stream);
+                        responseValue = reader.ReadToEnd();
+                    });
+
+                    task.Wait();
+
+                    var result = JsonConvert.DeserializeObject<VolterResponse>(responseValue);
+                    //var result = new VolterResponse()
+                    //{
+                    //    DescriptionOutcome = "Elaborazione terminata correttamente",
+                    //    ProcessedCode = "0001",
+                    //    VolterId = 198061
+                    //};
                     if (result.ProcessedCodeTypeEnum == ProcessedCodeType.ElaborazioneTerminataCorretamente)
                     {
                         op.Response = result;
