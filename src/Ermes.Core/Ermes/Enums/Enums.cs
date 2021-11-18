@@ -302,8 +302,8 @@ namespace Ermes.Enums
     public enum VolterOperationType
     {
         Registration,
-        OpenOperation,
-        CloseOperation
+        OpenIntervention,
+        CloseIntervention
     }
 
     [JsonConverter(typeof(StringEnumConverter))]

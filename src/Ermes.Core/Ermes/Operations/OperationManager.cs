@@ -21,12 +21,12 @@ namespace Ermes.Operations
             OperationRepository = operationRepository;
         }
 
-        public async Task<List<Operation>> GetOperationsByPersonId(int personId)
+        public async Task<List<Operation>> GetOperationsByPersonIdAsync(int personId)
         {
             return await Operations.Where(a => a.PersonId == personId).ToListAsync();
         }
 
-        public async Task<List<Operation>> GetOperationsByPersonLegacyId(int personLegacyId)
+        public async Task<List<Operation>> GetOperationsByPersonLegacyIdAsync(int personLegacyId)
         {
             return await Operations.Where(a => a.PersonLegacyId == personLegacyId).ToListAsync();
         }

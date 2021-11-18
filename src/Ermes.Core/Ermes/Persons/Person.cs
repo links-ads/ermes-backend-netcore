@@ -57,6 +57,6 @@ namespace Ermes.Persons
         /// It represents the internal Volter Id for an operation made by a first responder.
         /// This field has a value only for member of organization "Protezione Civile Piemonte" or its children.
         /// </summary>
-        public string CurrentOperationLegacyId { get; set; }
+        public int? CurrentOperationLegacyId { get; set; }
     }
 }
