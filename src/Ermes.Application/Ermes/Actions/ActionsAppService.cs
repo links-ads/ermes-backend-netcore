@@ -207,7 +207,7 @@ namespace Ermes.Actions
                     ////////////////
                     ///Section dedicated to CSI service integration, see issue #65 for details.
                     ///It is not necessary to create a new Intervention if the first responder was in an active status
-                    if (mustCreateIntervention && (!old_status.HasValue || old_status.Value != ActionStatusType.Active))
+                    if (mustCreateIntervention && (old_status == null || old_status.Value != ActionStatusType.Active))
                         await CreateInterventionAsync(personId, p_activity.Location.Y, p_activity.Location.X, activity.Name, p_activity.Timestamp, ActionStatusType.Active);
                     ////////////////
                     res.PersonAction = ObjectMapper.Map<PersonActionDto>(p_activity);
@@ -219,7 +219,6 @@ namespace Ermes.Actions
 
             res.PersonAction.Username = _session.LoggedUserPerson.Username;
             res.PersonAction.OrganizationId = _session.LoggedUserPerson.OrganizationId.HasValue ? _session.LoggedUserPerson.OrganizationId.Value : 0;
-            await CurrentUnitOfWork.SaveChangesAsync();
             Logger.Info("Ermes: InsertPersonAction executed by person: " + personId);
             return res;
         }
