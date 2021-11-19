@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 
 namespace Ermes.Csi
 {
+    /*
+     * Debug purpose service
+     */ 
     [ErmesIgnoreApi(true)]
     public class CsiAppService: ErmesAppServiceBase
     {
@@ -27,12 +30,12 @@ namespace Ermes.Csi
 
             if (input.PersonId.HasValue && input.PersonId.Value > 0)
             {
-                operations = await _operationManager.GetOperationsByPersonId(input.PersonId.Value);
+                operations = await _operationManager.GetOperationsByPersonIdAsync(input.PersonId.Value);
                 res.Operations = ObjectMapper.Map<List<OperationDto>>(operations);
             }
             else if (input.PersonLegacyId.HasValue && input.PersonLegacyId.Value > 0)
             {
-                operations = await _operationManager.GetOperationsByPersonLegacyId(input.PersonLegacyId.Value);
+                operations = await _operationManager.GetOperationsByPersonLegacyIdAsync(input.PersonLegacyId.Value);
                 res.Operations = ObjectMapper.Map<List<OperationDto>>(operations);
             }
             else

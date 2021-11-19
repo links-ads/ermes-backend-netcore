@@ -99,7 +99,7 @@ namespace Ermes.Operations
         public string volterID { get; set; }
         public string voluntaryActivity { get; set; }
         public DateTime missionDate { get; set; }
-        public string atatus { get; set; }
+        public string status { get; set; }
         public string operationId { get; set; }
     }
 }

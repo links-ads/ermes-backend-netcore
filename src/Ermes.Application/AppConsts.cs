@@ -42,5 +42,14 @@ namespace Ermes
         public const string Ermes_Shelter = "SHELTER";
         public const string Ermes_Safers = "SAFERS";
 
+        ///<summary>
+        /// CSI service consts
+        /// </summary>
+
+        public const string CSI_OFFLINE = "Offline";
+        public const string CSI_ACTIVITY = "Doing activity";
+        
+
+
     }
 }

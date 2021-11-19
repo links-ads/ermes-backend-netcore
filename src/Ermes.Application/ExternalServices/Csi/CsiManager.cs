@@ -67,6 +67,46 @@ namespace Ermes.ExternalServices.Csi
 
             op.Id = await _operationManager.InsertOrUpdateOperationAsync(op);
 
+            return await SendRequestInternal(request, op);
+        }
+
+        public async Task<int> InsertInterventiVolontariAsync(long personId, int personLegaycId, double latitude, double longitude, string activity, DateTime timestamp, string status, int? operationId = null)
+        {
+            var builder = new UriBuilder(CsiClient.BaseAddress + "/insertInterventiVolontari");
+            string requestBody = JsonConvert.SerializeObject(new Intervention()
+            {
+                subjectCode = SUBJECT_CODE,
+                latitude = latitude.ToString(),
+                longitude = longitude.ToString(),
+                missionDate = timestamp,
+                status = status,
+                voluntaryActivity = activity,
+                volterID = personLegaycId.ToString(),
+                operationId = status == AppConsts.CSI_OFFLINE && operationId.HasValue ? operationId.Value.ToString() : null
+            });
+
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri(builder.ToString()),
+                Content = new StringContent(requestBody, Encoding.UTF8, "application/json")
+            };
+
+            var op = new Operation()
+            {
+                Request = requestBody,
+                Type = status == AppConsts.CSI_OFFLINE ? VolterOperationType.CloseIntervention : VolterOperationType.OpenIntervention,
+                PersonId = personId,
+                PersonLegacyId = personLegaycId 
+            };
+
+            op.Id = await _operationManager.InsertOrUpdateOperationAsync(op);
+
+            return await SendRequestInternal(request, op);
+        }
+
+        private async Task<int> SendRequestInternal(HttpRequestMessage request, Operation op)
+        {
             try
             {
                 using CancellationTokenSource tokenSource = new CancellationTokenSource(4000);
@@ -84,11 +124,27 @@ namespace Ermes.ExternalServices.Csi
                     task.Wait();
 
                     var result = JsonConvert.DeserializeObject<VolterResponse>(responseValue);
-
+                    //var result = new VolterResponse()
+                    //{
+                    //    DescriptionOutcome = "Elaborazione terminata correttamente",
+                    //    ProcessedCode = "0001",
+                    //    VolterId = 198061
+                    //};
                     if (result.ProcessedCodeTypeEnum == ProcessedCodeType.ElaborazioneTerminataCorretamente)
                     {
                         op.Response = result;
-                        op.PersonLegacyId = result.VolterId;
+                        /*
+                         * For SearchVolontario API, volterId contained in the response refers to volter internal person id
+                         * For InsertInterventiVolontario API, volterId contained in the response refers to the volter internal operation id
+                         * 
+                         * This means that the same prop has different meaning, based on the called API service
+                         */
+
+                        if (op.Type == VolterOperationType.Registration)
+                            op.PersonLegacyId = result.VolterId;
+                        else
+                            op.OperationLegacyId = result.VolterId;
+
                         return result.VolterId;
                     }
                     else
