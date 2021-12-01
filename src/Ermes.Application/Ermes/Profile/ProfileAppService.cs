@@ -223,7 +223,9 @@ namespace Ermes.Profile
             if (
                 _ermesSettings.Value != null &&
                 _ermesSettings.Value.ErmesProject == AppConsts.Ermes_Faster &&
-                input.OrganizationId.HasValue
+                input.OrganizationId.HasValue &&
+                !person.LegacyId.HasValue &&
+                input.TaxCode != null
             )
             {
                 var refOrg = await _organizationManager.GetOrganizationByIdAsync(input.OrganizationId.Value);
