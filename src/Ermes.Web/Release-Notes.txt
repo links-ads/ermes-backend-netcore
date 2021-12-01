@@ -1,4 +1,8 @@
 Ver.
+-----------------------
+
+
+Ver. 2.7.0 - 2021-11-29
 ------------------------
 - Bugfix - Report creation procedure fix (#64)
 - Feature - GetLayers fixed example updated (#62)
@@ -6,7 +10,7 @@ Ver.
 - Feature - Abp.CsiServices module removed, Operation class added, SearhcVolontario and InsertInterventiVolontario added (migration added)(#65)
 
 
-Ver. 2.6.1 2021-11-10
+Ver. 2.6.1 - 2021-11-10
 ------------------------
 - Feature - IsPublic and Content properties added to report (migration added)(#56)
 - Feature - HasChildren prop added to OrganizationDto class (#61)
