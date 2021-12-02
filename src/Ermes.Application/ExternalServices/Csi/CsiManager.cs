@@ -80,7 +80,7 @@ namespace Ermes.ExternalServices.Csi
                 longitude = longitude.ToString(),
                 missionDate = timestamp,
                 status = status,
-                voluntaryActivity = activity,
+                voluntaryActivity = "SORVEGLIANZA",//activity,
                 volterID = personLegaycId.ToString(),
                 operationId = status == AppConsts.CSI_OFFLINE && operationId.HasValue ? operationId.Value.ToString() : null
             });
