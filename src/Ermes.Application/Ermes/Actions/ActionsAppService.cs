@@ -208,7 +208,10 @@ namespace Ermes.Actions
                     ///Section dedicated to CSI service integration, see issue #65 for details.
                     ///It is not necessary to create a new Intervention if the first responder was in an active status
                     if (mustCreateIntervention && (old_status == null || old_status.Value != ActionStatusType.Active))
-                        await CreateInterventionAsync(personId, p_activity.Location.Y, p_activity.Location.X, activity.Name, p_activity.Timestamp, ActionStatusType.Active);
+                    {
+                        var itaActivity = await _activityManager.getActivityTranslationByCoreIdAndLangAsync(input.PersonAction.ActivityId, "it");
+                        await CreateInterventionAsync(personId, p_activity.Location.Y, p_activity.Location.X, itaActivity.Name, p_activity.Timestamp, ActionStatusType.Active);
+                    }
                     ////////////////
                     res.PersonAction = ObjectMapper.Map<PersonActionDto>(p_activity);
                     res.PersonAction.ActivityName = activity.Name;
