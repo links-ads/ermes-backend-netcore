@@ -317,6 +317,17 @@ namespace Ermes.Enums
         CompitoNonEsistente = 31,
         InsertOUpdateFallito = 33,
         EventoNonEsistente = 38,
-        TrovatiPiuInterventiAperti = 39
+        TrovatiPiuInterventiAperti = 39,
+        NessunEventoApertoInAltaPriorita = 40,
+        CodiceFiscaleCorrispondeAPiuPersone = 41,
+        ErroreServizioEventi = 42,
+        ImpossibileTrovareAperturaIntervento = 43,
+        PresentiPiuApertureInterventoIdentiche = 44,
+        AperturaInterventoGiaPresente = 45,
+        ErroreGenericoRecuperoInterventi = 46,
+        ImpossibileFareMappingAttivita = 47,
+        ImpossibileTrovareOrganizzazioneVolontario = 48,
+        ImpossibileTrovareCoordinamentoOrganizzazione = 49
+
     }
 }
