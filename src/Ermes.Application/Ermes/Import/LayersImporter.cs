@@ -1,5 +1,6 @@
 ﻿using Abp.Domain.Uow;
 using Abp.UI;
+using Ermes.Enums;
 using Ermes.Import.Dto;
 using Ermes.Layers;
 using Ermes.Localization;
@@ -60,7 +61,7 @@ namespace Ermes.Import
                         layer.GroupKey = row.GetString("Group Key");
                         layer.SubGroupKey = row.GetString("SubGroup Key");
                         layer.PartnerName = row.GetString("Partner Name");
-
+                        layer.Type = row.GetEnum<LayerType>("Type");
                         await layerManager.InsertOrUpdateLayerAsync(layer);
                         context.SaveChanges();
                     }
