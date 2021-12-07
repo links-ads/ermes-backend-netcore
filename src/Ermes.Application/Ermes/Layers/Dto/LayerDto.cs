@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ermes.Enums;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -15,6 +16,7 @@ namespace Ermes.Layers.Dto
         public string SubGroupKey { get; set; }
         public string Name { get; set; }
         public string PartnerName { get; set; }
+        public LayerType Type { get; set; }
         public List<LayerDetailsDto> Details { get; set; }
     }
 }
