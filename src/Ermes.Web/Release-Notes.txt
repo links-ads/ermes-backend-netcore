@@ -1,5 +1,9 @@
 Ver.
 -----------------------
+
+
+Ver. 2.8.0 2021-12-09
+-----------------------
 - Feature - Type prop added to Layer entity (migration added)(#66)
 
 Ver. 2.7.0 - 2021-11-29
