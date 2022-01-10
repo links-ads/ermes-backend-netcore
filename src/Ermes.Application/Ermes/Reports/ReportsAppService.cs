@@ -295,6 +295,8 @@ namespace Ermes.Reports
                     - FilterByCreator: if true, only reports created by current logged user are fetched
                     - SouthWestBoundary: bottom-left corner of the bounding box for a spatial query. (optional) (to be filled together with NorthEast property)
                     - NorthEastBoundary: top-right corner of the bounding box for a spatial query format. (optional) (to be filled together with SouthWest property)
+                    - Visibility: if Private, only reports created by professional are fetched. If Public, only reports created by citizens are fetched. If All, all reports are fetched 
+                    - Contents: list of content types of interest
                 Output: list of ReportDto elements
 
                 N.B.: A person has visibility only on reports belonging to his organization

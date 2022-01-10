@@ -171,7 +171,7 @@ namespace Ermes.Layers
                 }
                 catch (Exception e)
                 {
-                    throw new UserFriendlyException("MalformedLayerName");
+                    throw new UserFriendlyException(string.Format("Exception while joining layer lists: {0}", e.Message));
                 }
             }
             catch(Exception e)
