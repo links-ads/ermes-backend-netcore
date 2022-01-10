@@ -1,5 +1,6 @@
 Ver.
 -----------------------
+- Bugfix - GetFeatureCollection with ContentType and Visibility filters, only public report for citizens (#67)
 
 
 Ver. 2.8.0 2021-12-09

@@ -23,6 +23,8 @@ namespace Ermes.GeoJson.Dto
         public List<LayerType> MapRequestLayerTypes { get; set; }
         public List<MapRequestStatusType> MapRequestStatusTypes { get; set; }
         public List<int> ActivityIds { get; set; }
+        public VisibilityType ReportVisibilityType { get; set; }
+        public List<ReportContentType> ReportContentTypes { get; set; }
     }
 
     public class GeoJsonItem

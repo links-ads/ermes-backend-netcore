@@ -113,6 +113,8 @@ namespace Ermes.GeoJson
             List<HazardType> mapRequestHazardTypes,
             List<LayerType> mapRequestLayerTypes,
             List<MapRequestStatusType> mapRequestStatusTypes,
+            VisibilityType visibilityType,
+            List<ReportContentType> reportContentTypes,
             int srid,
             string Language = "it"
             )
@@ -148,7 +150,9 @@ namespace Ermes.GeoJson
                         m.""CurrentStatus"" as ""missionStatusFilter"",
                         null as ""mapRequestHazardFilter"",
                         null as ""mapRequestStatusFilter"",
-                        null as ""mapRequestLayerFilter""
+                        null as ""mapRequestLayerFilter"",
+                        null as ""reportContentTypeFilter"",
+                        false as ""reportIsPublicFilter""
                     from public.missions m
                     left join public.organizations o on o.""Id"" = m.""OrganizationId""
                     join public.persons p on p.""Id"" = m.""CreatorUserId""
@@ -175,7 +179,9 @@ namespace Ermes.GeoJson
                         null as ""missionStatusFilter"",
                         null as ""mapRequestHazardFilter"",
                         null as ""mapRequestStatusFilter"",
-                        null as ""mapRequestLayerFilter""
+                        null as ""mapRequestLayerFilter"",
+                        null as ""reportContentTypeFilter"",
+                        false as ""reportIsPublicFilter""
                     from public.communications c
                     join public.persons p on p.""Id"" = c.""CreatorUserId""
                     left join public.organizations o on o.""Id"" = p.""OrganizationId""
@@ -202,7 +208,9 @@ namespace Ermes.GeoJson
                         null as ""missionStatusFilter"",
                         null as ""mapRequestHazardFilter"",
                         null as ""mapRequestStatusFilter"",
-                        null as ""mapRequestLayerFilter""
+                        null as ""mapRequestLayerFilter"",
+                        r.""ContentType"" as ""reportContentTypeFilter"",
+                        r.""IsPublic"" as ""reportIsPublicFilter""
                     from public.reports r 
                     join public.persons p on p.""Id"" = r.""CreatorUserId""
                     left join public.organizations o on o.""Id"" = p.""OrganizationId""
@@ -229,7 +237,9 @@ namespace Ermes.GeoJson
                         null as ""missionStatusFilter"",
                         null as ""mapRequestHazardFilter"",
                         null as ""mapRequestStatusFilter"",
-                        null as ""mapRequestLayerFilter""
+                        null as ""mapRequestLayerFilter"",
+                        null as ""reportContentTypeFilter"",
+                        false as ""reportIsPublicFilter""
                     from public.reportrequests r2 
                     join public.persons p on p.""Id"" = r2.""CreatorUserId""
                     left join public.organizations o on o.""Id"" = p.""OrganizationId""
@@ -256,7 +266,9 @@ namespace Ermes.GeoJson
                         null as ""missionStatusFilter"",
                         mr.""Hazard"" as ""mapRequestHazardFilter"",
                         mr.""Status"" as ""mapRequestStatusFilter"",
-                        mr.""Layer"" as ""mapRequestLayerFilter""
+                        mr.""Layer"" as ""mapRequestLayerFilter"",
+                        null as ""reportContentTypeFilter"",
+                        false as ""reportIsPublicFilter""
                     from public.map_requests mr
                     join public.persons p on p.""Id"" = mr.""CreatorUserId""
                     left join public.organizations o on o.""Id"" = p.""OrganizationId""
@@ -283,7 +295,9 @@ namespace Ermes.GeoJson
                         null as ""missionStatusFilter"",
                         null as ""mapRequestHazardFilter"",
                         null as ""mapRequestStatusFilter"",
-                        null as ""mapRequestLayerFilter""
+                        null as ""mapRequestLayerFilter"",
+                        null as ""reportContentTypeFilter"",
+                        false as ""reportIsPublicFilter""
                         FROM (
 	                        SELECT pa2.""PersonId"", MAX(pa2.""Timestamp"") as ""MaxTime""
                             FROM person_actions pa2
@@ -417,6 +431,27 @@ namespace Ermes.GeoJson
                     var p = new NpgsqlParameter("@mapRequestStatusTypes", NpgsqlDbType.Array | NpgsqlDbType.Text)
                     {
                         Value = mapRequestStatusTypes.Select(a => a.ToString()).ToArray()
+                    };
+                    command.Parameters.Add(p);
+                }
+
+                if (reportContentTypes != null && reportContentTypes.Count > 0)
+                {
+                    command.CommandText += @" and (tmp.""reportContentTypeFilter"" is null or tmp.""reportContentTypeFilter"" = any(array[@reportContentTypes]))";
+                    var p = new NpgsqlParameter("@reportContentTypes", NpgsqlDbType.Array | NpgsqlDbType.Text)
+                    {
+                        Value = reportContentTypes.Select(a => a.ToString()).ToArray()
+                    };
+                    command.Parameters.Add(p);
+                }
+
+                if (visibilityType != VisibilityType.All)
+                {
+                    var param = visibilityType == VisibilityType.Public;
+                    command.CommandText += @" and (tmp.""reportIsPublicFilter"" = @reportVisibility)";
+                    var p = new NpgsqlParameter("@reportVisibility", NpgsqlDbType.Boolean)
+                    {
+                        Value = param
                     };
                     command.Parameters.Add(p);
                 }

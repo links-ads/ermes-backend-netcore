@@ -84,6 +84,7 @@ namespace Ermes.Missions
             {
                 Geometry boundingBox = GeometryHelper.GetPolygonFromBoundaries(input.SouthWestBoundary, input.NorthEastBoundary);
                 query = _geoJsonBulkRepository.GetMissions(input.StartDate.Value, input.EndDate.Value, boundingBox);
+                query = query.Include(a => a.CreatorPerson).Include(a => a.CreatorPerson.Organization);
             }
             else
                 query = _missionManager.Missions.Include(m => m.Organization).Where(a => new NpgsqlRange<DateTime>(input.StartDate.Value, input.EndDate.Value).Contains(a.Duration));
