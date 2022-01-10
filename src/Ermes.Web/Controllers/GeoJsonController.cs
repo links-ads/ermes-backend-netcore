@@ -84,6 +84,8 @@ namespace Ermes.Web.Controllers
                         input.MapRequestHazardTypes,
                         input.MapRequestLayerTypes,
                         input.MapRequestStatusTypes,
+                        input.ReportVisibilityType,
+                        input.ReportContentTypes,
                         AppConsts.Srid, 
                         _languageManager.CurrentLanguage.Name
                     );
