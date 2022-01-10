@@ -76,6 +76,7 @@ namespace Ermes.Communications
             {
                 Geometry boundingBox = GeometryHelper.GetPolygonFromBoundaries(input.SouthWestBoundary, input.NorthEastBoundary);
                 query = _geoJsonBulkRepository.GetCommunications(input.StartDate.Value, input.EndDate.Value, boundingBox);
+                query = query.Include(a => a.Creator).Include(a => a.Creator.Organization);
             }
             else
 
