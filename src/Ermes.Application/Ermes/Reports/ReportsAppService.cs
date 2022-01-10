@@ -79,10 +79,10 @@ namespace Ermes.Reports
             {
                 Geometry boundingBox = GeometryHelper.GetPolygonFromBoundaries(input.SouthWestBoundary, input.NorthEastBoundary);
                 query = _geoJsonBulkRepository.GetReports(input.StartDate.Value, input.EndDate.Value, boundingBox);
+                query = query.Include(a => a.Creator).Include(a => a.Creator.Organization);
             }
             else
                 query = _reportManager.Reports.Where(a => new NpgsqlRange<DateTime>(input.StartDate.Value, input.EndDate.Value).Contains(a.Timestamp));
-
 
             if (input.ReportRequestId > 0)
             {               
@@ -95,8 +95,6 @@ namespace Ermes.Reports
                 //query = query
                 //            .Where(a => reportRequest.Duration.Contains(a.Timestamp));
             }
-            else
-                query = query.Include(a => a.Creator);
 
             if (input.Status != null && input.Status.Count > 0)
             {
