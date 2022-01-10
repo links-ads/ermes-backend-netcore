@@ -1,5 +1,10 @@
 Ver.
 -----------------------
+- Bugfix - GetMissionById API fix (#69)
+
+
+Ver. 2.8.1 2022-01-10
+-----------------------
 - Bugfix - GetFeatureCollection with ContentType and Visibility filters, only public report for citizens (#67)
 
 
