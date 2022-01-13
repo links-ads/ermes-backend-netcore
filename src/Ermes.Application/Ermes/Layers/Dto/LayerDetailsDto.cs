@@ -8,5 +8,6 @@ namespace Ermes.Layers.Dto
     {
         public string Name { get; set; }
         public List<DateTime> Timestamps { get; set; }
+        public DateTime Created_At { get; set; }
     }
 }

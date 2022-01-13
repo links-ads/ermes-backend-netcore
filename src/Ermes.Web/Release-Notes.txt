@@ -1,5 +1,6 @@
 Ver.
 -----------------------
+- Feature - Available layers retrieved from Importer component (#68)
 - Bugfix - GetMissionById API fix (#69)
 
 
