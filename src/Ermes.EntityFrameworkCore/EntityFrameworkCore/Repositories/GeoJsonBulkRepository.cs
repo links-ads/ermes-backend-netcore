@@ -152,7 +152,7 @@ namespace Ermes.GeoJson
                         null as ""mapRequestStatusFilter"",
                         null as ""mapRequestLayerFilter"",
                         null as ""reportContentTypeFilter"",
-                        false as ""reportIsPublicFilter""
+                        null as ""reportIsPublicFilter""
                     from public.missions m
                     left join public.organizations o on o.""Id"" = m.""OrganizationId""
                     join public.persons p on p.""Id"" = m.""CreatorUserId""
@@ -181,7 +181,7 @@ namespace Ermes.GeoJson
                         null as ""mapRequestStatusFilter"",
                         null as ""mapRequestLayerFilter"",
                         null as ""reportContentTypeFilter"",
-                        false as ""reportIsPublicFilter""
+                        null as ""reportIsPublicFilter""
                     from public.communications c
                     join public.persons p on p.""Id"" = c.""CreatorUserId""
                     left join public.organizations o on o.""Id"" = p.""OrganizationId""
@@ -210,7 +210,7 @@ namespace Ermes.GeoJson
                         null as ""mapRequestStatusFilter"",
                         null as ""mapRequestLayerFilter"",
                         r.""ContentType"" as ""reportContentTypeFilter"",
-                        r.""IsPublic"" as ""reportIsPublicFilter""
+                        r.""IsPublic""::text as ""reportIsPublicFilter""
                     from public.reports r 
                     join public.persons p on p.""Id"" = r.""CreatorUserId""
                     left join public.organizations o on o.""Id"" = p.""OrganizationId""
@@ -239,7 +239,7 @@ namespace Ermes.GeoJson
                         null as ""mapRequestStatusFilter"",
                         null as ""mapRequestLayerFilter"",
                         null as ""reportContentTypeFilter"",
-                        false as ""reportIsPublicFilter""
+                        null as ""reportIsPublicFilter""
                     from public.reportrequests r2 
                     join public.persons p on p.""Id"" = r2.""CreatorUserId""
                     left join public.organizations o on o.""Id"" = p.""OrganizationId""
@@ -268,7 +268,7 @@ namespace Ermes.GeoJson
                         mr.""Status"" as ""mapRequestStatusFilter"",
                         mr.""Layer"" as ""mapRequestLayerFilter"",
                         null as ""reportContentTypeFilter"",
-                        false as ""reportIsPublicFilter""
+                        null as ""reportIsPublicFilter""
                     from public.map_requests mr
                     join public.persons p on p.""Id"" = mr.""CreatorUserId""
                     left join public.organizations o on o.""Id"" = p.""OrganizationId""
@@ -297,7 +297,7 @@ namespace Ermes.GeoJson
                         null as ""mapRequestStatusFilter"",
                         null as ""mapRequestLayerFilter"",
                         null as ""reportContentTypeFilter"",
-                        false as ""reportIsPublicFilter""
+                        null as ""reportIsPublicFilter""
                         FROM (
 	                        SELECT pa2.""PersonId"", MAX(pa2.""Timestamp"") as ""MaxTime""
                             FROM person_actions pa2
@@ -445,11 +445,14 @@ namespace Ermes.GeoJson
                     command.Parameters.Add(p);
                 }
 
+
+                //Postgre throws error if we try to use the param as a boolean.
+                //The explicit cast to text here is needed
                 if (visibilityType != VisibilityType.All)
                 {
-                    var param = visibilityType == VisibilityType.Public;
-                    command.CommandText += @" and (tmp.""reportIsPublicFilter"" = @reportVisibility)";
-                    var p = new NpgsqlParameter("@reportVisibility", NpgsqlDbType.Boolean)
+                    var param = (visibilityType == VisibilityType.Public).ToString().ToLower();
+                    command.CommandText += @" and (tmp.""reportIsPublicFilter"" is null or tmp.""reportIsPublicFilter"" = @reportVisibility)";
+                    var p = new NpgsqlParameter("@reportVisibility", NpgsqlDbType.Text)
                     {
                         Value = param
                     };
