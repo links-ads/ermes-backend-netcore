@@ -1,6 +1,6 @@
 Ver.
 -----------------------
-
+- Feature - Application Insights added (settings update)(#9)
 
 Ver. 2.8.1 2022-01-10
 -----------------------
