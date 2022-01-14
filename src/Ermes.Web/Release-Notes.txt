@@ -3,6 +3,7 @@ Ver.
 - Feature - Available layers retrieved from Importer component (#68)
 - Bugfix - GetMissionById API fix (#69)
 
+- Feature - Application Insights added (settings update)(#9)
 
 Ver. 2.8.1 2022-01-10
 -----------------------
