@@ -171,6 +171,8 @@ namespace Ermes.Web.Startup
                 }
             }
 
+            services.AddApplicationInsightsTelemetry();
+
             //Configure Abp and Dependency Injection
             return services.AddAbp<ErmesWebModule>(options =>
             {
