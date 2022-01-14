@@ -15,7 +15,7 @@ namespace Ermes.Missions
 {
     public class MissionManager : DomainService
     {
-        public IQueryable<Mission> Missions { get { return MissionRepository.GetAll().Include(a => a.CreatorPerson.Organization); } }
+        public IQueryable<Mission> Missions { get { return MissionRepository.GetAll().Include(a => a.CreatorPerson.Organization).Include(a => a.Organization); } }
         protected IRepository<Mission> MissionRepository { get; set; }
         protected IRepository<Person, long> PersonRepository { get; set; }
 
