@@ -18,6 +18,7 @@ namespace Ermes.Authorization
             public const string Import_Categories = "Import.Categories";
             public const string Import_Gamification = "Import.Gamification";
             public const string Import_Users = "Import.Users";
+            public const string Import_Layers = "Import.Layers";
         }
 
         public static class Organizations
@@ -36,6 +37,12 @@ namespace Ermes.Authorization
         {
             public const string Mission = "Missions";
             public const string Mission_CanSeeCrossOrganization = "Missions.CanSeeCrossOrganization";
+        }
+
+        public static class Communications
+        {
+            public const string Communication = "Communications";
+            public const string Communication_CanSeeCrossOrganization = "Communications.CanSeeCrossOrganization";
         }
 
         public static class MapRequests

@@ -6,7 +6,7 @@ namespace Abp.CsiServices.Csi.Dto
 {
     public class SearchVolontarioInput
     {
-        public int CodiceMateria { get; set; }
-        public string CodFiscaleVolontario { get; set; }
+        public string subjectCode { get; set; }
+        public string fiscalCodeVoluntary { get; set; }
     }
 }

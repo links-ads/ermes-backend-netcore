@@ -21,6 +21,7 @@ namespace Ermes.Authorization
             AppPermissions.Imports.Import_Categories,
             AppPermissions.Imports.Import_Gamification,
             AppPermissions.Imports.Import_Users,
+            AppPermissions.Imports.Import_Layers,
             AppPermissions.Organizations.Organization,
             AppPermissions.Organizations.Organization_CanViewAll,
             AppPermissions.Organizations.Organization_CanCreate,
@@ -32,7 +33,8 @@ namespace Ermes.Authorization
             AppPermissions.Missions.Mission_CanSeeCrossOrganization,
             AppPermissions.Reports.Report_CanSeeCrossOrganization,
             AppPermissions.Actions.Action_CanSeeCrossOrganization,
-            AppPermissions.MapRequests.MapRequest_CanSeeCrossOrganization
+            AppPermissions.MapRequests.MapRequest_CanSeeCrossOrganization,
+            AppPermissions.Communications.Communication_CanSeeCrossOrganization
         };
 
         public static readonly string[] ORGANIZATION_MANAGER_PERMISSION_LIST = new string[]

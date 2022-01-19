@@ -17,6 +17,10 @@ using Abp.Localization;
 using Newtonsoft.Json;
 using Ermes.Dto.Datatable;
 using Ermes.Organizations;
+using Microsoft.Extensions.Options;
+using Ermes.Configuration;
+using Ermes.ExternalServices.Csi;
+using Abp.Domain.Uow;
 
 namespace Ermes.Actions
 {
@@ -30,6 +34,8 @@ namespace Ermes.Actions
         private readonly IGeoJsonBulkRepository _geoJsonBulkRepository;
         private readonly ILanguageManager _languageManager;
         private readonly ErmesPermissionChecker _permissionChecker;
+        private readonly IOptions<ErmesSettings> _ermesSettings;
+        private readonly CsiManager _csiManager;
 
         public ActionsAppService(
             PersonManager personManager,
@@ -38,6 +44,8 @@ namespace Ermes.Actions
             IGeoJsonBulkRepository geoJsonBulkRepository,
             OrganizationManager organizationManager,
             ErmesPermissionChecker permissionChecker,
+            IOptions<ErmesSettings> ermesSettings,
+            CsiManager csiManager,
             ILanguageManager languageManager)
         {
             _personManager = personManager;
@@ -47,6 +55,8 @@ namespace Ermes.Actions
             _languageManager = languageManager;
             _permissionChecker = permissionChecker;
             _organizationManager = organizationManager;
+            _ermesSettings = ermesSettings;
+            _csiManager = csiManager;
         }
         [OpenApiOperation("Get Actions",
             @"
@@ -124,6 +134,8 @@ namespace Ermes.Actions
             var res = new CreatePersonActionOutput();
             long personId = _session.UserId.Value;
             var lastAction = await _personManager.GetLastPersonActionAsync(personId);
+            var old_status = lastAction?.CurrentStatus;
+            bool mustCreateIntervention = _ermesSettings.Value != null && _ermesSettings.Value.ErmesProject == AppConsts.Ermes_Faster && _session.LoggedUserPerson.OrganizationId.HasValue;
 
             switch (input.PersonAction.Type)
                 //Use last valid location if new input location is null or is equals to (0,0)
@@ -171,6 +183,14 @@ namespace Ermes.Actions
                     if ((p_status.Location == null || (p_status.Location.X == 0 && p_status.Location.Y == 0)) && lastAction != null)
                         p_status.Location = lastAction.Location;
                     p_status.Id = await _personManager.InsertPersonActionStatusAsync(ObjectMapper.Map<PersonActionStatus>(p_status));
+                   
+                    ////////////////
+                    ///Section dedicated to CSI service integration, see issue #65 for details.
+                    ///It is not necessary to close an intervention for a first responder already in off Status
+                    ///The activity name is a mandatory field for this service, even if it has no meaning; a default value of "Sorveglianza" is being sent
+                    if (mustCreateIntervention && p_status.CurrentStatus == ActionStatusType.Off && old_status != null && old_status.Value != ActionStatusType.Off)
+                        await CreateInterventionAsync(personId, p_status.Location.Y, p_status.Location.X, p_status.Timestamp, ActionStatusType.Off);
+                    ///////////////
                     res.PersonAction = ObjectMapper.Map<PersonActionDto>(p_status);
                     break;
                 case PersonActionType.PersonActionActivity:
@@ -184,6 +204,16 @@ namespace Ermes.Actions
                     if ((p_activity.Location == null || (p_activity.Location.X == 0 && p_activity.Location.Y == 0)) && lastAction != null)
                         p_activity.Location = lastAction.Location;
                     p_activity.Id = await _personManager.InsertPersonActionActivityAsync(ObjectMapper.Map<PersonActionActivity>(p_activity));
+
+                    ////////////////
+                    ///Section dedicated to CSI service integration, see issue #65 for details.
+                    ///It is not necessary to create a new Intervention if the first responder was in an active status
+                    if (mustCreateIntervention && (old_status == null || old_status.Value != ActionStatusType.Active))
+                    {
+                        var itaActivity = await _activityManager.getActivityTranslationByCoreIdAndLangAsync(input.PersonAction.ActivityId, "it");
+                        await CreateInterventionAsync(personId, p_activity.Location.Y, p_activity.Location.X, p_activity.Timestamp, ActionStatusType.Active, itaActivity.Name);
+                    }
+                    ////////////////
                     res.PersonAction = ObjectMapper.Map<PersonActionDto>(p_activity);
                     res.PersonAction.ActivityName = activity.Name;
                     break;
@@ -195,6 +225,41 @@ namespace Ermes.Actions
             res.PersonAction.OrganizationId = _session.LoggedUserPerson.OrganizationId.HasValue ? _session.LoggedUserPerson.OrganizationId.Value : 0;
             Logger.Info("Ermes: InsertPersonAction executed by person: " + personId);
             return res;
+        }
+
+        protected async Task CreateInterventionAsync(long personId, double latitude, double longitude, DateTime timestamp, ActionStatusType status, string activityName = "Sorveglianza")
+        {
+            var person = await _personManager.GetPersonByIdAsync(personId);
+            /*
+             * Some persons inside Protezione Civile Piemonte do not have an associated legacyId
+             * but they can operate on the field. In this case it is not necessary to open/close an intervention
+             */ 
+            if (!person.OrganizationId.HasValue || !person.LegacyId.HasValue)
+                return;
+
+            //It is not necessary to create an intervention when first responder goes back to Active status without passing through Off status
+            //Example: Active -> Moving -> Active -> Off
+            //This must create only one Intervention
+            if (person.CurrentOperationLegacyId.HasValue && status == ActionStatusType.Active)
+                return;
+
+            var refOrg = await _organizationManager.GetOrganizationByIdAsync(person.OrganizationId.Value);
+            var housePartner = await SettingManager.GetSettingValueAsync(AppSettings.General.HouseOrganization);
+            if (refOrg.Name == housePartner || (refOrg.ParentId.HasValue && refOrg.Parent.Name == housePartner))
+            {
+                var operationLegacyId = await _csiManager.InsertInterventiVolontariAsync(personId, person.LegacyId.Value, latitude, longitude, activityName, timestamp, status == ActionStatusType.Off ? AppConsts.CSI_OFFLINE : AppConsts.CSI_ACTIVITY, person.CurrentOperationLegacyId);
+                if (operationLegacyId > 0)
+                {
+                    if (status == ActionStatusType.Off)
+                        person.CurrentOperationLegacyId = null;
+                    else if (status == ActionStatusType.Active)
+                        person.CurrentOperationLegacyId = operationLegacyId;
+                }
+                else
+                {
+                    Logger.ErrorFormat("####CreateInterventionAsync failed for personId:{0} at Timestamp {1}", personId, timestamp);
+                }
+            }
         }
     }
 }

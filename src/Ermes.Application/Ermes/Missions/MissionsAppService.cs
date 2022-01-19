@@ -84,6 +84,7 @@ namespace Ermes.Missions
             {
                 Geometry boundingBox = GeometryHelper.GetPolygonFromBoundaries(input.SouthWestBoundary, input.NorthEastBoundary);
                 query = _geoJsonBulkRepository.GetMissions(input.StartDate.Value, input.EndDate.Value, boundingBox);
+                query = query.Include(a => a.CreatorPerson).Include(a => a.CreatorPerson.Organization);
             }
             else
                 query = _missionManager.Missions.Include(m => m.Organization).Where(a => new NpgsqlRange<DateTime>(input.StartDate.Value, input.EndDate.Value).Contains(a.Duration));
@@ -286,8 +287,23 @@ namespace Ermes.Missions
         public virtual async Task<GetEntityByIdOutput<MissionDto>> GetMissionById(GetEntityByIdInput<int> input)
         {
             var mission = await GetMissionAsync(input.Id);
-            if (mission.OrganizationId != _session.LoggedUserPerson.OrganizationId)
-                throw new UserFriendlyException(L("EntityOutsideOrganization"));
+            var hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Missions.Mission_CanSeeCrossOrganization);
+            if (!hasPermission)
+            {
+                //Father Org can see child contents
+                //false the contrary
+                if (
+                        mission.OrganizationId != _session.LoggedUserPerson.OrganizationId &&
+                        (
+                            !mission.Organization.ParentId.HasValue ||
+                            (
+                                mission.Organization.ParentId.HasValue &&
+                                mission.Organization.ParentId.Value != _session.LoggedUserPerson.OrganizationId
+                            )
+                        )
+                )
+                    throw new UserFriendlyException(L("EntityOutsideOrganization"));
+            }
 
             var writer = new GeoJsonWriter();
             var res = new GetEntityByIdOutput<MissionDto>()

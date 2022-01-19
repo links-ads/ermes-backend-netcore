@@ -70,7 +70,25 @@ namespace Ermes.Web.Controllers
                 orgIdList = _organizationManager.GetOrganizationIds();
             else
                 orgIdList = _session.LoggedUserPerson.OrganizationId.HasValue ? new int[] { _session.LoggedUserPerson.OrganizationId.Value } : null;
-            string responseContent = _geoJsonBulkRepository.GetGeoJsonCollection(input.StartDate, input.EndDate, boundingBox, input.EntityTypes, orgIdList, input.StatusTypes, actIds, input.HazardTypes, input.ReportStatusTypes, input.MissionStatusTypes, AppConsts.Srid, _languageManager.CurrentLanguage.Name);
+            string responseContent = _geoJsonBulkRepository.GetGeoJsonCollection(
+                        input.StartDate, 
+                        input.EndDate, 
+                        boundingBox, 
+                        input.EntityTypes, 
+                        orgIdList, 
+                        input.StatusTypes, 
+                        actIds, 
+                        input.HazardTypes, 
+                        input.ReportStatusTypes, 
+                        input.MissionStatusTypes, 
+                        input.MapRequestHazardTypes,
+                        input.MapRequestLayerTypes,
+                        input.MapRequestStatusTypes,
+                        input.ReportVisibilityType,
+                        input.ReportContentTypes,
+                        AppConsts.Srid, 
+                        _languageManager.CurrentLanguage.Name
+                    );
 
             // I need to return a JsonResult or in case of exception, Abp produces html instead of json. However, the real
             // JsonResult serializes the object I give him while I have an already serialized one.

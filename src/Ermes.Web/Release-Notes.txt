@@ -1,8 +1,65 @@
 Ver.
+-----------------------
+
+
+Ver. 2.9.0 2022-01-14
+-----------------------
+- Feature - Available layers retrieved from Importer component (#68)
+- Feature - Application Insights added (settings update)(#9)
+- Bugfix - GetMissionById API fix (#69)
+
+
+Ver. 2.8.1 2022-01-10
+-----------------------
+- Bugfix - GetFeatureCollection with ContentType and Visibility filters, only public report for citizens (#67)
+
+
+Ver. 2.8.0 2021-12-09
+-----------------------
+- Feature - Type prop added to Layer entity (migration added)(#66)
+
+Ver. 2.7.0 - 2021-11-29
+------------------------
+- Bugfix - Report creation procedure fix (#64)
+- Feature - GetLayers fixed example updated (#62)
+- Feature - Message on Rabbit bus every time a new entity is created (#63)
+- Feature - Abp.CsiServices module removed, Operation class added, SearhcVolontario and InsertInterventiVolontario added (migration added)(#65)
+
+
+Ver. 2.6.1 - 2021-11-10
+------------------------
+- Feature - IsPublic and Content properties added to report (migration added)(#56)
+- Feature - HasChildren prop added to OrganizationDto class (#61)
+- Feature - GetLayers update for NetCdf support (#62)
+
+Ver. 2.5.0 - 2021-10-22
+------------------------
+- Feature - Organization MembersHaveTaxCode property added (migration added)(#58)
+- Feature - ParentId filter in GetOrganizatins API and IsNewUser property added to Person class (migration added)(#60)
+
+Ver. 2.4.2 - 2021-10-12
+------------------------
+- Bugfix - GetLayers with Tiles list
+
+Ver. 2.4.1 - 2021-10-05
+------------------------
+- Feature - LayerDto and GetLayerDefinition API update
+
+Ver. 2.4.0 - 2021-10-01
+------------------------
+- Feature - Importer module added (#52)
+- Feature - Layers definition and GetLayers function implementation (migration added)(#53)
+
+Ver. 2.3.1 - 2021-09-23
+------------------------
+- Feature - MapRequest management in GetFeatureCollection api (#50)
+- BugFix - GetEntityById permission and visibility fix (#51)
+
+Ver. 2.3.0 - 2021-09-16
 -------------------------
 - Feature - MapRequest management added (migration added) (#45)
 
-Ver. 2.2.1 - 2021-19.14
+Ver. 2.2.1 - 2021-09.14
 -------------------------
 - Feature - Organization name prop added to CommunicationDto class (#48)
 

@@ -57,6 +57,8 @@ using Ermes.Gamification.Dto;
 using Ermes.Quizzes;
 using Ermes.Answers;
 using Ermes.MapRequests.Dto;
+using Ermes.Layers;
+using Ermes.Layers.Dto;
 
 namespace Ermes
 {
@@ -70,6 +72,7 @@ namespace Ermes
             configuration.CreateMultiLingualMap<Tip, TipTranslation, TipDto>(context);
             configuration.CreateMultiLingualMap<Quiz, QuizTranslation, QuizDto>(context);
             configuration.CreateMultiLingualMap<Answer, AnswerTranslation, AnswerDto>(context);
+            configuration.CreateMultiLingualMap<Layer, LayerTranslation, LayerDto>(context);
             configuration.CreateMap<User, UserDto>()
                             .ReverseMap()
                             .ForMember(entity => entity.passwordChangeRequired, options => options.MapFrom(dto => false))
@@ -230,6 +233,8 @@ namespace Ermes
             configuration.CreateMap<ImportResultDto, ImportUsersDto>().ReverseMap();
             configuration.CreateMap<MapRequests.MapRequest, MapRequestDto>()
                             .ForMember(dto => dto.Centroid, options => options.MapFrom(b => new PointPosition(b.AreaOfInterest.Centroid.X, b.AreaOfInterest.Centroid.Y)))
+                            .ForMember(dto => dto.Organization, options => options.MapFrom(b => b.Creator.Organization))
+                            .ForMember(dto => dto.Username, options => options.MapFrom(b => b.Creator.Username))
                             .AfterMap((src, dest) => dest.Duration.LowerBound = dest.Duration.LowerBound.ToUniversalTime())
                             .AfterMap((src, dest) => dest.Duration.UpperBound = dest.Duration.UpperBound.ToUniversalTime())
                             .ReverseMap()

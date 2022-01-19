@@ -12,11 +12,13 @@ namespace Ermes.Reports.Dto
     {
         public List<HazardType> Hazards { get; set; }
         public List<GeneralStatus> Status { get; set; }
+        public List<ReportContentType> Contents { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public int ReportRequestId { get; set; }
         public bool FilterByCreator { get; set; }
         public PointPosition NorthEastBoundary { get; set; }
         public PointPosition SouthWestBoundary { get; set; }
+        public VisibilityType Visibility { get; set; }
     }
 }

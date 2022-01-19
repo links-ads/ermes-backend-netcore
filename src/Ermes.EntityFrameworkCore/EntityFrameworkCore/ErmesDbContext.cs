@@ -33,6 +33,8 @@ using Ermes.Tips;
 using Ermes.Quizzes;
 using Ermes.Answers;
 using Ermes.MapRequests;
+using Ermes.Layers;
+using Ermes.Operations;
 
 namespace Ermes.EntityFrameworkCore
 {
@@ -68,6 +70,9 @@ namespace Ermes.EntityFrameworkCore
         public virtual DbSet<Answer> Answers { get; set; }
         public virtual DbSet<AnswerTranslation> AnswerTranslations { get; set; }
         public virtual DbSet<MapRequest> MapRequests { get; set; }
+        public virtual DbSet<Layer> Layers { get; set; }
+        public virtual DbSet<LayerTranslation> LayerTranslations { get; set; }
+        public virtual DbSet<Operation> Operations { get; set; }
         public IEntityHistoryHelper EntityHistoryHelper { get; set; }
 
         private readonly ErmesLocalizationHelper _localizer;
@@ -136,6 +141,9 @@ namespace Ermes.EntityFrameworkCore
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<MapRequest>().HasIndex(t => t.Code).IsUnique(true);
+
+            modelBuilder.Entity<Layer>().HasIndex(i => i.DataTypeId).IsUnique();
+            modelBuilder.Entity<LayerTranslation>().HasIndex(i => new { i.CoreId, i.Language }).IsUnique();
 
             #region EntityHistory
             modelBuilder.Entity<SplitEntityChange>().HasMany(e => e.PropertyChanges).WithOne().HasForeignKey(e => e.EntityChangeId);

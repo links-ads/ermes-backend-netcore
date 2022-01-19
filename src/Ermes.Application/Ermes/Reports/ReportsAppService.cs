@@ -79,10 +79,10 @@ namespace Ermes.Reports
             {
                 Geometry boundingBox = GeometryHelper.GetPolygonFromBoundaries(input.SouthWestBoundary, input.NorthEastBoundary);
                 query = _geoJsonBulkRepository.GetReports(input.StartDate.Value, input.EndDate.Value, boundingBox);
+                query = query.Include(a => a.Creator).Include(a => a.Creator.Organization);
             }
             else
                 query = _reportManager.Reports.Where(a => new NpgsqlRange<DateTime>(input.StartDate.Value, input.EndDate.Value).Contains(a.Timestamp));
-
 
             if (input.ReportRequestId > 0)
             {               
@@ -95,8 +95,6 @@ namespace Ermes.Reports
                 //query = query
                 //            .Where(a => reportRequest.Duration.Contains(a.Timestamp));
             }
-            else
-                query = query.Include(a => a.Creator);
 
             if (input.Status != null && input.Status.Count > 0)
             {
@@ -110,12 +108,22 @@ namespace Ermes.Reports
                 query = query.Where(a => hazardList.Contains(a.HazardString));
             }
 
+            if (input.Contents != null && input.Contents.Count > 0)
+            {
+                var contentList = input.Contents.Select(a => a.ToString()).ToList();
+                query = query.Where(a => contentList.Contains(a.ContentString));
+            }
+
             query = query.DTFilterBy(input);
 
             var person = _session.LoggedUserPerson;
             var hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Reports.Report_CanSeeCrossOrganization);
-            if(!hasPermission)
-                query = query.DataOwnership(person.OrganizationId.HasValue ? new List<int>() { person.OrganizationId.Value } : null);
+            if (!hasPermission)
+            {
+                //Citizen can only see public reports
+                bool isCitizen = _session.Roles.Contains(AppRoles.CITIZEN);
+                query = query.DataOwnership(person.OrganizationId.HasValue ? new List<int>() { person.OrganizationId.Value } : null, null, isCitizen ? VisibilityType.Public : input.Visibility);
+            }
 
             if (input.FilterByCreator)
                 query = query.Where(r => r.CreatorUserId.HasValue && r.CreatorUserId.Value == person.Id);
@@ -287,6 +295,8 @@ namespace Ermes.Reports
                     - FilterByCreator: if true, only reports created by current logged user are fetched
                     - SouthWestBoundary: bottom-left corner of the bounding box for a spatial query. (optional) (to be filled together with NorthEast property)
                     - NorthEastBoundary: top-right corner of the bounding box for a spatial query format. (optional) (to be filled together with SouthWest property)
+                    - Visibility: if Private, only reports created by professional are fetched. If Public, only reports created by citizens are fetched. If All, all reports are fetched 
+                    - Contents: list of content types of interest
                 Output: list of ReportDto elements
 
                 N.B.: A person has visibility only on reports belonging to his organization
@@ -358,10 +368,29 @@ namespace Ermes.Reports
             var report = await _reportManager.GetReportByIdAsync(input.Id);
             if (report == null)
                 throw new UserFriendlyException(L("InvalidReportId", input.Id));
+            
             //report can be created by citizens
             //they won't have an organizationId associated
-            if (report.Creator.OrganizationId.HasValue && report.Creator.OrganizationId.Value != _session.LoggedUserPerson.OrganizationId)
+            var hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Reports.Report_CanSeeCrossOrganization);
+            if (!hasPermission)
+            {
+                //Father Org can see child contents
+                //false the contrary
+                if (
+                    report.Creator.OrganizationId.HasValue && 
+                    (
+                        report.Creator.OrganizationId.Value != _session.LoggedUserPerson.OrganizationId &&
+                        (
+                            !report.Creator.Organization.ParentId.HasValue ||
+                            (
+                                report.Creator.Organization.ParentId.HasValue && 
+                                report.Creator.Organization.ParentId.Value != _session.LoggedUserPerson.OrganizationId
+                            )
+                        )
+                    )
+                )
                 throw new UserFriendlyException(L("EntityOutsideOrganization"));
+            }
 
             var properties = ObjectMapper.Map<ReportDto>(report);
             properties.IsEditable = (report.CreatorUserId == _session.UserId);

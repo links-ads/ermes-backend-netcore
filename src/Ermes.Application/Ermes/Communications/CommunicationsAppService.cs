@@ -23,6 +23,7 @@ using Abp.BackgroundJobs;
 using Ermes.EventHandlers;
 using Ermes.GeoJson;
 using NetTopologySuite.Geometries;
+using Ermes.Authorization;
 
 namespace Ermes.Communications
 {
@@ -33,18 +34,21 @@ namespace Ermes.Communications
         private readonly CommunicationManager _communicationManager;
         private readonly IBackgroundJobManager _backgroundJobManager;
         private readonly IGeoJsonBulkRepository _geoJsonBulkRepository;
+        private readonly ErmesPermissionChecker _permissionChecker;
 
         public CommunicationsAppService(
                 ErmesAppSession session,
                 CommunicationManager communicationManager,
                 IBackgroundJobManager backgroundJobManager,
-                IGeoJsonBulkRepository geoJsonBulkRepository
+                IGeoJsonBulkRepository geoJsonBulkRepository,
+                ErmesPermissionChecker permissionChecker
             )
         {
             _session = session;
             _communicationManager = communicationManager;
             _backgroundJobManager = backgroundJobManager;
             _geoJsonBulkRepository = geoJsonBulkRepository;
+            _permissionChecker = permissionChecker;
         }
 
         #region Private
@@ -72,6 +76,7 @@ namespace Ermes.Communications
             {
                 Geometry boundingBox = GeometryHelper.GetPolygonFromBoundaries(input.SouthWestBoundary, input.NorthEastBoundary);
                 query = _geoJsonBulkRepository.GetCommunications(input.StartDate.Value, input.EndDate.Value, boundingBox);
+                query = query.Include(a => a.Creator).Include(a => a.Creator.Organization);
             }
             else
 
@@ -217,6 +222,25 @@ namespace Ermes.Communications
         public virtual async Task<GetEntityByIdOutput<CommunicationDto>> GetCommunicationById(GetEntityByIdInput<int> input)
         {
             var comm = await GetCommunicationAsync(input.Id);
+            var hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Communications.Communication_CanSeeCrossOrganization);
+            if (!hasPermission)
+            {
+                //Father Org can see child contents
+                //false the contrary
+                if (
+                        comm.Creator.OrganizationId != _session.LoggedUserPerson.OrganizationId &&
+                        (
+                            !comm.Creator.Organization.ParentId.HasValue ||
+                            (
+                                comm.Creator.Organization.ParentId.HasValue &&
+                                comm.Creator.Organization.ParentId.Value != _session.LoggedUserPerson.OrganizationId
+                            )
+                        )
+                )
+                    throw new UserFriendlyException(L("EntityOutsideOrganization"));
+            }
+
+
             var writer = new GeoJsonWriter();
             var res = new GetEntityByIdOutput<CommunicationDto>()
             {

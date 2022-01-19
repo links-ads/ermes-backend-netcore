@@ -52,7 +52,7 @@ namespace Ermes.Organizations
         /// <summary>
         /// Organization Logo url
         /// </summary>
-        public virtual string LogoUrl { get; set; }
+        public string LogoUrl { get; set; }
 
         /// <summary>
         /// List of competence areas associated to the this organization
@@ -65,6 +65,16 @@ namespace Ermes.Organizations
         /// </summary>
         [ForeignKey("ParentId")]
         public virtual Organization Parent { get; set; }
-        public virtual int? ParentId { get; set; }
+        public int? ParentId { get; set; }
+
+        public bool MembersHaveTaxCode { get; set; }
+
+        /// <summary>
+        /// List of children 
+        /// </summary>
+        public virtual ICollection<Organization> Children { get; set; }
+
+        [NotMapped]
+        public bool HasChildren { get { return Children != null && Children.Count > 0; } }
     }
 }

@@ -18,6 +18,7 @@ namespace Ermes.Resources
         private const string Thumbnails_Container_Name = "thumbnails";
         private const string ImportActivities_Container_Name = "import-activities";
         private const string ImportCategories_Container_Name = "import-categories";
+        private const string ImportLayers_Container_Name = "import-layers";
         private const string ImportTips_Container_Name = "import-tips";
         private const string ImportQuizzes_Container_Name = "import-quizzes";
         private const string ImportAnswers_Container_Name = "import-answers";
@@ -114,6 +115,13 @@ namespace Ermes.Resources
         {
             public string ContainerName { get { return ImportCategories_Container_Name; } }
             public string FileNameBase { get { return "categories-"; } }
+
+        }
+
+        public class ImportLayersResourceContainer : IImportResourceContainer
+        {
+            public string ContainerName { get { return ImportLayers_Container_Name; } }
+            public string FileNameBase { get { return "layers-"; } }
 
         }
 

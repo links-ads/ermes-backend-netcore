@@ -280,4 +280,54 @@ namespace Ermes.Enums
         ContentNotAvailable,
         Canceled
     }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum ReportContentType
+    {
+        Submitted = 0,
+        Inappropriate = 10,
+        Inaccurate = 20,
+        Validated = 30
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum VisibilityType
+    {
+        Private = 0,
+        Public = 10,
+        All = 20,
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum VolterOperationType
+    {
+        Registration,
+        OpenIntervention,
+        CloseIntervention
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum ProcessedCodeType
+    {
+        ElaborazioneTerminataCorretamente = 1,
+        CampoObbligatorioNonPresente = 5,
+        ErroreParametriInput = 10,
+        SistemaDiMateriaChiamanteNonEsistente = 22,
+        VolontarioNonEsistente = 30,
+        CompitoNonEsistente = 31,
+        InsertOUpdateFallito = 33,
+        EventoNonEsistente = 38,
+        TrovatiPiuInterventiAperti = 39,
+        NessunEventoApertoInAltaPriorita = 40,
+        CodiceFiscaleCorrispondeAPiuPersone = 41,
+        ErroreServizioEventi = 42,
+        ImpossibileTrovareAperturaIntervento = 43,
+        PresentiPiuApertureInterventoIdentiche = 44,
+        AperturaInterventoGiaPresente = 45,
+        ErroreGenericoRecuperoInterventi = 46,
+        ImpossibileFareMappingAttivita = 47,
+        ImpossibileTrovareOrganizzazioneVolontario = 48,
+        ImpossibileTrovareCoordinamentoOrganizzazione = 49
+
+    }
 }

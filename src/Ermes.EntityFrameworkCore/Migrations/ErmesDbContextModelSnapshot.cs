@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Ermes.EntityFrameworkCore;
+using Ermes.Operations;
 using Ermes.Reports;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -435,6 +436,77 @@ namespace Ermes.Migrations
                     b.ToTable("entitypropertychanges");
                 });
 
+            modelBuilder.Entity("Ermes.Layers.Layer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<int>("DataTypeId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("GroupKey")
+                        .IsRequired()
+                        .HasColumnType("character varying(255)")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("PartnerName")
+                        .HasColumnType("character varying(100)")
+                        .HasMaxLength(100);
+
+                    b.Property<string>("SubGroupKey")
+                        .IsRequired()
+                        .HasColumnType("character varying(255)")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("TypeString")
+                        .HasColumnName("Type")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DataTypeId")
+                        .IsUnique();
+
+                    b.ToTable("layers");
+                });
+
+            modelBuilder.Entity("Ermes.Layers.LayerTranslation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<int>("CoreId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Group")
+                        .IsRequired()
+                        .HasColumnType("character varying(255)")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("Language")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("character varying(255)")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("SubGroup")
+                        .HasColumnType("character varying(255)")
+                        .HasMaxLength(255);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CoreId", "Language")
+                        .IsUnique();
+
+                    b.ToTable("layer_translations");
+                });
+
             modelBuilder.Entity("Ermes.MapRequests.MapRequest", b =>
                 {
                     b.Property<int>("Id")
@@ -619,6 +691,54 @@ namespace Ermes.Migrations
                     b.ToTable("notifications");
                 });
 
+            modelBuilder.Entity("Ermes.Operations.Operation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<long?>("CreatorUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<long?>("LastModifierUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("OperationLegacyId")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("PersonId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("PersonLegacyId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Request")
+                        .HasColumnType("jsonb");
+
+                    b.Property<VolterResponse>("Response")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("TypeString")
+                        .HasColumnName("Type")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PersonId");
+
+                    b.ToTable("volter_operations");
+                });
+
             modelBuilder.Entity("Ermes.Organizations.Organization", b =>
                 {
                     b.Property<int>("Id")
@@ -644,6 +764,9 @@ namespace Ermes.Migrations
 
                     b.Property<string>("LogoUrl")
                         .HasColumnType("text");
+
+                    b.Property<bool>("MembersHaveTaxCode")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -740,10 +863,16 @@ namespace Ermes.Migrations
                     b.Property<long?>("CreatorUserId")
                         .HasColumnType("bigint");
 
+                    b.Property<int?>("CurrentOperationLegacyId")
+                        .HasColumnType("integer");
+
                     b.Property<Guid>("FusionAuthUserGuid")
                         .HasColumnType("uuid");
 
                     b.Property<bool>("IsFirstLogin")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsNewUser")
                         .HasColumnType("boolean");
 
                     b.Property<DateTime?>("LastModificationTime")
@@ -1038,6 +1167,10 @@ namespace Ermes.Migrations
                     b.Property<List<ReportAdultInfo>>("AdultInfo")
                         .HasColumnType("jsonb");
 
+                    b.Property<string>("ContentString")
+                        .HasColumnName("ContentType")
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("timestamp without time zone");
 
@@ -1054,6 +1187,9 @@ namespace Ermes.Migrations
                     b.Property<string>("HazardString")
                         .HasColumnName("Hazard")
                         .HasColumnType("text");
+
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("boolean");
 
                     b.Property<DateTime?>("LastModificationTime")
                         .HasColumnType("timestamp without time zone");
@@ -1366,6 +1502,15 @@ namespace Ermes.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Ermes.Layers.LayerTranslation", b =>
+                {
+                    b.HasOne("Ermes.Layers.Layer", "Core")
+                        .WithMany("Translations")
+                        .HasForeignKey("CoreId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Ermes.MapRequests.MapRequest", b =>
                 {
                     b.HasOne("Ermes.Persons.Person", "Creator")
@@ -1405,10 +1550,19 @@ namespace Ermes.Migrations
                         .HasForeignKey("ReceiverId");
                 });
 
+            modelBuilder.Entity("Ermes.Operations.Operation", b =>
+                {
+                    b.HasOne("Ermes.Persons.Person", "Person")
+                        .WithMany()
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Ermes.Organizations.Organization", b =>
                 {
                     b.HasOne("Ermes.Organizations.Organization", "Parent")
-                        .WithMany()
+                        .WithMany("Children")
                         .HasForeignKey("ParentId");
                 });
 

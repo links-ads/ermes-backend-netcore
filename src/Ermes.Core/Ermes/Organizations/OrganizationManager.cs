@@ -12,7 +12,7 @@ namespace Ermes.Organizations
 {
     public class OrganizationManager : DomainService
     {
-        public IQueryable<Organization> Organizations { get { return OrganizationRepository.GetAll().Include(o => o.Parent); } }
+        public IQueryable<Organization> Organizations { get { return OrganizationRepository.GetAll().Include(o => o.Parent).Include(o => o.Children); } }
         public IQueryable<OrganizationCompetenceArea> OrganizationCAs { get { return OrganizationCARepository.GetAll(); } }
         protected IRepository<Organization> OrganizationRepository { get; set; }
         protected IRepository<OrganizationCompetenceArea> OrganizationCARepository { get; set; }

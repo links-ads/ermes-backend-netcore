@@ -1,4 +1,5 @@
 ﻿using Abp.Domain.Entities.Auditing;
+using Ermes.Operations;
 using Ermes.Organizations;
 using Ermes.Persons.Cache;
 using Ermes.Teams;
@@ -40,8 +41,22 @@ namespace Ermes.Persons
         /// </summary>
         public string RegistrationToken { get; set; }
 
+        /// <summary>
+        ///True if it the first time a user logs in --> show tutorial on Chatbot
+        /// </summary>
         public bool IsFirstLogin { get; set; } = true;
 
         public int? LegacyId { get; set; }
+
+        /// <summary>
+        /// If true, User has just fill the registration form on FusionAuth and needs to complete registration procedure on Chatbot.
+        /// </summary>
+        public bool IsNewUser { get; set; }
+
+        /// <summary>
+        /// It represents the internal Volter Id for an operation made by a first responder.
+        /// This field has a value only for member of organization "Protezione Civile Piemonte" or its children.
+        /// </summary>
+        public int? CurrentOperationLegacyId { get; set; }
     }
 }

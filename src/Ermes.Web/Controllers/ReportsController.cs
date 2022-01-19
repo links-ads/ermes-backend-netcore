@@ -7,6 +7,7 @@ using Abp.IO.Extensions;
 using Abp.UI;
 using Ermes;
 using Ermes.Attributes;
+using Ermes.Authorization;
 using Ermes.Categories;
 using Ermes.Enums;
 using Ermes.EventHandlers;
@@ -160,6 +161,9 @@ namespace Ermes.Web.Controllers
 
             //Not mapped automatically, in update phase we need to ignore this prop
             report.Timestamp = reportDto.Timestamp;
+
+            //citizens' report are public by default
+            report.IsPublic = _session.Roles != null && _session.Roles.Contains(AppRoles.CITIZEN);
             //Need Id here, so that I can create Azure Report container
             report.Id = await _reportManager.InsertReportAsync(report);
 
@@ -276,6 +280,7 @@ namespace Ermes.Web.Controllers
                 if (report.MediaURIs == null)
                     report.MediaURIs = new List<string>();
 
+                var atLeastOneInappropriateContent = false;
                 foreach (var file in media)
                 {
                     byte[] fileBytes;
@@ -328,12 +333,18 @@ namespace Ermes.Web.Controllers
                                     MediaURI = uploadedFileName
                                 };
                                 report.AdultInfo.Add(info);
+
+                                if (!atLeastOneInappropriateContent)
+                                    atLeastOneInappropriateContent = imageAnalysis.Adult.IsAdultContent || imageAnalysis.Adult.IsGoryContent || imageAnalysis.Adult.IsRacyContent;
                             }
                         }
                         catch (Exception e)
                         {
                             Logger.Error("Error during image analisys phase: " + e.Message);
                         }
+                        if (atLeastOneInappropriateContent)
+                            report.Content = ReportContentType.Inappropriate;
+
                         string thumbnailName = ResourceManager.Thumbnails.GetJpegThumbnailFilename(uploadedFileName);
                         string thumbnailPath = ResourceManager.Thumbnails.GetRelativeMediaPath(report.Id, thumbnailName);
                         try

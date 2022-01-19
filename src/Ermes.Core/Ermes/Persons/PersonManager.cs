@@ -76,6 +76,7 @@ namespace Ermes.Persons
                         FusionAuthUserGuid = userId
                     };
                     person.Id = PersonRepository.InsertAndGetId(person);
+                    person.IsNewUser = true;
                 }
                 uow.Complete();
 

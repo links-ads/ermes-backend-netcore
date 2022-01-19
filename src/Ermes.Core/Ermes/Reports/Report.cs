@@ -71,7 +71,17 @@ namespace Ermes.Reports
         [Column(TypeName = "jsonb")]
         public List<ReportAdultInfo> AdultInfo { get; set; }
         [NotMapped]
-        public bool IsEditable { get; set; } 
+        public bool IsEditable { get; set; }
+        public bool IsPublic { get; set; }
+        
+        [Column("ContentType")]
+        public string ContentString
+        {
+            get { return Content.ToString(); }
+            private set { Content = value.ParseEnum<ReportContentType>(); }
+        }
+        [NotMapped]
+        public ReportContentType Content { get; set; }
     }
 
     public class ReportExtensionData

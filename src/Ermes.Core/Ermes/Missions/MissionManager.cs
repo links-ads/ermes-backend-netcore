@@ -15,7 +15,7 @@ namespace Ermes.Missions
 {
     public class MissionManager : DomainService
     {
-        public IQueryable<Mission> Missions { get { return MissionRepository.GetAll().Include(a => a.CreatorPerson.Organization); } }
+        public IQueryable<Mission> Missions { get { return MissionRepository.GetAll().Include(a => a.CreatorPerson.Organization).Include(a => a.Organization); } }
         protected IRepository<Mission> MissionRepository { get; set; }
         protected IRepository<Person, long> PersonRepository { get; set; }
 
@@ -65,7 +65,7 @@ namespace Ermes.Missions
         public List<Mission> GetCurrentMissions(IPersonBase person)
         {
             return MissionRepository.GetAll()
-                .Where(m => m.CoordinatorPersonId == person.Id || m.CoordinatorTeamId == person.TeamId || (!m.CoordinatorPersonId.HasValue && !m.CoordinatorTeamId.HasValue && m.OrganizationId == person.OrganizationId))
+                .Where(m => (m.CoordinatorPersonId.HasValue && m.CoordinatorPersonId == person.Id) || (m.CoordinatorTeamId.HasValue && m.CoordinatorTeamId == person.TeamId) || (!m.CoordinatorPersonId.HasValue && !m.CoordinatorTeamId.HasValue && m.OrganizationId == person.OrganizationId))
                 .Where(m => m.CurrentStatusString == MissionStatusType.Created.ToString() || m.CurrentStatusString == MissionStatusType.TakenInCharge.ToString())
                 .ToList();
         }
