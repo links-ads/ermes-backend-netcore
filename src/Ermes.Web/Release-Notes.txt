@@ -2,88 +2,85 @@ Ver.
 -----------------------
 
 
-Ver. 2.9.0 2022-01-14
------------------------
+Ver. 2.9.0 -  2022-01-14
+--------------------------------
 - Feature - Available layers retrieved from Importer component (#68)
 - Feature - Application Insights added (settings update)(#9)
 - Bugfix - GetMissionById API fix (#69)
 
-
-Ver. 2.8.1 2022-01-10
------------------------
+Ver. 2.8.1 - 2022-01-10
+--------------------------------
 - Bugfix - GetFeatureCollection with ContentType and Visibility filters, only public report for citizens (#67)
 
-
-Ver. 2.8.0 2021-12-09
------------------------
+Ver. 2.8.0 - 2021-12-09
+--------------------------------
 - Feature - Type prop added to Layer entity (migration added)(#66)
 
 Ver. 2.7.0 - 2021-11-29
-------------------------
+--------------------------------
 - Bugfix - Report creation procedure fix (#64)
 - Feature - GetLayers fixed example updated (#62)
 - Feature - Message on Rabbit bus every time a new entity is created (#63)
 - Feature - Abp.CsiServices module removed, Operation class added, SearhcVolontario and InsertInterventiVolontario added (migration added)(#65)
 
-
 Ver. 2.6.1 - 2021-11-10
-------------------------
+--------------------------------
 - Feature - IsPublic and Content properties added to report (migration added)(#56)
 - Feature - HasChildren prop added to OrganizationDto class (#61)
 - Feature - GetLayers update for NetCdf support (#62)
 
 Ver. 2.5.0 - 2021-10-22
-------------------------
+--------------------------------
 - Feature - Organization MembersHaveTaxCode property added (migration added)(#58)
 - Feature - ParentId filter in GetOrganizatins API and IsNewUser property added to Person class (migration added)(#60)
 
 Ver. 2.4.2 - 2021-10-12
-------------------------
+--------------------------------
 - Bugfix - GetLayers with Tiles list
 
 Ver. 2.4.1 - 2021-10-05
-------------------------
+--------------------------------
 - Feature - LayerDto and GetLayerDefinition API update
 
 Ver. 2.4.0 - 2021-10-01
-------------------------
+--------------------------------
 - Feature - Importer module added (#52)
 - Feature - Layers definition and GetLayers function implementation (migration added)(#53)
 
 Ver. 2.3.1 - 2021-09-23
-------------------------
+--------------------------------
 - Feature - MapRequest management in GetFeatureCollection api (#50)
 - BugFix - GetEntityById permission and visibility fix (#51)
 
 Ver. 2.3.0 - 2021-09-16
--------------------------
+--------------------------------
 - Feature - MapRequest management added (migration added) (#45)
 
 Ver. 2.2.1 - 2021-09.14
--------------------------
+--------------------------------
 - Feature - Organization name prop added to CommunicationDto class (#48)
 
 Ver. 2.2.0 - 2021-09-13
--------------------------
+--------------------------------
 - Feature - Spanish language support added (#46)
 - Feature - GetOrganization api added to ts-sdk (#47)
 
 Ver. 2.1.2 - 2021-08-06
---------------------------
+--------------------------------
 - Feature - Filter update for GetFeatureCollections (#43)
 
 Ver. 2.1.1 - 2021-08-06
---------------------------
+--------------------------------
 - Feature - Category min/max value as string (migration added)(#44)
 
 Ver. 2.1.0 - 2021-08-05
---------------------------
+--------------------------------
 - Feature - Tips management added (migration added)(#27)
 - Feature - Quizzes management added (migration added)(#41)
 - Feature - Answers management added (migration added)(#42)
 
 Ver. 2.0.0 - 2021-07-30
----------------------------
+--------------------------------
 - Bugfix - Set default role for new users (#33)
 - Bugfix - Search filter case insensitive (#35)
 - Feature - AdultInfo prop added to ReportDto class (#15)
@@ -94,154 +91,151 @@ Ver. 2.0.0 - 2021-07-30
 - Feature - FieldType added to Category (migration added)(#40)
 
 Ver. 1.7.3 - 2021-07-01
----------------------------
+--------------------------------
 - Feature - Subsidence Hazard Type added
 
 Ver. 1.7.2 - 2021-06-18
----------------------------
+--------------------------------
 - Feature - Target translations added (migration added)(#31)
 
 Ver. 1.7.1 - 2021-06-14
----------------------------
+--------------------------------
 - Feature - Edited Unique Key of category_translations (migration added)
 - Feature - GroupKey prop added to CategoryGroupDto
 
 Ver. 1.7.0 - 2021-06-10
----------------------------
+--------------------------------
 - Feature - Add filter on receiver list in case of new Communication (#29)
 - Feature - DashboardAppService added (#4)
 - Feature - Categories refactoring (2 migrations added)(#28)
 
-
 Ver. 1.6.0 - 2021-05-31
----------------------------
+--------------------------------
 - Feature - GetCategories API made public
 - Feature - ImportUsers API implementation (#26)
 
 Ver. 1.5.5 - 2021-05-20
----------------------------
+--------------------------------
 - Feature - IsFirstLogin field added to Person, update of ImportApiService, Permission initializations (migration added) (#25)
 - Feature - ClientIpAddress property removed (migration added) (#24)
 - Feature - RabbitMQ client added and Connection management (appsettings Bus section edited)(#2)
 
 Ver. 1.5.4 - 2021-04-09
----------------------------
+--------------------------------
 - Feature - Status 'Ready' added, update of Social Media Module SDK: NL added, id_str for tweet (#18)
 
 Ver. 1.5.3. - 2021-04-01
----------------------------
+--------------------------------
 - Feature - Update preferred languages API added and UpdateProfile API updated (#20)
 - Feature - Added Hazard property to Activity (migration added) (#19)
 
 Ver. 1.5.2 - 2021-03-26
----------------------------
+--------------------------------
 - Feature - Add GroupIcon prop to Category, UnitOfMeasure moved to cat_translations (migration added) (#16)
 
 Ver. 1.5.1 - 2021-03-23
----------------------------
+--------------------------------
 - Feature - Add AdultInfo prop to Report, but NOT in ReportDto (migration added) (#15)
 - Feature - Update of SocialAppService and SocialMedia SDK (#18)
 
 Ver. 1.5.0 - 2021-02-25
----------------------------
+--------------------------------
 - Bugfix - Fix CreatePersonAction bug (#14)
 - Feature - Citizen visibility management (migration added, prop Visibility removed) (#10)
 
 Ver. 1.4.9 - 2021-02-19
-----------------------------
+--------------------------------
 - Feature - Docker volume mapping for Logs (#11)
 - Bugfix - Fix in ConsumerService module (appsettings edited) (#12)
 
 Ver. 1.4.8 - 2021-02-16
-----------------------------
+--------------------------------
 - Feature - Update of Social Media Module (#7)
 
-
 Ver. 1.4.7 - 2021-02-12
-----------------------------
+--------------------------------
 - Feature - Abp.AzureCognitiveServices module added (migration, column Tags in Report) (appsettings to be updated) (#2)
 - Feature - Bus Producer and Bus Consumer modules added (changes in appsettings.json) (#8)
 
 Ver. 1.4.6 - 2021-02-08
-----------------------------
+--------------------------------
 - Bugfix - Fix PersonAction file class name
 - Feature - PersonActionSharingPosition now is recorded as a new row (#72)
 - Bugfix - Change CurrentStatus prop name in MissionNotificationDto (#71)
 - Feature - Add BBox filter for Get APIs (#68)
 
 Ver. 1.4.5 - 2021-01-26 (see https://bitbucket.org/mobilesolutionsismb/faster-backend-aspnetcore/src/master/ for full history)
-----------------------------
+--------------------------------
 - Bugfix - Add startDateFilter and endDateFilter in GetFeatureCollection api (#69)
 
 Ver. 1.4.4 - 2021-01-21
-----------------------------
+--------------------------------
 - Feature - Bus notification for UpdateReportStatus event added (#67)
 
 Ver. 1.4.3 - 2021-01-21
-----------------------------
+--------------------------------
 - Bugfix - Timestamp management in UpdateReport Api
 - Bugfix - MimeType update for mp4 and mp3 files
 
 Ver. 1.4.2 - 2021-01-20
-----------------------------
+--------------------------------
 - Bugfix - PersonActions full management (#64)
 - Feature - Update Report status API added (#65)
 
-
 Ver. 1.4.1 - 2021-01-15
------------------------------
+--------------------------------
 - Feature - GetLeafActivity function added (#63)
 - Bugfix - Mission update before notification sending (#61)
 - Feature - SelectedLocation prop deleted (migration) (#59)
 
 Ver. 1.4.0 - 2021-01-11
------------------------------
+--------------------------------
 - Feature - Filter Reports by Creator (#56)
 - Feature - Thumbnails for reports media (#53)
 - Bugfix - GetFeatureCollection api update and SharingPosition action management (#58)
 
 Ver. 1.3.8 - 2020-12-16
------------------------------
+--------------------------------
 - Feature - OrganizationName in addition to OrganizationId in GetFeatureCollection (#54)
 
 Ver. 1.3.7 - 2020-12-16
------------------------------
+--------------------------------
 - Feature - Added multilanguage categories with relative import API (#44)
 - Feature - Notifications are now managed with EventBus (#46)
 
 Ver. 1.3.6 - 2020-12-04
------------------------------
+--------------------------------
 - Bugfix - Fix GetFeatureCollection function
 
 Ver. 1.3.5 - 2020-11-26
------------------------------
+--------------------------------
 - Feature - Update of GetFeatureCollection function (#51)
 
 Ver. 1.3.4 - 2020-11-24
-------------------------------
+--------------------------------
 - Bugfix - CreateOrUpdateReport removed from swagger definition
 
 Ver. 1.3.3 - 2020-11-20
-------------------------------
+--------------------------------
 - Bugfix - Fix CreateOrUpdateMission api, either CoordinatorPersonId or CoordinatorTeamId can be set (#50)
 
 Ver. 1.3.2 - 2020-11-17
--------------------------------
+--------------------------------
 - Feature - Added RelativeMissionId property to ReportDto (#47)
 - Feature - Get members of current logged user organization (#49)
 - Bugfix  - FasterDbContex disposed exception when CreateOrUpdateReport is called (#48)
 
 Ver. 1.3.1 - 2020-11-12
--------------------------------
+--------------------------------
 - Bugfix - General SQL exception management
 
 Ver. 1.3.0 - 2020-11-12
--------------------------------
+--------------------------------
 - Feature - Added Bus Module, broadcasting events to the bus, notifications overhaul (#43)
 - Bugfix - Genaral bugfix and improvements
 
 Ver 1.2.0 - 2020-10-13
--------------------------------
+--------------------------------
 - Feature - Social Module added to the solution (#41)
 - Feature - Team integration: Missions have a Coordinator Person or a Coordinator Team, Notifications of missions are sent to the coordinators, 
 			Current Missions and Team information are listed in the profile (#38)
