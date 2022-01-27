@@ -27,6 +27,7 @@ namespace Ermes.Linq.Extensions
             if (parameters.Search == null || string.IsNullOrEmpty(parameters.Search.Value))
                 return query;
 
+            parameters.Search.Value = parameters.Search.Value.ToLower();
             query = ResolveLinqFilter(query, parameters.Search);
 
             return query;
