@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Ermes.Consumers
+namespace Ermes.Consumers.Kafka
 {
     public class MissionChangeStatusDto
     {

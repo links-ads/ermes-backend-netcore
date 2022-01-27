@@ -8,7 +8,7 @@ namespace Ermes.Helpers
 {
     public static class NotificationNameHelper
     {
-        public static string GetBusTopicName(EntityType type, EntityWriteAction action, string projectName)
+        public static string GetBusTopicName(EntityType type, EntityWriteAction action, string projectName, string entityIdentifier = "")
         {
             string topicName = "mm." + type.ToString().ToLowerInvariant();
             switch (projectName)
@@ -16,6 +16,11 @@ namespace Ermes.Helpers
                 case "FASTER":
                     break;
                 case "SAFERS":
+                    if (type == EntityType.MapRequest)
+                        topicName = "map.request.links." + entityIdentifier;
+                    else
+                        topicName += "." + action.ToString().ToLowerInvariant();
+                    break;
                 case "SHELTER":
                     topicName += "." + action.ToString().ToLowerInvariant();
                     break;

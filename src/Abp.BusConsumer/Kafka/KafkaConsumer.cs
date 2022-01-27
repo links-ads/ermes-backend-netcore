@@ -14,12 +14,12 @@ namespace Abp.BusConsumer.Kafka
         private readonly string[] topicList;
         private readonly IBusConfigurationProvider _busConfigurationProvider;
         private readonly IConsumer<Null, string> kafkaConsumer;
-        private readonly ConsumerService _consumerService;
+        private readonly IConsumerService _consumerService;
         private readonly ILogger Logger;
 
         public KafkaConsumer(
             IBusConfigurationProvider busConfigurationProvider,
-            ConsumerService consumerService,
+            IConsumerService consumerService,
             ILogger<KafkaConsumer> logger)
         {
             Logger = logger;

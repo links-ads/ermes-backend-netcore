@@ -1,6 +1,6 @@
 Ver.
 -----------------------
-
+- Feature - Send message on RabbitMq for when a map request is being created (#49)
 
 Ver. 2.9.0 -  2022-01-14
 --------------------------------

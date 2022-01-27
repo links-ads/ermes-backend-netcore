@@ -215,7 +215,7 @@ namespace Ermes.EventHandlers
         [UnitOfWork]
         public virtual async Task HandleEventAsync(NotificationEvent<MapRequestNotificationDto> eventData)
         {
-            await _notifierService.SendBusNotification(eventData.CreatorId, eventData.EntityId, eventData.Content, eventData.Action, EntityType.MapRequest);
+            await _notifierService.SendBusNotification(eventData.CreatorId, eventData.EntityId, eventData.Content, eventData.Action, EntityType.MapRequest, true);
         }
     }
 }

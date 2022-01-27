@@ -13,6 +13,9 @@
         public const string SwaggerBackofficeDocumentName = "backoffice-v1";
         public const string IgnoreApi = "IgnoreApi";
         public const string DefaultProjectName = "FASTER";
+        public const string FasterProjectName = "FASTER";
+        public const string SafersProjectName = "SAFERS";
+        public const string ShelterProjectName = "SHELTER";
         public const string DefaultYear = "2020";
 
 

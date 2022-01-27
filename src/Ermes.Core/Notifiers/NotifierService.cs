@@ -10,6 +10,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
+using Ermes.MapRequests;
 
 namespace Ermes.Notifiers
 {
@@ -18,34 +19,53 @@ namespace Ermes.Notifiers
         private readonly INotifierBase _notifierBase;
         private readonly NotificationManager _notificationManager;
         private readonly IOptions<ErmesSettings> _ermesSettings;
+        private readonly NotifierServiceHelper _helper;
 
         public NotifierService(
                 INotifierBase notifierBase,
                 NotificationManager notificationManager,
+                NotifierServiceHelper helper,
                 IOptions<ErmesSettings> ermesSettings)
         {
             _notifierBase = notifierBase;
             _notificationManager = notificationManager;
             _ermesSettings = ermesSettings;
+            _helper = helper;
         }
 
-        public async Task SendBusNotification<T>(long creatorId, int entityId, T content, EntityWriteAction action, EntityType entityType)
+        public async Task SendBusNotification<T>(long creatorId, int entityId, T content, EntityWriteAction action, EntityType entityType, bool containsGeometry = false)
         {
-            BusDto<T> busPayload = new BusDto<T>
+            string serializedPayload;
+            string entityIdentifier = "";
+            if (_ermesSettings.Value.ErmesProject != ErmesConsts.SafersProjectName) //FASTER, SHELTER
             {
-                Content = content,
-                EntityType = entityType,
-                EntityWriteAction = action
-            };
-            var options = new JsonSerializerOptions();
-            options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
-
+                BusDto<T> busPayload = new BusDto<T>
+                {
+                    Content = content,
+                    EntityType = entityType,
+                    EntityWriteAction = action
+                };
+                var options = new JsonSerializerOptions();
+                options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+                serializedPayload = JsonSerializer.Serialize(busPayload, options);
+            }
+            else //SAFERS
+            {
+                if (containsGeometry)
+                {
+                    (serializedPayload, entityIdentifier) = await _helper.GetEntityByIdAsync(entityType, entityId);
+                }
+                else
+                {
+                    serializedPayload = JsonSerializer.Serialize(content);
+                    entityIdentifier = entityId.ToString();
+                }
+            }
             string failureMessage = null;
-            string serializedPayload = JsonSerializer.Serialize(busPayload, options);
 
             try
             {
-                await _notifierBase.SendBusNotificationAsync(NotificationNameHelper.GetBusTopicName(entityType, action, _ermesSettings.Value.ErmesProject), serializedPayload);
+                await _notifierBase.SendBusNotificationAsync(NotificationNameHelper.GetBusTopicName(entityType, action, _ermesSettings.Value.ErmesProject, entityIdentifier), serializedPayload);
             }
             catch (Exception ex)
             {
