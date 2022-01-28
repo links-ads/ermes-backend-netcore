@@ -45,15 +45,21 @@ namespace Abp.BusConsumer.RabbitMq
             };
             _connection = connectionFactory.CreateConnection();
             _channel = _connection.CreateModel();
-            //Queues and exchanges can be declared "passively". A passive declare simply checks that the entity with the provided name exists.
+            //Queues and exchanges can be declared "passively". A passive declare simply checks that the entity
+            //with the provided name exists.
             _channel.ExchangeDeclarePassive(_busConfigurationProvider.GetExchange());
             var q = _channel.QueueDeclarePassive(_busConfigurationProvider.GetQueue());
+
+            //Create the binding if not present
             _channel.QueueBind(q.QueueName, _busConfigurationProvider.GetExchange(), "status.brn.links.*");
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            new Thread(() => Consume()).Start();
+            new Thread(() => Consume())
+            {
+                Name = "RabbitMqConsumerThread"
+            }.Start();
 
             return Task.CompletedTask;
         }
@@ -69,9 +75,11 @@ namespace Abp.BusConsumer.RabbitMq
             _consumer = new EventingBasicConsumer(_channel);
             _consumer.Received += (model, result) =>
             {
+                //Check on routing key should not be necessary
+                //The queue should be binded to a single routing key
                 if (result.RoutingKey.Contains("status.brn.links"))
                 {
-                    Logger.LogDebug("---------------- RabbitMQ Consumer: new message received with body: ");
+                    Logger.LogDebug("---------------- RabbitMQ Consumer: new message received");
                     var body = result.Body.ToArray();
                     var bodyString = Encoding.UTF8.GetString(body);
                     Logger.LogDebug("RoutingKey: " + result.RoutingKey);

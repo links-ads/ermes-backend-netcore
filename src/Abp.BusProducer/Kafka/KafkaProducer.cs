@@ -8,7 +8,7 @@ namespace Abp.BusProducer.Kafka
     public class KafkaProducer: IBusProducer
     {
         private readonly IBusConfigurationProvider _busConfigurationProvider;
-        IProducer<Null, string> _producer;
+        readonly IProducer<Null, string> _producer;
 
         public KafkaProducer(
                 IBusConfigurationProvider busConfigurationProvider

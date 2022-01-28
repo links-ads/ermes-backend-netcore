@@ -11,7 +11,7 @@ namespace Abp.BusProducer.RabbitMq
     public class RabbitMqProducer : IBusProducer
     {
         private readonly IBusConfigurationProvider _busConfigurationProvider;
-        private ConnectionFactory _factory;
+        private readonly ConnectionFactory _factory;
 
         public RabbitMqProducer(
             IBusConfigurationProvider busConfigurationProvider

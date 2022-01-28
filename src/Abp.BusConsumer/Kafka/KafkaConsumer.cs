@@ -32,7 +32,9 @@ namespace Abp.BusConsumer.Kafka
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            new Thread(() => StartConsumerLoop(stoppingToken)).Start();
+            new Thread(() => StartConsumerLoop(stoppingToken)) { 
+                Name = "KafkaConsumerThread"
+            }.Start();
 
             return Task.CompletedTask;
         }

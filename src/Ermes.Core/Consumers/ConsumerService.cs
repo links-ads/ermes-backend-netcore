@@ -34,6 +34,8 @@ namespace Ermes.Consumers
 
         public void ConsumeBusNotification(string message, string routingKey)
         {
+            //Consume the message based on routing key prop
+            //Kafka bus does not use routingKey, while for RabbitMq it is a mandatory field
             if (routingKey != "")
                 //TODO: to be generalized, only map request status update is managed
                 ConsumeRabbitMqNotification(message, routingKey);
