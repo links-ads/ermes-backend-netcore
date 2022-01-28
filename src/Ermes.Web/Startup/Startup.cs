@@ -164,7 +164,7 @@ namespace Ermes.Web.Startup
                         break;
                     case "SHELTER":
                     case "SAFERS":
-                        services.AddHostedService<RabbitMqManager>();
+                        services.AddHostedService<RabbitMqConsumer>();
                         break;
                     default:
                         break;

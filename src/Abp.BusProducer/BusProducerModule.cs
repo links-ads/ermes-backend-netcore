@@ -21,7 +21,7 @@ namespace Abp.BusProducer
             {
                 case "SHELTER":
                 case "SAFERS":
-                    IocManager.Register<IBusProducer, RabbitMqManager>();
+                    IocManager.Register<IBusProducer, RabbitMqProducer>();
                     break;
                 case "FASTER":
                     IocManager.Register<IBusProducer, KafkaProducer>();

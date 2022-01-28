@@ -176,7 +176,7 @@ namespace Ermes.Enums
         PersonActionTracking = 60,
         PersonActionStatus = 70,
         PersonActionActivity = 80,
-        Person = 90
+        Person = 90,
     }
 
     [JsonConverter(typeof(StringEnumConverter))]

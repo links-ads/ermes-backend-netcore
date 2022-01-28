@@ -239,6 +239,7 @@ namespace Ermes
                             .AfterMap((src, dest) => dest.Duration.UpperBound = dest.Duration.UpperBound.ToUniversalTime())
                             .ReverseMap()
                             .ForMember(entity => entity.Code, options => options.Ignore());
+            configuration.CreateMap<MapRequests.MapRequest, MapRequestNotificationDto>();
             #region GeoJsons
             configuration.CreateMap<Communication, FeatureDto<GeoJsonItem>>()
                             .ForMember(fd => fd.Geometry, options => options.MapFrom(c => new GeoJsonWriter().Write(c.AreaOfInterest)))

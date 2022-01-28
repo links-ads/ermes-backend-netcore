@@ -1,6 +1,9 @@
 ﻿using Abp.Domain.Uow;
 using Abp.Threading;
+using Ermes.Consumers.Kafka;
+using Ermes.Consumers.RabbitMq;
 using Ermes.Enums;
+using Ermes.MapRequests;
 using Ermes.Missions;
 using Ermes.Notifiers;
 using Ermes.Persons;
@@ -10,23 +13,102 @@ using System.Transactions;
 
 namespace Ermes.Consumers
 {
-    public class ConsumerService: ErmesDomainServiceBase
+    public class ConsumerService: ErmesDomainServiceBase, IConsumerService
     {
         private readonly MissionManager _missionManager;
         private readonly PersonManager _personManager;
         private readonly NotifierService _notifierService;
+        private readonly MapRequestManager _mapRequestManager;
 
         public ConsumerService(
             MissionManager missionManager, 
             NotifierService notifierService,
-            PersonManager personManager)
+            PersonManager personManager,
+            MapRequestManager mapRequestManager)
         {
             _missionManager = missionManager;
             _notifierService = notifierService;
             _personManager = personManager;
+            _mapRequestManager = mapRequestManager;
         }
 
-        public void ConsumeBusNotification(string message)
+        public void ConsumeBusNotification(string message, string routingKey)
+        {
+            //Consume the message based on routing key prop
+            //Kafka bus does not use routingKey, while for RabbitMq it is a mandatory field
+            if (routingKey != "")
+                //TODO: to be generalized, only map request status update is managed
+                ConsumeRabbitMqNotification(message, routingKey);
+            else
+                ConsumeKafkaNotification(message);
+        }
+
+        #region RabbitMq
+        public void ConsumeRabbitMqNotification(string message, string routingKey)
+        {
+            try
+            {
+                var eventData = JsonConvert.DeserializeObject<RabbitMqResponse>(message);
+                eventData.request_code = routingKey.Split('.')[^1];
+                HandleMapRequestStatusChange(eventData);
+            }
+            catch (Exception e)
+            {
+                Logger.ErrorFormat("ConsumeBusNotification Exception: {0}", e.Message);
+            }
+
+            return;
+        }
+
+        [UnitOfWork(IsDisabled = true)]
+        private void HandleMapRequestStatusChange(RabbitMqResponse eventData)
+        {
+            using (var unitOfWork = UnitOfWorkManager.Begin(new UnitOfWorkOptions
+            {
+                IsolationLevel = IsolationLevel.ReadCommitted,
+                IsTransactional = true,
+                Timeout = TimeSpan.FromMinutes(30),
+                FilterOverrides =
+                        {
+                            new DataFilterConfiguration(AbpDataFilters.MayHaveTenant,false),
+                            new DataFilterConfiguration(AbpDataFilters.MustHaveTenant, false)
+                        }
+            }))
+            {
+                try
+                {
+                    var mr = _mapRequestManager.GetMapRequestByCode(eventData.request_code);
+                    if (mr == null)
+                    {
+                        Logger.ErrorFormat("HandleMapRequestStatusChange: MapRequest with Code {0} not found", eventData.request_code);
+                        return;
+                    }
+                    if (eventData.status == "success")
+                    {
+                        mr.Status = MapRequestStatusType.ContentAvailable;
+                    }
+                    else
+                    {
+                        mr.Status = MapRequestStatusType.ContentNotAvailable;
+                        mr.ErrorMessage = eventData.message;
+                    }
+
+
+                    CurrentUnitOfWork.SaveChanges();
+                }
+                catch (Exception e)
+                {
+                    Logger.ErrorFormat("HandleMapRequestStatusChange exception: {0}", e.Message);
+                }
+
+                unitOfWork.Complete();
+            }
+        }
+
+        #endregion
+
+        #region Kafka
+        public void ConsumeKafkaNotification(string message)
         {
             try
             {
@@ -51,14 +133,13 @@ namespace Ermes.Consumers
                     }
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logger.ErrorFormat("ConsumeBusNotification Exception: {0}", e.Message);
             }
 
             return;
         }
-
         private void HandleMissionMessage(BusDto<object> eventData)
         {
             try
@@ -175,5 +256,6 @@ namespace Ermes.Consumers
                 unitOfWork.Complete();
             }
         }
+        #endregion
     }
 }

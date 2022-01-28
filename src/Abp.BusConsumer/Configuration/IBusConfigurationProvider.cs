@@ -7,5 +7,13 @@ namespace Abp.BusConsumer.Configuration
         string GetGroupId();        
         string[] GetTopicList();
         bool IsEnabled();
+        string GetHostname();
+        string GetUsername();
+        string GetPassword();
+        int GetPort();
+        string GetVirtualHost();
+        string GetExchange();
+        string GetQueue();
+
     }
 }

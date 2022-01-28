@@ -1,4 +1,5 @@
 ﻿using Abp.Application.Services.Dto;
+using Abp.BackgroundJobs;
 using Abp.Linq.Extensions;
 using Abp.UI;
 using Ermes.Attributes;
@@ -7,6 +8,7 @@ using Ermes.Dto;
 using Ermes.Dto.Datatable;
 using Ermes.Dto.Spatial;
 using Ermes.Enums;
+using Ermes.EventHandlers;
 using Ermes.GeoJson;
 using Ermes.Helpers;
 using Ermes.Linq.Extensions;
@@ -31,17 +33,20 @@ namespace Ermes.MapRequests
         private readonly MapRequestManager _mapRequestManager;
         private readonly IGeoJsonBulkRepository _geoJsonBulkRepository;
         private readonly ErmesPermissionChecker _permissionChecker;
+        private readonly IBackgroundJobManager _backgroundJobManager;
         public MapRequestsAppService(
             ErmesAppSession session,
             MapRequestManager mapRequestManager,
             IGeoJsonBulkRepository geoJsonBulkRepository,
-            ErmesPermissionChecker permissionChecker
+            ErmesPermissionChecker permissionChecker,
+            IBackgroundJobManager backgroundJobManager
         )
         {
             _session = session;
             _mapRequestManager = mapRequestManager;
             _geoJsonBulkRepository = geoJsonBulkRepository;
             _permissionChecker = permissionChecker;
+            _backgroundJobManager = backgroundJobManager;
         }
 
         #region Private
@@ -139,11 +144,11 @@ namespace Ermes.MapRequests
 
             await CurrentUnitOfWork.SaveChangesAsync();
 
-            //NotificationEvent<CommunicationNotificationDto> notification = new NotificationEvent<CommunicationNotificationDto>(newCommunication.Id,
-            //    _session.UserId.Value,
-            //    ObjectMapper.Map<CommunicationNotificationDto>(newCommunication),
-            //    EntityWriteAction.Create);
-            //await _backgroundJobManager.EnqueueEventAsync(notification);
+            NotificationEvent<MapRequestNotificationDto> notification = new NotificationEvent<MapRequestNotificationDto>(newMR.Id,
+                _session.UserId.Value,
+                ObjectMapper.Map<MapRequestNotificationDto>(newMR),
+                EntityWriteAction.Create);
+            await _backgroundJobManager.EnqueueEventAsync(notification);
 
             return newMR;
         }
