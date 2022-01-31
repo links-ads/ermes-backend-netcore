@@ -1,6 +1,6 @@
 Ver.
 --------------------------------
-
+- Feature - Importer update, GetLayers with MapRequestCode input param (#75)
 
 Ver. 3.0.0 - 2022-01-31
 --------------------------------

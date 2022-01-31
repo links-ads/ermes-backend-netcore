@@ -27,10 +27,10 @@ namespace Abp.Importer
             GlobalConfiguration.Instance = new GlobalConfiguration(new Dictionary<string, string>(), apiKeyDict, new Dictionary<string, string>(), _connectionProvider.GetBaseUrl());
         }
 
-        public async Task<object> GetLayers(List<string> datatype_ids, string bbox, DateTime start, DateTime end)
+        public async Task<object> GetLayers(List<string> datatype_ids, string bbox, DateTime start, DateTime end, string request_code)
         {
             var api = new DashboardApi();
-            return await api.GetLayersLayersGetAsync(datatype_ids, bbox, start, end);
+            return await api.GetLayersLayersGetAsync(datatype_ids, bbox, start, end, request_code);
         }
     }
 }

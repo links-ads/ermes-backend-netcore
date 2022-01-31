@@ -19,6 +19,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Linq;
 using System.ComponentModel.DataAnnotations;
 using OpenAPIDateConverter = Abp.Importer.Client.OpenAPIDateConverter;
 
@@ -49,50 +50,73 @@ namespace Abp.Importer.Model
         /// <param name="resourceId">resourceId (required).</param>
         /// <param name="metadataId">metadataId (required).</param>
         /// <param name="bbox">bbox (required).</param>
-        public GeoserverResourceSchema(string datatypeId = default(string), string workspaceName = default(string), string storeName = default(string), string layerName = default(string), string storageLocation = default(string), DateTime expireOn = default(DateTime), DateTime start = default(DateTime), DateTime end = default(DateTime), string resourceId = default(string), string metadataId = default(string), string bbox = default(string))
+        /// <param name="requestCode">requestCode.</param>
+        public GeoserverResourceSchema(string datatypeId = default(string), string workspaceName = default(string), string storeName = default(string), string layerName = default(string), string storageLocation = default(string), DateTime expireOn = default(DateTime), DateTime start = default(DateTime), DateTime end = default(DateTime), string resourceId = default(string), string metadataId = default(string), string bbox = default(string), string requestCode = default(string))
         {
             // to ensure "datatypeId" is required (not null)
-            this.DatatypeId = datatypeId ?? throw new ArgumentNullException("datatypeId is a required property for GeoserverResourceSchema and cannot be null");
+            if (datatypeId == null) {
+                throw new ArgumentNullException("datatypeId is a required property for GeoserverResourceSchema and cannot be null");
+            }
+            this.DatatypeId = datatypeId;
             // to ensure "workspaceName" is required (not null)
-            this.WorkspaceName = workspaceName ?? throw new ArgumentNullException("workspaceName is a required property for GeoserverResourceSchema and cannot be null");
+            if (workspaceName == null) {
+                throw new ArgumentNullException("workspaceName is a required property for GeoserverResourceSchema and cannot be null");
+            }
+            this.WorkspaceName = workspaceName;
             // to ensure "storeName" is required (not null)
-            this.StoreName = storeName ?? throw new ArgumentNullException("storeName is a required property for GeoserverResourceSchema and cannot be null");
+            if (storeName == null) {
+                throw new ArgumentNullException("storeName is a required property for GeoserverResourceSchema and cannot be null");
+            }
+            this.StoreName = storeName;
             // to ensure "layerName" is required (not null)
-            this.LayerName = layerName ?? throw new ArgumentNullException("layerName is a required property for GeoserverResourceSchema and cannot be null");
+            if (layerName == null) {
+                throw new ArgumentNullException("layerName is a required property for GeoserverResourceSchema and cannot be null");
+            }
+            this.LayerName = layerName;
             this.Start = start;
             this.End = end;
             // to ensure "resourceId" is required (not null)
-            this.ResourceId = resourceId ?? throw new ArgumentNullException("resourceId is a required property for GeoserverResourceSchema and cannot be null");
+            if (resourceId == null) {
+                throw new ArgumentNullException("resourceId is a required property for GeoserverResourceSchema and cannot be null");
+            }
+            this.ResourceId = resourceId;
             // to ensure "metadataId" is required (not null)
-            this.MetadataId = metadataId ?? throw new ArgumentNullException("metadataId is a required property for GeoserverResourceSchema and cannot be null");
+            if (metadataId == null) {
+                throw new ArgumentNullException("metadataId is a required property for GeoserverResourceSchema and cannot be null");
+            }
+            this.MetadataId = metadataId;
             // to ensure "bbox" is required (not null)
-            this.Bbox = bbox ?? throw new ArgumentNullException("bbox is a required property for GeoserverResourceSchema and cannot be null");
+            if (bbox == null) {
+                throw new ArgumentNullException("bbox is a required property for GeoserverResourceSchema and cannot be null");
+            }
+            this.Bbox = bbox;
             this.StorageLocation = storageLocation;
             this.ExpireOn = expireOn;
+            this.RequestCode = requestCode;
         }
 
         /// <summary>
         /// Gets or Sets DatatypeId
         /// </summary>
-        [DataMember(Name = "datatype_id", EmitDefaultValue = true)]
+        [DataMember(Name = "datatype_id", IsRequired = true, EmitDefaultValue = true)]
         public string DatatypeId { get; set; }
 
         /// <summary>
         /// Gets or Sets WorkspaceName
         /// </summary>
-        [DataMember(Name = "workspace_name", EmitDefaultValue = true)]
+        [DataMember(Name = "workspace_name", IsRequired = true, EmitDefaultValue = true)]
         public string WorkspaceName { get; set; }
 
         /// <summary>
         /// Gets or Sets StoreName
         /// </summary>
-        [DataMember(Name = "store_name", EmitDefaultValue = true)]
+        [DataMember(Name = "store_name", IsRequired = true, EmitDefaultValue = true)]
         public string StoreName { get; set; }
 
         /// <summary>
         /// Gets or Sets LayerName
         /// </summary>
-        [DataMember(Name = "layer_name", EmitDefaultValue = true)]
+        [DataMember(Name = "layer_name", IsRequired = true, EmitDefaultValue = true)]
         public string LayerName { get; set; }
 
         /// <summary>
@@ -110,32 +134,38 @@ namespace Abp.Importer.Model
         /// <summary>
         /// Gets or Sets Start
         /// </summary>
-        [DataMember(Name = "start", EmitDefaultValue = true)]
+        [DataMember(Name = "start", IsRequired = true, EmitDefaultValue = true)]
         public DateTime Start { get; set; }
 
         /// <summary>
         /// Gets or Sets End
         /// </summary>
-        [DataMember(Name = "end", EmitDefaultValue = true)]
+        [DataMember(Name = "end", IsRequired = true, EmitDefaultValue = true)]
         public DateTime End { get; set; }
 
         /// <summary>
         /// Gets or Sets ResourceId
         /// </summary>
-        [DataMember(Name = "resource_id", EmitDefaultValue = true)]
+        [DataMember(Name = "resource_id", IsRequired = true, EmitDefaultValue = true)]
         public string ResourceId { get; set; }
 
         /// <summary>
         /// Gets or Sets MetadataId
         /// </summary>
-        [DataMember(Name = "metadata_id", EmitDefaultValue = true)]
+        [DataMember(Name = "metadata_id", IsRequired = true, EmitDefaultValue = true)]
         public string MetadataId { get; set; }
 
         /// <summary>
         /// Gets or Sets Bbox
         /// </summary>
-        [DataMember(Name = "bbox", EmitDefaultValue = true)]
+        [DataMember(Name = "bbox", IsRequired = true, EmitDefaultValue = true)]
         public string Bbox { get; set; }
+
+        /// <summary>
+        /// Gets or Sets RequestCode
+        /// </summary>
+        [DataMember(Name = "request_code", EmitDefaultValue = true)]
+        public string RequestCode { get; set; }
 
         /// <summary>
         /// Returns the string presentation of the object
@@ -143,7 +173,7 @@ namespace Abp.Importer.Model
         /// <returns>String presentation of the object</returns>
         public override string ToString()
         {
-            var sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder();
             sb.Append("class GeoserverResourceSchema {\n");
             sb.Append("  DatatypeId: ").Append(DatatypeId).Append("\n");
             sb.Append("  WorkspaceName: ").Append(WorkspaceName).Append("\n");
@@ -156,6 +186,7 @@ namespace Abp.Importer.Model
             sb.Append("  ResourceId: ").Append(ResourceId).Append("\n");
             sb.Append("  MetadataId: ").Append(MetadataId).Append("\n");
             sb.Append("  Bbox: ").Append(Bbox).Append("\n");
+            sb.Append("  RequestCode: ").Append(RequestCode).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
         }
@@ -166,7 +197,7 @@ namespace Abp.Importer.Model
         /// <returns>JSON string presentation of the object</returns>
         public virtual string ToJson()
         {
-            return JsonConvert.SerializeObject(this, Formatting.Indented);
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
         }
 
         /// <summary>
@@ -187,8 +218,9 @@ namespace Abp.Importer.Model
         public bool Equals(GeoserverResourceSchema input)
         {
             if (input == null)
+            {
                 return false;
-
+            }
             return 
                 (
                     this.DatatypeId == input.DatatypeId ||
@@ -244,6 +276,11 @@ namespace Abp.Importer.Model
                     this.Bbox == input.Bbox ||
                     (this.Bbox != null &&
                     this.Bbox.Equals(input.Bbox))
+                ) && 
+                (
+                    this.RequestCode == input.RequestCode ||
+                    (this.RequestCode != null &&
+                    this.RequestCode.Equals(input.RequestCode))
                 );
         }
 
@@ -257,27 +294,53 @@ namespace Abp.Importer.Model
             {
                 int hashCode = 41;
                 if (this.DatatypeId != null)
-                    hashCode = hashCode * 59 + this.DatatypeId.GetHashCode();
+                {
+                    hashCode = (hashCode * 59) + this.DatatypeId.GetHashCode();
+                }
                 if (this.WorkspaceName != null)
-                    hashCode = hashCode * 59 + this.WorkspaceName.GetHashCode();
+                {
+                    hashCode = (hashCode * 59) + this.WorkspaceName.GetHashCode();
+                }
                 if (this.StoreName != null)
-                    hashCode = hashCode * 59 + this.StoreName.GetHashCode();
+                {
+                    hashCode = (hashCode * 59) + this.StoreName.GetHashCode();
+                }
                 if (this.LayerName != null)
-                    hashCode = hashCode * 59 + this.LayerName.GetHashCode();
+                {
+                    hashCode = (hashCode * 59) + this.LayerName.GetHashCode();
+                }
                 if (this.StorageLocation != null)
-                    hashCode = hashCode * 59 + this.StorageLocation.GetHashCode();
+                {
+                    hashCode = (hashCode * 59) + this.StorageLocation.GetHashCode();
+                }
                 if (this.ExpireOn != null)
-                    hashCode = hashCode * 59 + this.ExpireOn.GetHashCode();
+                {
+                    hashCode = (hashCode * 59) + this.ExpireOn.GetHashCode();
+                }
                 if (this.Start != null)
-                    hashCode = hashCode * 59 + this.Start.GetHashCode();
+                {
+                    hashCode = (hashCode * 59) + this.Start.GetHashCode();
+                }
                 if (this.End != null)
-                    hashCode = hashCode * 59 + this.End.GetHashCode();
+                {
+                    hashCode = (hashCode * 59) + this.End.GetHashCode();
+                }
                 if (this.ResourceId != null)
-                    hashCode = hashCode * 59 + this.ResourceId.GetHashCode();
+                {
+                    hashCode = (hashCode * 59) + this.ResourceId.GetHashCode();
+                }
                 if (this.MetadataId != null)
-                    hashCode = hashCode * 59 + this.MetadataId.GetHashCode();
+                {
+                    hashCode = (hashCode * 59) + this.MetadataId.GetHashCode();
+                }
                 if (this.Bbox != null)
-                    hashCode = hashCode * 59 + this.Bbox.GetHashCode();
+                {
+                    hashCode = (hashCode * 59) + this.Bbox.GetHashCode();
+                }
+                if (this.RequestCode != null)
+                {
+                    hashCode = (hashCode * 59) + this.RequestCode.GetHashCode();
+                }
                 return hashCode;
             }
         }
@@ -287,7 +350,7 @@ namespace Abp.Importer.Model
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> IValidatableObject.Validate(ValidationContext validationContext)
+        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
         {
             yield break;
         }

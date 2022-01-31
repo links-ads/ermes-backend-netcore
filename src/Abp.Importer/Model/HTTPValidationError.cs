@@ -19,6 +19,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Linq;
 using System.ComponentModel.DataAnnotations;
 using OpenAPIDateConverter = Abp.Importer.Client.OpenAPIDateConverter;
 
@@ -51,7 +52,7 @@ namespace Abp.Importer.Model
         /// <returns>String presentation of the object</returns>
         public override string ToString()
         {
-            var sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder();
             sb.Append("class HTTPValidationError {\n");
             sb.Append("  Detail: ").Append(Detail).Append("\n");
             sb.Append("}\n");
@@ -64,7 +65,7 @@ namespace Abp.Importer.Model
         /// <returns>JSON string presentation of the object</returns>
         public virtual string ToJson()
         {
-            return JsonConvert.SerializeObject(this, Formatting.Indented);
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
         }
 
         /// <summary>
@@ -85,8 +86,9 @@ namespace Abp.Importer.Model
         public bool Equals(HTTPValidationError input)
         {
             if (input == null)
+            {
                 return false;
-
+            }
             return 
                 (
                     this.Detail == input.Detail ||
@@ -106,7 +108,9 @@ namespace Abp.Importer.Model
             {
                 int hashCode = 41;
                 if (this.Detail != null)
-                    hashCode = hashCode * 59 + this.Detail.GetHashCode();
+                {
+                    hashCode = (hashCode * 59) + this.Detail.GetHashCode();
+                }
                 return hashCode;
             }
         }
@@ -116,7 +120,7 @@ namespace Abp.Importer.Model
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> IValidatableObject.Validate(ValidationContext validationContext)
+        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
         {
             yield break;
         }

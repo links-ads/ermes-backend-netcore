@@ -10,6 +10,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Security.Cryptography.X509Certificates;
 
 namespace Abp.Importer.Client
@@ -46,7 +47,7 @@ namespace Abp.Importer.Client
         /// <summary>
         /// Gets the date time format.
         /// </summary>
-        /// <value>Date time foramt.</value>
+        /// <value>Date time format.</value>
         string DateTimeFormat { get; }
 
         /// <summary>
@@ -73,6 +74,12 @@ namespace Abp.Importer.Client
         /// </summary>
         /// <value>HTTP connection timeout.</value>
         int Timeout { get; }
+
+        /// <summary>
+        /// Gets the proxy.
+        /// </summary>
+        /// <value>Proxy.</value>
+        WebProxy Proxy { get; }
 
         /// <summary>
         /// Gets the user agent.
