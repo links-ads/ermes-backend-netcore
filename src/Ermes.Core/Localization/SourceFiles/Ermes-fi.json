@@ -81,6 +81,7 @@
     "TimeWindowLimitError": "End date must be greater than Start date",
     "InvalidParentId": "Invalid Parent Id: {0}",
     "InvalidCategoryRangeValue": "Invalid Category Range Value: {0}",
-    "InvalidCategoryNumericValue": "Invalid Category Numeric Value: {0}"
+    "InvalidCategoryNumericValue": "Invalid Category Numeric Value: {0}",
+    "DoNotTakePartToGamification": "You do not take part to gamification"
   }
 }

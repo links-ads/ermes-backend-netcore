@@ -58,5 +58,7 @@ namespace Ermes.Persons
         /// This field has a value only for member of organization "Protezione Civile Piemonte" or its children.
         /// </summary>
         public int? CurrentOperationLegacyId { get; set; }
+
+        public virtual ICollection<PersonTip> Tips { get; set; }
     }
 }

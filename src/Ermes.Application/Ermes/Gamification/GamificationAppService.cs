@@ -1,13 +1,18 @@
 ﻿using Abp.Application.Services.Dto;
 using Abp.Linq.Extensions;
+using Abp.UI;
 using Ermes.Answers;
 using Ermes.Attributes;
+using Ermes.Authorization;
 using Ermes.Dto.Datatable;
+using Ermes.Ermes.Gamification.Dto;
 using Ermes.Gamification.Dto;
 using Ermes.Linq.Extensions;
+using Ermes.Persons;
 using Ermes.Quizzes;
 using Ermes.Tips;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,15 +25,21 @@ namespace Ermes.Gamification
         private readonly TipManager _tipManager;
         private readonly QuizManager _quizManager;
         private readonly AnswerManager _answerManager;
+        private readonly PersonManager _personManager;
+        private readonly ErmesAppSession _session;
         public GamificationAppService(
                 TipManager tipManager,
                 QuizManager quizManager,
-                AnswerManager answerManager
+                AnswerManager answerManager,
+                ErmesAppSession session,
+                PersonManager personManager
             )
         {
             _tipManager = tipManager;
             _quizManager = quizManager;
             _answerManager = answerManager;
+            _session = session;
+            _personManager = personManager;
         }
 
         #region Private
@@ -42,6 +53,10 @@ namespace Ermes.Gamification
                 var hazardList = input.Hazards.Select(a => a.ToString()).ToList();
                 query = query.Where(a => hazardList.Contains(a.HazardString));
             }
+
+            //current logged user will not receive tips he has already read
+            var tipCodesLit = await _personManager.GetTipsReadByPersonIdAsync(_session.LoggedUserPerson.Id);
+            query = query.Where(t => !tipCodesLit.Contains(t.Code));
 
             result.TotalCount = await query.CountAsync();
 
@@ -132,6 +147,25 @@ namespace Ermes.Gamification
         {
             PagedResultDto<AnswerDto> result = await InternalGetAnswers(input);
             return new DTResult<AnswerDto>(input.Draw, result.TotalCount, result.Items.Count, result.Items.ToList());
+        }
+
+        public virtual async Task<bool> SetTipAsRead(SetTipAsReadInput input)
+        {
+            //Only citizens can read tips
+            if (!_session.Roles.Any(r => r == AppRoles.CITIZEN))
+                throw new UserFriendlyException(L("DoNotTakePartToGamification"));
+
+            try
+            {
+                await _personManager.CreatePersonTip(_session.LoggedUserPerson.Id, input.TipCode);
+            }
+            catch(Exception e)
+            {
+                Logger.ErrorFormat("Errro while inserting PersonTip: {0}", e.Message);
+                return false;
+            }
+
+            return true;
         }
     }
 }

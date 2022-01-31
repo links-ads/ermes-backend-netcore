@@ -1,6 +1,6 @@
 Ver.
 --------------------------------
-
+- Feature - PersonTips table added, SetTipAsRead API added (migration added)(#74)
 
 Ver. 2.10.0 - 2022-01-28
 --------------------------------
