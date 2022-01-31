@@ -19,6 +19,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Linq;
 using System.ComponentModel.DataAnnotations;
 using OpenAPIDateConverter = Abp.Importer.Client.OpenAPIDateConverter;
 
@@ -44,29 +45,38 @@ namespace Abp.Importer.Model
         public ValidationError(List<string> loc = default(List<string>), string msg = default(string), string type = default(string))
         {
             // to ensure "loc" is required (not null)
-            this.Loc = loc ?? throw new ArgumentNullException("loc is a required property for ValidationError and cannot be null");
+            if (loc == null) {
+                throw new ArgumentNullException("loc is a required property for ValidationError and cannot be null");
+            }
+            this.Loc = loc;
             // to ensure "msg" is required (not null)
-            this.Msg = msg ?? throw new ArgumentNullException("msg is a required property for ValidationError and cannot be null");
+            if (msg == null) {
+                throw new ArgumentNullException("msg is a required property for ValidationError and cannot be null");
+            }
+            this.Msg = msg;
             // to ensure "type" is required (not null)
-            this.Type = type ?? throw new ArgumentNullException("type is a required property for ValidationError and cannot be null");
+            if (type == null) {
+                throw new ArgumentNullException("type is a required property for ValidationError and cannot be null");
+            }
+            this.Type = type;
         }
 
         /// <summary>
         /// Gets or Sets Loc
         /// </summary>
-        [DataMember(Name = "loc", EmitDefaultValue = true)]
+        [DataMember(Name = "loc", IsRequired = true, EmitDefaultValue = true)]
         public List<string> Loc { get; set; }
 
         /// <summary>
         /// Gets or Sets Msg
         /// </summary>
-        [DataMember(Name = "msg", EmitDefaultValue = true)]
+        [DataMember(Name = "msg", IsRequired = true, EmitDefaultValue = true)]
         public string Msg { get; set; }
 
         /// <summary>
         /// Gets or Sets Type
         /// </summary>
-        [DataMember(Name = "type", EmitDefaultValue = true)]
+        [DataMember(Name = "type", IsRequired = true, EmitDefaultValue = true)]
         public string Type { get; set; }
 
         /// <summary>
@@ -75,7 +85,7 @@ namespace Abp.Importer.Model
         /// <returns>String presentation of the object</returns>
         public override string ToString()
         {
-            var sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder();
             sb.Append("class ValidationError {\n");
             sb.Append("  Loc: ").Append(Loc).Append("\n");
             sb.Append("  Msg: ").Append(Msg).Append("\n");
@@ -90,7 +100,7 @@ namespace Abp.Importer.Model
         /// <returns>JSON string presentation of the object</returns>
         public virtual string ToJson()
         {
-            return JsonConvert.SerializeObject(this, Formatting.Indented);
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
         }
 
         /// <summary>
@@ -111,8 +121,9 @@ namespace Abp.Importer.Model
         public bool Equals(ValidationError input)
         {
             if (input == null)
+            {
                 return false;
-
+            }
             return 
                 (
                     this.Loc == input.Loc ||
@@ -142,11 +153,17 @@ namespace Abp.Importer.Model
             {
                 int hashCode = 41;
                 if (this.Loc != null)
-                    hashCode = hashCode * 59 + this.Loc.GetHashCode();
+                {
+                    hashCode = (hashCode * 59) + this.Loc.GetHashCode();
+                }
                 if (this.Msg != null)
-                    hashCode = hashCode * 59 + this.Msg.GetHashCode();
+                {
+                    hashCode = (hashCode * 59) + this.Msg.GetHashCode();
+                }
                 if (this.Type != null)
-                    hashCode = hashCode * 59 + this.Type.GetHashCode();
+                {
+                    hashCode = (hashCode * 59) + this.Type.GetHashCode();
+                }
                 return hashCode;
             }
         }
@@ -156,7 +173,7 @@ namespace Abp.Importer.Model
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> IValidatableObject.Validate(ValidationContext validationContext)
+        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
         {
             yield break;
         }

@@ -1,5 +1,9 @@
 Ver.
 --------------------------------
+- Feature - Importer update, GetLayers with MapRequestCode input param (#75)
+
+Ver. 3.0.0 - 2022-01-31
+--------------------------------
 - Feature - PersonTips table added, SetTipAsRead API added (migration added)(#74)
 
 Ver. 2.10.0 - 2022-01-28

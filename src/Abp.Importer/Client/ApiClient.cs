@@ -13,20 +13,21 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Web;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters;
 using System.Text;
 using System.Threading;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using ErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
 using RestSharp;
 using RestSharp.Deserializers;
-using ErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
 using RestSharpMethod = RestSharp.Method;
 using Polly;
 
@@ -47,7 +48,7 @@ namespace Abp.Importer.Client
             {
                 NamingStrategy = new CamelCaseNamingStrategy
                 {
-                    OverrideSpecifiedNames = true
+                    OverrideSpecifiedNames = false
                 }
             }
         };
@@ -63,10 +64,22 @@ namespace Abp.Importer.Client
             _configuration = configuration;
         }
 
+        /// <summary>
+        /// Serialize the object into a JSON string.
+        /// </summary>
+        /// <param name="obj">Object to be serialized.</param>
+        /// <returns>A JSON string.</returns>
         public string Serialize(object obj)
         {
-            var result = JsonConvert.SerializeObject(obj, _serializerSettings);
-            return result;
+            if (obj != null && obj is Abp.Importer.Model.AbstractOpenAPISchema)
+            {
+                // the object to be serialized is an oneOf/anyOf schema
+                return ((Abp.Importer.Model.AbstractOpenAPISchema)obj).ToJson();
+            }
+            else
+            {
+                return JsonConvert.SerializeObject(obj, _serializerSettings);
+            }
         }
 
         public T Deserialize<T>(IRestResponse response)
@@ -83,7 +96,6 @@ namespace Abp.Importer.Client
         /// <returns>Object representation of the JSON string.</returns>
         internal object Deserialize(IRestResponse response, Type type)
         {
-            IList<Parameter> headers = response.Headers;
             if (type == typeof(byte[])) // return byte array
             {
                 return response.RawBytes;
@@ -92,24 +104,25 @@ namespace Abp.Importer.Client
             // TODO: ? if (type.IsAssignableFrom(typeof(Stream)))
             if (type == typeof(Stream))
             {
-                if (headers != null)
+                var bytes = response.RawBytes;
+                if (response.Headers != null)
                 {
-                    var filePath = String.IsNullOrEmpty(_configuration.TempFolderPath)
+                    var filePath = string.IsNullOrEmpty(_configuration.TempFolderPath)
                         ? Path.GetTempPath()
                         : _configuration.TempFolderPath;
                     var regex = new Regex(@"Content-Disposition=.*filename=['""]?([^'""\s]+)['""]?$");
-                    foreach (var header in headers)
+                    foreach (var header in response.Headers)
                     {
                         var match = regex.Match(header.ToString());
                         if (match.Success)
                         {
                             string fileName = filePath + ClientUtils.SanitizeFilename(match.Groups[1].Value.Replace("\"", "").Replace("'", ""));
-                            File.WriteAllBytes(fileName, response.RawBytes);
+                            File.WriteAllBytes(fileName, bytes);
                             return new FileStream(fileName, FileMode.Open);
                         }
                     }
                 }
-                var stream = new MemoryStream(response.RawBytes);
+                var stream = new MemoryStream(bytes);
                 return stream;
             }
 
@@ -118,7 +131,7 @@ namespace Abp.Importer.Client
                 return DateTime.Parse(response.Content, null, System.Globalization.DateTimeStyles.RoundtripKind);
             }
 
-            if (type == typeof(String) || type.Name.StartsWith("System.Nullable")) // return primitive type
+            if (type == typeof(string) || type.Name.StartsWith("System.Nullable")) // return primitive type
             {
                 return Convert.ChangeType(response.Content, type);
             }
@@ -145,12 +158,29 @@ namespace Abp.Importer.Client
         }
     }
     /// <summary>
-    /// Provides a default implementation of an Api client (both synchronous and asynchronous implementatios),
+    /// Provides a default implementation of an Api client (both synchronous and asynchronous implementations),
     /// encapsulating general REST accessor use cases.
     /// </summary>
     public partial class ApiClient : ISynchronousClient, IAsynchronousClient
     {
-        private readonly String _baseUrl;
+        private readonly string _baseUrl;
+
+        /// <summary>
+        /// Specifies the settings on a <see cref="JsonSerializer" /> object.
+        /// These settings can be adjusted to accommodate custom serialization rules.
+        /// </summary>
+        public JsonSerializerSettings SerializerSettings { get; set; } = new JsonSerializerSettings
+        {
+            // OpenAPI generated types generally hide default constructors.
+            ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor,
+            ContractResolver = new DefaultContractResolver
+            {
+                NamingStrategy = new CamelCaseNamingStrategy
+                {
+                    OverrideSpecifiedNames = false
+                }
+            }
+        };
 
         /// <summary>
         /// Allows for extending request processing for <see cref="ApiClient"/> generated code.
@@ -178,7 +208,7 @@ namespace Abp.Importer.Client
         /// </summary>
         /// <param name="basePath">The target service's base path in URL format.</param>
         /// <exception cref="ArgumentException"></exception>
-        public ApiClient(String basePath)
+        public ApiClient(string basePath)
         {
             if (string.IsNullOrEmpty(basePath))
                 throw new ArgumentException("basePath cannot be empty");
@@ -239,7 +269,7 @@ namespace Abp.Importer.Client
         /// <exception cref="ArgumentNullException"></exception>
         private RestRequest NewRequest(
             HttpMethod method,
-            String path,
+            string path,
             RequestOptions options,
             IReadableConfiguration configuration)
         {
@@ -250,7 +280,7 @@ namespace Abp.Importer.Client
             RestRequest request = new RestRequest(Method(method))
             {
                 Resource = path,
-                JsonSerializer = new CustomJsonCodec(configuration)
+                JsonSerializer = new CustomJsonCodec(SerializerSettings, configuration)
             };
 
             if (options.PathParameters != null)
@@ -301,37 +331,55 @@ namespace Abp.Importer.Client
 
             if (options.Data != null)
             {
-                if (options.HeaderParameters != null)
+                if (options.Data is Stream stream)
                 {
-                    var contentTypes = options.HeaderParameters["Content-Type"];
-                    if (contentTypes == null || contentTypes.Any(header => header.Contains("application/json")))
+                    var contentType = "application/octet-stream";
+                    if (options.HeaderParameters != null)
                     {
-                        request.RequestFormat = DataFormat.Json;
+                        var contentTypes = options.HeaderParameters["Content-Type"];
+                        contentType = contentTypes[0];
                     }
-                    else
-                    {
-                        // TODO: Generated client user should add additional handlers. RestSharp only supports XML and JSON, with XML as default.
-                    }
+
+                    var bytes = ClientUtils.ReadAsBytes(stream);
+                    request.AddParameter(contentType, bytes, ParameterType.RequestBody);
                 }
                 else
                 {
-                    // Here, we'll assume JSON APIs are more common. XML can be forced by adding produces/consumes to openapi spec explicitly.
-                    request.RequestFormat = DataFormat.Json;
-                }
+                    if (options.HeaderParameters != null)
+                    {
+                        var contentTypes = options.HeaderParameters["Content-Type"];
+                        if (contentTypes == null || contentTypes.Any(header => header.Contains("application/json")))
+                        {
+                            request.RequestFormat = DataFormat.Json;
+                        }
+                        else
+                        {
+                            // TODO: Generated client user should add additional handlers. RestSharp only supports XML and JSON, with XML as default.
+                        }
+                    }
+                    else
+                    {
+                        // Here, we'll assume JSON APIs are more common. XML can be forced by adding produces/consumes to openapi spec explicitly.
+                        request.RequestFormat = DataFormat.Json;
+                    }
 
-                request.AddJsonBody(options.Data);
+                    request.AddJsonBody(options.Data);
+                }
             }
 
             if (options.FileParameters != null)
             {
                 foreach (var fileParam in options.FileParameters)
                 {
-                    var bytes = ClientUtils.ReadAsBytes(fileParam.Value);
-                    var fileStream = fileParam.Value as FileStream;
-                    if (fileStream != null)
-                        request.Files.Add(FileParameter.Create(fileParam.Key, bytes, System.IO.Path.GetFileName(fileStream.Name)));
-                    else
-                        request.Files.Add(FileParameter.Create(fileParam.Key, bytes, "no_file_name_provided"));
+                    foreach (var file in fileParam.Value)
+                    {
+                        var bytes = ClientUtils.ReadAsBytes(file);
+                        var fileStream = file as FileStream;
+                        if (fileStream != null)
+                            request.Files.Add(FileParameter.Create(fileParam.Key, bytes, System.IO.Path.GetFileName(fileStream.Name)));
+                        else
+                            request.Files.Add(FileParameter.Create(fileParam.Key, bytes, "no_file_name_provided"));
+                    }
                 }
             }
 
@@ -398,7 +446,7 @@ namespace Abp.Importer.Client
             }
             else
             {
-                var customDeserializer = new CustomJsonCodec(configuration);
+                var customDeserializer = new CustomJsonCodec(SerializerSettings, configuration);
                 client.AddHandler("application/json", () => customDeserializer);
                 client.AddHandler("text/json", () => customDeserializer);
                 client.AddHandler("text/x-json", () => customDeserializer);
@@ -414,6 +462,11 @@ namespace Abp.Importer.Client
 
             client.Timeout = configuration.Timeout;
 
+            if (configuration.Proxy != null)
+            {
+                client.Proxy = configuration.Proxy;
+            }
+
             if (configuration.UserAgent != null)
             {
                 client.UserAgent = configuration.UserAgent;
@@ -427,7 +480,7 @@ namespace Abp.Importer.Client
             InterceptRequest(req);
 
             IRestResponse<T> response;
-            if (RetryConfiguration.RetryPolicy != null)	
+            if (RetryConfiguration.RetryPolicy != null)
             {
                 var policy = RetryConfiguration.RetryPolicy;
                 var policyResult = policy.ExecuteAndCapture(() => client.Execute(req));
@@ -440,6 +493,23 @@ namespace Abp.Importer.Client
             else
             {
                 response = client.Execute<T>(req);
+            }
+
+            // if the response type is oneOf/anyOf, call FromJSON to deserialize the data
+            if (typeof(Abp.Importer.Model.AbstractOpenAPISchema).IsAssignableFrom(typeof(T)))
+            {
+                try
+                {
+                    response.Data = (T) typeof(T).GetMethod("FromJson").Invoke(null, new object[] { response.Content });
+                }
+                catch (Exception ex)
+                {
+                    throw ex.InnerException != null ? ex.InnerException : ex;
+                }
+            }
+            else if (typeof(T).Name == "Stream") // for binary response
+            {
+                response.Data = (T)(object)new MemoryStream(response.RawBytes);
             }
 
             InterceptResponse(req, response);
@@ -495,7 +565,7 @@ namespace Abp.Importer.Client
             }
             else
             {
-                var customDeserializer = new CustomJsonCodec(configuration);
+                var customDeserializer = new CustomJsonCodec(SerializerSettings, configuration);
                 client.AddHandler("application/json", () => customDeserializer);
                 client.AddHandler("text/json", () => customDeserializer);
                 client.AddHandler("text/x-json", () => customDeserializer);
@@ -510,6 +580,11 @@ namespace Abp.Importer.Client
             client.AddHandler("*", () => xmlDeserializer);
 
             client.Timeout = configuration.Timeout;
+
+            if (configuration.Proxy != null)
+            {
+                client.Proxy = configuration.Proxy;
+            }
 
             if (configuration.UserAgent != null)
             {
@@ -527,7 +602,7 @@ namespace Abp.Importer.Client
             if (RetryConfiguration.AsyncRetryPolicy != null)
             {
                 var policy = RetryConfiguration.AsyncRetryPolicy;
-                var policyResult = await policy.ExecuteAndCaptureAsync(() => client.ExecuteAsync(req, cancellationToken)).ConfigureAwait(false);
+                var policyResult = await policy.ExecuteAndCaptureAsync((ct) => client.ExecuteAsync(req, ct), cancellationToken).ConfigureAwait(false);
                 response = (policyResult.Outcome == OutcomeType.Successful) ? client.Deserialize<T>(policyResult.Result) : new RestResponse<T>
                 {
                     Request = req,
@@ -536,7 +611,17 @@ namespace Abp.Importer.Client
             }
             else
             {
-                 response = await client.ExecuteAsync<T>(req, cancellationToken).ConfigureAwait(false);
+                response = await client.ExecuteAsync<T>(req, cancellationToken).ConfigureAwait(false);
+            }
+
+            // if the response type is oneOf/anyOf, call FromJSON to deserialize the data
+            if (typeof(Abp.Importer.Model.AbstractOpenAPISchema).IsAssignableFrom(typeof(T)))
+            {
+                response.Data = (T) typeof(T).GetMethod("FromJson").Invoke(null, new object[] { response.Content });
+            }
+            else if (typeof(T).Name == "Stream") // for binary response
+            {
+                response.Data = (T)(object)new MemoryStream(response.RawBytes);
             }
 
             InterceptResponse(req, response);
