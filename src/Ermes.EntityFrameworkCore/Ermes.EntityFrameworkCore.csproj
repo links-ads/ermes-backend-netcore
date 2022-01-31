@@ -80,6 +80,8 @@
     <Compile Include="Migrations\20211118103809_Person_CurrentOperationLegacyId_int.Designer.cs" />
     <Compile Include="Migrations\20211207144029_Layer_Type_Added.cs" />
     <Compile Include="Migrations\20211207144029_Layer_Type_Added.Designer.cs" />
+    <Compile Include="Migrations\20220131090644_PersonTips_Added.cs" />
+    <Compile Include="Migrations\20220131090644_PersonTips_Added.Designer.cs" />
     <Compile Include="Migrations\ErmesDbContextModelSnapshot.cs" />
     <Compile Include="Migrations\Seed\ModelBuilderExtensions.cs" />
   </ItemGroup>

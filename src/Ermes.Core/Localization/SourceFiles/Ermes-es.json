@@ -81,6 +81,7 @@
     "TimeWindowLimitError": "La fecha de finalización debe ser mayor que la fecha de inicio",
     "InvalidParentId": "ID de padre no válido: {0}",
     "InvalidCategoryRangeValue": "Valor de rango de categoría no válido: {0}",
-    "InvalidCategoryNumericValue": "Valor numérico de categoría no válido: {0}"
+    "InvalidCategoryNumericValue": "Valor numérico de categoría no válido: {0}",
+    "DoNotTakePartToGamification": "You do not take part to gamification"
   }
 }

@@ -64,6 +64,7 @@ namespace Ermes.EntityFrameworkCore
         public virtual DbSet<SplitEntityChangeSet> EntityChangeSet { get; set; }
         public virtual DbSet<SplitEntityPropertyChange> EntityPropertyChange { get; set; }
         public virtual DbSet<Tip> Tips { get; set; }
+        public virtual DbSet<PersonTip> PersonTips { get; set; }
         public virtual DbSet<TipTranslation> TipTranslations { get; set; }
         public virtual DbSet<Quiz> Quizzes { get; set; }
         public virtual DbSet<QuizTranslation> QuizTranslations { get; set; }        
@@ -144,6 +145,27 @@ namespace Ermes.EntityFrameworkCore
 
             modelBuilder.Entity<Layer>().HasIndex(i => i.DataTypeId).IsUnique();
             modelBuilder.Entity<LayerTranslation>().HasIndex(i => new { i.CoreId, i.Language }).IsUnique();
+
+            modelBuilder.Entity<PersonTip>()
+                .HasIndex(pt => new { pt.PersonId, pt.TipCode })
+                .IsUnique();
+
+            modelBuilder.Entity<PersonTip>()
+                .HasOne<Person>(pt => pt.Person)
+                .WithMany(p => p.Tips)
+                .HasPrincipalKey(p => p.Id)
+                .HasForeignKey(pt => pt.PersonId)
+                .IsRequired(true)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PersonTip>()
+                .HasOne<Tip>(pt => pt.Tip)
+                .WithMany(p => p.Readers)
+                .HasPrincipalKey(t => t.Code)
+                .HasForeignKey(pt => pt.TipCode)
+                .IsRequired(true)
+                .OnDelete(DeleteBehavior.Restrict);
+                
 
             #region EntityHistory
             modelBuilder.Entity<SplitEntityChange>().HasMany(e => e.PropertyChanges).WithOne().HasForeignKey(e => e.EntityChangeId);

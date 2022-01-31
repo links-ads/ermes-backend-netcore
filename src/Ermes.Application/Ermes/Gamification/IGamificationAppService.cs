@@ -1,5 +1,7 @@
 ﻿using Abp.Application.Services;
+using Ermes.Dto;
 using Ermes.Dto.Datatable;
+using Ermes.Ermes.Gamification.Dto;
 using Ermes.Gamification.Dto;
 using System;
 using System.Collections.Generic;
@@ -13,5 +15,6 @@ namespace Ermes.Gamification
         Task<DTResult<TipDto>> GetTips(GetTipsInput input);
         Task<DTResult<QuizDto>> GetQuizzes(GetQuizzesInput input);
         Task<DTResult<AnswerDto>> GetAnswers(GetAnswersInput input);
+        Task<bool> SetTipAsRead(SetTipAsReadInput input);
     }
 }

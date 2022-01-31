@@ -1,6 +1,7 @@
 ﻿using Abp.Domain.Entities;
 using Ermes.Enums;
 using Ermes.Helpers;
+using Ermes.Persons;
 using Ermes.Quizzes;
 using System;
 using System.Collections.Generic;
@@ -56,5 +57,6 @@ namespace Ermes.Tips
 
         public virtual ICollection<TipTranslation> Translations { get; set; }
         public virtual ICollection<Quiz> Quizzes { get; set; }
+        public virtual ICollection<PersonTip> Readers { get; set; }
     }
 }

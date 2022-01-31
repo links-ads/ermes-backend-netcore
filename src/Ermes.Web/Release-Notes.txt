@@ -1,5 +1,9 @@
 Ver.
 --------------------------------
+- Feature - PersonTips table added, SetTipAsRead API added (migration added)(#74)
+
+Ver. 2.10.0 - 2022-01-28
+--------------------------------
 - Bugfix - Fix search value in Linq DTFilter (#71)
 - Feature - Send message on RabbitMq when a map request is being created, receive message when MapRequest is being updated (#49)
 
