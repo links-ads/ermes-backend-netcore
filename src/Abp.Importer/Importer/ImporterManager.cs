@@ -32,5 +32,11 @@ namespace Abp.Importer
             var api = new DashboardApi();
             return await api.GetLayersLayersGetAsync(datatype_ids, bbox, start, end, request_code);
         }
+
+        public async Task<object> GetTimeSeries(string datatype_id, string point, string attribute, DateTime start, DateTime end)
+        {
+            var api = new DashboardApi();
+            return await api.GetTimeSeriesTimeSeriesGetAsync(datatype_id, point, attribute, start, end);
+        }
     }
 }
