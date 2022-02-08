@@ -1,6 +1,6 @@
 Ver.
 --------------------------------
-
+- Bugfix - Fix bug on prop IsPrivate for Report, when a citizen updates it (#76)
 
 Ver. 3.1.0 - 2022-01-31
 --------------------------------

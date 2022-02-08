@@ -132,6 +132,10 @@ namespace Ermes.Web.Controllers
                 report.MediaURIs = confirmedMediaURIs.ToList();
             }
 
+            //citizens' report are public by default
+            //TODO: allow user to change this prop from client
+            report.IsPublic = _session.Roles != null && _session.Roles.Contains(AppRoles.CITIZEN);
+
             ObjectMapper.Map(reportDto, report);
 
             //Files to be added are stored in media
