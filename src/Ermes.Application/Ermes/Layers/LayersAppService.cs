@@ -70,7 +70,7 @@ namespace Ermes.Layers
                 //2) Join this list with layer definition
                 //3) Group the result by GroupKey and SubGroupKey
                 input.MapRequestCode = input.MapRequestCode != null ? "links." + input.MapRequestCode : input.MapRequestCode;
-                var res = await _importerMananger.GetLayers(input.DataTypeIds, input.Bbox, input.Start.Value, input.End.Value, input.MapRequestCode);
+                var res = await _importerMananger.GetLayers(input.DataTypeIds, input.Bbox, input.Start.Value, input.End.Value, input.MapRequestCode, input.IncludeMapRequests);
 
                 #region Example
                 //Old static example
@@ -179,7 +179,7 @@ namespace Ermes.Layers
             input.End = input.End == null ? DateTime.MaxValue : input.End;
 
 
-            return result;
+            throw new NotImplementedException();
         }
     }
 }

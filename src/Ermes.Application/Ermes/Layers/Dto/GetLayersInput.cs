@@ -11,5 +11,6 @@ namespace Ermes.Layers.Dto
         public DateTime? Start { get; set; }
         public DateTime? End { get; set; }
         public string MapRequestCode { get; set; }
+        public bool IncludeMapRequests { get; set; }
     }
 }

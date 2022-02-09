@@ -38,8 +38,9 @@ namespace Abp.Importer.Api
         /// <param name="start"> (optional)</param>
         /// <param name="end"> (optional)</param>
         /// <param name="requestCode"> (optional)</param>
+        /// <param name="includeMapRequests"> (optional, default to true)</param>
         /// <returns>Object</returns>
-        Object GetLayersLayersGet(List<string> datatypeIds = default(List<string>), string bbox = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string requestCode = default(string));
+        Object GetLayersLayersGet(List<string> datatypeIds = default(List<string>), string bbox = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string requestCode = default(string), bool? includeMapRequests = default(bool?));
 
         /// <summary>
         /// Get Layers
@@ -53,8 +54,9 @@ namespace Abp.Importer.Api
         /// <param name="start"> (optional)</param>
         /// <param name="end"> (optional)</param>
         /// <param name="requestCode"> (optional)</param>
+        /// <param name="includeMapRequests"> (optional, default to true)</param>
         /// <returns>ApiResponse of Object</returns>
-        ApiResponse<Object> GetLayersLayersGetWithHttpInfo(List<string> datatypeIds = default(List<string>), string bbox = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string requestCode = default(string));
+        ApiResponse<Object> GetLayersLayersGetWithHttpInfo(List<string> datatypeIds = default(List<string>), string bbox = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string requestCode = default(string), bool? includeMapRequests = default(bool?));
         /// <summary>
         /// Get Resources
         /// </summary>
@@ -138,9 +140,10 @@ namespace Abp.Importer.Api
         /// <param name="start"> (optional)</param>
         /// <param name="end"> (optional)</param>
         /// <param name="requestCode"> (optional)</param>
+        /// <param name="includeMapRequests"> (optional, default to true)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of Object</returns>
-        System.Threading.Tasks.Task<Object> GetLayersLayersGetAsync(List<string> datatypeIds = default(List<string>), string bbox = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string requestCode = default(string), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Object> GetLayersLayersGetAsync(List<string> datatypeIds = default(List<string>), string bbox = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string requestCode = default(string), bool? includeMapRequests = default(bool?), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <summary>
         /// Get Layers
@@ -154,9 +157,10 @@ namespace Abp.Importer.Api
         /// <param name="start"> (optional)</param>
         /// <param name="end"> (optional)</param>
         /// <param name="requestCode"> (optional)</param>
+        /// <param name="includeMapRequests"> (optional, default to true)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of ApiResponse (Object)</returns>
-        System.Threading.Tasks.Task<ApiResponse<Object>> GetLayersLayersGetWithHttpInfoAsync(List<string> datatypeIds = default(List<string>), string bbox = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string requestCode = default(string), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<ApiResponse<Object>> GetLayersLayersGetWithHttpInfoAsync(List<string> datatypeIds = default(List<string>), string bbox = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string requestCode = default(string), bool? includeMapRequests = default(bool?), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
         /// <summary>
         /// Get Resources
         /// </summary>
@@ -352,10 +356,11 @@ namespace Abp.Importer.Api
         /// <param name="start"> (optional)</param>
         /// <param name="end"> (optional)</param>
         /// <param name="requestCode"> (optional)</param>
+        /// <param name="includeMapRequests"> (optional, default to true)</param>
         /// <returns>Object</returns>
-        public Object GetLayersLayersGet(List<string> datatypeIds = default(List<string>), string bbox = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string requestCode = default(string))
+        public Object GetLayersLayersGet(List<string> datatypeIds = default(List<string>), string bbox = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string requestCode = default(string), bool? includeMapRequests = default(bool?))
         {
-            Abp.Importer.Client.ApiResponse<Object> localVarResponse = GetLayersLayersGetWithHttpInfo(datatypeIds, bbox, start, end, requestCode);
+            Abp.Importer.Client.ApiResponse<Object> localVarResponse = GetLayersLayersGetWithHttpInfo(datatypeIds, bbox, start, end, requestCode, includeMapRequests);
             return localVarResponse.Data;
         }
 
@@ -368,8 +373,9 @@ namespace Abp.Importer.Api
         /// <param name="start"> (optional)</param>
         /// <param name="end"> (optional)</param>
         /// <param name="requestCode"> (optional)</param>
+        /// <param name="includeMapRequests"> (optional, default to true)</param>
         /// <returns>ApiResponse of Object</returns>
-        public Abp.Importer.Client.ApiResponse<Object> GetLayersLayersGetWithHttpInfo(List<string> datatypeIds = default(List<string>), string bbox = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string requestCode = default(string))
+        public Abp.Importer.Client.ApiResponse<Object> GetLayersLayersGetWithHttpInfo(List<string> datatypeIds = default(List<string>), string bbox = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string requestCode = default(string), bool? includeMapRequests = default(bool?))
         {
             Abp.Importer.Client.RequestOptions localVarRequestOptions = new Abp.Importer.Client.RequestOptions();
 
@@ -412,6 +418,10 @@ namespace Abp.Importer.Api
             if (requestCode != null)
             {
                 localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("", "request_code", requestCode));
+            }
+            if (includeMapRequests != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("", "include_map_requests", includeMapRequests));
             }
 
             // authentication (APIKeyHeader) required
@@ -443,11 +453,12 @@ namespace Abp.Importer.Api
         /// <param name="start"> (optional)</param>
         /// <param name="end"> (optional)</param>
         /// <param name="requestCode"> (optional)</param>
+        /// <param name="includeMapRequests"> (optional, default to true)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of Object</returns>
-        public async System.Threading.Tasks.Task<Object> GetLayersLayersGetAsync(List<string> datatypeIds = default(List<string>), string bbox = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string requestCode = default(string), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public async System.Threading.Tasks.Task<Object> GetLayersLayersGetAsync(List<string> datatypeIds = default(List<string>), string bbox = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string requestCode = default(string), bool? includeMapRequests = default(bool?), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
-            Abp.Importer.Client.ApiResponse<Object> localVarResponse = await GetLayersLayersGetWithHttpInfoAsync(datatypeIds, bbox, start, end, requestCode, cancellationToken).ConfigureAwait(false);
+            Abp.Importer.Client.ApiResponse<Object> localVarResponse = await GetLayersLayersGetWithHttpInfoAsync(datatypeIds, bbox, start, end, requestCode, includeMapRequests, cancellationToken).ConfigureAwait(false);
             return localVarResponse.Data;
         }
 
@@ -460,9 +471,10 @@ namespace Abp.Importer.Api
         /// <param name="start"> (optional)</param>
         /// <param name="end"> (optional)</param>
         /// <param name="requestCode"> (optional)</param>
+        /// <param name="includeMapRequests"> (optional, default to true)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of ApiResponse (Object)</returns>
-        public async System.Threading.Tasks.Task<Abp.Importer.Client.ApiResponse<Object>> GetLayersLayersGetWithHttpInfoAsync(List<string> datatypeIds = default(List<string>), string bbox = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string requestCode = default(string), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public async System.Threading.Tasks.Task<Abp.Importer.Client.ApiResponse<Object>> GetLayersLayersGetWithHttpInfoAsync(List<string> datatypeIds = default(List<string>), string bbox = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string requestCode = default(string), bool? includeMapRequests = default(bool?), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
 
             Abp.Importer.Client.RequestOptions localVarRequestOptions = new Abp.Importer.Client.RequestOptions();
@@ -506,6 +518,10 @@ namespace Abp.Importer.Api
             if (requestCode != null)
             {
                 localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("", "request_code", requestCode));
+            }
+            if (includeMapRequests != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("", "include_map_requests", includeMapRequests));
             }
 
             // authentication (APIKeyHeader) required
