@@ -1,5 +1,9 @@
 Ver.
 --------------------------------
+
+
+Ver. 3.3.0 - 2022-02-09
+--------------------------------
 - Bugfix - Fix bug on prop IsPrivate for Report, when a citizen updates it (#76)
 - Feature - Importer update, GetLayers with includeMapRequests input param (#75)
 
