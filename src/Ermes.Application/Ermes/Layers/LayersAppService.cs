@@ -70,7 +70,7 @@ namespace Ermes.Layers
                 //2) Join this list with layer definition
                 //3) Group the result by GroupKey and SubGroupKey
                 input.MapRequestCode = input.MapRequestCode != null ? "links." + input.MapRequestCode : input.MapRequestCode;
-                var res = await _importerMananger.GetLayers(input.DataTypeIds, input.Bbox, input.Start.Value, input.End.Value, input.MapRequestCode);
+                var res = await _importerMananger.GetLayers(input.DataTypeIds, input.Bbox, input.Start.Value, input.End.Value, input.MapRequestCode, input.IncludeMapRequests);
 
                 #region Example
                 //Old static example
@@ -151,12 +151,35 @@ namespace Ermes.Layers
                     throw new UserFriendlyException(string.Format("Exception while joining layer lists: {0}", e.Message));
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logger.ErrorFormat("#####Importer module not available: {0}", e.Message);
             }
 
             return result;
+        }
+
+        [OpenApiOperation("Retrieves the time series of the requested attribute for layers denoted by the specified datatype_id, at the \"point\" position",
+            @"
+                Input: use the following properties to filter result list:
+                    - DataTypeId: dataTypeId to be considered
+                    - Point: point of interest
+                    - Attribute:
+                    - Start: start date
+                    - End: end date
+                    
+                Output:  time series of the attribute values at 'point' location
+                Exception: Importer service not available
+            "
+        )]
+        public virtual async Task<GetTimeSeriesOutput> GetTimeSeries(GetTimeSeriesInput input)
+        {
+            var result = new GetTimeSeriesOutput();
+            input.Start = input.Start == null ? DateTime.MinValue : input.Start;
+            input.End = input.End == null ? DateTime.MaxValue : input.End;
+
+
+            throw new NotImplementedException();
         }
     }
 }
