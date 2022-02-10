@@ -1,6 +1,6 @@
 Ver.
 --------------------------------
-
+- Bugfix - Fix CreateTeam function, possibility for organization manager to create child org (#72)
 
 Ver. 3.3.0 - 2022-02-09
 --------------------------------

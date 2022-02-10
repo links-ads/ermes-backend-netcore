@@ -29,6 +29,7 @@ namespace Ermes.Authorization
             public const string Organization_CanUpdate = "Organizations.CanUpdate";
             public const string Organization_CanUpdateAll = "Organizations.CanUpdateAll";
             public const string Organization_CanAssignPersonCrossOrganization = "Organizations.CanAssignPersonCrossOrganization";
+            public const string Organization_CanDeleteCrossOrganization = "Organizations.CanDeleteCrossOrganization";
         }
 
         public const string Permissions = "Permissions";

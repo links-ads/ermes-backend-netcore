@@ -182,27 +182,31 @@ namespace Ermes.Teams
         {
             Team team = ObjectMapper.Map<Team>(input);
             var person = _session.LoggedUserPerson;
-            if (person.OrganizationId.HasValue)
-                team.OrganizationId = person.OrganizationId.Value;
-            else
+
+            if (!input.OrganizationId.HasValue || input.OrganizationId.Value == 0)
+                throw new UserFriendlyException(L("OrganizationRequiredForOperation", input.Id, "Team"));
+
+            var org = await _organizationManager.GetOrganizationByIdAsync(input.OrganizationId.Value);
+            if (org == null)
+                throw new UserFriendlyException(L("InvalidOrganizationId", input.OrganizationId.Value));
+
+
+            //By default, a user can create Team for his own org or for one of the child organizations
+            if (!person.OrganizationId.HasValue) //Admin user
             {
                 if (_permissionChecker.IsGranted(_session.Roles, AppPermissions.Teams.Team_CanCreateTeamCrossOrganization))
-                {
-                    if (input.OrganizationId.HasValue && input.OrganizationId.Value > 0)
-                    {
-                        var org = await _organizationManager.GetOrganizationByIdAsync(input.OrganizationId.Value);
-                        if(org == null)
-                          throw new UserFriendlyException(L("InvalidOrganizationId", input.OrganizationId.Value));
-                        else
-                            team.OrganizationId = input.OrganizationId.Value;
-                    }
-                    else
-                        throw new UserFriendlyException(L("OrganizationRequiredForOperation", input.Id, "Team"));
-                }
+                    team.OrganizationId = input.OrganizationId.Value;
                 else
                     throw new UserFriendlyException(L("MissingPermission"));
             }
-                
+            else
+            {
+                if (person.OrganizationId.Value == org.Id || person.OrganizationId.Value == org.ParentId)
+                    team.OrganizationId = input.OrganizationId.Value;
+                else
+                    throw new UserFriendlyException(L("MissingPermission"));
+            }
+
             return await _teamManager.InsertTeamAsync(team);
         }
 
