@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Ermes.Roles;
 using Abp.Linq.Extensions;
 using Abp.UI;
+using Ermes.Organizations;
 
 namespace Ermes.Persons
 {
@@ -19,24 +20,28 @@ namespace Ermes.Persons
         protected IRepository<PersonRole> PersonRoleRepository { get; set; }
         protected IRepository<PersonTip> PersonTipRepository { get; set; }
         protected IRepository<Role> RolesRepository { get; set; }
+        protected IRepository<Organization> OrganizationsRepository { get; set; }
 
         public IQueryable<Person> Persons { get { return PersonRepository.GetAll(); } }
         public IQueryable<Role> Roles { get { return RolesRepository.GetAll(); } }
         public IQueryable<PersonAction> PersonActions { get { return PersonActionsRepository.GetAll(); } }
         public IQueryable<PersonRole> PersonRoles { get { return PersonRoleRepository.GetAll(); } }
         public IQueryable<PersonTip> PersonTips { get { return PersonTipRepository.GetAll(); } }
+        public IQueryable<Organization> Organizations { get { return OrganizationsRepository.GetAll(); } }
 
         public PersonManager(IRepository<Person, long> personRepository,
                                 IRepository<PersonAction> personActionsRepository,
                                 IRepository<PersonRole> personRoleRepository,
                                 IRepository<Role> rolesRepository,
-                                IRepository<PersonTip> personTipRepository)
+                                IRepository<PersonTip> personTipRepository,
+                                IRepository<Organization> organizationsRepository)
         {
             PersonRepository = personRepository;
             PersonActionsRepository = personActionsRepository;
             PersonRoleRepository = personRoleRepository;
             RolesRepository = rolesRepository;
             PersonTipRepository = personTipRepository;
+            OrganizationsRepository = organizationsRepository;
         }
 
         public async Task<Person> GetPersonByIdAsync(long personId)
@@ -206,9 +211,17 @@ namespace Ermes.Persons
             await PersonRoleRepository.DeleteAsync(p => (p.PersonId == personId));
         }
 
-        public async Task<int> CountMembersOfOrganizationAsync(int organizationId)
+        public async Task<bool> CanOrganizationBeDeletedAsync(int organizationId)
         {
-            return await Persons.CountAsync(p => p.OrganizationId == organizationId);
+            //No person associated to the organization
+            if (await Persons.CountAsync(p => p.OrganizationId == organizationId) > 0)
+                return false;
+
+            //Organization must not have children
+            if (await Organizations.CountAsync(o => o.ParentId.HasValue && o.ParentId.Value == organizationId) > 0)
+                return false;
+
+            return true;
         }
 
         public async Task<bool> CheckIfRoleExists(string role)

@@ -50,8 +50,18 @@ namespace Ermes.Organizations
         #region Private Methods
         private async Task<int> CreateOrganization(OrganizationDto newOrganization)
         {
-            if (!_permissionChecker.IsGranted(_session.Roles, AppPermissions.Organizations.Organization_CanCreate))
-                throw new UserFriendlyException(L("MissingPermission", AppPermissions.Organizations.Organization_CanCreate));
+            var person = _session.LoggedUserPerson;
+
+            if (!person.OrganizationId.HasValue)
+            {
+                if (!_permissionChecker.IsGranted(_session.Roles, AppPermissions.Organizations.Organization_CanCreate))
+                    throw new UserFriendlyException(L("MissingPermission", AppPermissions.Organizations.Organization_CanCreate));
+            }
+            else
+            {
+                if (person.OrganizationId.Value != newOrganization.ParentId)
+                    throw new UserFriendlyException(L("MissingPermission"));
+            }
 
             if(! (await _organizationManager.CheckParent(newOrganization.ParentId)))
                 throw new UserFriendlyException(L("InvalidParentId", newOrganization.ParentId.Value));
@@ -140,14 +150,31 @@ namespace Ermes.Organizations
 
         public virtual async Task<bool> DeleteOrganization(DeleteOrganizationInput input)
         {
-            if (await _personManager.CountMembersOfOrganizationAsync(input.OrganizationId) > 0)
+            var org = await _organizationManager.GetOrganizationByIdAsync(input.OrganizationId);
+            if (org == null)
+                throw new UserFriendlyException(L("InvalidOrganizationId", input.OrganizationId));
+
+            if (!await _personManager.CanOrganizationBeDeletedAsync(input.OrganizationId))
                 throw new UserFriendlyException(L("OrganizationCannotBeDeleted", input.OrganizationId));
 
-            //TB Implemented
-            //await _organizationManager.DeleteOrganizationAsync(input.OrganizationId);
-            //Logger.Info("Ermes: DeleteOrganization with Id: " + input.OrganizationId);
-            //return true;
-            throw new NotImplementedException();
+            var person = _session.LoggedUserPerson;
+            if(!person.OrganizationId.HasValue)
+            {
+                if (_permissionChecker.IsGranted(_session.Roles, AppPermissions.Organizations.Organization_CanDeleteCrossOrganization))
+                    await _organizationManager.DeleteOrganizationAsync(input.OrganizationId);
+                else
+                    throw new UserFriendlyException(L("MissingPermission"));
+            }
+            else
+            {
+                if(person.OrganizationId.Value == org.Id || person.OrganizationId.Value == org.ParentId)
+                    await _organizationManager.DeleteOrganizationAsync(input.OrganizationId);
+                else
+                    throw new UserFriendlyException(L("MissingPermission"));
+            }
+
+            Logger.Info("Ermes: DeleteOrganization with Id: " + input.OrganizationId + "by Person: " + person.Username);
+            return true;
         }
 
         public virtual async Task<bool> AssignOrganizationToCompetenceAreas(AssignOrganizationToCompetenceAreasInput input)
