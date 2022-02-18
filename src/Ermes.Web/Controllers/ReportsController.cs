@@ -310,7 +310,7 @@ namespace Ermes.Web.Controllers
                         try
                         {
                             imageStream = new MemoryStream(fileBytes);
-                            var imageAnalysis = await _cognitiveServicesManager.AnalyzeImage(imageStream);
+                            var imageAnalysis = await _cognitiveServicesManager.AnalyzeImage(ResourceManager.Reports.GetMediaPath(report.Id, uploadedFileName));
                             if (imageAnalysis != null && imageAnalysis.Tags != null && imageAnalysis.Tags.Count > 0)
                             {
                                 if (report.Tags == null)
