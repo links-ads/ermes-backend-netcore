@@ -1,6 +1,7 @@
 ﻿using Abp.AzureCognitiveServices.CognitiveServices.Configuration;
 using Microsoft.Azure.CognitiveServices.Vision.ComputerVision;
 using Microsoft.Azure.CognitiveServices.Vision.ComputerVision.Models;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,11 +15,13 @@ namespace Abp.AzureCognitiveServices.CognitiveServices.ComputerVision
     {
         private static ComputerVisionClient client;
         private readonly IComputerVisionConnectionProvider _connectionProvider;
+        private readonly ILogger Logger;
 
-        public ComputerVisionManager(IComputerVisionConnectionProvider connectionProvider)
+        public ComputerVisionManager(IComputerVisionConnectionProvider connectionProvider, ILogger<ComputerVisionManager> logger)
         {
             _connectionProvider = connectionProvider;
             client = GetComputerVisionClient();
+            Logger = logger;
         }
         private ComputerVisionClient GetComputerVisionClient()
         {
@@ -31,6 +34,7 @@ namespace Abp.AzureCognitiveServices.CognitiveServices.ComputerVision
         {
             try
             {
+                Logger.LogInformation("Ermes Cognitive Service: Analyze Image");
                 if (client == null)
                     client = GetComputerVisionClient();
 
@@ -41,10 +45,13 @@ namespace Abp.AzureCognitiveServices.CognitiveServices.ComputerVision
                 };
 
                 // Analyze the URL image 
-                return await client.AnalyzeImageAsync(imageUrl, features);
+                var response = await client.AnalyzeImageAsync(imageUrl, features);
+                Logger.LogInformation("Ermes Cognitive Service: successfully analyzed image");
+                return response;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Logger.LogError("Ermes Cognitive Service: exception while analyzing the image: " + e.Message);
                 return null;
             }
         }
@@ -53,6 +60,7 @@ namespace Abp.AzureCognitiveServices.CognitiveServices.ComputerVision
         {
             try
             {
+                Logger.LogInformation("Ermes Cognitive Service: Analyze Image");
                 if (client == null)
                     client = GetComputerVisionClient();
 
@@ -63,10 +71,13 @@ namespace Abp.AzureCognitiveServices.CognitiveServices.ComputerVision
                 };
 
                 // Analyze the URL image 
-                return await client.AnalyzeImageInStreamAsync(stream, features);
+                var response = await client.AnalyzeImageInStreamAsync(stream, features);
+                Logger.LogInformation("Ermes Cognitive Service: successfully analyzed image");
+                return response;
             }
-            catch(Exception)
+            catch(Exception e)
             {
+                Logger.LogError("Ermes Cognitive Service: exception while analyzing the image: " + e.Message);
                 return null;
             }
         }
