@@ -1,6 +1,6 @@
 Ver.
 --------------------------------
-
+- Bugfix - Added ReadByUser property to TipDto class (#77)
 
 Ver. 3.3.0 - 2022-02-09
 --------------------------------
