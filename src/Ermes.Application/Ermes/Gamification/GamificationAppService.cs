@@ -54,10 +54,6 @@ namespace Ermes.Gamification
                 query = query.Where(a => hazardList.Contains(a.HazardString));
             }
 
-            //current logged user will not receive tips he has already read
-            var tipCodesLit = await _personManager.GetTipsReadByPersonIdAsync(_session.LoggedUserPerson.Id);
-            query = query.Where(t => !tipCodesLit.Contains(t.Code));
-
             result.TotalCount = await query.CountAsync();
 
             if (input?.Order != null && input.Order.Count == 0)
@@ -73,6 +69,10 @@ namespace Ermes.Gamification
 
             var items = await query.ToListAsync();
             result.Items = ObjectMapper.Map<List<TipDto>>(items);
+            //Check for tips the current logged user has already read
+            //Cannot be done with Join statement due to a limitation in EF Core
+            var tipCodesLit = await _personManager.GetTipsReadByPersonIdAsync(_session.LoggedUserPerson.Id);
+            result.Items = result.Items.Select(t => { t.ReadByUser = tipCodesLit.Contains(t.Code); return t; }).ToList();
             return result;
         }
 

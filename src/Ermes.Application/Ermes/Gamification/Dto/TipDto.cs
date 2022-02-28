@@ -12,6 +12,7 @@ namespace Ermes.Gamification.Dto
         public string CrisisPhase { get; set; }
         public string EventContext { get; set; }
         public string Hazard { get; set; }
+        public bool ReadByUser { get; set; }
         public List<QuizDto> Quizzes { get; set; }
     }
 }
