@@ -35,6 +35,16 @@ namespace Ermes.Layers
         [NotMapped]
         public LayerType Type { get; set; }
 
+        public bool CanBeVisualized { get; set; }
+        [Column("Format")]
+        public string FormatString
+        {
+            get { return Format.ToString(); }
+            private set { Format = value.ParseEnum<FormatType>(); }
+        }
+        [NotMapped]
+        public FormatType Format { get; set; }
+
         public ICollection<LayerTranslation> Translations { get; set; }
 
     }

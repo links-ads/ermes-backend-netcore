@@ -27,7 +27,7 @@ namespace Ermes.Layers
         public virtual async Task<GetLayersOutput> GetLayerDefinition()
         {
             var result = new GetLayersOutput();
-            var layers = await _layerManager.GetLayerDefinitionAsync();
+            var layers = await _layerManager.GetLayerDefinitionAsync(true);
             result.LayerGroups =
                         layers
                         .Select(a => ObjectMapper.Map<LayerDto>(a))
@@ -116,7 +116,7 @@ namespace Ermes.Layers
                 #endregion
 
                 var availableLayers = JsonConvert.DeserializeObject<ImporterLayerList>(res.ToString());
-                var layerDefinition = await _layerManager.GetLayerDefinitionAsync();
+                var layerDefinition = await _layerManager.GetLayerDefinitionAsync(true);
 
                 try
                 {

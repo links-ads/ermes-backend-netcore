@@ -62,6 +62,8 @@ namespace Ermes.Import
                         layer.SubGroupKey = row.GetString("SubGroup Key");
                         layer.PartnerName = row.GetString("Partner Name");
                         layer.Type = row.GetEnum<LayerType>("Type");
+                        layer.Format = row.GetEnum<FormatType>("Format");
+                        layer.CanBeVisualized = row.GetBoolean("Can be visualized");
                         await layerManager.InsertOrUpdateLayerAsync(layer);
                         context.SaveChanges();
                     }
