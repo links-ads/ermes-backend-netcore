@@ -1,6 +1,6 @@
 Ver.
 --------------------------------
-
+- Feature - Properties CanBeVisualized and Format added to Layer class (migration added)(#79)
 
 Ver. 3.3.1 - 2022-03-04
 --------------------------------

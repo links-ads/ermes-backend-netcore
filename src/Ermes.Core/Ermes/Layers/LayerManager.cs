@@ -22,9 +22,9 @@ namespace Ermes.Layers
             LayerTranslationRepository = layerTranslationRepository;
         }
 
-        public async Task<List<Layer>> GetLayerDefinitionAsync()
+        public async Task<List<Layer>> GetLayerDefinitionAsync(bool? canBeVisualized)
         {
-            return await Layers.ToListAsync();
+            return await Layers.Where(l => canBeVisualized.HasValue ? l.CanBeVisualized == canBeVisualized.Value : true).ToListAsync();
         }
 
         public async Task<Layer> GetLayerByDataTypeIdAsync(int dataTypeId)

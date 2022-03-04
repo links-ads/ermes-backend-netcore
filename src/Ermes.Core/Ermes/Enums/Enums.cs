@@ -330,4 +330,15 @@ namespace Ermes.Enums
         ImpossibileTrovareCoordinamentoOrganizzazione = 49
 
     }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum FormatType
+    {
+        GeoJSON,
+        JSON,
+        JPEG,
+        GeoTIFF,
+        NetCDF,
+        GeoPNG
+    }
 }
