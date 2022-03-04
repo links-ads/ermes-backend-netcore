@@ -15,7 +15,8 @@ namespace Ermes.Migrations
             migrationBuilder.AddColumn<string>(
                 name: "Format",
                 table: "layers",
-                nullable: true);
+                nullable: true,
+                defaultValue: "GeoJSON");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
