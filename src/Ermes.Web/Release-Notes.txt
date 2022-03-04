@@ -1,5 +1,9 @@
 Ver.
 --------------------------------
+
+
+Ver. 3.3.1 - 2022-03-04
+--------------------------------
 - Bugfix - Fix CreateTeam function, possibility for organization manager to create child org (#72)
 - Bugfix - Added ReadByUser property to TipDto class (#77)
 
