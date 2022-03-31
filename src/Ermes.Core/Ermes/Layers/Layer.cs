@@ -45,6 +45,15 @@ namespace Ermes.Layers
         [NotMapped]
         public FormatType Format { get; set; }
 
+        [Column("Frequency")]
+        public string FrequencyString
+        {
+            get { return Frequency.ToString(); }
+            private set { Frequency = value.ParseEnum<FrequencyType>(); }
+        }
+        [NotMapped]
+        public FrequencyType Frequency { get; set; }
+
         public ICollection<LayerTranslation> Translations { get; set; }
 
     }

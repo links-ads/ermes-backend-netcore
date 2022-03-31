@@ -17,6 +17,7 @@ namespace Ermes.Layers.Dto
         public string Name { get; set; }
         public string PartnerName { get; set; }
         public LayerType Type { get; set; }
+        public FrequencyType Frequency { get; set; }
         public List<LayerDetailsDto> Details { get; set; }
     }
 }
