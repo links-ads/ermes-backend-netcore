@@ -1,5 +1,9 @@
 Ver.
 --------------------------------
+- Feature TMP - Removed Backoffice permission from SocialAppService
+
+Ver. 3.3.2 - 2022-03-04
+--------------------------------
 - Feature - Properties CanBeVisualized and Format added to Layer class (migration added)(#79)
 
 Ver. 3.3.1 - 2022-03-04

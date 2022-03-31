@@ -13,7 +13,8 @@ using System.Threading.Tasks;
 
 namespace Ermes.Social
 {
-    [ErmesAuthorize(AppPermissions.Backoffice)]
+    //[ErmesAuthorize(AppPermissions.Backoffice)]
+    [ErmesAuthorize]
     public class SocialAppService : ErmesAppServiceBase, ISocialAppService
     {
         private readonly SocialMediaManager _socialManager;
