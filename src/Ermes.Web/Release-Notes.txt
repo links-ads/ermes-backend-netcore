@@ -1,6 +1,6 @@
 Ver.
 --------------------------------
-
+- Feature TMP - Removed Backoffice permission from SocialAppService
 
 Ver. 3.3.2 - 2022-03-04
 --------------------------------
