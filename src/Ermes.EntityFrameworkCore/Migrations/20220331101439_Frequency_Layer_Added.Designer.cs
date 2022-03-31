@@ -6,6 +6,7 @@ using Ermes.Operations;
 using Ermes.Reports;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -14,9 +15,10 @@ using NpgsqlTypes;
 namespace Ermes.Migrations
 {
     [DbContext(typeof(ErmesDbContext))]
-    partial class ErmesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220331101439_Frequency_Layer_Added")]
+    partial class Frequency_Layer_Added
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

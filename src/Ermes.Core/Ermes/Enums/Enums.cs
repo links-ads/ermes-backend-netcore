@@ -341,4 +341,13 @@ namespace Ermes.Enums
         NetCDF,
         GeoPNG
     }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum FrequencyType
+    {
+        Daily,
+        OnDemand,
+        H6,
+        H12
+    }
 }

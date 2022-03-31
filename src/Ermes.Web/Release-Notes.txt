@@ -1,6 +1,7 @@
 Ver.
 --------------------------------
 - Feature TMP - Removed Backoffice permission from SocialAppService
+- Feature - Frequency prop added to Layer class (migration added)(#81)
 
 Ver. 3.3.2 - 2022-03-04
 --------------------------------
