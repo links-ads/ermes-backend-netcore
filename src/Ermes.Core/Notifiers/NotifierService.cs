@@ -35,7 +35,8 @@ namespace Ermes.Notifiers
 
         public async Task SendBusNotification<T>(long creatorId, int entityId, T content, EntityWriteAction action, EntityType entityType, bool containsGeometry = false)
         {
-            string serializedPayload;
+            string[] serializedPayloads;
+            int[] dataTypeIds = null;
             string entityIdentifier = "";
             if (_ermesSettings.Value.ErmesProject != ErmesConsts.SafersProjectName) //FASTER, SHELTER
             {
@@ -47,17 +48,19 @@ namespace Ermes.Notifiers
                 };
                 var options = new JsonSerializerOptions();
                 options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
-                serializedPayload = JsonSerializer.Serialize(busPayload, options);
+                serializedPayloads = new string[1];
+                serializedPayloads[0] = JsonSerializer.Serialize(busPayload, options);
             }
             else //SAFERS
             {
                 if (containsGeometry)
                 {
-                    (serializedPayload, entityIdentifier) = await _helper.GetEntityByIdAsync(entityType, entityId);
+                    (serializedPayloads, entityIdentifier, dataTypeIds) = await _helper.GetPayloadsByEntityIdAsync(entityType, entityId);
                 }
                 else
                 {
-                    serializedPayload = JsonSerializer.Serialize(content);
+                    serializedPayloads = new string[1];
+                    serializedPayloads[0] = JsonSerializer.Serialize(content);
                     entityIdentifier = entityId.ToString();
                 }
             }
@@ -65,7 +68,10 @@ namespace Ermes.Notifiers
 
             try
             {
-                await _notifierBase.SendBusNotificationAsync(NotificationNameHelper.GetBusTopicName(entityType, action, _ermesSettings.Value.ErmesProject, entityIdentifier), serializedPayload);
+                for(int i= 0; i<serializedPayloads.Length; i++)
+                {
+                    await _notifierBase.SendBusNotificationAsync(NotificationNameHelper.GetBusTopicName(entityType, action, _ermesSettings.Value.ErmesProject, entityIdentifier, dataTypeIds != null ? dataTypeIds[i].ToString() : null), serializedPayloads[i]);
+                }
             }
             catch (Exception ex)
             {
@@ -73,21 +79,24 @@ namespace Ermes.Notifiers
                 Logger.ErrorFormat("Ermes: Failure to send bus message for {1} {2} due exception {3}. EntityId: {0}", entityId, action.ToString(), entityType.ToString(), ex.Message);
             }
 
-            Notification not = new Notification()
+            foreach (var payload in serializedPayloads)
             {
-                Channel = NotificationChannelType.Bus,
-                CreatorId = creatorId,
-                Entity = entityType,
-                EntityId = entityId,
-                Title = null,
-                Message = serializedPayload.Truncate(Notification.MaxMessageLength),
-                Name = NotificationNameHelper.GetNotificationName(entityType, action),
-                ReceiverId = null,
-                Status = failureMessage == null ? NotificationStatus.Ok : NotificationStatus.Failed,
-                Timestamp = DateTime.Now.ToUniversalTime(),
-                FailureMessage = failureMessage
-            };
-            not.Id = await _notificationManager.CreateNotificationAsync(not);
+                Notification not = new Notification()
+                {
+                    Channel = NotificationChannelType.Bus,
+                    CreatorId = creatorId,
+                    Entity = entityType,
+                    EntityId = entityId,
+                    Title = null,
+                    Message = payload.Truncate(Notification.MaxMessageLength),
+                    Name = NotificationNameHelper.GetNotificationName(entityType, action),
+                    ReceiverId = null,
+                    Status = failureMessage == null ? NotificationStatus.Ok : NotificationStatus.Failed,
+                    Timestamp = DateTime.Now.ToUniversalTime(),
+                    FailureMessage = failureMessage
+                };
+                not.Id = await _notificationManager.CreateNotificationAsync(not);
+            }
         }
 
         public async Task SendTestBusNotification<T>(long creatorId, int entityId, T content, EntityWriteAction action, EntityType entityType, string topicName)

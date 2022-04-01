@@ -17,7 +17,7 @@ namespace Ermes.MapRequests.Dto
         public HazardType Hazard { get; set; }
         public LayerType Layer { get; set; }
         public int Frequency { get; set; }
-        public int DataTypeId { get; set; }
+        public List<int> DataTypeIds { get; set; }
         public MapRequestStatusType Status { get; set; }
         public string ErrorMessage { get; set; }
         public OrganizationDto Organization { get; set; }
