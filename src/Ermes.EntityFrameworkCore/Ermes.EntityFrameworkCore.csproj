@@ -86,6 +86,8 @@
     <Compile Include="Migrations\20220304114128_Layer_Format_CanBeVisualized_Added.Designer.cs" />
     <Compile Include="Migrations\20220331101439_Frequency_Layer_Added.cs" />
     <Compile Include="Migrations\20220331101439_Frequency_Layer_Added.Designer.cs" />
+    <Compile Include="Migrations\20220401085044_DataTypeId_List_In_MapRequest.cs" />
+    <Compile Include="Migrations\20220401085044_DataTypeId_List_In_MapRequest.Designer.cs" />
     <Compile Include="Migrations\ErmesDbContextModelSnapshot.cs" />
     <Compile Include="Migrations\Seed\ModelBuilderExtensions.cs" />
   </ItemGroup>

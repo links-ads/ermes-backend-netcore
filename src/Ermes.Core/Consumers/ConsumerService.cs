@@ -83,16 +83,19 @@ namespace Ermes.Consumers
                         Logger.ErrorFormat("HandleMapRequestStatusChange: MapRequest with Code {0} not found", eventData.request_code);
                         return;
                     }
-                    if (eventData.status == "success")
+                    if (eventData.status_code == "200")
                     {
                         mr.Status = MapRequestStatusType.ContentAvailable;
                     }
                     else
                     {
-                        mr.Status = MapRequestStatusType.ContentNotAvailable;
-                        mr.ErrorMessage = eventData.message;
+                        //If at least one DatatypeId is available, do not change the overall status of the MapRequest
+                        if (mr.Status == MapRequestStatusType.RequestSubmitted)
+                        {
+                            mr.Status = MapRequestStatusType.ContentNotAvailable;
+                            mr.ErrorMessage = eventData.message;
+                        }
                     }
-
 
                     CurrentUnitOfWork.SaveChanges();
                 }

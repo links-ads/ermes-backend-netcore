@@ -7,10 +7,11 @@ namespace Ermes.Notifiers.MessageBody
 {
     public class MapRequestBody
     {
-        public string hazard { get; set; }
-        public DateTime delineation_time_start { get; set; }
-        public DateTime delineation_time_end { get; set; }
+        public DateTime start { get; set; }
+        public DateTime end { get; set; }
         public Geometry geometry { get; set; }
         public string request_code { get; set; }
+        public int frequency { get; set; }
+        public int datatype_id { get; set; }
     }
 }

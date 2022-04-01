@@ -16,32 +16,41 @@ namespace Ermes.Notifiers
             _mapRequestManager = mapRequestManager;
         }
 
-        public async Task<Tuple<string, string>> GetEntityByIdAsync(EntityType type, int entityId)
+        public async Task<Tuple<string[], string, int[]>> GetPayloadsByEntityIdAsync(EntityType type, int entityId)
         {
-            string entityIdentifier = "", payload = "";
+            string entityIdentifier = "";
+            string[] payloads = null;
+            int[] dataTypeIds = null;
             var writer = new GeoJsonWriter();
 
             switch (type)
             {
                 case EntityType.MapRequest:
                     var mr = await _mapRequestManager.GetMapRequestByIdAsync(entityId);
+                    payloads = new string[mr.DataTypeIds.Count];
+                    dataTypeIds = new int[mr.DataTypeIds.Count];
                     entityIdentifier = mr.Code;
-                    MapRequestBody body = new MapRequestBody()
+                    for (int i = 0; i < mr.DataTypeIds.Count; i++)
                     {
-                        hazard = mr.HazardString.ToLower(),
-                        delineation_time_start = mr.Duration.LowerBound,
-                        delineation_time_end = mr.Duration.UpperBound,
-                        request_code = mr.Code,
-                        geometry = mr.AreaOfInterest
-                    };
-                    payload = writer.Write(body);
+                        MapRequestBody body = new MapRequestBody()
+                        {
+                            start = mr.Duration.LowerBound,
+                            end = mr.Duration.UpperBound,
+                            request_code = mr.Code,
+                            geometry = mr.AreaOfInterest,
+                            frequency = mr.Frequency,
+                            datatype_id = mr.DataTypeIds[i]
+                        };
+                        payloads[i] = writer.Write(body);
+                        dataTypeIds[i] = body.datatype_id;
+                    }
                     
                     break;
                 default:
                     break;
             }
 
-            return new Tuple<string, string>(payload, entityIdentifier);
+            return new Tuple<string[], string, int[]>(payloads, entityIdentifier, dataTypeIds);
         }
     }
 }

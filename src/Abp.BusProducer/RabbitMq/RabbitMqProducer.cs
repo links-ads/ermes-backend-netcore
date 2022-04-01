@@ -51,7 +51,9 @@ namespace Abp.BusProducer.RabbitMq
                     return true;
                 }
                 props.UserId = _busConfigurationProvider.GetUsername();
-
+                props.ContentType = "application/json";
+                props.ContentEncoding = "utf-8";
+                props.DeliveryMode = 2;
                 // Dashboard service
                 props.AppId = "dsh";
 
