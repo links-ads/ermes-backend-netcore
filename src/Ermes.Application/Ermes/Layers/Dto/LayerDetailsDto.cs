@@ -23,5 +23,7 @@ namespace Ermes.Layers.Dto
                 return Request_Code?.Split('.').FirstOrDefault();
             }
         }
+
+        public string Metadata_Id { get; set; }
     }
 }

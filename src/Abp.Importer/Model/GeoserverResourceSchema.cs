@@ -47,51 +47,60 @@ namespace Abp.Importer.Model
         /// <param name="expireOn">expireOn.</param>
         /// <param name="start">start (required).</param>
         /// <param name="end">end (required).</param>
+        /// <param name="creationDate">creationDate.</param>
         /// <param name="resourceId">resourceId (required).</param>
         /// <param name="metadataId">metadataId (required).</param>
         /// <param name="bbox">bbox (required).</param>
         /// <param name="requestCode">requestCode.</param>
-        public GeoserverResourceSchema(string datatypeId = default(string), string workspaceName = default(string), string storeName = default(string), string layerName = default(string), string storageLocation = default(string), DateTime expireOn = default(DateTime), DateTime start = default(DateTime), DateTime end = default(DateTime), string resourceId = default(string), string metadataId = default(string), string bbox = default(string), string requestCode = default(string))
+        public GeoserverResourceSchema(string datatypeId = default(string), string workspaceName = default(string), string storeName = default(string), string layerName = default(string), string storageLocation = default(string), DateTime expireOn = default(DateTime), DateTime start = default(DateTime), DateTime end = default(DateTime), DateTime creationDate = default(DateTime), string resourceId = default(string), string metadataId = default(string), string bbox = default(string), string requestCode = default(string))
         {
             // to ensure "datatypeId" is required (not null)
-            if (datatypeId == null) {
+            if (datatypeId == null)
+            {
                 throw new ArgumentNullException("datatypeId is a required property for GeoserverResourceSchema and cannot be null");
             }
             this.DatatypeId = datatypeId;
             // to ensure "workspaceName" is required (not null)
-            if (workspaceName == null) {
+            if (workspaceName == null)
+            {
                 throw new ArgumentNullException("workspaceName is a required property for GeoserverResourceSchema and cannot be null");
             }
             this.WorkspaceName = workspaceName;
             // to ensure "storeName" is required (not null)
-            if (storeName == null) {
+            if (storeName == null)
+            {
                 throw new ArgumentNullException("storeName is a required property for GeoserverResourceSchema and cannot be null");
             }
             this.StoreName = storeName;
             // to ensure "layerName" is required (not null)
-            if (layerName == null) {
+            if (layerName == null)
+            {
                 throw new ArgumentNullException("layerName is a required property for GeoserverResourceSchema and cannot be null");
             }
             this.LayerName = layerName;
             this.Start = start;
             this.End = end;
             // to ensure "resourceId" is required (not null)
-            if (resourceId == null) {
+            if (resourceId == null)
+            {
                 throw new ArgumentNullException("resourceId is a required property for GeoserverResourceSchema and cannot be null");
             }
             this.ResourceId = resourceId;
             // to ensure "metadataId" is required (not null)
-            if (metadataId == null) {
+            if (metadataId == null)
+            {
                 throw new ArgumentNullException("metadataId is a required property for GeoserverResourceSchema and cannot be null");
             }
             this.MetadataId = metadataId;
             // to ensure "bbox" is required (not null)
-            if (bbox == null) {
+            if (bbox == null)
+            {
                 throw new ArgumentNullException("bbox is a required property for GeoserverResourceSchema and cannot be null");
             }
             this.Bbox = bbox;
             this.StorageLocation = storageLocation;
             this.ExpireOn = expireOn;
+            this.CreationDate = creationDate;
             this.RequestCode = requestCode;
         }
 
@@ -144,6 +153,12 @@ namespace Abp.Importer.Model
         public DateTime End { get; set; }
 
         /// <summary>
+        /// Gets or Sets CreationDate
+        /// </summary>
+        [DataMember(Name = "creation_date", EmitDefaultValue = true)]
+        public DateTime CreationDate { get; set; }
+
+        /// <summary>
         /// Gets or Sets ResourceId
         /// </summary>
         [DataMember(Name = "resource_id", IsRequired = true, EmitDefaultValue = true)]
@@ -183,6 +198,7 @@ namespace Abp.Importer.Model
             sb.Append("  ExpireOn: ").Append(ExpireOn).Append("\n");
             sb.Append("  Start: ").Append(Start).Append("\n");
             sb.Append("  End: ").Append(End).Append("\n");
+            sb.Append("  CreationDate: ").Append(CreationDate).Append("\n");
             sb.Append("  ResourceId: ").Append(ResourceId).Append("\n");
             sb.Append("  MetadataId: ").Append(MetadataId).Append("\n");
             sb.Append("  Bbox: ").Append(Bbox).Append("\n");
@@ -263,6 +279,11 @@ namespace Abp.Importer.Model
                     this.End.Equals(input.End))
                 ) && 
                 (
+                    this.CreationDate == input.CreationDate ||
+                    (this.CreationDate != null &&
+                    this.CreationDate.Equals(input.CreationDate))
+                ) && 
+                (
                     this.ResourceId == input.ResourceId ||
                     (this.ResourceId != null &&
                     this.ResourceId.Equals(input.ResourceId))
@@ -324,6 +345,10 @@ namespace Abp.Importer.Model
                 if (this.End != null)
                 {
                     hashCode = (hashCode * 59) + this.End.GetHashCode();
+                }
+                if (this.CreationDate != null)
+                {
+                    hashCode = (hashCode * 59) + this.CreationDate.GetHashCode();
                 }
                 if (this.ResourceId != null)
                 {

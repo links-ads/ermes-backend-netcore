@@ -1,5 +1,9 @@
 Ver.
 --------------------------------
+- Feature - GetMetadata API of importer added (#80)
+
+Ver. 3.5.0 - 2022-04-08
+--------------------------------
 - Feature - MapRequest with more than one DataypeId added (migration added)(#82)
 
 Ver. 3.4.0 - 2022-03-31

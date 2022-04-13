@@ -38,5 +38,11 @@ namespace Abp.Importer
             var api = new DashboardApi();
             return await api.GetTimeSeriesTimeSeriesGetAsync(datatype_id, point, attribute, start, end);
         }
+
+        public async Task<object> GetMetadata(string metadata_id)
+        {
+            var api = new DashboardApi();
+            return await api.GetMetadataMetadataGetAsync(metadata_id);
+        }
     }
 }
