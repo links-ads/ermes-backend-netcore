@@ -159,29 +159,6 @@ namespace Ermes.Layers
             return result;
         }
 
-        [OpenApiOperation("Retrieves the time series of the requested attribute for layers denoted by the specified datatype_id, at the \"point\" position",
-            @"
-                Input: use the following properties to filter result list:
-                    - DataTypeId: dataTypeId to be considered
-                    - Point: point of interest
-                    - Attribute:
-                    - Start: start date
-                    - End: end date
-                    
-                Output:  time series of the attribute values at 'point' location
-                Exception: Importer service not available
-            "
-        )]
-        public virtual async Task<GetTimeSeriesOutput> GetTimeSeries(GetTimeSeriesInput input)
-        {
-            var result = new GetTimeSeriesOutput();
-            input.Start = input.Start == null ? DateTime.MinValue : input.Start;
-            input.End = input.End == null ? DateTime.MaxValue : input.End;
-
-
-            throw new NotImplementedException();
-        }
-
         [OpenApiOperation("Gets the layer metadata given the metadata_id.",
             @"
                 Input: use the following properties to filter result list:
