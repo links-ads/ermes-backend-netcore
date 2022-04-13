@@ -45,17 +45,20 @@ namespace Abp.Importer.Model
         public ValidationError(List<string> loc = default(List<string>), string msg = default(string), string type = default(string))
         {
             // to ensure "loc" is required (not null)
-            if (loc == null) {
+            if (loc == null)
+            {
                 throw new ArgumentNullException("loc is a required property for ValidationError and cannot be null");
             }
             this.Loc = loc;
             // to ensure "msg" is required (not null)
-            if (msg == null) {
+            if (msg == null)
+            {
                 throw new ArgumentNullException("msg is a required property for ValidationError and cannot be null");
             }
             this.Msg = msg;
             // to ensure "type" is required (not null)
-            if (type == null) {
+            if (type == null)
+            {
                 throw new ArgumentNullException("type is a required property for ValidationError and cannot be null");
             }
             this.Type = type;

@@ -181,5 +181,25 @@ namespace Ermes.Layers
 
             throw new NotImplementedException();
         }
+
+        [OpenApiOperation("Gets the layer metadata given the metadata_id.",
+            @"
+                Input: use the following properties to filter result list:
+                    - MetadataId: metadata id of the layer. It's returned by GetLayers API
+                    
+                Exception: Importer service not available
+            "
+        )]
+        public virtual async Task<object> GetMetadata(GetMetadataInput input)
+        {
+            try
+            {
+                return await _importerMananger.GetMetadata(input.MetadataId);
+            }
+            catch(Exception e)
+            {
+                throw new UserFriendlyException(e.Message);
+            }
+        }
     }
 }
