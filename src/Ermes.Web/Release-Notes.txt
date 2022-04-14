@@ -1,5 +1,13 @@
 Ver.
 --------------------------------
+
+
+Ver. 3.6.1 - 2022-04-14
+--------------------------------
+- Feature - Format property added to LayerDto class
+
+Ver. 3.6.0 - 2022-04-13
+--------------------------------
 - Feature - GetMetadata API of importer added (#80)
 
 Ver. 3.5.0 - 2022-04-08
