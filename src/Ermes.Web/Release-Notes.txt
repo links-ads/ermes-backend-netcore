@@ -1,5 +1,9 @@
 Ver.
 --------------------------------
+- Feature - Resolution property added to MapRequest class (#84)
+
+Ver. 3.7.1 - 2022-04-26
+--------------------------------
 - Feature - solvedByUser property added to QuizDto class (#83)
 
 Ver. 3.7.0 - 2022-04-26
