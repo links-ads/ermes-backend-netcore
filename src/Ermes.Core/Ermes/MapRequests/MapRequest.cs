@@ -60,5 +60,10 @@ namespace Ermes.MapRequests
 
         [ForeignKey("CreatorUserId")]
         public virtual Person Creator { get; set; }
+
+        /// <summary>
+        /// Number of meters per pixel
+        /// </summary>
+        public int Resolution { get; set; } = 10;
     }
 }

@@ -90,6 +90,8 @@
     <Compile Include="Migrations\20220401085044_DataTypeId_List_In_MapRequest.Designer.cs" />
     <Compile Include="Migrations\20220426082410_PersonQuiz_Added.cs" />
     <Compile Include="Migrations\20220426082410_PersonQuiz_Added.Designer.cs" />
+    <Compile Include="Migrations\20220426122906_Resolution_MapRequest_Added.cs" />
+    <Compile Include="Migrations\20220426122906_Resolution_MapRequest_Added.Designer.cs" />
     <Compile Include="Migrations\ErmesDbContextModelSnapshot.cs" />
     <Compile Include="Migrations\Seed\ModelBuilderExtensions.cs" />
   </ItemGroup>

@@ -1,5 +1,6 @@
 Ver.
 --------------------------------
+- Feature - Resolution property added to MapRequest class (#84)
 
 Ver. 3.7.1 - 2022-04-26
 --------------------------------
