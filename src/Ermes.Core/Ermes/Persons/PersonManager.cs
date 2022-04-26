@@ -19,6 +19,7 @@ namespace Ermes.Persons
         protected IRepository<PersonAction> PersonActionsRepository { get; set; }
         protected IRepository<PersonRole> PersonRoleRepository { get; set; }
         protected IRepository<PersonTip> PersonTipRepository { get; set; }
+        protected IRepository<PersonQuiz> PersonQuizRepository { get; set; }
         protected IRepository<Role> RolesRepository { get; set; }
         protected IRepository<Organization> OrganizationsRepository { get; set; }
 
@@ -27,6 +28,7 @@ namespace Ermes.Persons
         public IQueryable<PersonAction> PersonActions { get { return PersonActionsRepository.GetAll(); } }
         public IQueryable<PersonRole> PersonRoles { get { return PersonRoleRepository.GetAll(); } }
         public IQueryable<PersonTip> PersonTips { get { return PersonTipRepository.GetAll(); } }
+        public IQueryable<PersonQuiz> PersonQuizzes { get { return PersonQuizRepository.GetAll(); } }
         public IQueryable<Organization> Organizations { get { return OrganizationsRepository.GetAll(); } }
 
         public PersonManager(IRepository<Person, long> personRepository,
@@ -34,6 +36,7 @@ namespace Ermes.Persons
                                 IRepository<PersonRole> personRoleRepository,
                                 IRepository<Role> rolesRepository,
                                 IRepository<PersonTip> personTipRepository,
+                                IRepository<PersonQuiz> personQuizRepository,
                                 IRepository<Organization> organizationsRepository)
         {
             PersonRepository = personRepository;
@@ -42,6 +45,7 @@ namespace Ermes.Persons
             RolesRepository = rolesRepository;
             PersonTipRepository = personTipRepository;
             OrganizationsRepository = organizationsRepository;
+            PersonQuizRepository = personQuizRepository;
         }
 
         public async Task<Person> GetPersonByIdAsync(long personId)
@@ -287,10 +291,16 @@ namespace Ermes.Persons
                             .ToListAsync();
         }
 
-        public async Task CreatePersonTip(long personId, string tipCode)
+        public async Task CreatePersonTipAsync(long personId, string tipCode)
         {
             var newItem = new PersonTip(personId, tipCode);
             await PersonTipRepository.InsertAsync(newItem);
+        }
+
+        public async Task CreatePersonQuizAsync(long personId, string quizCode)
+        {
+            var newItem = new PersonQuiz(personId, quizCode);
+            await PersonQuizRepository.InsertAsync(newItem);
         }
 
     }

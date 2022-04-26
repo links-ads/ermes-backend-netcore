@@ -45,5 +45,11 @@ namespace Ermes.Answers
         {
             return await AnswerTranslations.SingleOrDefaultAsync(a => a.CoreId == coreId && a.Language == language);
         }
+
+        public async Task<bool> IsTheRightAnswerAsync(string answerCode)
+        {
+            var ans = await Answers.FirstAsync(a => a.Code == answerCode);
+            return ans.IsTheRightAnswer;
+        }
     }
 }
