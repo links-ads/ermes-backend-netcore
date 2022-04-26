@@ -291,6 +291,14 @@ namespace Ermes.Persons
                             .ToListAsync();
         }
 
+        public async Task<List<string>> GetQuizzesReadByPersonIdAsync(long personId)
+        {
+            return await PersonQuizzes
+                            .Where(pt => pt.PersonId == personId)
+                            .Select(tp => tp.QuizCode)
+                            .ToListAsync();
+        }
+
         public async Task CreatePersonTipAsync(long personId, string tipCode)
         {
             var newItem = new PersonTip(personId, tipCode);
