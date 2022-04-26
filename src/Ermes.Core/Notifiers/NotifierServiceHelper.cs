@@ -39,7 +39,8 @@ namespace Ermes.Notifiers
                             request_code = mr.Code,
                             geometry = mr.AreaOfInterest,
                             frequency = mr.Frequency,
-                            datatype_id = mr.DataTypeIds[i]
+                            datatype_id = mr.DataTypeIds[i],
+                            resolution = mr.Resolution
                         };
                         payloads[i] = writer.Write(body);
                         dataTypeIds[i] = body.datatype_id;
