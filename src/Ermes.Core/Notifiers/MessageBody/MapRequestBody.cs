@@ -13,5 +13,6 @@ namespace Ermes.Notifiers.MessageBody
         public string request_code { get; set; }
         public int frequency { get; set; }
         public int datatype_id { get; set; }
+        public int resolution { get; set; }
     }
 }
