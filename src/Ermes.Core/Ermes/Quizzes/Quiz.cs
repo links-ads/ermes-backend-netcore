@@ -2,6 +2,7 @@
 using Ermes.Answers;
 using Ermes.Enums;
 using Ermes.Helpers;
+using Ermes.Persons;
 using Ermes.Tips;
 using System;
 using System.Collections.Generic;
@@ -70,5 +71,6 @@ namespace Ermes.Quizzes
 
         public virtual ICollection<Answer> Answers { get; set; }
         public virtual ICollection<QuizTranslation> Translations { get; set; }
+        public virtual ICollection<PersonQuiz> Solvers { get; set; }
     }
 }

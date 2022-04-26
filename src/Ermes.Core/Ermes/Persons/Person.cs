@@ -60,5 +60,6 @@ namespace Ermes.Persons
         public int? CurrentOperationLegacyId { get; set; }
 
         public virtual ICollection<PersonTip> Tips { get; set; }
+        public virtual ICollection<PersonQuiz> Quizzes { get; set; }
     }
 }

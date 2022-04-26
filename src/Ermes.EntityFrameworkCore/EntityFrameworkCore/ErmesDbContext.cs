@@ -67,6 +67,7 @@ namespace Ermes.EntityFrameworkCore
         public virtual DbSet<PersonTip> PersonTips { get; set; }
         public virtual DbSet<TipTranslation> TipTranslations { get; set; }
         public virtual DbSet<Quiz> Quizzes { get; set; }
+        public virtual DbSet<PersonQuiz> PersonQuizzes { get; set; }
         public virtual DbSet<QuizTranslation> QuizTranslations { get; set; }        
         public virtual DbSet<Answer> Answers { get; set; }
         public virtual DbSet<AnswerTranslation> AnswerTranslations { get; set; }
@@ -165,7 +166,26 @@ namespace Ermes.EntityFrameworkCore
                 .HasForeignKey(pt => pt.TipCode)
                 .IsRequired(true)
                 .OnDelete(DeleteBehavior.Restrict);
-                
+
+            modelBuilder.Entity<PersonQuiz>()
+                .HasIndex(pt => new { pt.PersonId, pt.QuizCode })
+                .IsUnique();
+
+            modelBuilder.Entity<PersonQuiz>()
+                .HasOne<Person>(pt => pt.Person)
+                .WithMany(p => p.Quizzes)
+                .HasPrincipalKey(p => p.Id)
+                .HasForeignKey(pt => pt.PersonId)
+                .IsRequired(true)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PersonQuiz>()
+                .HasOne<Quiz>(pt => pt.Quiz)
+                .WithMany(p => p.Solvers)
+                .HasPrincipalKey(t => t.Code)
+                .HasForeignKey(pt => pt.QuizCode)
+                .IsRequired(true)
+                .OnDelete(DeleteBehavior.Restrict);
 
             #region EntityHistory
             modelBuilder.Entity<SplitEntityChange>().HasMany(e => e.PropertyChanges).WithOne().HasForeignKey(e => e.EntityChangeId);
