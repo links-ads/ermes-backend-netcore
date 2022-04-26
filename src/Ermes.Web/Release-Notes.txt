@@ -1,5 +1,9 @@
 Ver.
 --------------------------------
+- Feature - solvedByUser property added to QuizDto class (#83)
+
+Ver. 3.7.0 - 2022-04-26
+--------------------------------
 - Feature - Quiz&Answer management (#migration added)(#83)
 
 Ver. 3.6.1 - 2022-04-14

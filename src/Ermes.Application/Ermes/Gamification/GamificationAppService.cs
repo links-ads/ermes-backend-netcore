@@ -102,6 +102,10 @@ namespace Ermes.Gamification
 
             var items = await query.ToListAsync();
             result.Items = ObjectMapper.Map<List<QuizDto>>(items);
+            //Check for quizzes the current logged user has already solved
+            //Cannot be done with Join statement due to a limitation in EF Core
+            var quizCodesLit = await _personManager.GetQuizzesReadByPersonIdAsync(_session.LoggedUserPerson.Id);
+            result.Items = result.Items.Select(t => { t.SolvedByUser = quizCodesLit.Contains(t.Code); return t; }).ToList();
             return result;
         }
 
