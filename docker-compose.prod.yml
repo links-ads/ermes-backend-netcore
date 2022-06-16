@@ -22,6 +22,7 @@ services:
       - fasterlogsprod:/app/App_Data/Logs/
     env_file:
       - ./.env
+      - ./proxy.env
 
   faster-pgsql:
     image: 'faster-pgsql'
