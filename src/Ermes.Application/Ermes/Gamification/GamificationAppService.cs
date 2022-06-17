@@ -20,6 +20,7 @@ using System.Threading.Tasks;
 namespace Ermes.Gamification
 {
     [ErmesAuthorize]
+    [ErmesGamification]
     public class GamificationAppService : ErmesAppServiceBase, IGamificationAppService
     {
         private readonly TipManager _tipManager;
@@ -158,10 +159,6 @@ namespace Ermes.Gamification
 
         public virtual async Task<bool> SetTipAsRead(SetTipAsReadInput input)
         {
-            //Only citizens take part to gamification
-            if (!_session.Roles.Any(r => r == AppRoles.CITIZEN))
-                throw new UserFriendlyException(L("DoNotTakePartToGamification"));
-
             try
             {
                 await _personManager.CreatePersonTipAsync(_session.LoggedUserPerson.Id, input.TipCode);
@@ -177,10 +174,6 @@ namespace Ermes.Gamification
 
         public virtual async Task<bool> CheckPersonAnswer(CheckPersonAnswerInput input)
         {
-            //Only citizens take part to gamification
-            if (!_session.Roles.Any(r => r == AppRoles.CITIZEN))
-                throw new UserFriendlyException(L("DoNotTakePartToGamification"));
-
             try
             {
                 var ans = await _answerManager.GetAnswerByCodeAsync(input.AnswerCode);
