@@ -59,6 +59,7 @@ using Ermes.Answers;
 using Ermes.MapRequests.Dto;
 using Ermes.Layers;
 using Ermes.Layers.Dto;
+using Ermes.Gamification;
 
 namespace Ermes
 {
@@ -240,6 +241,10 @@ namespace Ermes
                             .ReverseMap()
                             .ForMember(entity => entity.Code, options => options.Ignore());
             configuration.CreateMap<MapRequests.MapRequest, MapRequestNotificationDto>();
+
+            configuration.CreateMap<Level, LevelDto>()
+                            .ForMember(dto => dto.PreviousLevelName, options => options.MapFrom(b => b.PreviousLevelId.HasValue ? b.PreviousLevel.Name : null))
+                            .ForMember(dto => dto.FollowingLevelName, options => options.MapFrom(b => b.FollowingLevelId.HasValue ? b.FollowingLevel.Name : null));
             #region GeoJsons
             configuration.CreateMap<Communication, FeatureDto<GeoJsonItem>>()
                             .ForMember(fd => fd.Geometry, options => options.MapFrom(c => new GeoJsonWriter().Write(c.AreaOfInterest)))

@@ -26,13 +26,15 @@ namespace Ermes.Gamification
         private readonly QuizManager _quizManager;
         private readonly AnswerManager _answerManager;
         private readonly PersonManager _personManager;
+        private readonly GamificationManager _gamificationManager;
         private readonly ErmesAppSession _session;
         public GamificationAppService(
                 TipManager tipManager,
                 QuizManager quizManager,
                 AnswerManager answerManager,
                 ErmesAppSession session,
-                PersonManager personManager
+                PersonManager personManager,
+                GamificationManager gamificationManager
             )
         {
             _tipManager = tipManager;
@@ -40,6 +42,7 @@ namespace Ermes.Gamification
             _answerManager = answerManager;
             _session = session;
             _personManager = personManager;
+            _gamificationManager = gamificationManager;
         }
 
         #region Private
@@ -193,6 +196,12 @@ namespace Ermes.Gamification
             }
 
             return true;
+        }
+
+        public virtual async Task<GetLevelsOutput> GetLevels()
+        {
+            var levels = await _gamificationManager.GetLevelsAsync();
+            return new GetLevelsOutput() { Levels = ObjectMapper.Map<List<LevelDto>>(levels) };
         }
     }
 }

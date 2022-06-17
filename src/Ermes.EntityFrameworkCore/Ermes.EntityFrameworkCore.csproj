@@ -92,6 +92,8 @@
     <Compile Include="Migrations\20220426082410_PersonQuiz_Added.Designer.cs" />
     <Compile Include="Migrations\20220426122906_Resolution_MapRequest_Added.cs" />
     <Compile Include="Migrations\20220426122906_Resolution_MapRequest_Added.Designer.cs" />
+    <Compile Include="Migrations\20220616154008_Gamification_Levels_Added.cs" />
+    <Compile Include="Migrations\20220616154008_Gamification_Levels_Added.Designer.cs" />
     <Compile Include="Migrations\ErmesDbContextModelSnapshot.cs" />
     <Compile Include="Migrations\Seed\ModelBuilderExtensions.cs" />
   </ItemGroup>

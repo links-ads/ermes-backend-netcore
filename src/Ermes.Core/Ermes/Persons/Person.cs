@@ -1,4 +1,5 @@
 ﻿using Abp.Domain.Entities.Auditing;
+using Ermes.Gamification;
 using Ermes.Operations;
 using Ermes.Organizations;
 using Ermes.Persons.Cache;
@@ -61,5 +62,11 @@ namespace Ermes.Persons
 
         public virtual ICollection<PersonTip> Tips { get; set; }
         public virtual ICollection<PersonQuiz> Quizzes { get; set; }
+
+        public int Points { get; set; }
+
+        [ForeignKey("LevelId")]
+        public virtual Level Level { get; set; }
+        public int? LevelId { get; set; }
     }
 }
