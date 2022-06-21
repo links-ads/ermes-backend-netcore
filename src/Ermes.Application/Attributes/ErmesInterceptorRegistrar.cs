@@ -22,7 +22,7 @@ namespace Ermes.Attributes
                 }
                 if(type.IsSubclassOf(typeof(ErmesAppServiceBase)) || type.GetTypeInfo().IsDefined(typeof(ErmesAuthorizeAttribute), true))
                     handler.ComponentModel.Interceptors.Add(new InterceptorReference(typeof(ErmesLoadUserInterceptor)));
-                if (type.IsSubclassOf(typeof(ErmesAppServiceBase)) || type.GetTypeInfo().IsDefined(typeof(ErmesGamificationAttribute), true))
+                if (type.GetTypeInfo().IsDefined(typeof(ErmesGamificationAttribute), true))
                     handler.ComponentModel.Interceptors.Add(new InterceptorReference(typeof(ErmesGamificationInterceptor)));
             };
         }

@@ -50,7 +50,7 @@ namespace Ermes.Persons
 
         public async Task<Person> GetPersonByIdAsync(long personId)
         {
-            return await Persons.Include(p => p.Organization).Include(p => p.Team).SingleOrDefaultAsync(p => p.Id == personId);
+            return await Persons.Include(p => p.Organization).Include(p => p.Team).Include(p => p.Level).SingleOrDefaultAsync(p => p.Id == personId);
         }
 
         public async Task<Person> GetPersonByFusionAuthUserGuidAsync(Guid userId, string username)

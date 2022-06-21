@@ -196,5 +196,12 @@ namespace Ermes.Gamification
             var levels = await _gamificationManager.GetLevelsAsync();
             return new GetLevelsOutput() { Levels = ObjectMapper.Map<List<LevelDto>>(levels) };
         }
+
+        public async Task<List<GamificationActionDto>> GetActions()
+        {
+            var items = await _gamificationManager.Actions.ToListAsync();
+            var result = ObjectMapper.Map<List<GamificationActionDto>>(items);
+            return result;
+        }
     }
 }

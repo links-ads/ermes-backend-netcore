@@ -13,9 +13,11 @@ namespace Ermes.Layers
         public const int MaxNameLength = 255;
         public const int MaxGroupLength = 255;
         public const int MaxSubGroupLength = 255;
+        public const int MaxLanguageLength = 2;
 
         public Layer Core { get; set; }
         public int CoreId { get; set; }
+        [StringLength(MaxLanguageLength)]
         public string Language { get; set; }
 
         [Required]

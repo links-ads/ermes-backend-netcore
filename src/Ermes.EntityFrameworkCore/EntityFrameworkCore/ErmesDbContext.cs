@@ -77,6 +77,8 @@ namespace Ermes.EntityFrameworkCore
         public virtual DbSet<LayerTranslation> LayerTranslations { get; set; }
         public virtual DbSet<Operation> Operations { get; set; }
         public virtual DbSet<Level> Levels { get; set; }
+        public virtual DbSet<GamificationAction> GamificationActions { get; set; }
+        public virtual DbSet<GamificationActionTranslation> GamificationActionTranslations { get; set; }
         public IEntityHistoryHelper EntityHistoryHelper { get; set; }
 
         private readonly ErmesLocalizationHelper _localizer;
@@ -188,6 +190,9 @@ namespace Ermes.EntityFrameworkCore
                 .HasForeignKey(pt => pt.QuizCode)
                 .IsRequired(true)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<GamificationAction>().HasIndex(i => i.Code).IsUnique();
+            modelBuilder.Entity<GamificationActionTranslation>().HasIndex(gat => new { gat.Language, gat.CoreId, }).IsUnique(true);
 
             #region EntityHistory
             modelBuilder.Entity<SplitEntityChange>().HasMany(e => e.PropertyChanges).WithOne().HasForeignKey(e => e.EntityChangeId);

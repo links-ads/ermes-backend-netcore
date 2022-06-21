@@ -111,6 +111,8 @@ namespace Ermes
                 IsFirstLogin = person.IsFirstLogin,
                 IsNewUser = person.IsNewUser,
                 LegacyId = person.LegacyId,
+                Points = person.Points,
+                Level = person.LevelId.HasValue ? person.Level.Name : null,
                 User = ObjectMapper.Map<UserDto>(user)
             };
 

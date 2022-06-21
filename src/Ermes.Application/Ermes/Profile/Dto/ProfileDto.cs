@@ -27,6 +27,8 @@ namespace Ermes.Profile.Dto
         public bool IsNewUser { get; set; }
         public int? LegacyId { get; set; }
         public string TaxCode { get; set; }
+        public int Points { get; set; }
+        public string Level { get; set; }
 
     }
 

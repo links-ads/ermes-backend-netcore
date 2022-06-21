@@ -5,21 +5,23 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
-namespace Ermes.Answers
+namespace Ermes.Gamification
 {
-    [Table("answer_translations")]
-    public class AnswerTranslation : Entity, IEntityTranslation<Answer>
+    [Table("gamification_action_translations")]
+    public class GamificationActionTranslation: Entity, IEntityTranslation<GamificationAction>
     {
-        public const int MaxTextLength = 1000;
+        public const int MaxDescriptionLength = 1000;
         public const int MaxLanguageLength = 2;
 
-        public Answer Core { get; set; }
+        public GamificationAction Core { get; set; }
         public int CoreId { get; set; }
+
+        [Required]
         [StringLength(MaxLanguageLength)]
         public string Language { get; set; }
 
         [Required]
-        [StringLength(MaxTextLength)]
-        public string Text { get; set; }
+        [StringLength(MaxDescriptionLength)]
+        public string Description { get; set; }
     }
 }

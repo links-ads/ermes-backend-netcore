@@ -20,7 +20,7 @@ namespace Ermes.Attributes
         public void Intercept(IInvocation invocation)
         {            
             //Only citizens take part to gamification
-            if (!_session.Roles.Any(r => r == AppRoles.CITIZEN))
+            if (!_session.Roles.Any(r => r == AppRoles.CITIZEN ))
                 throw new UserFriendlyException("DoNotTakePartToGamification");
             invocation.Proceed();
         }

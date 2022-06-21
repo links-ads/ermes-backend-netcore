@@ -18,5 +18,6 @@ namespace Ermes.Gamification
         Task<bool> SetTipAsRead(SetTipAsReadInput input);
         Task<bool> CheckPersonAnswer(CheckPersonAnswerInput input);
         Task<GetLevelsOutput> GetLevels();
+        Task<List<GamificationActionDto>> GetActions();
     }
 }
