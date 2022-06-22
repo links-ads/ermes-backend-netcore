@@ -1,11 +1,14 @@
 ﻿using Abp.Application.Services.Dto;
+using Abp.BackgroundJobs;
 using Abp.Linq.Extensions;
 using Abp.UI;
 using Ermes.Answers;
 using Ermes.Attributes;
 using Ermes.Authorization;
 using Ermes.Dto.Datatable;
+using Ermes.Enums;
 using Ermes.Ermes.Gamification.Dto;
+using Ermes.EventHandlers;
 using Ermes.Gamification.Dto;
 using Ermes.Linq.Extensions;
 using Ermes.Persons;
@@ -29,13 +32,15 @@ namespace Ermes.Gamification
         private readonly PersonManager _personManager;
         private readonly GamificationManager _gamificationManager;
         private readonly ErmesAppSession _session;
+        private readonly IBackgroundJobManager _backgroundJobManager;
         public GamificationAppService(
                 TipManager tipManager,
                 QuizManager quizManager,
                 AnswerManager answerManager,
                 ErmesAppSession session,
                 PersonManager personManager,
-                GamificationManager gamificationManager
+                GamificationManager gamificationManager,
+                IBackgroundJobManager backgroundJobManager
             )
         {
             _tipManager = tipManager;
@@ -44,6 +49,7 @@ namespace Ermes.Gamification
             _session = session;
             _personManager = personManager;
             _gamificationManager = gamificationManager;
+            _backgroundJobManager = backgroundJobManager;
         }
 
         #region Private
@@ -137,8 +143,6 @@ namespace Ermes.Gamification
         }
         #endregion
 
-
-
         public virtual async Task<DTResult<TipDto>> GetTips(GetTipsInput input)
         {
             PagedResultDto<TipDto> result = await InternalGetTips(input);
@@ -162,6 +166,20 @@ namespace Ermes.Gamification
             try
             {
                 await _personManager.CreatePersonTipAsync(_session.LoggedUserPerson.Id, input.TipCode);
+                var (sendNotification, newValue) = await _gamificationManager.UpdatePersonGamificationProfileAsync(_session.LoggedUserPerson.Id, ErmesConsts.GamificationActionConsts.READ_TIP);
+                if(sendNotification)
+                {
+                    NotificationEvent<GamificationNotificationDto> notification = new NotificationEvent<GamificationNotificationDto>(0,
+                    1, //creator does not receive notification, use 1 as mocked Id
+                    new GamificationNotificationDto()
+                    {
+                        PersonId = _session.LoggedUserPerson.Id,
+                        ActionName = ErmesConsts.GamificationActionConsts.READ_TIP,
+                        NewValue = newValue
+                    },
+                    EntityWriteAction.LevelChange);
+                    await _backgroundJobManager.EnqueueEventAsync(notification);
+                }
             }
             catch(Exception e)
             {
@@ -178,7 +196,23 @@ namespace Ermes.Gamification
             {
                 var ans = await _answerManager.GetAnswerByCodeAsync(input.AnswerCode);
                 if (ans.IsTheRightAnswer)
+                {
                     await _personManager.CreatePersonQuizAsync(_session.LoggedUserPerson.Id, ans.QuizCode);
+                    var (sendNotification, newValue) = await _gamificationManager.UpdatePersonGamificationProfileAsync(_session.LoggedUserPerson.Id, ErmesConsts.GamificationActionConsts.ANSWER_QUIZ);
+                    if (sendNotification)
+                    {
+                        NotificationEvent<GamificationNotificationDto> notification = new NotificationEvent<GamificationNotificationDto>(0,
+                        1, //creator does not receive notification, use 1 as mocked Id
+                        new GamificationNotificationDto()
+                        {
+                            PersonId = _session.LoggedUserPerson.Id,
+                            ActionName = ErmesConsts.GamificationActionConsts.ANSWER_QUIZ,
+                            NewValue = newValue
+                        },
+                        EntityWriteAction.LevelChange);
+                        await _backgroundJobManager.EnqueueEventAsync(notification);
+                    }
+                }
                 else
                     return false;
             }
@@ -197,7 +231,7 @@ namespace Ermes.Gamification
             return new GetLevelsOutput() { Levels = ObjectMapper.Map<List<LevelDto>>(levels) };
         }
 
-        public async Task<List<GamificationActionDto>> GetActions()
+        public virtual async Task<List<GamificationActionDto>> GetActions()
         {
             var items = await _gamificationManager.Actions.ToListAsync();
             var result = ObjectMapper.Map<List<GamificationActionDto>>(items);

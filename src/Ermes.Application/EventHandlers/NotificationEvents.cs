@@ -19,6 +19,7 @@ using Ermes.Actions.Dto;
 using Microsoft.EntityFrameworkCore;
 using Ermes.MapRequests;
 using Ermes.MapRequests.Dto;
+using Ermes.Gamification.Dto;
 
 namespace Ermes.EventHandlers
 {
@@ -216,6 +217,45 @@ namespace Ermes.EventHandlers
         public virtual async Task HandleEventAsync(NotificationEvent<MapRequestNotificationDto> eventData)
         {
             await _notifierService.SendBusNotification(eventData.CreatorId, eventData.EntityId, eventData.Content, eventData.Action, EntityType.MapRequest, true);
+        }
+    }
+
+    public class GamificationNotificationEventHandler : IAsyncEventHandler<NotificationEvent<GamificationNotificationDto>>, ITransientDependency
+    {
+        private readonly NotifierService _notifierService;
+        private readonly PersonManager _personManager;
+        public GamificationNotificationEventHandler(NotifierService notifierService, PersonManager personManager)
+        {
+            _notifierService = notifierService;
+            _personManager = personManager;
+        }
+
+        [UnitOfWork]
+        public virtual async Task HandleEventAsync(NotificationEvent<GamificationNotificationDto> eventData)
+        {
+            string titleKey = null, bodyKey = null;
+            string[] bodyParams = null;
+
+            switch (eventData.Action)
+            {
+                case EntityWriteAction.LevelChange:
+                    {
+                        titleKey = "Notification_Gamification_LevelChange_Title";
+                        bodyKey = "Notification_Gamification_LevelChange_Body";
+                        bodyParams = new string[] { eventData.Content.NewValue }; 
+                        break;
+                    }
+                default:
+                    {
+                        titleKey = "";
+                        bodyKey = "";
+                        break;
+                    }
+            }
+
+            var receivers = _personManager.Persons.Where(p => p.Id == eventData.Content.PersonId);
+
+            await _notifierService.SendUserNotification(eventData.CreatorId, receivers, eventData.EntityId, (bodyKey, bodyParams), (titleKey, null), eventData.Action, EntityType.Gamification);
         }
     }
 }

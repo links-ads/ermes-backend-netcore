@@ -56,6 +56,7 @@ namespace Ermes.Import
                         }
 
                         act.Code = row.GetString("Code");
+                        act.Name = row.GetString("Name");
                         act.Competence = row.GetEnum<CompetenceType>("Competence");
                         act.Points = row.GetInt("Points");
 

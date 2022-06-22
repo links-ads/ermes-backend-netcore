@@ -177,6 +177,7 @@ namespace Ermes.Enums
         PersonActionStatus = 70,
         PersonActionActivity = 80,
         Person = 90,
+        Gamification = 100
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -208,7 +209,8 @@ namespace Ermes.Enums
         Create,
         Update,
         Delete,
-        StatusChange
+        StatusChange,
+        LevelChange
     }
 
     [JsonConverter(typeof(StringEnumConverter))]

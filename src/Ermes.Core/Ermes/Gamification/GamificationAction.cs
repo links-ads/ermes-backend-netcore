@@ -13,10 +13,14 @@ namespace Ermes.Gamification
     public class GamificationAction: Entity, IMultiLingualEntity<GamificationActionTranslation>
     {
         public const int MaxCodeLength = 100;
+        public const int MaxNameLength = 1000;
 
         [Required]
         [StringLength(MaxCodeLength)]
         public string Code { get; set; }
+        [Required]
+        [StringLength(MaxNameLength)]
+        public string Name { get; set; }
         public int Points { get; set; }
         [Column("Competence")]
         public string CompetenceString

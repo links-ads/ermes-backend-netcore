@@ -96,6 +96,8 @@
     <Compile Include="Migrations\20220616154008_Gamification_Levels_Added.Designer.cs" />
     <Compile Include="Migrations\20220621143835_Gamification_Actions_Added.cs" />
     <Compile Include="Migrations\20220621143835_Gamification_Actions_Added.Designer.cs" />
+    <Compile Include="Migrations\20220622101013_GamificationActions_Name_Added.cs" />
+    <Compile Include="Migrations\20220622101013_GamificationActions_Name_Added.Designer.cs" />
     <Compile Include="Migrations\ErmesDbContextModelSnapshot.cs" />
     <Compile Include="Migrations\Seed\ModelBuilderExtensions.cs" />
   </ItemGroup>
