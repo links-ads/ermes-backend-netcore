@@ -1,23 +1,49 @@
-#docker-compose.prod.yml (Extended config for Prod env.)
-version: '3.4'
+#docker-compose.prod.yml (Extended config for PROD env.)
+version: '3.5'
 
 services:
   faster.web:
+    depends_on:
+      - faster-pgsql
+    image: 'faster.web'
+    build:
+      context: .
+      dockerfile: src/Ermes.Web/Dockerfile
+    restart: unless-stopped  
     environment:
-      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_ENVIRONMENT=FasterProduction
+      - GOOGLE_APPLICATION_CREDENTIALS=firebasekey-faster.json
     ports:
       - '${FASTER_WEB_PORT_PROD}:80'
     container_name: 'faster-web-${ENVTYPE_PROD}'
-    env_file: 
-      - ./proxy.env
+    networks:
+      - faster-net
+    volumes:
+      - fasterlogsprod:/app/App_Data/Logs/
+    env_file:
       - ./.env
+      - ./proxy.env
 
   faster-pgsql:
+    image: 'faster-pgsql'
+    build:
+      context: .
+      dockerfile: src/containers/postgresql/Dockerfile
+    restart: unless-stopped  
     container_name: 'faster-pgsql-${ENVTYPE_PROD}'
+    networks:
+      - faster-net
     environment:
       POSTGRES_PASSWORD: ${FASTER_PASSWORD_PROD}
-      FASTER_PASSWORD: ${FASTER_PASSWORD_PROD}
-      FASTER_DB: ${FASTER_DB_PROD}
-      FASTER_USER: ${FASTER_USER_PROD}
+      DB_PASSWORD: ${FASTER_PASSWORD_PROD}
+      DB_NAME: ${FASTER_DB_PROD}
+      DB_USER: ${FASTER_USER_PROD}
     ports:
       - '${PGSQL_PORT_PROD}:5432'
+
+networks:
+  faster-net:
+    name: faster-net-${ENVTYPE_PROD}
+
+volumes:
+  fasterlogsprod:
