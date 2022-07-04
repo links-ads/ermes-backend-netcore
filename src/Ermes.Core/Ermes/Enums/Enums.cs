@@ -210,7 +210,8 @@ namespace Ermes.Enums
         Update,
         Delete,
         StatusChange,
-        LevelChange
+        LevelChangeUp,
+        LevelChangeDown
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -362,5 +363,4 @@ namespace Ermes.Enums
         Reviewer,
         Socializer
     }
-
 }

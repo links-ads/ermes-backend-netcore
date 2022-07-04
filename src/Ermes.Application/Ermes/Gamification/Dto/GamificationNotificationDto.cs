@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ermes.Enums;
+using System;
 using System.Collections.Generic;
 using System.Text;
 

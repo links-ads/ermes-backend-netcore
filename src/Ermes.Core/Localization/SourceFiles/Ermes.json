@@ -71,6 +71,10 @@
     "Notification_ReportRequest_Update_Body": "Report Request '{0}' has been updated!",
     "Notification_ReportRequest_Delete_Title": "Report Request Deleted",
     "Notification_ReportRequest_Delete_Body": "Report Request '{0}' has been deleted!",
+    "Notification_Gamification_LevelChange_Title": "New level reached",
+    "Notification_Gamification_LevelChange_Body": "You have reached level '{0}'",
+    "Notification_Gamification_LevelChangeDown_Title": "Opppsss",
+    "Notification_Gamification_LevelChangeDown_Body": "You have been demoted '{0}'",
     "TeamNotInOrganization": "Team {0} does not belong to organization {1}",
     "EntityOutsideOrganization": "You do not have the visibility on this item",
     "MissingPermission": "You don't have the permission to perform this operation",
@@ -82,6 +86,6 @@
     "InvalidParentId": "Invalid Parent Id: {0}",
     "InvalidCategoryRangeValue": "Invalid Category Range Value: {0}",
     "InvalidCategoryNumericValue": "Invalid Category Numeric Value: {0}",
-    "DoNotTakePartToGamification":  "You do not take part to gamification"
+    "DoNotTakePartToGamification": "You do not take part to gamification"
   }
 }

@@ -1,5 +1,6 @@
 ﻿using Abp.Domain.Repositories;
 using Abp.Domain.Services;
+using Ermes.Enums;
 using Ermes.Gamification;
 using Ermes.Persons;
 using Microsoft.EntityFrameworkCore;
@@ -68,24 +69,30 @@ namespace Ermes.Gamification
             return await ActionTranslationRepository.InsertOrUpdateAndGetIdAsync(actionTrans);
         }
 
-        //True --> send notification
-        public async Task<(bool sendNotification, string newValue)> UpdatePersonGamificationProfileAsync(long personId, string actionName)
+        
+        public async Task<List<(EntityWriteAction Action, string NewValue)>> UpdatePersonGamificationProfileAsync(long personId, string actionName)
         {
             var person = await PersonManager.GetPersonByIdAsync(personId);
             var action = await GetActionByNameAsync(actionName);
+            List<(EntityWriteAction, string newValue)> result = new List<(EntityWriteAction, string newValue)>();
 
             if (person == null || action == null)
             {
                 Logger.ErrorFormat("Error in UpdatePersonGamificationProfileAsync for person with id {0} and action {1}", personId, actionName);
-                return (false,string.Empty);
+                return result;
             }
 
             person.Points += action.Points;
 
             var level = await GetLevelByPointsAsync(person.Points);
-            (bool, string) result = (level.Id != person.LevelId, level.Name);
-            person.LevelId = level.Id;
+            if (level.Id != person.LevelId)
+            {
+                result.Add((action.Points > 0 ? EntityWriteAction.LevelChangeUp : EntityWriteAction.LevelChangeDown, level.Name));
+                person.LevelId = level.Id;
+            }
 
+            //TODO: add to the result list the remaining notifications, like new badges, new medals, etc...
+            
             return result;
         }
     }

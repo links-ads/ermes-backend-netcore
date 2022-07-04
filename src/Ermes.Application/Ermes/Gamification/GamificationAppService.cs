@@ -1,5 +1,6 @@
 ﻿using Abp.Application.Services.Dto;
 using Abp.BackgroundJobs;
+using Abp.Domain.Uow;
 using Abp.Linq.Extensions;
 using Abp.UI;
 using Ermes.Answers;
@@ -161,24 +162,37 @@ namespace Ermes.Gamification
             return new DTResult<AnswerDto>(input.Draw, result.TotalCount, result.Items.Count, result.Items.ToList());
         }
 
+
+        //TODO: bisogna restituire al client il profilo aggiornato dell'utente, con almeno livello e punteggio
         public virtual async Task<bool> SetTipAsRead(SetTipAsReadInput input)
         {
             try
             {
-                await _personManager.CreatePersonTipAsync(_session.LoggedUserPerson.Id, input.TipCode);
-                var (sendNotification, newValue) = await _gamificationManager.UpdatePersonGamificationProfileAsync(_session.LoggedUserPerson.Id, ErmesConsts.GamificationActionConsts.READ_TIP);
-                if(sendNotification)
+                int id = await _personManager.CreatePersonTipAsync(_session.LoggedUserPerson.Id, input.TipCode);
+
+                if (id > 0)
                 {
-                    NotificationEvent<GamificationNotificationDto> notification = new NotificationEvent<GamificationNotificationDto>(0,
-                    1, //creator does not receive notification, use 1 as mocked Id
-                    new GamificationNotificationDto()
+                    //The list contains the information about the notification to be sent
+                    var list = await _gamificationManager.UpdatePersonGamificationProfileAsync(_session.LoggedUserPerson.Id, ErmesConsts.GamificationActionConsts.READ_TIP);
+                    foreach (var item in list)
                     {
-                        PersonId = _session.LoggedUserPerson.Id,
-                        ActionName = ErmesConsts.GamificationActionConsts.READ_TIP,
-                        NewValue = newValue
-                    },
-                    EntityWriteAction.LevelChange);
-                    await _backgroundJobManager.EnqueueEventAsync(notification);
+                        NotificationEvent<GamificationNotificationDto> notification = new NotificationEvent<GamificationNotificationDto>(0,
+                        _session.LoggedUserPerson.Id,
+                        new GamificationNotificationDto()
+                        {
+                            PersonId = _session.LoggedUserPerson.Id,
+                            ActionName = ErmesConsts.GamificationActionConsts.READ_TIP,
+                            NewValue = item.NewValue
+                        },
+                        item.Action,
+                        true);
+                        await _backgroundJobManager.EnqueueEventAsync(notification);
+                    }
+                }
+                else
+                {
+                    Logger.ErrorFormat("Person {0} has already read tip {1}", _session.LoggedUserPerson.Id, input.TipCode);
+                    return false;
                 }
             }
             catch(Exception e)
@@ -186,7 +200,6 @@ namespace Ermes.Gamification
                 Logger.ErrorFormat("Errro while inserting PersonTip: {0}", e.Message);
                 return false;
             }
-
             return true;
         }
 
@@ -198,18 +211,20 @@ namespace Ermes.Gamification
                 if (ans.IsTheRightAnswer)
                 {
                     await _personManager.CreatePersonQuizAsync(_session.LoggedUserPerson.Id, ans.QuizCode);
-                    var (sendNotification, newValue) = await _gamificationManager.UpdatePersonGamificationProfileAsync(_session.LoggedUserPerson.Id, ErmesConsts.GamificationActionConsts.ANSWER_QUIZ);
-                    if (sendNotification)
+                    //The list contains the information about the notification to be sent
+                    var list = await _gamificationManager.UpdatePersonGamificationProfileAsync(_session.LoggedUserPerson.Id, ErmesConsts.GamificationActionConsts.ANSWER_QUIZ);
+                    foreach (var item in list)
                     {
                         NotificationEvent<GamificationNotificationDto> notification = new NotificationEvent<GamificationNotificationDto>(0,
-                        1, //creator does not receive notification, use 1 as mocked Id
+                        _session.LoggedUserPerson.Id,
                         new GamificationNotificationDto()
                         {
                             PersonId = _session.LoggedUserPerson.Id,
                             ActionName = ErmesConsts.GamificationActionConsts.ANSWER_QUIZ,
-                            NewValue = newValue
+                            NewValue = item.NewValue
                         },
-                        EntityWriteAction.LevelChange);
+                        item.Action,
+                        true);
                         await _backgroundJobManager.EnqueueEventAsync(notification);
                     }
                 }

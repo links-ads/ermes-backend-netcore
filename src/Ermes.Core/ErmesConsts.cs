@@ -46,6 +46,7 @@
         {
             public const string READ_TIP = "ReadTip";
             public const string ANSWER_QUIZ = "AnswerQuiz";
+            public const string DO_REPORT = "DoReport";
         }
     }
 }
