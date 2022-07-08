@@ -98,6 +98,8 @@
     <Compile Include="Migrations\20220621143835_Gamification_Actions_Added.Designer.cs" />
     <Compile Include="Migrations\20220622101013_GamificationActions_Name_Added.cs" />
     <Compile Include="Migrations\20220622101013_GamificationActions_Name_Added.Designer.cs" />
+    <Compile Include="Migrations\20220707101921_Gamification_Rewards_And_Audit.cs" />
+    <Compile Include="Migrations\20220707101921_Gamification_Rewards_And_Audit.Designer.cs" />
     <Compile Include="Migrations\ErmesDbContextModelSnapshot.cs" />
     <Compile Include="Migrations\Seed\ModelBuilderExtensions.cs" />
   </ItemGroup>

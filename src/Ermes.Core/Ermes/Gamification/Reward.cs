@@ -9,19 +9,16 @@ using System.Text;
 
 namespace Ermes.Gamification
 {
-    [Table("gamification_actions")]
-    public class GamificationAction: Entity, IMultiLingualEntity<GamificationActionTranslation>
+    /// <summary>
+    /// There are two kind of rewards: Achievements and Awards.
+    /// The main difference between them is that the formers are gained and retained forever, 
+    /// while the latter are assigned with a given periodicity, thus they can be gained and loosed.
+    /// </summary>
+    [Table("gamification_rewards")]
+    public class Reward: Entity
     {
-        public const int MaxCodeLength = 100;
         public const int MaxNameLength = 1000;
 
-        [Required]
-        [StringLength(MaxCodeLength)]
-        public string Code { get; set; }
-        [Required]
-        [StringLength(MaxNameLength)]
-        public string Name { get; set; }
-        public int Points { get; set; }
         [Column("Competence")]
         public string CompetenceString
         {
@@ -31,8 +28,15 @@ namespace Ermes.Gamification
         [NotMapped]
         public CompetenceType Competence { get; set; }
 
-        public ICollection<GamificationActionTranslation> Translations { get; set; }
+        [Required]
+        [StringLength(MaxNameLength)]
+        public string Name { get; set; }
 
-        public ICollection<Achievement> Achievements { get; set; }
+    }
+
+    public class GamificationDetail
+    {
+        public int Threshold { get; set; }
+        public int Points { get; set; }
     }
 }

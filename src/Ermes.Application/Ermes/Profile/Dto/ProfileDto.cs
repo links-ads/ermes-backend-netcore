@@ -1,5 +1,6 @@
 ﻿using Ermes.Auth.Dto;
 using Ermes.Enums;
+using Ermes.Gamification.Dto;
 using Ermes.Missions.Dto;
 using Ermes.Organizations.Dto;
 using Ermes.Teams.Dto;
@@ -29,6 +30,8 @@ namespace Ermes.Profile.Dto
         public string TaxCode { get; set; }
         public int Points { get; set; }
         public string Level { get; set; }
+        public List<MedalDto> Medals { get; set; }
+        public List<BadgeDto> Badges { get; set; }
 
     }
 

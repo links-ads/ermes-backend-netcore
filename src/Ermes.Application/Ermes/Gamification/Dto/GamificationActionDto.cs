@@ -12,5 +12,6 @@ namespace Ermes.Gamification.Dto
         public string Description { get; set; }
         public CompetenceType Competence { get; set; }
         public int Points { get; set; }
+        public List<Achievement> Achievements { get; set; }
     }
 }

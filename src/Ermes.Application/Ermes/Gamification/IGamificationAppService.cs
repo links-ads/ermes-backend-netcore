@@ -15,9 +15,8 @@ namespace Ermes.Gamification
         Task<DTResult<TipDto>> GetTips(GetTipsInput input);
         Task<DTResult<QuizDto>> GetQuizzes(GetQuizzesInput input);
         Task<DTResult<AnswerDto>> GetAnswers(GetAnswersInput input);
-        Task<bool> SetTipAsRead(SetTipAsReadInput input);
-        Task<bool> CheckPersonAnswer(CheckPersonAnswerInput input);
+        Task<BaseGamificationDto> SetTipAsRead(SetTipAsReadInput input);
+        Task<BaseGamificationDto> CheckPersonAnswer(CheckPersonAnswerInput input);
         Task<GetLevelsOutput> GetLevels();
-        Task<List<GamificationActionDto>> GetActions();
     }
 }

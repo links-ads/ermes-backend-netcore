@@ -254,6 +254,20 @@ namespace Ermes.EventHandlers
                         bodyParams = new string[] { eventData.Content.NewValue };
                         break;
                     }
+                case EntityWriteAction.MedalObtained:
+                    {
+                        titleKey = "Notification_Gamification_MedalObtained_Title";
+                        bodyKey = "Notification_Gamification_MedalObtained_Body";
+                        bodyParams = new string[] { eventData.Content.NewValue };
+                        break;
+                    }
+                case EntityWriteAction.BadgeObtained:
+                    {
+                        titleKey = "Notification_Gamification_BadgeObtained_Title";
+                        bodyKey = "Notification_Gamification_BadgeObtained_Body";
+                        bodyParams = new string[] { eventData.Content.NewValue };
+                        break;
+                    }
                 default:
                     {
                         titleKey = "";

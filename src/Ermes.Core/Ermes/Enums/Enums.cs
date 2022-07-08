@@ -211,7 +211,9 @@ namespace Ermes.Enums
         Delete,
         StatusChange,
         LevelChangeUp,
-        LevelChangeDown
+        LevelChangeDown,
+        MedalObtained,
+        BadgeObtained
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -362,5 +364,14 @@ namespace Ermes.Enums
         Reporter,
         Reviewer,
         Socializer
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum MedalType
+    {
+        Bronze,
+        Silver,
+        Gold,
+        Platinum
     }
 }

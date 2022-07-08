@@ -79,6 +79,12 @@ namespace Ermes.EntityFrameworkCore
         public virtual DbSet<Level> Levels { get; set; }
         public virtual DbSet<GamificationAction> GamificationActions { get; set; }
         public virtual DbSet<GamificationActionTranslation> GamificationActionTranslations { get; set; }
+        public virtual DbSet<Reward> Rewards { get; set; }
+        public virtual DbSet<Achievement> Achievements { get; set; }
+        public virtual DbSet<Medal> Medals { get; set; }
+        public virtual DbSet<Badge> Badges { get; set; }
+        public virtual DbSet<Award> Awards { get; set; }
+        public virtual DbSet<GamificationAudit> GamificationAudit { get; set; }
         public IEntityHistoryHelper EntityHistoryHelper { get; set; }
 
         private readonly ErmesLocalizationHelper _localizer;
@@ -193,6 +199,13 @@ namespace Ermes.EntityFrameworkCore
 
             modelBuilder.Entity<GamificationAction>().HasIndex(i => i.Code).IsUnique();
             modelBuilder.Entity<GamificationActionTranslation>().HasIndex(gat => new { gat.Language, gat.CoreId, }).IsUnique(true);
+
+            modelBuilder.Entity<Achievement>()
+                .HasOne<GamificationAction>(a => a.GamificationAction)
+                .WithMany(a => a.Achievements)
+                .HasPrincipalKey(a => a.Code)
+                .HasForeignKey(a => a.GamificationActionCode)
+                .OnDelete(DeleteBehavior.Restrict);
 
             #region EntityHistory
             modelBuilder.Entity<SplitEntityChange>().HasMany(e => e.PropertyChanges).WithOne().HasForeignKey(e => e.EntityChangeId);

@@ -444,21 +444,21 @@ namespace Ermes.Reports
             await _backgroundJobManager.EnqueueEventAsync(notification);
 
             //The list contains the information about the notification to be sent
-            var list = await _gamificationManager.UpdatePersonGamificationProfileAsync(_session.LoggedUserPerson.Id, ErmesConsts.GamificationActionConsts.DO_REPORT);
-            foreach (var item in list)
-            {
-                NotificationEvent<GamificationNotificationDto> gamNotification = new NotificationEvent<GamificationNotificationDto>(0,
-                _session.LoggedUserPerson.Id,
-                new GamificationNotificationDto()
-                {
-                    PersonId = _session.LoggedUserPerson.Id,
-                    ActionName = ErmesConsts.GamificationActionConsts.DO_REPORT,
-                    NewValue = item.NewValue
-                },
-                item.Action,
-                true);
-                await _backgroundJobManager.EnqueueEventAsync(gamNotification);
-            }
+            //var list = await _gamificationManager.UpdatePersonGamificationProfileAsync(_session.LoggedUserPerson.Id, ErmesConsts.GamificationActionConsts.DO_REPORT);
+            //foreach (var item in list)
+            //{
+            //    NotificationEvent<GamificationNotificationDto> gamNotification = new NotificationEvent<GamificationNotificationDto>(0,
+            //    _session.LoggedUserPerson.Id,
+            //    new GamificationNotificationDto()
+            //    {
+            //        PersonId = _session.LoggedUserPerson.Id,
+            //        ActionName = ErmesConsts.GamificationActionConsts.DO_REPORT,
+            //        NewValue = item.NewValue
+            //    },
+            //    item.Action,
+            //    true);
+            //    await _backgroundJobManager.EnqueueEventAsync(gamNotification);
+            //}
 
             return true;
         }

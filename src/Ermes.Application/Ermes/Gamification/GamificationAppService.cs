@@ -142,6 +142,24 @@ namespace Ermes.Gamification
             result.Items = ObjectMapper.Map<List<AnswerDto>>(items);
             return result;
         }
+
+        private async Task SendNotification(List<(EntityWriteAction Action, string NewValue)> list, string actionName)
+        {
+            foreach (var item in list)
+            {
+                NotificationEvent<GamificationNotificationDto> notification = new NotificationEvent<GamificationNotificationDto>(0,
+                _session.LoggedUserPerson.Id,
+                new GamificationNotificationDto()
+                {
+                    PersonId = _session.LoggedUserPerson.Id,
+                    ActionName = actionName,
+                    NewValue = item.NewValue
+                },
+                item.Action,
+                true);
+                await _backgroundJobManager.EnqueueEventAsync(notification);
+            }
+        }
         #endregion
 
         public virtual async Task<DTResult<TipDto>> GetTips(GetTipsInput input)
@@ -162,95 +180,170 @@ namespace Ermes.Gamification
             return new DTResult<AnswerDto>(input.Draw, result.TotalCount, result.Items.Count, result.Items.ToList());
         }
 
-
-        //TODO: bisogna restituire al client il profilo aggiornato dell'utente, con almeno livello e punteggio
-        public virtual async Task<bool> SetTipAsRead(SetTipAsReadInput input)
+        public virtual async Task<BaseGamificationDto> SetTipAsRead(SetTipAsReadInput input)
         {
+            var result = new BaseGamificationDto()
+            {
+                Success = true
+            };
+            Person person = await _personManager.GetPersonByIdAsync(_session.LoggedUserPerson.Id);
+
             try
             {
+                Tip tip = await _tipManager.GetTipByCodeAsync(input.TipCode);
                 int id = await _personManager.CreatePersonTipAsync(_session.LoggedUserPerson.Id, input.TipCode);
 
                 if (id > 0)
                 {
-                    //The list contains the information about the notification to be sent
-                    var list = await _gamificationManager.UpdatePersonGamificationProfileAsync(_session.LoggedUserPerson.Id, ErmesConsts.GamificationActionConsts.READ_TIP);
-                    foreach (var item in list)
-                    {
-                        NotificationEvent<GamificationNotificationDto> notification = new NotificationEvent<GamificationNotificationDto>(0,
-                        _session.LoggedUserPerson.Id,
-                        new GamificationNotificationDto()
+                    
+                    async Task<List<(EntityWriteAction, string NewValue)>> AssignRewards(long personId) {
+                        List<(EntityWriteAction, string newValue)> result = new List<(EntityWriteAction, string newValue)>();
+                        var action = await _gamificationManager.GetActionByNameAsync(ErmesConsts.GamificationActionConsts.READ_TIP);
+                        var person = await _personManager.GetPersonByIdAsync(personId);
+                        if(action != null && action.Achievements != null && action.Achievements.Count > 0)
                         {
-                            PersonId = _session.LoggedUserPerson.Id,
-                            ActionName = ErmesConsts.GamificationActionConsts.READ_TIP,
-                            NewValue = item.NewValue
-                        },
-                        item.Action,
-                        true);
-                        await _backgroundJobManager.EnqueueEventAsync(notification);
+                            var personTips = await _tipManager.GetTipsByPersonAsync(_session.LoggedUserPerson.Id);
+                            foreach (var item in action.Achievements)
+                            {
+                                if(item is Medal)
+                                {
+                                    if(item.Detail.Threshold == personTips.Count)
+                                    {
+                                        await _gamificationManager.InsertAudit(_session.LoggedUserPerson.Id, null, item.Id, null);
+                                        person.Points += item.Detail.Points;
+                                        result.Add((EntityWriteAction.MedalObtained, item.Name));
+                                    }
+
+                                }
+                                else if(item is Badge)
+                                {
+                                    Badge badge = (Badge)item;
+                                    if (badge.Hazard != tip.Hazard)
+                                        continue;
+
+                                    var personTipsByHazard = personTips.Where(a => a.Hazard == tip.Hazard).ToList();
+                                    var tipsByHazardCount = _tipManager.Tips.Where(t => t.HazardString == tip.HazardString).Count();
+                                    if(tipsByHazardCount == personTipsByHazard.Count)
+                                    {
+                                        await _gamificationManager.InsertAudit(_session.LoggedUserPerson.Id, null, item.Id, null);
+                                        person.Points += badge.Detail.Points;
+                                        result.Add((EntityWriteAction.BadgeObtained, badge.Name));
+                                    }
+                                }
+
+                            }
+                        }
+
+                        return result;
                     }
+
+
+                    //The list contains the information about the notifications to be sent
+                    var list = await _gamificationManager.UpdatePersonGamificationProfileAsync(_session.LoggedUserPerson.Id, ErmesConsts.GamificationActionConsts.READ_TIP, AssignRewards);
+                    await SendNotification(list, ErmesConsts.GamificationActionConsts.READ_TIP);
                 }
                 else
                 {
                     Logger.ErrorFormat("Person {0} has already read tip {1}", _session.LoggedUserPerson.Id, input.TipCode);
-                    return false;
+                    result.Success = false;
                 }
             }
             catch(Exception e)
             {
-                Logger.ErrorFormat("Errro while inserting PersonTip: {0}", e.Message);
-                return false;
+                Logger.ErrorFormat("Error while inserting PersonTip: {0}", e.Message);
+                result.Success = false;
             }
-            return true;
+
+            if (result.Success) {
+                result.Points = person.Points;
+                result.LevelId = person.LevelId;
+            }
+
+            return result;
         }
 
-        public virtual async Task<bool> CheckPersonAnswer(CheckPersonAnswerInput input)
+        public virtual async Task<BaseGamificationDto> CheckPersonAnswer(CheckPersonAnswerInput input)
         {
+            var result = new BaseGamificationDto()
+            {
+                Success = true
+            };
+            Person person = await _personManager.GetPersonByIdAsync(_session.LoggedUserPerson.Id);
             try
             {
                 var ans = await _answerManager.GetAnswerByCodeAsync(input.AnswerCode);
+                Quiz quiz = await  _quizManager.GetQuizByCodeAsync(ans.QuizCode);
                 if (ans.IsTheRightAnswer)
                 {
                     await _personManager.CreatePersonQuizAsync(_session.LoggedUserPerson.Id, ans.QuizCode);
-                    //The list contains the information about the notification to be sent
-                    var list = await _gamificationManager.UpdatePersonGamificationProfileAsync(_session.LoggedUserPerson.Id, ErmesConsts.GamificationActionConsts.ANSWER_QUIZ);
-                    foreach (var item in list)
+
+                    async Task<List<(EntityWriteAction, string NewValue)>> AssignRewards(long personId)
                     {
-                        NotificationEvent<GamificationNotificationDto> notification = new NotificationEvent<GamificationNotificationDto>(0,
-                        _session.LoggedUserPerson.Id,
-                        new GamificationNotificationDto()
+                        List<(EntityWriteAction, string newValue)> result = new List<(EntityWriteAction, string newValue)>();
+                        var action = await _gamificationManager.GetActionByNameAsync(ErmesConsts.GamificationActionConsts.ANSWER_QUIZ);
+                        var person = await _personManager.GetPersonByIdAsync(personId);
+                        if (action != null && action.Achievements != null && action.Achievements.Count > 0)
                         {
-                            PersonId = _session.LoggedUserPerson.Id,
-                            ActionName = ErmesConsts.GamificationActionConsts.ANSWER_QUIZ,
-                            NewValue = item.NewValue
-                        },
-                        item.Action,
-                        true);
-                        await _backgroundJobManager.EnqueueEventAsync(notification);
+                            var personQuizzes = await _quizManager.GetQuizzesByPersonAsync(_session.LoggedUserPerson.Id);
+                            foreach (var item in action.Achievements)
+                            {
+                                if (item is Medal)
+                                {
+                                    if (item.Detail.Threshold == personQuizzes.Count)
+                                    {
+                                        await _gamificationManager.InsertAudit(_session.LoggedUserPerson.Id, null, item.Id, null);
+                                        person.Points += item.Detail.Points;
+                                        result.Add((EntityWriteAction.MedalObtained, item.Name));
+                                    }
+
+                                }
+                                else if (item is Badge)
+                                {
+                                    Badge badge = (Badge)item;
+                                    if (badge.Hazard != quiz.Hazard)
+                                        continue;
+
+                                    var personQuizsByHazard = personQuizzes.Where(a => a.Hazard == quiz.Hazard).ToList();
+                                    var quizzesByHazardCount = _quizManager.Quizzes.Where(t => t.HazardString == quiz.HazardString).Count();
+                                    if (quizzesByHazardCount == personQuizsByHazard.Count)
+                                    {
+                                        await _gamificationManager.InsertAudit(_session.LoggedUserPerson.Id, null, item.Id, null);
+                                        person.Points += badge.Detail.Points;
+                                        result.Add((EntityWriteAction.BadgeObtained, badge.Name));
+                                    }
+                                }
+
+                            }
+                        }
+
+                        return result;
                     }
+
+                    //The list contains the information about the notification to be sent
+                    var list = await _gamificationManager.UpdatePersonGamificationProfileAsync(_session.LoggedUserPerson.Id, ErmesConsts.GamificationActionConsts.ANSWER_QUIZ, AssignRewards);
+                    await SendNotification(list, ErmesConsts.GamificationActionConsts.ANSWER_QUIZ);
                 }
                 else
-                    return false;
+                    result.Success = false;
             }
             catch (Exception e)
             {
-                Logger.ErrorFormat("Errro while inserting PersonQuiz: {0}", e.Message);
-                return false;
+                Logger.ErrorFormat("Error while inserting PersonQuiz: {0}", e.Message);
+                result.Success = false;
             }
 
-            return true;
+            if (result.Success)
+            {
+                result.Points = person.Points;
+                result.LevelId = person.LevelId;
+            }
+            return result;
         }
 
-        public virtual async Task<GetLevelsOutput> GetLevels()
+        public async Task<GetLevelsOutput> GetLevels()
         {
             var levels = await _gamificationManager.GetLevelsAsync();
             return new GetLevelsOutput() { Levels = ObjectMapper.Map<List<LevelDto>>(levels) };
-        }
-
-        public virtual async Task<List<GamificationActionDto>> GetActions()
-        {
-            var items = await _gamificationManager.Actions.ToListAsync();
-            var result = ObjectMapper.Map<List<GamificationActionDto>>(items);
-            return result;
         }
     }
 }
