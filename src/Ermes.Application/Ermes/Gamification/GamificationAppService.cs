@@ -6,6 +6,7 @@ using Abp.UI;
 using Ermes.Answers;
 using Ermes.Attributes;
 using Ermes.Authorization;
+using Ermes.Dto;
 using Ermes.Dto.Datatable;
 using Ermes.Enums;
 using Ermes.Ermes.Gamification.Dto;
@@ -180,11 +181,14 @@ namespace Ermes.Gamification
             return new DTResult<AnswerDto>(input.Draw, result.TotalCount, result.Items.Count, result.Items.ToList());
         }
 
-        public virtual async Task<BaseGamificationDto> SetTipAsRead(SetTipAsReadInput input)
+        public virtual async Task<GamificationResponse> SetTipAsRead(SetTipAsReadInput input)
         {
-            var result = new BaseGamificationDto()
+            var result = new GamificationResponse()
             {
-                Success = true
+                Response = new ResponseBaseDto()
+                {
+                    Success = true
+                }
             };
             Person person = await _personManager.GetPersonByIdAsync(_session.LoggedUserPerson.Id);
 
@@ -244,29 +248,36 @@ namespace Ermes.Gamification
                 }
                 else
                 {
-                    Logger.ErrorFormat("Person {0} has already read tip {1}", _session.LoggedUserPerson.Id, input.TipCode);
-                    result.Success = false;
+                    var message = string.Format("Person {0} has already read tip {1}", _session.LoggedUserPerson.Id, input.TipCode);
+                    Logger.Error(message);
+                    result.Response.Success = false;
+                    result.Response.ErrorMessage = message;
                 }
             }
             catch(Exception e)
             {
-                Logger.ErrorFormat("Error while inserting PersonTip: {0}", e.Message);
-                result.Success = false;
+                var message = string.Format("Error while inserting PersonTip: {0}", e.Message);
+                Logger.Error(message);
+                result.Response.Success = false;
+                result.Response.ErrorMessage = message;
             }
 
-            if (result.Success) {
-                result.Points = person.Points;
-                result.LevelId = person.LevelId;
+            if (result.Response.Success) {
+                result.Gamification.Points = person.Points;
+                result.Gamification.LevelId = person.LevelId;
             }
 
             return result;
         }
 
-        public virtual async Task<BaseGamificationDto> CheckPersonAnswer(CheckPersonAnswerInput input)
+        public virtual async Task<GamificationResponse> CheckPersonAnswer(CheckPersonAnswerInput input)
         {
-            var result = new BaseGamificationDto()
+            var result = new GamificationResponse()
             {
-                Success = true
+                Response = new ResponseBaseDto()
+                {
+                    Success = true
+                }
             };
             Person person = await _personManager.GetPersonByIdAsync(_session.LoggedUserPerson.Id);
             try
@@ -324,18 +335,25 @@ namespace Ermes.Gamification
                     await SendNotification(list, ErmesConsts.GamificationActionConsts.ANSWER_QUIZ);
                 }
                 else
-                    result.Success = false;
+                {
+                    var message = string.Format("This is not the right answer: {0}", input.AnswerCode);
+                    Logger.Error(message);
+                    result.Response.Success = false;
+                    result.Response.ErrorMessage = message;
+                }
             }
             catch (Exception e)
             {
-                Logger.ErrorFormat("Error while inserting PersonQuiz: {0}", e.Message);
-                result.Success = false;
+                var message = string.Format("Error while inserting PersonQuiz: {0}", e.Message);
+                Logger.Error(message);
+                result.Response.Success = false;
+                result.Response.ErrorMessage = message;
             }
 
-            if (result.Success)
+            if (result.Response.Success)
             {
-                result.Points = person.Points;
-                result.LevelId = person.LevelId;
+                result.Gamification.Points = person.Points;
+                result.Gamification.LevelId = person.LevelId;
             }
             return result;
         }
@@ -344,6 +362,33 @@ namespace Ermes.Gamification
         {
             var levels = await _gamificationManager.GetLevelsAsync();
             return new GetLevelsOutput() { Levels = ObjectMapper.Map<List<LevelDto>>(levels) };
+        }
+
+        public virtual async Task<GetLeaderboardOutput> GetLeaderboard()
+        {
+            var competitors = await _personManager
+                                .Persons
+                                .Join(
+                                    _personManager.PersonRoles,
+                                    a => a.Id,
+                                    b => b.PersonId,
+                                    (a, b) => new { Person = a, role = b.Role }
+                                )
+                                .Where(ab => ab.role.Name == AppRoles.CITIZEN)
+                                .Select(ab => ab.Person)
+                                .OrderByDescending(p => p.Points)
+                                .ThenBy(p => p.Id)
+                                .ToListAsync();
+
+            int indexOfPerson = competitors.FindIndex(0, p => p.Id == _session.LoggedUserPerson.Id);
+            var subList = competitors
+                            .TakeWhile((p, index) => index >= indexOfPerson - 2 && index <= indexOfPerson + 2)
+                            .ToList();
+
+            return new GetLeaderboardOutput()
+            {
+                Competitors = ObjectMapper.Map<List<GamificationBaseDto>>(subList)
+            };
         }
     }
 }
