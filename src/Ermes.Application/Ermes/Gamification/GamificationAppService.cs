@@ -368,6 +368,7 @@ namespace Ermes.Gamification
         {
             var competitors = await _personManager
                                 .Persons
+                                .Include(p => p.Level)
                                 .Join(
                                     _personManager.PersonRoles,
                                     a => a.Id,
