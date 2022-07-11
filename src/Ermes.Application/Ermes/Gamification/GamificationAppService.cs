@@ -383,12 +383,23 @@ namespace Ermes.Gamification
             int indexOfPerson = competitors.FindIndex(0, p => p.Id == _session.LoggedUserPerson.Id);
             var subList = competitors
                             .TakeWhile((p, index) => index >= indexOfPerson - 2 && index <= indexOfPerson + 2)
+                            .Select((p, index) => new
+                            {
+                                Person = p,
+                                Index = ++index
+                            })
                             .ToList();
 
-            return new GetLeaderboardOutput()
+            var result = new GetLeaderboardOutput();
+            
+            foreach (var item in subList)
             {
-                Competitors = ObjectMapper.Map<List<GamificationBaseDto>>(subList)
-            };
+                var newCompetitor = ObjectMapper.Map<GamificationBaseDto>(item.Person);
+                newCompetitor.Position = item.Index;
+                result.Competitors.Add(newCompetitor);
+            }
+
+            return result;
         }
     }
 }
