@@ -150,6 +150,8 @@ namespace Ermes
                     RoleId = defaultRole.Id
                 });
                 profile.User.Roles.Add(defaultRole.Name);
+                if (defaultRole.Name == AppRoles.CITIZEN)
+                    person.LevelId = (await _gamificationManager.GetDefaultLevel()).Id;
             }
 
             if (profile.User.Timezone == null)
