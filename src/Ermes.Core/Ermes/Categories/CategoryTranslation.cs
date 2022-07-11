@@ -10,6 +10,7 @@ namespace Ermes.Categories
         public const int MaxNameLength = 255;
         public const int MaxGroupLength = 100;
         public const int MaxSubGroupLength = 255;
+        public const int MaxLanguageLength = 2;
 
         [Required]
         [StringLength(MaxGroupLength)]
@@ -25,6 +26,7 @@ namespace Ermes.Categories
 
         public Category Core { get; set; }
         public int CoreId { get; set; }
+        [StringLength(MaxLanguageLength)]
         public string Language { get; set; }
         public string UnitOfMeasure { get; set; }
         public string Target { get; set; }

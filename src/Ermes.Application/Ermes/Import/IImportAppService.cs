@@ -19,5 +19,6 @@ namespace Ermes.Import
         Task<ImportResultDto> ImportQuizzes(IFormFile file);
         Task<ImportResultDto> ImportAnswers(IFormFile file);
         Task<ImportResultDto> ImportLayers(IFormFile file);
+        Task<ImportResultDto> ImportGamificationActions(IFormFile file);
     }
 }

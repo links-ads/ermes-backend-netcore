@@ -1,11 +1,16 @@
 ﻿using Abp.Application.Services.Dto;
+using Abp.BackgroundJobs;
+using Abp.Domain.Uow;
 using Abp.Linq.Extensions;
 using Abp.UI;
 using Ermes.Answers;
 using Ermes.Attributes;
 using Ermes.Authorization;
+using Ermes.Dto;
 using Ermes.Dto.Datatable;
+using Ermes.Enums;
 using Ermes.Ermes.Gamification.Dto;
+using Ermes.EventHandlers;
 using Ermes.Gamification.Dto;
 using Ermes.Linq.Extensions;
 using Ermes.Persons;
@@ -20,19 +25,24 @@ using System.Threading.Tasks;
 namespace Ermes.Gamification
 {
     [ErmesAuthorize]
+    [ErmesGamification]
     public class GamificationAppService : ErmesAppServiceBase, IGamificationAppService
     {
         private readonly TipManager _tipManager;
         private readonly QuizManager _quizManager;
         private readonly AnswerManager _answerManager;
         private readonly PersonManager _personManager;
+        private readonly GamificationManager _gamificationManager;
         private readonly ErmesAppSession _session;
+        private readonly IBackgroundJobManager _backgroundJobManager;
         public GamificationAppService(
                 TipManager tipManager,
                 QuizManager quizManager,
                 AnswerManager answerManager,
                 ErmesAppSession session,
-                PersonManager personManager
+                PersonManager personManager,
+                GamificationManager gamificationManager,
+                IBackgroundJobManager backgroundJobManager
             )
         {
             _tipManager = tipManager;
@@ -40,6 +50,8 @@ namespace Ermes.Gamification
             _answerManager = answerManager;
             _session = session;
             _personManager = personManager;
+            _gamificationManager = gamificationManager;
+            _backgroundJobManager = backgroundJobManager;
         }
 
         #region Private
@@ -131,9 +143,25 @@ namespace Ermes.Gamification
             result.Items = ObjectMapper.Map<List<AnswerDto>>(items);
             return result;
         }
+
+        private async Task SendNotification(List<(EntityWriteAction Action, string NewValue)> list, string actionName)
+        {
+            foreach (var item in list)
+            {
+                NotificationEvent<GamificationNotificationDto> notification = new NotificationEvent<GamificationNotificationDto>(0,
+                _session.LoggedUserPerson.Id,
+                new GamificationNotificationDto()
+                {
+                    PersonId = _session.LoggedUserPerson.Id,
+                    ActionName = actionName,
+                    NewValue = item.NewValue
+                },
+                item.Action,
+                true);
+                await _backgroundJobManager.EnqueueEventAsync(notification);
+            }
+        }
         #endregion
-
-
 
         public virtual async Task<DTResult<TipDto>> GetTips(GetTipsInput input)
         {
@@ -153,46 +181,214 @@ namespace Ermes.Gamification
             return new DTResult<AnswerDto>(input.Draw, result.TotalCount, result.Items.Count, result.Items.ToList());
         }
 
-        public virtual async Task<bool> SetTipAsRead(SetTipAsReadInput input)
+        public virtual async Task<GamificationResponse> SetTipAsRead(SetTipAsReadInput input)
         {
-            //Only citizens take part to gamification
-            if (!_session.Roles.Any(r => r == AppRoles.CITIZEN))
-                throw new UserFriendlyException(L("DoNotTakePartToGamification"));
+            var result = new GamificationResponse()
+            {
+                Response = new ResponseBaseDto()
+                {
+                    Success = true
+                }
+            };
+            Person person = await _personManager.GetPersonByIdAsync(_session.LoggedUserPerson.Id);
 
             try
             {
-                await _personManager.CreatePersonTipAsync(_session.LoggedUserPerson.Id, input.TipCode);
+                Tip tip = await _tipManager.GetTipByCodeAsync(input.TipCode);
+                int id = await _personManager.CreatePersonTipAsync(_session.LoggedUserPerson.Id, input.TipCode);
+
+                if (id > 0)
+                {
+                    
+                    async Task<List<(EntityWriteAction, string NewValue)>> AssignRewards(long personId) {
+                        List<(EntityWriteAction, string newValue)> result = new List<(EntityWriteAction, string newValue)>();
+                        var action = await _gamificationManager.GetActionByNameAsync(ErmesConsts.GamificationActionConsts.READ_TIP);
+                        var person = await _personManager.GetPersonByIdAsync(personId);
+                        if(action != null && action.Achievements != null && action.Achievements.Count > 0)
+                        {
+                            var personTips = await _tipManager.GetTipsByPersonAsync(_session.LoggedUserPerson.Id);
+                            foreach (var item in action.Achievements)
+                            {
+                                if(item is Medal)
+                                {
+                                    if(item.Detail.Threshold == personTips.Count)
+                                    {
+                                        await _gamificationManager.InsertAudit(_session.LoggedUserPerson.Id, null, item.Id, null);
+                                        person.Points += item.Detail.Points;
+                                        result.Add((EntityWriteAction.MedalObtained, item.Name));
+                                    }
+
+                                }
+                                else if(item is Badge)
+                                {
+                                    Badge badge = (Badge)item;
+                                    if (badge.Hazard != tip.Hazard)
+                                        continue;
+
+                                    var personTipsByHazard = personTips.Where(a => a.Hazard == tip.Hazard).ToList();
+                                    var tipsByHazardCount = _tipManager.Tips.Where(t => t.HazardString == tip.HazardString).Count();
+                                    if(tipsByHazardCount == personTipsByHazard.Count)
+                                    {
+                                        await _gamificationManager.InsertAudit(_session.LoggedUserPerson.Id, null, item.Id, null);
+                                        person.Points += badge.Detail.Points;
+                                        result.Add((EntityWriteAction.BadgeObtained, badge.Name));
+                                    }
+                                }
+
+                            }
+                        }
+
+                        return result;
+                    }
+
+
+                    //The list contains the information about the notifications to be sent
+                    var list = await _gamificationManager.UpdatePersonGamificationProfileAsync(_session.LoggedUserPerson.Id, ErmesConsts.GamificationActionConsts.READ_TIP, AssignRewards);
+                    await SendNotification(list, ErmesConsts.GamificationActionConsts.READ_TIP);
+                }
+                else
+                {
+                    var message = string.Format("Person {0} has already read tip {1}", _session.LoggedUserPerson.Id, input.TipCode);
+                    Logger.Error(message);
+                    result.Response.Success = false;
+                    result.Response.ErrorMessage = message;
+                }
             }
             catch(Exception e)
             {
-                Logger.ErrorFormat("Errro while inserting PersonTip: {0}", e.Message);
-                return false;
+                var message = string.Format("Error while inserting PersonTip: {0}", e.Message);
+                Logger.Error(message);
+                result.Response.Success = false;
+                result.Response.ErrorMessage = message;
             }
 
-            return true;
+            if (result.Response.Success) {
+                result.Gamification.Points = person.Points;
+                result.Gamification.LevelId = person.LevelId;
+            }
+
+            return result;
         }
 
-        public virtual async Task<bool> CheckPersonAnswer(CheckPersonAnswerInput input)
+        public virtual async Task<GamificationResponse> CheckPersonAnswer(CheckPersonAnswerInput input)
         {
-            //Only citizens take part to gamification
-            if (!_session.Roles.Any(r => r == AppRoles.CITIZEN))
-                throw new UserFriendlyException(L("DoNotTakePartToGamification"));
-
+            var result = new GamificationResponse()
+            {
+                Response = new ResponseBaseDto()
+                {
+                    Success = true
+                }
+            };
+            Person person = await _personManager.GetPersonByIdAsync(_session.LoggedUserPerson.Id);
             try
             {
                 var ans = await _answerManager.GetAnswerByCodeAsync(input.AnswerCode);
+                Quiz quiz = await  _quizManager.GetQuizByCodeAsync(ans.QuizCode);
                 if (ans.IsTheRightAnswer)
+                {
                     await _personManager.CreatePersonQuizAsync(_session.LoggedUserPerson.Id, ans.QuizCode);
+
+                    async Task<List<(EntityWriteAction, string NewValue)>> AssignRewards(long personId)
+                    {
+                        List<(EntityWriteAction, string newValue)> result = new List<(EntityWriteAction, string newValue)>();
+                        var action = await _gamificationManager.GetActionByNameAsync(ErmesConsts.GamificationActionConsts.ANSWER_QUIZ);
+                        var person = await _personManager.GetPersonByIdAsync(personId);
+                        if (action != null && action.Achievements != null && action.Achievements.Count > 0)
+                        {
+                            var personQuizzes = await _quizManager.GetQuizzesByPersonAsync(_session.LoggedUserPerson.Id);
+                            foreach (var item in action.Achievements)
+                            {
+                                if (item is Medal)
+                                {
+                                    if (item.Detail.Threshold == personQuizzes.Count)
+                                    {
+                                        await _gamificationManager.InsertAudit(_session.LoggedUserPerson.Id, null, item.Id, null);
+                                        person.Points += item.Detail.Points;
+                                        result.Add((EntityWriteAction.MedalObtained, item.Name));
+                                    }
+
+                                }
+                                else if (item is Badge)
+                                {
+                                    Badge badge = (Badge)item;
+                                    if (badge.Hazard != quiz.Hazard)
+                                        continue;
+
+                                    var personQuizsByHazard = personQuizzes.Where(a => a.Hazard == quiz.Hazard).ToList();
+                                    var quizzesByHazardCount = _quizManager.Quizzes.Where(t => t.HazardString == quiz.HazardString).Count();
+                                    if (quizzesByHazardCount == personQuizsByHazard.Count)
+                                    {
+                                        await _gamificationManager.InsertAudit(_session.LoggedUserPerson.Id, null, item.Id, null);
+                                        person.Points += badge.Detail.Points;
+                                        result.Add((EntityWriteAction.BadgeObtained, badge.Name));
+                                    }
+                                }
+
+                            }
+                        }
+
+                        return result;
+                    }
+
+                    //The list contains the information about the notification to be sent
+                    var list = await _gamificationManager.UpdatePersonGamificationProfileAsync(_session.LoggedUserPerson.Id, ErmesConsts.GamificationActionConsts.ANSWER_QUIZ, AssignRewards);
+                    await SendNotification(list, ErmesConsts.GamificationActionConsts.ANSWER_QUIZ);
+                }
                 else
-                    return false;
+                {
+                    var message = string.Format("This is not the right answer: {0}", input.AnswerCode);
+                    Logger.Error(message);
+                    result.Response.Success = false;
+                    result.Response.ErrorMessage = message;
+                }
             }
             catch (Exception e)
             {
-                Logger.ErrorFormat("Errro while inserting PersonQuiz: {0}", e.Message);
-                return false;
+                var message = string.Format("Error while inserting PersonQuiz: {0}", e.Message);
+                Logger.Error(message);
+                result.Response.Success = false;
+                result.Response.ErrorMessage = message;
             }
 
-            return true;
+            if (result.Response.Success)
+            {
+                result.Gamification.Points = person.Points;
+                result.Gamification.LevelId = person.LevelId;
+            }
+            return result;
+        }
+
+        public async Task<GetLevelsOutput> GetLevels()
+        {
+            var levels = await _gamificationManager.GetLevelsAsync();
+            return new GetLevelsOutput() { Levels = ObjectMapper.Map<List<LevelDto>>(levels) };
+        }
+
+        public virtual async Task<GetLeaderboardOutput> GetLeaderboard()
+        {
+            var competitors = await _personManager
+                                .Persons
+                                .Join(
+                                    _personManager.PersonRoles,
+                                    a => a.Id,
+                                    b => b.PersonId,
+                                    (a, b) => new { Person = a, role = b.Role }
+                                )
+                                .Where(ab => ab.role.Name == AppRoles.CITIZEN)
+                                .Select(ab => ab.Person)
+                                .OrderByDescending(p => p.Points)
+                                .ThenBy(p => p.Id)
+                                .ToListAsync();
+
+            int indexOfPerson = competitors.FindIndex(0, p => p.Id == _session.LoggedUserPerson.Id);
+            var subList = competitors
+                            .TakeWhile((p, index) => index >= indexOfPerson - 2 && index <= indexOfPerson + 2)
+                            .ToList();
+
+            return new GetLeaderboardOutput()
+            {
+                Competitors = ObjectMapper.Map<List<GamificationBaseDto>>(subList)
+            };
         }
     }
 }

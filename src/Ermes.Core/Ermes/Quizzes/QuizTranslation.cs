@@ -12,8 +12,10 @@ namespace Ermes.Quizzes
     {
         public const int MaxTextLength = 1000;
         public const int MaxDetailLength = 50;
+        public const int MaxLanguageLength = 2;
         public Quiz Core { get; set; }
         public int CoreId { get; set; }
+        [StringLength(MaxLanguageLength)]
         public string Language { get; set; }
 
         [Required]

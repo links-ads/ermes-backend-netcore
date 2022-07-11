@@ -177,6 +177,7 @@ namespace Ermes.Enums
         PersonActionStatus = 70,
         PersonActionActivity = 80,
         Person = 90,
+        Gamification = 100
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -208,7 +209,11 @@ namespace Ermes.Enums
         Create,
         Update,
         Delete,
-        StatusChange
+        StatusChange,
+        LevelChangeUp,
+        LevelChangeDown,
+        MedalObtained,
+        BadgeObtained
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -350,5 +355,24 @@ namespace Ermes.Enums
         OnDemand,
         H6,
         H12
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum CompetenceType
+    {
+        Starter,
+        Learner,
+        Reporter,
+        Reviewer,
+        Socializer
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum MedalType
+    {
+        Bronze,
+        Silver,
+        Gold,
+        Platinum
     }
 }

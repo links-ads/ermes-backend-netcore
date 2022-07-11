@@ -1,5 +1,6 @@
 ﻿using Abp.Domain.Repositories;
 using Abp.Domain.Services;
+using Ermes.Persons;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -17,10 +18,14 @@ namespace Ermes.Tips
         public IQueryable<TipTranslation> TipsTranslation { get { return TipTranslationRepository.GetAllIncluding(ct => ct.Core); } }
         protected IRepository<TipTranslation> TipTranslationRepository { get; set; }
 
-        public TipManager(IRepository<Tip> tipRepository, IRepository<TipTranslation> tipTranslationRepository)
+        protected IRepository<PersonTip> PersonTipRepository { get; set; }
+        public IQueryable<PersonTip> PersonTips { get { return PersonTipRepository.GetAllIncluding(a => a.Tip); } }
+
+        public TipManager(IRepository<Tip> tipRepository, IRepository<TipTranslation> tipTranslationRepository, IRepository<PersonTip> personTipRepository)
         {
             TipRepository = tipRepository;
             TipTranslationRepository = tipTranslationRepository;
+            PersonTipRepository = personTipRepository;
         }
 
         public async Task<List<Tip>> GetTipsAsync()
@@ -45,6 +50,11 @@ namespace Ermes.Tips
         public async Task<TipTranslation> GetTipTranslationByCoreIdLanguageAsync(int coreId, string language)
         {
             return await TipsTranslation.SingleOrDefaultAsync(a => a.CoreId == coreId && a.Language == language);
+        }
+
+        public async Task<List<Tip>> GetTipsByPersonAsync(long personId)
+        {
+            return await PersonTips.Where(pt => pt.PersonId == personId).Select(a => a.Tip).ToListAsync();
         }
     }
 }
