@@ -383,12 +383,12 @@ namespace Ermes.Gamification
 
             int indexOfPerson = competitors.FindIndex(0, p => p.Id == _session.LoggedUserPerson.Id);
             var subList = competitors
-                            .Where((p, index) => index >= indexOfPerson - 2 && index <= indexOfPerson + 2)
                             .Select((p, index) => new
                             {
                                 Person = p,
                                 Index = ++index
                             })
+                            .Where((p, index) => index >= indexOfPerson - 2 && index <= indexOfPerson + 2)
                             .ToList();
 
             var result = new GetLeaderboardOutput();
