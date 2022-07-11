@@ -94,7 +94,15 @@ namespace Ermes.Migrations
 
             migrationBuilder.Sql(
                 @"
-                    update public.persons set ""LevelId"" = (select ""Id"" from public.gamification_levels where ""Name"" = 'Rookie');
+                    update public.persons p2
+                    set ""LevelId"" = (select ""Id"" from public.gamification_levels where ""Name"" = 'Rookie')
+                    where p2.""Id"" in (
+                        select p.""Id""
+                        from persons p
+                        join person_roles pr on pr.""PersonId"" = p.""Id""
+                        join roles r on r.""Id"" = pr.""RoleId""
+                        where r.""Name"" = 'citizen'
+                    )
                 "
             );
         }

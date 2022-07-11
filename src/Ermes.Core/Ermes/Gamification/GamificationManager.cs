@@ -154,5 +154,10 @@ namespace Ermes.Gamification
                             .OfType<Badge>()
                             .ToListAsync();
         }
+
+        public async Task<Level> GetDefaultLevel()
+        {
+            return await Levels.SingleOrDefaultAsync(l => !l.PreviousLevelId.HasValue);
+        }
     }
 }
