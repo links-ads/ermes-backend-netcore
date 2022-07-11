@@ -82,7 +82,7 @@
     "TeamNotInOrganization": "Team {0} non appartiene all'organizzazione {1}",
     "EntityOutsideOrganization": "Non hai la visibilit� su questo elemento",
     "MissingPermission": "Non si dispone dei permessi per effettuare questa operazione",
-    "InvalidActivityCode": "Codice Attivit� non valido: {0}, lunghezza massima consentita: {1}",
+    "InvalidActivityCode": "Codice Attivita' non valido: {0}, lunghezza massima consentita: {1}",
     "CategoryImportIndexMustBeFirst": "Il foglio indice deve essere il primo",
     "MissingField": "Campo mancante: {0}",
     "TimeWindowSizeError": "Ridurre la dimensione della finestra temporale",

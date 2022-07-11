@@ -256,6 +256,7 @@ namespace Ermes.Enums
         InVehicle,
         River,
         Outdoor,
+        HospitalArea,
         Everywhere
     }
 
