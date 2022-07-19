@@ -1,7 +1,6 @@
 ﻿using Castle.MicroKernel.SubSystems.Conversion;
 using Ermes.Enums;
 using Ermes.Helpers;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
@@ -13,7 +12,7 @@ namespace Ermes.Gamification
     /// </summary>
     public class Medal: Achievement
     {
-        
+
         [Column("Type")]
         public string TypeString
         {
