@@ -70,14 +70,14 @@ namespace Ermes.ExternalServices.Csi
             return await SendRequestInternal(request, op);
         }
 
-        public async Task<int> InsertInterventiVolontariAsync(long personId, int personLegaycId, double latitude, double longitude, string activity, DateTime timestamp, string status, int? operationId = null)
+        public async Task<int> InsertInterventiVolontariAsync(long personId, int personLegaycId, double? latitude, double? longitude, string activity, DateTime timestamp, string status, int? operationId = null)
         {
             var builder = new UriBuilder(CsiClient.BaseAddress + "/insertInterventiVolontari");
             string requestBody = JsonConvert.SerializeObject(new Intervention()
             {
                 subjectCode = SUBJECT_CODE,
-                latitude = latitude.ToString(),
-                longitude = longitude.ToString(),
+                latitude = latitude?.ToString(),
+                longitude = longitude?.ToString(),
                 missionDate = timestamp,
                 status = status,
                 voluntaryActivity = activity,
