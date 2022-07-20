@@ -262,10 +262,8 @@ namespace Ermes.Gamification
                 result.Response.ErrorMessage = message;
             }
 
-            if (result.Response.Success) {
-                result.Gamification.Points = person.Points;
-                result.Gamification.LevelId = person.LevelId;
-            }
+            if (result.Response.Success)
+                result.Gamification = new GamificationBaseDto(person.Points, person.LevelId);
 
             return result;
         }
@@ -351,10 +349,8 @@ namespace Ermes.Gamification
             }
 
             if (result.Response.Success)
-            {
-                result.Gamification.Points = person.Points;
-                result.Gamification.LevelId = person.LevelId;
-            }
+                result.Gamification = new GamificationBaseDto(person.Points, person.LevelId);
+
             return result;
         }
 

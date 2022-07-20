@@ -1,11 +1,8 @@
 ﻿using Abp.Domain.Entities;
 using Ermes.Enums;
 using Ermes.Helpers;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 
 namespace Ermes.Gamification
 {
@@ -31,7 +28,7 @@ namespace Ermes.Gamification
         [Required]
         [StringLength(MaxNameLength)]
         public string Name { get; set; }
-
+        public virtual Barrier Barrier { get; set; }
     }
 
     public class GamificationDetail
