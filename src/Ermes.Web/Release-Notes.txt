@@ -1,6 +1,7 @@
 Ver.
 --------------------------------
 - Bugfix - CreatePersonAction, CreateInterventionAsync, fix for people that set their status to Active for the first time (#90)
+- Feature - Order of GetTips set based on CrisisPhase (#92)
 
 Ver. 3.7.2 - 2022-04-26
 --------------------------------

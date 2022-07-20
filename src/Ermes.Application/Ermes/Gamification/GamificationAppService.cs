@@ -55,19 +55,13 @@ namespace Ermes.Gamification
             }
 
             result.TotalCount = await query.CountAsync();
-
-            if (input?.Order != null && input.Order.Count == 0)
-            {
-                query = query.OrderByDescending(a => a.Code);
-                query = query.PageBy(input);
-            }
-            else
-            {
-                query = query.DTOrderedBy(input)
-                    .PageBy(input);
-            }
+            query = query.PageBy(input);
 
             var items = await query.ToListAsync();
+
+            //Cannot be done with IQueryable object, since is a not-mapped field
+            items = items.OrderBy(a => a.CrisisPhaseKey).ToList();
+
             result.Items = ObjectMapper.Map<List<TipDto>>(items);
             //Check for tips the current logged user has already read
             //Cannot be done with Join statement due to a limitation in EF Core
