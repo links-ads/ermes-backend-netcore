@@ -12,13 +12,13 @@ namespace Ermes.Gamification
     /// </summary>
     public class Badge: Achievement
     {
-        [Column("Hazard")]
-        public string HazardString
+        [Column("CrisisPhase")]
+        public string CrisisPhaseString
         {
-            get { return Hazard.ToString(); }
-            private set { Hazard = value.ParseEnum<HazardType>(); }
+            get { return CrisisPhase.ToString(); }
+            private set { CrisisPhase = value.ParseEnum<CrisisPhaseType>(); }
         }
         [NotMapped]
-        public HazardType Hazard { get; set; }
+        public CrisisPhaseType CrisisPhase { get; set; }
     }
 }

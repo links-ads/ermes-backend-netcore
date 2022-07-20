@@ -74,7 +74,6 @@ namespace Ermes
             configuration.CreateMultiLingualMap<Quiz, QuizTranslation, QuizDto>(context);
             configuration.CreateMultiLingualMap<Answer, AnswerTranslation, AnswerDto>(context);
             configuration.CreateMultiLingualMap<Layer, LayerTranslation, LayerDto>(context);
-            configuration.CreateMultiLingualMap<GamificationAction, GamificationActionTranslation, GamificationActionDto>(context);
             configuration.CreateMap<User, UserDto>()
                             .ReverseMap()
                             .ForMember(entity => entity.passwordChangeRequired, options => options.MapFrom(dto => false))

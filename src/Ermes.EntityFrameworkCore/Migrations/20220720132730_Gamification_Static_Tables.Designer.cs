@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Ermes.EntityFrameworkCore;
+using Ermes.Gamification;
 using Ermes.Operations;
 using Ermes.Reports;
 using Microsoft.EntityFrameworkCore;
@@ -15,8 +16,8 @@ using NpgsqlTypes;
 namespace Ermes.Migrations
 {
     [DbContext(typeof(ErmesDbContext))]
-    [Migration("20220616154008_Gamification_Levels_Added")]
-    partial class Gamification_Levels_Added
+    [Migration("20220720132730_Gamification_Static_Tables")]
+    partial class Gamification_Static_Tables
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -65,7 +66,8 @@ namespace Ermes.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("Language")
-                        .HasColumnType("text");
+                        .HasColumnType("character varying(2)")
+                        .HasMaxLength(2);
 
                     b.Property<string>("Name")
                         .HasColumnType("character varying(255)")
@@ -123,7 +125,8 @@ namespace Ermes.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("Language")
-                        .HasColumnType("text");
+                        .HasColumnType("character varying(2)")
+                        .HasMaxLength(2);
 
                     b.Property<string>("Text")
                         .IsRequired()
@@ -213,7 +216,8 @@ namespace Ermes.Migrations
                         .HasMaxLength(100);
 
                     b.Property<string>("Language")
-                        .HasColumnType("text");
+                        .HasColumnType("character varying(2)")
+                        .HasMaxLength(2);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -438,6 +442,102 @@ namespace Ermes.Migrations
                     b.ToTable("entitypropertychanges");
                 });
 
+            modelBuilder.Entity("Ermes.Gamification.Barrier", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<string>("LevelName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("RewardName")
+                        .HasColumnType("character varying(1000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RewardName")
+                        .IsUnique();
+
+                    b.HasIndex("LevelName", "RewardName")
+                        .IsUnique();
+
+                    b.ToTable("gamification_barriers");
+                });
+
+            modelBuilder.Entity("Ermes.Gamification.GamificationAction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("character varying(100)")
+                        .HasMaxLength(100);
+
+                    b.Property<string>("CompetenceString")
+                        .HasColumnName("Competence")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("character varying(1000)")
+                        .HasMaxLength(1000);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("character varying(100)")
+                        .HasMaxLength(100);
+
+                    b.Property<int>("Points")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.ToTable("gamification_actions");
+                });
+
+            modelBuilder.Entity("Ermes.Gamification.GamificationAudit", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int?>("GamificationActionId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("LevelId")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("PersonId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int?>("RewardId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GamificationActionId");
+
+                    b.HasIndex("LevelId");
+
+                    b.HasIndex("PersonId");
+
+                    b.HasIndex("RewardId");
+
+                    b.ToTable("gamification_audit");
+                });
+
             modelBuilder.Entity("Ermes.Gamification.Level", b =>
                 {
                     b.Property<int>("Id")
@@ -452,6 +552,7 @@ namespace Ermes.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int?>("PreviousLevelId")
@@ -467,6 +568,33 @@ namespace Ermes.Migrations
                     b.HasIndex("PreviousLevelId");
 
                     b.ToTable("gamification_levels");
+                });
+
+            modelBuilder.Entity("Ermes.Gamification.Reward", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<string>("CompetenceString")
+                        .HasColumnName("Competence")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("character varying(1000)")
+                        .HasMaxLength(1000);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("gamification_rewards");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("Reward");
                 });
 
             modelBuilder.Entity("Ermes.Layers.Layer", b =>
@@ -532,7 +660,8 @@ namespace Ermes.Migrations
                         .HasMaxLength(255);
 
                     b.Property<string>("Language")
-                        .HasColumnType("text");
+                        .HasColumnType("character varying(2)")
+                        .HasMaxLength(2);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -1215,7 +1344,8 @@ namespace Ermes.Migrations
                         .HasMaxLength(50);
 
                     b.Property<string>("Language")
-                        .HasColumnType("text");
+                        .HasColumnType("character varying(2)")
+                        .HasMaxLength(2);
 
                     b.Property<string>("Text")
                         .IsRequired()
@@ -1481,7 +1611,8 @@ namespace Ermes.Migrations
                         .HasMaxLength(50);
 
                     b.Property<string>("Language")
-                        .HasColumnType("text");
+                        .HasColumnType("character varying(2)")
+                        .HasMaxLength(2);
 
                     b.Property<string>("Text")
                         .IsRequired()
@@ -1499,6 +1630,39 @@ namespace Ermes.Migrations
                         .IsUnique();
 
                     b.ToTable("tip_translations");
+                });
+
+            modelBuilder.Entity("Ermes.Gamification.Achievement", b =>
+                {
+                    b.HasBaseType("Ermes.Gamification.Reward");
+
+                    b.Property<GamificationDetail>("Detail")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("GamificationActionCode")
+                        .HasColumnType("character varying(100)");
+
+                    b.HasIndex("GamificationActionCode");
+
+                    b.ToTable("gamification_rewards");
+
+                    b.HasDiscriminator().HasValue("Achievement");
+                });
+
+            modelBuilder.Entity("Ermes.Gamification.Award", b =>
+                {
+                    b.HasBaseType("Ermes.Gamification.Reward");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("character varying(1000)")
+                        .HasMaxLength(1000);
+
+                    b.Property<int>("Points")
+                        .HasColumnType("integer");
+
+                    b.ToTable("gamification_rewards");
+
+                    b.HasDiscriminator().HasValue("Award");
                 });
 
             modelBuilder.Entity("Ermes.Persons.PersonActionActivity", b =>
@@ -1547,6 +1711,32 @@ namespace Ermes.Migrations
                     b.ToTable("person_actions");
 
                     b.HasDiscriminator().HasValue("PersonActionTracking");
+                });
+
+            modelBuilder.Entity("Ermes.Gamification.Badge", b =>
+                {
+                    b.HasBaseType("Ermes.Gamification.Achievement");
+
+                    b.Property<string>("CrisisPhaseString")
+                        .HasColumnName("CrisisPhase")
+                        .HasColumnType("text");
+
+                    b.ToTable("gamification_rewards");
+
+                    b.HasDiscriminator().HasValue("Badge");
+                });
+
+            modelBuilder.Entity("Ermes.Gamification.Medal", b =>
+                {
+                    b.HasBaseType("Ermes.Gamification.Achievement");
+
+                    b.Property<string>("TypeString")
+                        .HasColumnName("Type")
+                        .HasColumnType("text");
+
+                    b.ToTable("gamification_rewards");
+
+                    b.HasDiscriminator().HasValue("Medal");
                 });
 
             modelBuilder.Entity("Ermes.Activities.Activity", b =>
@@ -1615,6 +1805,43 @@ namespace Ermes.Migrations
                         .HasForeignKey("EntityChangeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Ermes.Gamification.Barrier", b =>
+                {
+                    b.HasOne("Ermes.Gamification.Level", "Level")
+                        .WithMany("Barriers")
+                        .HasForeignKey("LevelName")
+                        .HasPrincipalKey("Name")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Ermes.Gamification.Reward", "Reward")
+                        .WithOne("Barrier")
+                        .HasForeignKey("Ermes.Gamification.Barrier", "RewardName")
+                        .HasPrincipalKey("Ermes.Gamification.Reward", "Name")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Ermes.Gamification.GamificationAudit", b =>
+                {
+                    b.HasOne("Ermes.Gamification.GamificationAction", "GamificationAction")
+                        .WithMany()
+                        .HasForeignKey("GamificationActionId");
+
+                    b.HasOne("Ermes.Gamification.Level", "Level")
+                        .WithMany()
+                        .HasForeignKey("LevelId");
+
+                    b.HasOne("Ermes.Persons.Person", "Person")
+                        .WithMany()
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Ermes.Gamification.Reward", "Reward")
+                        .WithMany()
+                        .HasForeignKey("RewardId");
                 });
 
             modelBuilder.Entity("Ermes.Gamification.Level", b =>
@@ -1852,6 +2079,15 @@ namespace Ermes.Migrations
                         .HasForeignKey("CoreId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Ermes.Gamification.Achievement", b =>
+                {
+                    b.HasOne("Ermes.Gamification.GamificationAction", "GamificationAction")
+                        .WithMany("Achievements")
+                        .HasForeignKey("GamificationActionCode")
+                        .HasPrincipalKey("Code")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("Ermes.Persons.PersonActionActivity", b =>

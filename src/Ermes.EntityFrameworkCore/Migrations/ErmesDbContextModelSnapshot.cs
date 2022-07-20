@@ -481,10 +481,14 @@ namespace Ermes.Migrations
                         .HasColumnName("Competence")
                         .HasColumnType("text");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
+                    b.Property<string>("Description")
                         .HasColumnType("character varying(1000)")
                         .HasMaxLength(1000);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("character varying(100)")
+                        .HasMaxLength(100);
 
                     b.Property<int>("Points")
                         .HasColumnType("integer");
@@ -495,36 +499,6 @@ namespace Ermes.Migrations
                         .IsUnique();
 
                     b.ToTable("gamification_actions");
-                });
-
-            modelBuilder.Entity("Ermes.Gamification.GamificationActionTranslation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<int>("CoreId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("character varying(1000)")
-                        .HasMaxLength(1000);
-
-                    b.Property<string>("Language")
-                        .IsRequired()
-                        .HasColumnType("character varying(2)")
-                        .HasMaxLength(2);
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CoreId");
-
-                    b.HasIndex("Language", "CoreId")
-                        .IsUnique();
-
-                    b.ToTable("gamification_action_translations");
                 });
 
             modelBuilder.Entity("Ermes.Gamification.GamificationAudit", b =>
@@ -1741,8 +1715,8 @@ namespace Ermes.Migrations
                 {
                     b.HasBaseType("Ermes.Gamification.Achievement");
 
-                    b.Property<string>("HazardString")
-                        .HasColumnName("Hazard")
+                    b.Property<string>("CrisisPhaseString")
+                        .HasColumnName("CrisisPhase")
                         .HasColumnType("text");
 
                     b.ToTable("gamification_rewards");
@@ -1845,15 +1819,6 @@ namespace Ermes.Migrations
                         .HasForeignKey("Ermes.Gamification.Barrier", "RewardName")
                         .HasPrincipalKey("Ermes.Gamification.Reward", "Name")
                         .OnDelete(DeleteBehavior.Restrict);
-                });
-
-            modelBuilder.Entity("Ermes.Gamification.GamificationActionTranslation", b =>
-                {
-                    b.HasOne("Ermes.Gamification.GamificationAction", "Core")
-                        .WithMany("Translations")
-                        .HasForeignKey("CoreId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Ermes.Gamification.GamificationAudit", b =>

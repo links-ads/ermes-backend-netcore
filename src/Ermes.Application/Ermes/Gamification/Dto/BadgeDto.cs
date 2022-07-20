@@ -7,6 +7,6 @@ namespace Ermes.Gamification.Dto
 {
     public class BadgeDto: AchievementDto
     {
-        public HazardType Hazard { get; set; }
+        public CrisisPhaseType CrisisPhase { get; set; }
     }
 }
