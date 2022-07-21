@@ -360,11 +360,11 @@ namespace Ermes.Enums
     [JsonConverter(typeof(StringEnumConverter))]
     public enum CompetenceType
     {
-        Starter,
-        Learner,
-        Reporter,
-        Reviewer,
-        Socializer
+        Onboarding,
+        Learning,
+        Mastering,
+        Reporting,
+        Reviewing
     }
 
     [JsonConverter(typeof(StringEnumConverter))]

@@ -288,34 +288,31 @@ namespace Ermes.Migrations
                 @"
                     INSERT INTO public.gamification_levels (""Name"", ""LowerBound"", ""UpperBound"", ""PreviousLevelId"", ""FollowingLevelId"") 
                     VALUES
-                        ('Rookie', 0, 69, null, null), 
-                        ('Watcher', 70, 299, null, null), 
-                        ('Sentinel', 300, 799, null, null), 
-                        ('Explorer', 800, 1999, null, null), 
-                        ('Master', 2000, 11999, null, null), 
-                        ('Guru', 12000, 100000, null, null);
+                        ('Rookie', 0, 15, null, null), 
+                        ('Novice', 16, 50, null, null), 
+                        ('Junior', 51, 200, null, null), 
+                        ('Expert', 201, 600, null, null), 
+                        ('Guru', 601, 1000, null, null);
                 ");
 
             migrationBuilder.Sql(
                 @"
-                    update public.gamification_levels set ""FollowingLevelId"" = (select ""Id"" from public.gamification_levels where ""Name"" = 'Watcher') where ""Name"" = 'Rookie';
+                    update public.gamification_levels set ""FollowingLevelId"" = (select ""Id"" from public.gamification_levels where ""Name"" = 'Novice') where ""Name"" = 'Rookie';
 
-                    update public.gamification_levels set ""FollowingLevelId"" = (select ""Id"" from public.gamification_levels where ""Name"" = 'Sentinel') where ""Name"" = 'Watcher';
-                    update public.gamification_levels set ""PreviousLevelId"" = (select ""Id"" from public.gamification_levels where ""Name"" = 'Rookie') where ""Name"" = 'Watcher';
+                    update public.gamification_levels set ""FollowingLevelId"" = (select ""Id"" from public.gamification_levels where ""Name"" = 'Junior') where ""Name"" = 'Novice';
+                    update public.gamification_levels set ""PreviousLevelId"" = (select ""Id"" from public.gamification_levels where ""Name"" = 'Rookie') where ""Name"" = 'Novice';
 
-                    update public.gamification_levels set ""FollowingLevelId"" = (select ""Id"" from public.gamification_levels where ""Name"" = 'Explorer') where ""Name"" = 'Sentinel';
-                    update public.gamification_levels set ""PreviousLevelId"" = (select ""Id"" from public.gamification_levels where ""Name"" = 'Watcher') where ""Name"" = 'Sentinel';
+                    update public.gamification_levels set ""FollowingLevelId"" = (select ""Id"" from public.gamification_levels where ""Name"" = 'Expert') where ""Name"" = 'Junior';
+                    update public.gamification_levels set ""PreviousLevelId"" = (select ""Id"" from public.gamification_levels where ""Name"" = 'Novice') where ""Name"" = 'Junior';
 
-                    update public.gamification_levels set ""FollowingLevelId"" = (select ""Id"" from public.gamification_levels where ""Name"" = 'Master') where ""Name"" = 'Explorer';
-                    update public.gamification_levels set ""PreviousLevelId"" = (select ""Id"" from public.gamification_levels where ""Name"" = 'Sentinel') where ""Name"" = 'Explorer';
+                    update public.gamification_levels set ""FollowingLevelId"" = (select ""Id"" from public.gamification_levels where ""Name"" = 'Guru') where ""Name"" = 'Expert';
+                    update public.gamification_levels set ""PreviousLevelId"" = (select ""Id"" from public.gamification_levels where ""Name"" = 'Junior') where ""Name"" = 'Expert';
 
-                    update public.gamification_levels set ""FollowingLevelId"" = (select ""Id"" from public.gamification_levels where ""Name"" = 'Guru') where ""Name"" = 'Master';
-                    update public.gamification_levels set ""PreviousLevelId"" = (select ""Id"" from public.gamification_levels where ""Name"" = 'Explorer') where ""Name"" = 'Master';
-                    
-                    update public.gamification_levels set ""PreviousLevelId"" = (select ""Id"" from public.gamification_levels where ""Name"" = 'Master') where ""Name"" = 'Guru';
+                    update public.gamification_levels set ""PreviousLevelId"" = (select ""Id"" from public.gamification_levels where ""Name"" = 'Expert') where ""Name"" = 'Guru';
                 "
             );
 
+            //Assign default Rookie level to every citizen
             migrationBuilder.Sql(
                 @"
                     update public.persons p2
@@ -335,47 +332,60 @@ namespace Ermes.Migrations
                 @"
                     INSERT INTO public.gamification_actions (""Code"", ""Competence"", ""Name"", ""Points"", ""Description"") 
                         VALUES
-                            ('STA.1', 'Starter', 'FirstLogin', 1, 'First Login'),
-                            ('STA.2', 'Starter', 'CompleteWizard', 4, 'Complete wizard'),
-                            ('LEA.1', 'Learner', 'ReadTip', 2, 'Read tip'),
-                            ('LEA.2', 'Learner', 'AnswerQuiz', 3, 'Answer quiz'),
-                            ('REP.1', 'Reporter', 'DoReport', 4, 'Do a report'),
-                            ('REP.2', 'Reporter', 'ReportGetValidated', 1, 'Report has been validated by a public authority'),
-                            ('REP.3', 'Reporter', 'ReportGetRejectedAsInappropriate', -1, 'Report get rejected as not appropriate by public authority'),
-                            ('REP.4', 'Reporter', 'ReportGetRejectedAsInaccurate', -1, 'Report get rejected as not accurate by public authority'),
-                            ('REP.5', 'Reporter', 'ReportGetPositiveFeedback', 1, 'Report get positive feedback from peer'),
-                            ('REP.6', 'Reporter', 'ReportGetNegativeFeedback', 1, 'Report get negative feedback from peer'),
-                            ('REW.1', 'Reviewer', 'VoteReport', 2, 'Vote a report'),
-                            ('REW.2', 'Reviewer', 'FirstToReviewReport', 2, First to review a report'),
-                            ('REW.3', 'Reviewer', 'AuthorityConfirmReportFeedback', 2, 'Authority validate a report I have upvoted, or reject a report I have downvoted'),
-                            ('REW.4', 'Reviewer', 'AuthorityRejectReportFeedback', -1, 'Authority validate a report I have downvoted, or reject a report I have upvoted')
+                            ('ONB.1', 'Onboarding', 'FirstLogin', 10, 'First Login'),
+                            ('ONB.2', 'Onboarding', 'CompleteWizard', 5, 'Complete wizard'),
+                            ('LEA.1', 'Learning', 'ReadTip', 2, 'Read tip'),
+                            ('MAS.1', 'Mastering', 'AnswerQuiz', 3, 'Answer quiz'),
+                            ('REP.1', 'Reporting', 'DoReport', 8, 'Do a report'),
+                            ('REP.2', 'Reporting', 'ReportGetValidated', 1, 'Report has been validated by a public authority'),
+                            ('REP.3', 'Reporting', 'ReportGetRejectedAsInappropriate', -1, 'Report get rejected as not appropriate by public authority'),
+                            ('REP.5', 'Reporting', 'ReportGetPositiveFeedback', 1, 'Report get positive feedback from peer'),
+                            ('REP.6', 'Reporting', 'ReportGetNegativeFeedback', 1, 'Report get negative feedback from peer'),
+                            ('REW.1', 'Reviewing', 'VoteReport', 2, 'Vote a report'),
+                            ('REW.2', 'Reviewing', 'FirstToReviewReport', 2, First to review a report'),
+                            ('REW.3', 'Reviewing', 'AuthorityConfirmReportFeedback', 2, 'Authority validate a report I have upvoted, or reject a report I have downvoted'),
+                            ('REW.4', 'Reviewing', 'AuthorityRejectReportFeedback', -1, 'Authority validate a report I have downvoted, or reject a report I have upvoted'),
                 ");
             #endregion
 
             #region Rewards
             migrationBuilder.Sql(
                 @"
-                    INSERT INTO public.gamification_rewards (""Competence"", ""Name"", ""Discriminator"", ""Detail"", ""GamificationActionCode"", ""Type"", ""Hazard"", ""Points"", ""Description"") 
+                    INSERT INTO public.gamification_rewards (""Competence"", ""Name"", ""Discriminator"", ""Detail"", ""GamificationActionCode"", ""Type"", ""CrisisPhase"", ""Points"", ""Description"") 
                         VALUES
-                                ('Learner', 'ReadTipBronze',   'Medal', '{""Threshold"": 3,   ""Points"":  5}', 'LEA.1', 'Bronze', null, null, null), 
-                                ('Learner', 'ReadTipSilver',   'Medal', '{""Threshold"": 30,  ""Points"": 15}', 'LEA.1', 'Silver', null, null, null), 
-                                ('Learner', 'ReadTipGold',     'Medal', '{""Threshold"": 100, ""Points"": 30}', 'LEA.1', 'Gold', null, null, null), 
-                                ('Learner', 'ReadTipPlatinum', 'Medal', '{""Threshold"": 200, ""Points"": 60}', 'LEA.1', 'Platinum', null, null, null), 
-                                ('Learner', 'AnswerQuizBronze',   'Medal', '{""Threshold"": 3,    ""Points"":  10}', 'LEA.2', 'Bronze', null, null, null), 
-                                ('Learner', 'AnswerQuizSilver',   'Medal', '{""Threshold"": 30,   ""Points"":  30}', 'LEA.2', 'Silver', null, null, null), 
-                                ('Learner', 'AnswerQuizGold',     'Medal', '{""Threshold"": 100,  ""Points"": 100}', 'LEA.2', 'Gold', null, null, null), 
-                                ('Learner', 'AnswerQuizPlatinum', 'Medal', '{""Threshold"": 200,  ""Points"": 200}', 'LEA.2', 'Platinum', null, null, null), 
-                                ('Reporter', 'DoReportBronze',   'Medal', '{""Threshold"":    3, ""Points"":  15}', 'REP.1', 'Bronze', null, null, null), 
-                                ('Reporter', 'DoReportSilver',   'Medal', '{""Threshold"":   30, ""Points"":  45}', 'REP.1', 'Silver', null, null, null), 
-                                ('Reporter', 'DoReportGold',     'Medal', '{""Threshold"":  100, ""Points"": 100}', 'REP.1', 'Gold', null, null, null), 
-                                ('Reporter', 'DoReportPlatinum', 'Medal', '{""Threshold"": 1000, ""Points"": 300}', 'REP.1', 'Platinum', null, null, null), 
-                                ('Learner', 'ReadTipPrevention', 'Badge', '{""Threshold"": -1, ""Points"": 100}', 'LEA.1', null, 'Avalanche', null, null),
-                                ('Learner', 'ReadTipPreparedness', 'Badge', '{""Threshold"": -1, ""Points"": 100}', 'LEA.1', null, 'Earthquake', null, null), 
-                                ('Learner', 'ReadTipResponse', 'Badge', '{""Threshold"": -1, ""Points"": 100}', 'LEA.1', null, 'Fire', null, null), 
-                                ('Learner', 'ReadTipPostEvent', 'Badge', '{""Threshold"": -1, ""Points"": 100}', 'LEA.1', null, 'Flood', null, null), 
-                                ('Learner', 'ReadTipEnvironment', 'Badge', '{""Threshold"": -1, ""Points"": 100}', 'LEA.1', null, 'Landslide', null, null), 
-                                ('Reporter', 'TopReporter', 'Award', null, null, null, null, 25, 'highest score obtained in the Reported category, overall'), 
-                                ('Reporter', 'BestReport', 'Award', null, null, null, null, 15, 'owner of the most upvoted report');                             
+                                ('Learning', 'ReadTipBronze',   'Medal', '{""Threshold"": 3,   ""Points"":  6}', 'LEA.1', 'Bronze', null, null, null), 
+                                ('Learning', 'ReadTipSilver',   'Medal', '{""Threshold"": 30,  ""Points"": 16}', 'LEA.1', 'Silver', null, null, null), 
+                                ('Learning', 'ReadTipGold',     'Medal', '{""Threshold"": 100, ""Points"": 32}', 'LEA.1', 'Gold', null, null, null), 
+                                ('Learning', 'ReadTipPlatinum', 'Medal', '{""Threshold"": 200, ""Points"": 60}', 'LEA.1', 'Platinum', null, null, null), 
+                                ('Mastering', 'AnswerQuizBronze',   'Medal', '{""Threshold"": 3,    ""Points"":  9}', 'MAS.1', 'Bronze', null, null, null), 
+                                ('Mastering', 'AnswerQuizSilver',   'Medal', '{""Threshold"": 30,   ""Points"":  30}', 'MAS.1', 'Silver', null, null, null), 
+                                ('Mastering', 'AnswerQuizGold',     'Medal', '{""Threshold"": 100,  ""Points"": 90}', 'MAS.1', 'Gold', null, null, null), 
+                                ('Mastering', 'AnswerQuizPlatinum', 'Medal', '{""Threshold"": 200,  ""Points"": 180}', 'MAS.1', 'Platinum', null, null, null), 
+                                ('Reporting', 'DoReportBronze',   'Medal', '{""Threshold"":    3, ""Points"":  25}', 'REP.1', 'Bronze', null, null, null), 
+                                ('Reporting', 'DoReportSilver',   'Medal', '{""Threshold"":   30, ""Points"":  45}', 'REP.1', 'Silver', null, null, null), 
+                                ('Reporting', 'DoReportGold',     'Medal', '{""Threshold"":  100, ""Points"": 100}', 'REP.1', 'Gold', null, null, null), 
+                                ('Reporting', 'DoReportPlatinum', 'Medal', '{""Threshold"": 1000, ""Points"": 300}', 'REP.1', 'Platinum', null, null, null), 
+                                ('Reviewing', 'VoteReport', 'Medal', '{""Threshold"": 3,    ""Points"": 5}', 'REW.1', 'Bronze', null, null, null), 
+                                ('Reviewing', 'VoteReport', 'Medal', '{""Threshold"": 30,   ""Points"": 15}', 'REW.1', 'Silver', null, null, null), 
+                                ('Reviewing', 'VoteReport', 'Medal', '{""Threshold"": 100,  ""Points"": 30}', 'REW.1', 'Gold', null, null, null), 
+                                ('Reviewing', 'VoteReport', 'Medal', '{""Threshold"": 1000, ""Points"": 100}', 'REW.1', 'Platinum', null, null, null), 
+                                ('Learnning', 'ReadTipPrevention', 'Badge', '{""Threshold"": -1, ""Points"": 100}', 'LEA.1', null, 'Prevention', null, null),
+                                ('Learnning', 'ReadTipPreparedness', 'Badge', '{""Threshold"": -1, ""Points"": 100}', 'LEA.1', null, 'Preparedness', null, null), 
+                                ('Learnning', 'ReadTipResponse', 'Badge', '{""Threshold"": -1, ""Points"": 100}', 'LEA.1', null, 'Response', null, null), 
+                                ('Learnning', 'ReadTipPostEvent', 'Badge', '{""Threshold"": -1, ""Points"": 100}', 'LEA.1', null, 'PostEvent', null, null), 
+                                ('Learnning', 'ReadTipEnvironment', 'Badge', '{""Threshold"": -1, ""Points"": 100}', 'LEA.1', null, 'Environment', null, null), 
+                                ('Mastering', 'AnswerQuizPrevention', 'Badge', '{""Threshold"": -1, ""Points"": 100}', 'MAS.1', null, 'Prevention', null, null),
+                                ('Mastering', 'AnswerQuizPreparedness', 'Badge', '{""Threshold"": -1, ""Points"": 100}', 'MAS.1', null, 'Preparedness', null, null), 
+                                ('Mastering', 'AnswerQuizResponse', 'Badge', '{""Threshold"": -1, ""Points"": 100}', 'MAS.1', null, 'Response', null, null), 
+                                ('Mastering', 'AnswerQuizPostEvent', 'Badge', '{""Threshold"": -1, ""Points"": 100}', 'MAS.1', null, 'PostEvent', null, null), 
+                                ('Mastering', 'AnswerQuizEnvironment', 'Badge', '{""Threshold"": -1, ""Points"": 100}', 'MAS.1', null, 'Environment', null, null), 
+                                ('Learnning', 'BestLearner', 'Award', null, null, null, null, 15, 'User reading more tips in a week'), 
+                                ('Mastering', 'BestMaster', 'Award', null, null, null, null, 15, 'User replying more quizzes in a week'), 
+                                ('Reporting', 'BestReporter', 'Award', null, null, null, null, 15, 'Owner of the most upvoted report'); 
+                                ('Reporting', 'TopReporter', 'Award', null, null, null, null, 15, 'Highest number of reports'), 
+                                ('Reviewing', 'TopReviewer', 'Award', null, null, null, null, 15, 'Highest score obtained in the Reviwing category'), 
+                                ('Reviewing', 'ActiveReviewer', 'Award', null, null, null, null, 15, 'Highest number of votes done')
+                                                            
                 ");
             #endregion
 
@@ -384,16 +394,16 @@ namespace Ermes.Migrations
                 @"
                     INSERT INTO public.gamification_barriers (""LevelName"", ""RewardName"") 
                         VALUES
-                            ('Watcher',  'AnswerQuizBronze'),
-                            ('Watcher',  'ReadTipSilver'),
-                            ('Sentinel', 'AnswerQuizSilver'),
-                            ('Sentinel', 'DoReportBronze'),
-                            ('Explorer', 'ReadTipGold'),
-                            ('Explorer', 'DoReportSilver'),
-                            ('Master',   'AnswerQuizGold'),
-                            ('Master',   'DoReportGold'),
-                            ('Guru',     'ReadTipPlatinum'),
-                            ('Guru',     'DoReportPlatinum')
+                            ('Novice',  'AnswerQuizBronze'),
+                            ('Novice',  'ReadTipSilver'),
+                            ('Junior',  'AnswerQuizSilver'),
+                            ('Junior',  'DoReportBronze'),
+                            ('Junior',  'ReadTipGold'),
+                            ('Expert',  'ReadTipPlatinum'),
+                            ('Expert',  'DoReportSilver'),
+                            ('Expert',  'AnswerQuizGold'),
+                            ('Guru',    'AnswerQuizPlatinum'),
+                            ('Guru',    'DoReportGold')
                 ");
             #endregion
         }
