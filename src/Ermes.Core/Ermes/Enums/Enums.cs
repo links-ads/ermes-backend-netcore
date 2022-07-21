@@ -351,4 +351,11 @@ namespace Ermes.Enums
         H6,
         H12
     }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum CommunicationScopeType
+    {
+        Public,
+        Restricted
+    }
 }

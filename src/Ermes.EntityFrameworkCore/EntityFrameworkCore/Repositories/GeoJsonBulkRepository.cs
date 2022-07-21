@@ -495,6 +495,8 @@ namespace Ermes.GeoJson
 	                o.""Name"" as ""OrganizationName"",
                     o.""ParentId"" as ""OrganizationParentId"",
 	                p.""Username"",
+                    p.""Id"" as ""PersonId"",
+                    p.""TeamId"",
                     null as ""Type"",
                     coalesce(a.""ParentId"", a.""Id"") as ""activityFilter""
                     FROM (
