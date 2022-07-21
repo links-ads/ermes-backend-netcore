@@ -213,21 +213,6 @@ namespace Ermes.Web.Controllers
                             }
 
                         }
-                        else if (item is Badge)
-                        {
-                            Badge badge = (Badge)item;
-                            if (badge.Hazard != report.Hazard)
-                                continue;
-
-                            var personReportsByHazard = personReports.Where(a => a.Hazard == report.Hazard).ToList();
-                            if (badge.Detail.Threshold == personReportsByHazard.Count)
-                            {
-                                await _gamificationManager.InsertAudit(_session.LoggedUserPerson.Id, null, item.Id, null);
-                                person.Points += badge.Detail.Points;
-                                result.Add((EntityWriteAction.BadgeObtained, badge.Name));
-                            }
-                        }
-
                     }
                 }
 

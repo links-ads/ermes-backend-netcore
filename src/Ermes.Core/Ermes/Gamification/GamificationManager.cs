@@ -17,28 +17,24 @@ namespace Ermes.Gamification
         protected IRepository<Level> LevelRepository{ get; set; }
         protected IRepository<Reward> RewardRepository { get; set; }
         protected IRepository<GamificationAction> ActionRepository { get; set; }
-        protected IRepository<GamificationActionTranslation> ActionTranslationRepository { get; set; }
         protected IRepository<GamificationAudit> AuditRepository { get; set; }
         public IQueryable<Level> Levels { get { return LevelRepository.GetAll(); } }
         public IQueryable<Medal> Medals { get { return RewardRepository.GetAll().OfType<Medal>(); } }
         public IQueryable<Badge> Badges { get { return RewardRepository.GetAll().OfType<Badge>(); } }
         public IQueryable<Award> Awards { get { return RewardRepository.GetAll().OfType<Award>(); } }
-        public IQueryable<GamificationAction> Actions { get { return ActionRepository.GetAll().Include(c => c.Translations).Include(c => c.Achievements); } }
-        public IQueryable<GamificationActionTranslation> ActionTranslations { get { return ActionTranslationRepository.GetAll(); } }
+        public IQueryable<GamificationAction> Actions { get { return ActionRepository.GetAll().Include(c => c.Achievements); } }
         public IQueryable<GamificationAudit> GamificationAudits { get { return AuditRepository.GetAll(); } }
         private readonly PersonManager PersonManager;
 
         public GamificationManager(
                 IRepository<Level> levelRepository, 
                 IRepository<GamificationAction> actionRepository, 
-                IRepository<GamificationActionTranslation> actionTranslationRepository,
                 IRepository<Reward> rewardRepository,
                 IRepository<GamificationAudit> auditRepository, 
                 PersonManager personManager)
         {
             LevelRepository = levelRepository;
             ActionRepository = actionRepository;
-            ActionTranslationRepository = actionTranslationRepository;
             PersonManager = personManager;
             AuditRepository = auditRepository;
             RewardRepository = rewardRepository;
@@ -80,16 +76,6 @@ namespace Ermes.Gamification
         public async Task InsertOrUpdateActionAsync(GamificationAction action)
         {
             await ActionRepository.InsertOrUpdateAndGetIdAsync(action);
-        }
-
-        public async Task<GamificationActionTranslation> GetActionTranslationByCoreIdLanguageAsync(int coreId, string language)
-        {
-            return await ActionTranslations.SingleOrDefaultAsync(a => a.CoreId == coreId && a.Language == language);
-        }
-
-        public async Task<int> InsertOrUpdateActionTranslationAsync(GamificationActionTranslation actionTrans)
-        {
-            return await ActionTranslationRepository.InsertOrUpdateAndGetIdAsync(actionTrans);
         }
 
         public async Task InsertAudit(long personId, int? actionId, int? rewardId, int? levelId)

@@ -216,12 +216,12 @@ namespace Ermes.Gamification
                                 else if(item is Badge)
                                 {
                                     Badge badge = (Badge)item;
-                                    if (badge.Hazard != tip.Hazard)
+                                    if (badge.CrisisPhase != tip.CrisisPhaseKey)
                                         continue;
 
-                                    var personTipsByHazard = personTips.Where(a => a.Hazard == tip.Hazard).ToList();
-                                    var tipsByHazardCount = _tipManager.Tips.Where(t => t.HazardString == tip.HazardString).Count();
-                                    if(tipsByHazardCount == personTipsByHazard.Count)
+                                    var personTipsByPhase = personTips.Where(a => a.CrisisPhaseKey == tip.CrisisPhaseKey).ToList();
+                                    var tipsByPhaseCount = _tipManager.Tips.Where(t => t.CrisisPhaseKeyString == tip.CrisisPhaseKeyString).Count();
+                                    if(tipsByPhaseCount == personTipsByPhase.Count)
                                     {
                                         await _gamificationManager.InsertAudit(_session.LoggedUserPerson.Id, null, item.Id, null);
                                         person.Points += badge.Detail.Points;
@@ -303,12 +303,12 @@ namespace Ermes.Gamification
                                 else if (item is Badge)
                                 {
                                     Badge badge = (Badge)item;
-                                    if (badge.Hazard != quiz.Hazard)
+                                    if (badge.CrisisPhase != quiz.CrisisPhaseKey)
                                         continue;
 
-                                    var personQuizsByHazard = personQuizzes.Where(a => a.Hazard == quiz.Hazard).ToList();
-                                    var quizzesByHazardCount = _quizManager.Quizzes.Where(t => t.HazardString == quiz.HazardString).Count();
-                                    if (quizzesByHazardCount == personQuizsByHazard.Count)
+                                    var personQuizsByPhase = personQuizzes.Where(a => a.CrisisPhaseKey == quiz.CrisisPhaseKey).ToList();
+                                    var quizzesByPhaseCount = _quizManager.Quizzes.Where(t => t.CrisisPhaseKeyString == quiz.CrisisPhaseKeyString).Count();
+                                    if (quizzesByPhaseCount == personQuizsByPhase.Count)
                                     {
                                         await _gamificationManager.InsertAudit(_session.LoggedUserPerson.Id, null, item.Id, null);
                                         person.Points += badge.Detail.Points;

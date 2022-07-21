@@ -390,22 +390,5 @@ s            "
 
         #endregion
 
-        #region Gamification Actions
-        [OpenApiOperation("Import Gamification action",
-            @"
-                Import (creating or updating) a list of actions and relative translations.
-                Input: attach as form-data an excel (.xls or .xlsx) file with the correct format
-                Output: An import result dto, containing a summary of insertions and updates
-            "
-        )]
-        [ErmesAuthorize(AppPermissions.Imports.Import_Gamification)]
-        public virtual async Task<ImportResultDto> ImportGamificationActions(IFormFile file)
-        {
-            return await LoadFileAndImport((filename, contentType) =>
-            {
-                return GamificationActionsImporter.ImportGamificationActionsAsync(filename, contentType, _gamificationManager, _localizer, CurrentUnitOfWork);
-            }, new ImportGamificationActionsResourceContainer(), AcceptedGamificationSourceMimeTypes);
-        }
-        #endregion
     }
 }

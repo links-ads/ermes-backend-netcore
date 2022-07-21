@@ -10,10 +10,11 @@ using System.Text;
 namespace Ermes.Gamification
 {
     [Table("gamification_actions")]
-    public class GamificationAction: Entity, IMultiLingualEntity<GamificationActionTranslation>
+    public class GamificationAction: Entity
     {
         public const int MaxCodeLength = 100;
-        public const int MaxNameLength = 1000;
+        public const int MaxNameLength = 100;
+        public const int MaxDescriptionLength = 1000;
 
         [Required]
         [StringLength(MaxCodeLength)]
@@ -21,6 +22,9 @@ namespace Ermes.Gamification
         [Required]
         [StringLength(MaxNameLength)]
         public string Name { get; set; }
+        [StringLength(MaxDescriptionLength)]
+        public string Description { get; set; }
+
         public int Points { get; set; }
         [Column("Competence")]
         public string CompetenceString
@@ -30,8 +34,6 @@ namespace Ermes.Gamification
         }
         [NotMapped]
         public CompetenceType Competence { get; set; }
-
-        public ICollection<GamificationActionTranslation> Translations { get; set; }
 
         public ICollection<Achievement> Achievements { get; set; }
     }
