@@ -342,9 +342,9 @@ namespace Ermes.Migrations
                             ('REP.5', 'Reporting', 'ReportGetPositiveFeedback', 1, 'Report get positive feedback from peer'),
                             ('REP.6', 'Reporting', 'ReportGetNegativeFeedback', 1, 'Report get negative feedback from peer'),
                             ('REW.1', 'Reviewing', 'VoteReport', 2, 'Vote a report'),
-                            ('REW.2', 'Reviewing', 'FirstToReviewReport', 2, First to review a report'),
+                            ('REW.2', 'Reviewing', 'FirstToReviewReport', 2, 'First to review a report'),
                             ('REW.3', 'Reviewing', 'AuthorityConfirmReportFeedback', 2, 'Authority validate a report I have upvoted, or reject a report I have downvoted'),
-                            ('REW.4', 'Reviewing', 'AuthorityRejectReportFeedback', -1, 'Authority validate a report I have downvoted, or reject a report I have upvoted'),
+                            ('REW.4', 'Reviewing', 'AuthorityRejectReportFeedback', -1, 'Authority validate a report I have downvoted, or reject a report I have upvoted')
                 ");
             #endregion
 
@@ -365,10 +365,10 @@ namespace Ermes.Migrations
                                 ('Reporting', 'DoReportSilver',   'Medal', '{""Threshold"":   30, ""Points"":  45}', 'REP.1', 'Silver', null, null, null), 
                                 ('Reporting', 'DoReportGold',     'Medal', '{""Threshold"":  100, ""Points"": 100}', 'REP.1', 'Gold', null, null, null), 
                                 ('Reporting', 'DoReportPlatinum', 'Medal', '{""Threshold"": 1000, ""Points"": 300}', 'REP.1', 'Platinum', null, null, null), 
-                                ('Reviewing', 'VoteReport', 'Medal', '{""Threshold"": 3,    ""Points"": 5}', 'REW.1', 'Bronze', null, null, null), 
-                                ('Reviewing', 'VoteReport', 'Medal', '{""Threshold"": 30,   ""Points"": 15}', 'REW.1', 'Silver', null, null, null), 
-                                ('Reviewing', 'VoteReport', 'Medal', '{""Threshold"": 100,  ""Points"": 30}', 'REW.1', 'Gold', null, null, null), 
-                                ('Reviewing', 'VoteReport', 'Medal', '{""Threshold"": 1000, ""Points"": 100}', 'REW.1', 'Platinum', null, null, null), 
+                                ('Reviewing', 'VoteReportBronze', 'Medal', '{""Threshold"": 3,    ""Points"": 5}', 'REW.1', 'Bronze', null, null, null), 
+                                ('Reviewing', 'VoteReportSilver', 'Medal', '{""Threshold"": 30,   ""Points"": 15}', 'REW.1', 'Silver', null, null, null), 
+                                ('Reviewing', 'VoteReportGold', 'Medal', '{""Threshold"": 100,  ""Points"": 30}', 'REW.1', 'Gold', null, null, null), 
+                                ('Reviewing', 'VoteReportPlatinum', 'Medal', '{""Threshold"": 1000, ""Points"": 100}', 'REW.1', 'Platinum', null, null, null), 
                                 ('Learnning', 'ReadTipPrevention', 'Badge', '{""Threshold"": -1, ""Points"": 100}', 'LEA.1', null, 'Prevention', null, null),
                                 ('Learnning', 'ReadTipPreparedness', 'Badge', '{""Threshold"": -1, ""Points"": 100}', 'LEA.1', null, 'Preparedness', null, null), 
                                 ('Learnning', 'ReadTipResponse', 'Badge', '{""Threshold"": -1, ""Points"": 100}', 'LEA.1', null, 'Response', null, null), 
@@ -381,7 +381,7 @@ namespace Ermes.Migrations
                                 ('Mastering', 'AnswerQuizEnvironment', 'Badge', '{""Threshold"": -1, ""Points"": 100}', 'MAS.1', null, 'Environment', null, null), 
                                 ('Learnning', 'BestLearner', 'Award', null, null, null, null, 15, 'User reading more tips in a week'), 
                                 ('Mastering', 'BestMaster', 'Award', null, null, null, null, 15, 'User replying more quizzes in a week'), 
-                                ('Reporting', 'BestReporter', 'Award', null, null, null, null, 15, 'Owner of the most upvoted report'); 
+                                ('Reporting', 'BestReporter', 'Award', null, null, null, null, 15, 'Owner of the most upvoted report'),
                                 ('Reporting', 'TopReporter', 'Award', null, null, null, null, 15, 'Highest number of reports'), 
                                 ('Reviewing', 'TopReviewer', 'Award', null, null, null, null, 15, 'Highest score obtained in the Reviwing category'), 
                                 ('Reviewing', 'ActiveReviewer', 'Award', null, null, null, null, 15, 'Highest number of votes done')
