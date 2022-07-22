@@ -375,4 +375,13 @@ namespace Ermes.Enums
         Gold,
         Platinum
     }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum CommunicationScopeType
+    {
+        Restricted,  //Inside my organization
+        Citizens,    //Only citizens
+        Wide,      //Inside my organization + citizens (no persons belonging to other organization)
+        Public       //No restriction
+    }
 }

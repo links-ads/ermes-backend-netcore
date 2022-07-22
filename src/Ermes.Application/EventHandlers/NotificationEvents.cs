@@ -65,27 +65,37 @@ namespace Ermes.EventHandlers
             int? orgId = (await _personManager.GetPersonByIdAsync(eventData.CreatorId)).OrganizationId;
             if (!orgId.HasValue)
                 return;
-            List<string> personUsernameList;
+            List<long> personIdList;
             try
             {
                 //Need to filter receivers by the Area of Interest of the communication
                 var comm = await _communicationManager.GetCommunicationByIdAsync(eventData.EntityId);
+
+                //Exclude persons in status = Off; citizens are by default in status = Ready
                 var statusTypes = new List<ActionStatusType>() { ActionStatusType.Active, ActionStatusType.Moving, ActionStatusType.Ready };
-                var items = _geoJsonBulkRepository.GetPersonActions(comm.Duration.LowerBound, comm.Duration.UpperBound, new int[] { eventData.Content.OrganizationId.Value }, statusTypes, null, comm.AreaOfInterest, null, "en");
+
+                var items = _geoJsonBulkRepository.GetPersonActions(comm.Duration.LowerBound, comm.Duration.UpperBound, new int[] { eventData.Content.OrganizationId.Value }, statusTypes, null, comm.AreaOfInterest, null, "en", comm.Scope, comm.ReceiverTeamId, comm.ReceiverId);
                 var actions = JsonConvert.DeserializeObject<GetActionsOutput>(items);
-                //PersonId not available, make check on username
-                personUsernameList= actions.PersonActions.Select(a => a.Username).ToList();
+                if (actions.PersonActions == null)
+                    actions.PersonActions = new List<PersonActionDto>();
+
+                if (eventData.Content.ReceiverTeamId.HasValue)
+                    actions.PersonActions = actions.PersonActions.Where(a => a.TeamId == eventData.Content.ReceiverTeamId.Value).ToList();
+                if (eventData.Content.ReceiverId.HasValue)
+                    actions.PersonActions = actions.PersonActions.Where(a => a.PersonId == eventData.Content.ReceiverId.Value).ToList();
+                
+                personIdList = actions.PersonActions.Select(a => a.PersonId).ToList();
             }
             catch
             {
-                personUsernameList = null;
+                personIdList = null;
             }
 
             var receivers = _personManager
                                 .Persons
                                 .Include(p => p.Organization)
-                                .Where(p => p.OrganizationId == orgId || (p.Organization.ParentId.HasValue && p.Organization.ParentId.Value == orgId))
-                                .Where(p => personUsernameList != null && personUsernameList.Contains(p.Username));
+                                //.Where(p => p.OrganizationId == orgId || (p.Organization.ParentId.HasValue && p.Organization.ParentId.Value == orgId))
+                                .Where(p => personIdList != null && personIdList.Contains(p.Id));
             await _notifierService.SendUserNotification(eventData.CreatorId, receivers, eventData.EntityId, ("Notification_Communication_Create_Body", bodyParams), (titleKey, null), eventData.Action, EntityType.Communication);
         }
     }

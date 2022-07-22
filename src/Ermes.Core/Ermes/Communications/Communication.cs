@@ -1,8 +1,10 @@
 ﻿using Abp.Domain.Entities;
 using Abp.Domain.Entities.Auditing;
 using Ermes.Enums;
+using Ermes.Helpers;
 using Ermes.Organizations;
 using Ermes.Persons;
+using Ermes.Teams;
 using NetTopologySuite.Geometries;
 using NpgsqlTypes;
 using System;
@@ -30,5 +32,26 @@ namespace Ermes.Communications
         public Geometry AreaOfInterest { get; set; }
         [ForeignKey("CreatorUserId")]
         public Person Creator { get; set; }
+
+        [Required]
+        [Column("Scope")]
+        public string ScopeString
+        {
+            get { return Scope.ToString(); }
+            private set { Scope = value.ParseEnum<CommunicationScopeType>(); }
+        }
+
+        [NotMapped]
+        public CommunicationScopeType Scope { get; set; }
+
+        [ForeignKey("ReceiverId")]
+        public virtual Person Receiver { get; set; }
+        public virtual long? ReceiverId { get; set; }
+
+        [ForeignKey("ReceiverTeamId")]
+        public virtual Team ReceiverTeam { get; set; }
+        public virtual int? ReceiverTeamId { get; set; }
+
+
     }
 }

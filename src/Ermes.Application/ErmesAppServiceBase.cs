@@ -242,6 +242,21 @@ namespace Ermes
                     RoleId = rta.Id
                 };
                 await _personManager.InsertPersonRoleAsync(pr);
+
+                //If citizen, set Ready as default state;
+                //This allows to send communications to citizens, since they cannot change their status from the UI of the Chatbot;
+                //Communication are not sent to person in Off status
+                if (rta.Name == AppRoles.CITIZEN)
+                {
+                    await _personManager.InsertPersonActionStatusAsync(new PersonActionStatus()
+                    {
+                        CurrentStatus = ActionStatusType.Ready,
+                        PersonId = personId,
+                        Timestamp = DateTime.UtcNow,
+                        Status = ActionStatusType.Ready,
+                        CreatorUserId = personId
+                    });
+                }
             }
 
             await CurrentUnitOfWork.SaveChangesAsync();

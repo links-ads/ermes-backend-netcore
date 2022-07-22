@@ -122,7 +122,7 @@ namespace Ermes.Dashboard
             else
                 orgIdList = _session.LoggedUserPerson.OrganizationId.HasValue ? new int[] { _session.LoggedUserPerson.OrganizationId.Value } : null;
 
-            var items = _geoJsonBulkRepository.GetPersonActions(start, end, orgIdList, null, null, null, null, _languageManager.CurrentLanguage.Name);
+            var items = _geoJsonBulkRepository.GetPersonActions(start, end, orgIdList, null, null, null, null, _languageManager.CurrentLanguage.Name, orgIdList == null ? CommunicationScopeType.Citizens : CommunicationScopeType.Wide);
             var deserialized = JsonConvert.DeserializeObject<GetActionsOutput>(items);
             var actions = deserialized != null && deserialized.PersonActions != null ? deserialized.PersonActions : new List<PersonActionDto>();
             ////////////////////

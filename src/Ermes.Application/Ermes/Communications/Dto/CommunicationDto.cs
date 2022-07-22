@@ -1,5 +1,6 @@
 ﻿using Ermes.Dto;
 using Ermes.Dto.Spatial;
+using Ermes.Enums;
 using Ermes.Organizations.Dto;
 using System;
 using System.Collections.Generic;
@@ -16,5 +17,10 @@ namespace Ermes.Communications.Dto
         public RangeDto<DateTime> Duration { get; set; }
         public PointPosition Centroid { get; set; }
         public string OrganizationName { get; set; }
+        public CommunicationScopeType Scope { get; set; }
+        public long? ReceiverId { get; set; }
+        public string ReceiverName { get; set; }
+        public int? ReceiverTeamId { get; set; }
+        public string ReceiverTeamName { get; set; }
     }
 }

@@ -114,7 +114,7 @@ namespace Ermes.Communications
             else
                 throw new UserFriendlyException(L("InvalidAOI"));
 
-
+            newCommunication.Receiver = null;
             newCommunication.Id = await _communicationManager.CreateOrUpdateCommunicationAsync(newCommunication);
 
             await CurrentUnitOfWork.SaveChangesAsync();
