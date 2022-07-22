@@ -74,7 +74,7 @@ namespace Ermes.EventHandlers
                 //Exclude persons in status = Off; citizens are by default in status = Ready
                 var statusTypes = new List<ActionStatusType>() { ActionStatusType.Active, ActionStatusType.Moving, ActionStatusType.Ready };
 
-                var items = _geoJsonBulkRepository.GetPersonActions(comm.Duration.LowerBound, comm.Duration.UpperBound, new int[] { eventData.Content.OrganizationId.Value }, statusTypes, null, comm.AreaOfInterest, null, "en", comm.Scope);
+                var items = _geoJsonBulkRepository.GetPersonActions(comm.Duration.LowerBound, comm.Duration.UpperBound, new int[] { eventData.Content.OrganizationId.Value }, statusTypes, null, comm.AreaOfInterest, null, "en", comm.Scope, comm.ReceiverTeamId, comm.ReceiverId);
                 var actions = JsonConvert.DeserializeObject<GetActionsOutput>(items);
                 if (actions.PersonActions == null)
                     actions.PersonActions = new List<PersonActionDto>();

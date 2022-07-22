@@ -469,7 +469,19 @@ namespace Ermes.GeoJson
             }
         }
 
-        public string GetPersonActions(DateTime startDate, DateTime endDate, int[] organizationIdList, List<ActionStatusType> statusTypes, int[] activityIds, Geometry boundingBox, string search = "", string language = "it", CommunicationScopeType scope = CommunicationScopeType.Restricted)
+        public string GetPersonActions(
+            DateTime startDate, 
+            DateTime endDate, 
+            int[] organizationIdList, 
+            List<ActionStatusType> statusTypes, 
+            int[] activityIds, 
+            Geometry boundingBox, 
+            string search = "", 
+            string language = "it", 
+            CommunicationScopeType scope = CommunicationScopeType.Restricted,
+            int? teamId = null,
+            long? personId = null
+        )
         {
             var result = new List<object>();
             ErmesDbContext context = _dbContextProvider.GetDbContext();
@@ -526,6 +538,26 @@ namespace Ermes.GeoJson
                         var p = new NpgsqlParameter("@organizations", NpgsqlDbType.Array | NpgsqlDbType.Integer)
                         {
                             Value = organizationIdList
+                        };
+                        command.Parameters.Add(p);
+                    }
+
+                    if(teamId.HasValue)
+                    {
+                        command.CommandText += @" and (tmp.""TeamId"" = @teamId)";
+                        var p = new NpgsqlParameter("@teamId", NpgsqlDbType.Integer)
+                        {
+                            Value = teamId.Value
+                        };
+                        command.Parameters.Add(p);
+                    }
+
+                    if(personId.HasValue)
+                    {
+                        command.CommandText += @" and (tmp.""PersonId"" = @personId)";
+                        var p = new NpgsqlParameter("@personId", NpgsqlDbType.Integer)
+                        {
+                            Value = personId.Value
                         };
                         command.Parameters.Add(p);
                     }
