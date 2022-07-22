@@ -10,6 +10,7 @@ using Ermes.Configuration;
 using Ermes.Dto;
 using Ermes.Dto.Datatable;
 using Ermes.ExternalServices.Csi;
+using Ermes.Gamification;
 using Ermes.Linq.Extensions;
 using Ermes.Missions;
 using Ermes.Organizations;
@@ -37,6 +38,7 @@ namespace Ermes.Profile
         private readonly ErmesAppSession _session;
         private readonly PersonManager _personManager;
         private readonly MissionManager _missionManager;
+        private readonly GamificationManager _gamificationManager;
         private readonly TeamManager _teamManager;
         private readonly OrganizationManager _organizationManager;
         private readonly IOptions<FusionAuthSettings> _fusionAuthSettings;
@@ -46,6 +48,7 @@ namespace Ermes.Profile
         public ProfileAppService(ErmesAppSession session,
                     PersonManager personManger,
                     MissionManager missionManager,
+                    GamificationManager gamificationManager,
                     TeamManager teamManager,
                     OrganizationManager organizationManager,
                     ErmesPermissionChecker permissionChecker,
@@ -62,6 +65,7 @@ namespace Ermes.Profile
             _organizationManager = organizationManager;
             _ermesSettings = ermesSettings;
             _csiManager = csiManager;
+            _gamificationManager = gamificationManager;
         }
 
         #region Private
@@ -192,7 +196,7 @@ namespace Ermes.Profile
                     person.Username = response.successResponse.user.username;
                 return new GetProfileOutput()
                 {
-                    Profile = await GetProfileInternal(person, response.successResponse.user, _personManager, _missionManager)
+                    Profile = await GetProfileInternal(person, response.successResponse.user, _personManager, _missionManager, _gamificationManager)
                 };
             }
             else
@@ -249,7 +253,7 @@ namespace Ermes.Profile
             {
                 return new UpdateProfileOutput()
                 {
-                    Profile = await GetProfileInternal(person, user, _personManager, _missionManager),
+                    Profile = await GetProfileInternal(person, user, _personManager, _missionManager, _gamificationManager),
                 };
             }
             else

@@ -28,5 +28,7 @@ namespace Ermes.Reports.Dto
         public List<ReportTag> Tags { get; set; }
         public List<ReportAdultInfo> AdultInfo { get; set; }
         public bool IsPublic { get; set; }
+        public int Points { get; set; }
+        public int? LevelId { get; set; }
     }
 }

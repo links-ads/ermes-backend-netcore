@@ -4,6 +4,7 @@ using Ermes.Attributes;
 using Ermes.Auth.Dto;
 using Ermes.Authorization;
 using Ermes.Dto.Datatable;
+using Ermes.Gamification;
 using Ermes.Helpers;
 using Ermes.Missions;
 using Ermes.Organizations;
@@ -33,6 +34,7 @@ namespace Ermes.Users
         private readonly ErmesAppSession _session;
         private readonly PersonManager _personManager;
         private readonly MissionManager _missionManager;
+        private readonly GamificationManager _gamificationManager;
         private readonly OrganizationManager _organizationManager;
         private readonly TeamManager _teamManager;
         private readonly ErmesPermissionChecker _permissionChecker;
@@ -43,6 +45,7 @@ namespace Ermes.Users
                     ErmesAppSession session,
                     PersonManager personManger,
                     MissionManager missionManager,
+                    GamificationManager gamificationManager,
                     IOptions<FusionAuthSettings> fusionAuthSettings,
                     IOptions<ErmesSettings> ermesSettings,
                     OrganizationManager organizationManager,
@@ -53,6 +56,7 @@ namespace Ermes.Users
             _session = session;
             _personManager = personManger;
             _missionManager = missionManager;
+            _gamificationManager = gamificationManager;
             _fusionAuthSettings = fusionAuthSettings;
             _ermesSettings = ermesSettings;
             _teamManager = teamManager;
@@ -87,7 +91,7 @@ namespace Ermes.Users
                     {
                         var person = await _personManager.GetPersonByFusionAuthUserGuidAsync(item.id.Value, item.username);
 
-                        ProfileDto profile = await GetProfileInternal(person, item, _personManager, _missionManager);
+                        ProfileDto profile = await GetProfileInternal(person, item, _personManager, _missionManager, _gamificationManager);
 
                         list.Add(profile);
                     }
@@ -138,7 +142,7 @@ namespace Ermes.Users
 
             return new CreateOrUpdateUserOutput()
             {
-                Profile = await GetProfileInternal(person, currentUser, _personManager, _missionManager)
+                Profile = await GetProfileInternal(person, currentUser, _personManager, _missionManager, _gamificationManager)
             };
         }
 

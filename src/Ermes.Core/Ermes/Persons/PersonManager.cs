@@ -50,7 +50,7 @@ namespace Ermes.Persons
 
         public async Task<Person> GetPersonByIdAsync(long personId)
         {
-            return await Persons.Include(p => p.Organization).Include(p => p.Team).SingleOrDefaultAsync(p => p.Id == personId);
+            return await Persons.Include(p => p.Organization).Include(p => p.Team).Include(p => p.Level).SingleOrDefaultAsync(p => p.Id == personId);
         }
 
         public async Task<Person> GetPersonByFusionAuthUserGuidAsync(Guid userId, string username)
@@ -299,10 +299,15 @@ namespace Ermes.Persons
                             .ToListAsync();
         }
 
-        public async Task CreatePersonTipAsync(long personId, string tipCode)
+        public async Task<int> CreatePersonTipAsync(long personId, string tipCode)
         {
-            var newItem = new PersonTip(personId, tipCode);
-            await PersonTipRepository.InsertAsync(newItem);
+            if (PersonTips.Where(pt => pt.PersonId == personId && pt.TipCode == tipCode).Count() == 0)
+            {
+                var newItem = new PersonTip(personId, tipCode);
+                return await PersonTipRepository.InsertAndGetIdAsync(newItem);
+            }
+            else
+                return -1;
         }
 
         public async Task CreatePersonQuizAsync(long personId, string quizCode)

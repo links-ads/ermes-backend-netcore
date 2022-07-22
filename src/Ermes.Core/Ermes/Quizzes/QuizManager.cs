@@ -1,5 +1,6 @@
 ﻿using Abp.Domain.Repositories;
 using Abp.Domain.Services;
+using Ermes.Persons;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -20,11 +21,14 @@ namespace Ermes.Quizzes
         protected IRepository<Quiz> QuizRepository { get; set; }
         public IQueryable<QuizTranslation> QuizTranslations { get { return QuizTranslationRepository.GetAllIncluding(ct => ct.Core); } }
         protected IRepository<QuizTranslation> QuizTranslationRepository { get; set; }
+        protected IRepository<PersonQuiz> PersonQuizRepository { get; set; }
+        public IQueryable<PersonQuiz> PersonQuizzes { get { return PersonQuizRepository.GetAllIncluding(a => a.Quiz); } }
 
-        public QuizManager(IRepository<Quiz> quizRepository, IRepository<QuizTranslation> quizTranslationRepository)
+        public QuizManager(IRepository<Quiz> quizRepository, IRepository<QuizTranslation> quizTranslationRepository, IRepository<PersonQuiz> personQuizRepository)
         {
             QuizRepository = quizRepository;
             QuizTranslationRepository = quizTranslationRepository;
+            PersonQuizRepository = personQuizRepository;
         }
 
         public async Task<List<Quiz>> GetQuizzesAsync()
@@ -49,6 +53,11 @@ namespace Ermes.Quizzes
         public async Task<QuizTranslation> GetQuizTranslationByCoreIdLanguageAsync(int coreId, string language)
         {
             return await QuizTranslations.SingleOrDefaultAsync(a => a.CoreId == coreId && a.Language == language);
+        }
+
+        public async Task<List<Quiz>> GetQuizzesByPersonAsync(long personId)
+        {
+            return await PersonQuizzes.Where(a => a.PersonId == personId).Select(a => a.Quiz).ToListAsync();
         }
     }
 }
