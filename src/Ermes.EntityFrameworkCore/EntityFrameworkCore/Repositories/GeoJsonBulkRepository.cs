@@ -469,7 +469,7 @@ namespace Ermes.GeoJson
             }
         }
 
-        public string GetPersonActions(DateTime startDate, DateTime endDate, int[] organizationIdList, List<ActionStatusType> statusTypes, int[] activityIds, Geometry boundingBox, string search = "", string language = "it")
+        public string GetPersonActions(DateTime startDate, DateTime endDate, int[] organizationIdList, List<ActionStatusType> statusTypes, int[] activityIds, Geometry boundingBox, string search = "", string language = "it", CommunicationScopeType scope = CommunicationScopeType.Restricted)
         {
             var result = new List<object>();
             ErmesDbContext context = _dbContextProvider.GetDbContext();
@@ -518,16 +518,19 @@ namespace Ermes.GeoJson
                 command.Parameters.Add(new NpgsqlParameter("@startDate", startDate));
                 command.Parameters.Add(new NpgsqlParameter("@endDate", endDate));
                 command.Parameters.Add(new NpgsqlParameter("@language", language));
-                if (organizationIdList != null)
+                if (scope == CommunicationScopeType.Restricted)
                 {
-                    command.CommandText += @" and (tmp.""OrganizationId"" = any(array[@organizations]) or tmp.""OrganizationParentId"" = any(array[@organizations]) or tmp.""OrganizationId"" is null)";
-                    var p = new NpgsqlParameter("@organizations", NpgsqlDbType.Array | NpgsqlDbType.Integer)
+                    if (organizationIdList != null)
                     {
-                        Value = organizationIdList
-                    };
-                    command.Parameters.Add(p);
+                        command.CommandText += @" and (tmp.""OrganizationId"" = any(array[@organizations]) or tmp.""OrganizationParentId"" = any(array[@organizations]) or tmp.""OrganizationId"" is null)";
+                        var p = new NpgsqlParameter("@organizations", NpgsqlDbType.Array | NpgsqlDbType.Integer)
+                        {
+                            Value = organizationIdList
+                        };
+                        command.Parameters.Add(p);
+                    }
                 }
-                else //Get only citizen actions
+                else if(scope == CommunicationScopeType.Citizens)
                 {
                     command.CommandText += @" and tmp.""OrganizationId"" is null";
                 }

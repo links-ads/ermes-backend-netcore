@@ -70,12 +70,14 @@ namespace Ermes.EventHandlers
             {
                 //Need to filter receivers by the Area of Interest of the communication
                 var comm = await _communicationManager.GetCommunicationByIdAsync(eventData.EntityId);
+
+                //Exclude persons in status = Off; citizens are by default in status = Ready
                 var statusTypes = new List<ActionStatusType>() { ActionStatusType.Active, ActionStatusType.Moving, ActionStatusType.Ready };
 
-                //TODO: if organizationList is set to null, only citizens are retrieved
-                //for a public communication, we need both citizens and professiona
-                var items = _geoJsonBulkRepository.GetPersonActions(comm.Duration.LowerBound, comm.Duration.UpperBound, eventData.Content.Scope == CommunicationScopeType.Public ? null : new int[] { eventData.Content.OrganizationId.Value }, statusTypes, null, comm.AreaOfInterest, null, "en");
+                var items = _geoJsonBulkRepository.GetPersonActions(comm.Duration.LowerBound, comm.Duration.UpperBound, new int[] { eventData.Content.OrganizationId.Value }, statusTypes, null, comm.AreaOfInterest, null, "en", comm.Scope);
                 var actions = JsonConvert.DeserializeObject<GetActionsOutput>(items);
+                if (actions.PersonActions == null)
+                    actions.PersonActions = new List<PersonActionDto>();
 
                 if (eventData.Content.ReceiverTeamId.HasValue)
                     actions.PersonActions = actions.PersonActions.Where(a => a.TeamId == eventData.Content.ReceiverTeamId.Value).ToList();
@@ -91,9 +93,8 @@ namespace Ermes.EventHandlers
 
             var receivers = _personManager
                                 .Persons
-                                //TODO: to be updated according to the scope
                                 .Include(p => p.Organization)
-                                .Where(p => p.OrganizationId == orgId || (p.Organization.ParentId.HasValue && p.Organization.ParentId.Value == orgId))
+                                //.Where(p => p.OrganizationId == orgId || (p.Organization.ParentId.HasValue && p.Organization.ParentId.Value == orgId))
                                 .Where(p => personIdList != null && personIdList.Contains(p.Id));
             await _notifierService.SendUserNotification(eventData.CreatorId, receivers, eventData.EntityId, ("Notification_Communication_Create_Body", bodyParams), (titleKey, null), eventData.Action, EntityType.Communication);
         }

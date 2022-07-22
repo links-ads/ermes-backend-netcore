@@ -94,6 +94,8 @@
     <Compile Include="Migrations\20220426122906_Resolution_MapRequest_Added.Designer.cs" />
     <Compile Include="Migrations\20220720132730_Gamification_Static_Tables.cs" />
     <Compile Include="Migrations\20220720132730_Gamification_Static_Tables.Designer.cs" />
+    <Compile Include="Migrations\20220722085924_Communication_Scope_Added.cs" />
+    <Compile Include="Migrations\20220722085924_Communication_Scope_Added.Designer.cs" />
     <Compile Include="Migrations\ErmesDbContextModelSnapshot.cs" />
     <Compile Include="Migrations\Seed\ModelBuilderExtensions.cs" />
   </ItemGroup>

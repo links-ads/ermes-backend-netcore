@@ -379,7 +379,8 @@ namespace Ermes.Enums
     [JsonConverter(typeof(StringEnumConverter))]
     public enum CommunicationScopeType
     {
-        Public,
-        Restricted
+        Restricted,
+        Citizens,
+        Public
     }
 }
