@@ -522,12 +522,28 @@ namespace Ermes.GeoJson
                 {
                     if (organizationIdList != null)
                     {
+                        command.CommandText += @" and (tmp.""OrganizationId"" = any(array[@organizations]) or tmp.""OrganizationParentId"" = any(array[@organizations]))";
+                        var p = new NpgsqlParameter("@organizations", NpgsqlDbType.Array | NpgsqlDbType.Integer)
+                        {
+                            Value = organizationIdList
+                        };
+                        command.Parameters.Add(p);
+                    }
+                }
+                else if (scope == CommunicationScopeType.Wide)
+                {
+                    if (organizationIdList != null)
+                    {
                         command.CommandText += @" and (tmp.""OrganizationId"" = any(array[@organizations]) or tmp.""OrganizationParentId"" = any(array[@organizations]) or tmp.""OrganizationId"" is null)";
                         var p = new NpgsqlParameter("@organizations", NpgsqlDbType.Array | NpgsqlDbType.Integer)
                         {
                             Value = organizationIdList
                         };
                         command.Parameters.Add(p);
+                    }
+                    else
+                    {
+                        command.CommandText += @" and tmp.""OrganizationId"" is null";
                     }
                 }
                 else if(scope == CommunicationScopeType.Citizens)
