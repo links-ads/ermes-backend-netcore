@@ -3,6 +3,8 @@ using Abp.UI;
 using Ermes.Auth.Dto;
 using Ermes.Authorization;
 using Ermes.Enums;
+using Ermes.Gamification;
+using Ermes.Gamification.Dto;
 using Ermes.Missions;
 using Ermes.Missions.Dto;
 using Ermes.Organizations;
@@ -103,7 +105,7 @@ namespace Ermes
             return roleList;
         }
 
-        protected async Task<ProfileDto> GetProfileInternal(Person person, User user, PersonManager _personManager, MissionManager _missionManager)
+        protected async Task<ProfileDto> GetProfileInternal(Person person, User user, PersonManager _personManager, MissionManager _missionManager, GamificationManager _gamificationManager)
         {
             ProfileDto profile = new ProfileDto()
             {
@@ -111,6 +113,8 @@ namespace Ermes
                 IsFirstLogin = person.IsFirstLogin,
                 IsNewUser = person.IsNewUser,
                 LegacyId = person.LegacyId,
+                Points = person.Points,
+                Level = person.LevelId.HasValue ? person.Level.Name : null,
                 User = ObjectMapper.Map<UserDto>(user)
             };
 
@@ -146,6 +150,8 @@ namespace Ermes
                     RoleId = defaultRole.Id
                 });
                 profile.User.Roles.Add(defaultRole.Name);
+                if (defaultRole.Name == AppRoles.CITIZEN)
+                    person.LevelId = (await _gamificationManager.GetDefaultLevel()).Id;
             }
 
             if (profile.User.Timezone == null)
@@ -154,6 +160,9 @@ namespace Ermes
             //set Default language, but does not update User profile on FusionAuth
             if (profile.User.PreferredLanguages == null || profile.User.PreferredLanguages.Count == 0)
                 profile.User.PreferredLanguages = new List<string>() { AppConsts.DefaultLanguage };
+
+            profile.Medals = ObjectMapper.Map<List<MedalDto>>(await _gamificationManager.GetPersonMedalsAsync(profile.PersonId));
+            profile.Badges = ObjectMapper.Map<List<BadgeDto>>(await _gamificationManager.GetPersonBadgesAsync(profile.PersonId));
 
             return profile;
         }

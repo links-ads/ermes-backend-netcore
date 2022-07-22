@@ -11,9 +11,12 @@ using Ermes.Authorization;
 using Ermes.Categories;
 using Ermes.Enums;
 using Ermes.EventHandlers;
+using Ermes.Gamification;
+using Ermes.Gamification.Dto;
 using Ermes.Helpers;
 using Ermes.Missions;
 using Ermes.Net.MimeTypes;
+using Ermes.Persons;
 using Ermes.Reports;
 using Ermes.Reports.Dto;
 using Ermes.Resources;
@@ -41,6 +44,8 @@ namespace Ermes.Web.Controllers
         private readonly ReportManager _reportManager;
         private readonly ErmesAppSession _session;
         private readonly MissionManager _missionManager;
+        private readonly PersonManager _personManager;
+        private readonly GamificationManager _gamificationManager;
         private readonly IAzureManager _azureManager;
         private readonly ICognitiveServicesManager _cognitiveServicesManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -51,6 +56,8 @@ namespace Ermes.Web.Controllers
                         ReportManager reportManager,
                         ErmesAppSession session,
                         MissionManager missionManager,
+                        PersonManager personManager,
+                        GamificationManager gamificationManager,
                         IHttpContextAccessor httpContextAccessor,
                         IAzureManager azureManager,
                         ICognitiveServicesManager cognitiveServicesManager,
@@ -62,6 +69,8 @@ namespace Ermes.Web.Controllers
             _reportManager = reportManager;
             _session = session;
             _missionManager = missionManager;
+            _personManager = personManager;
+            _gamificationManager = gamificationManager;
             _azureManager = azureManager;
             _backgroundJobManager = backgroundJobManager;
             _cognitiveServicesManager = cognitiveServicesManager;
@@ -182,8 +191,56 @@ namespace Ermes.Web.Controllers
                 EntityWriteAction.Create);
             await _backgroundJobManager.EnqueueEventAsync(notification);
 
+            Person p = await _personManager.GetPersonByIdAsync(_session.LoggedUserPerson.Id);
+
+            async Task<List<(EntityWriteAction, string NewValue)>> AssignRewards(long personId)
+            {
+                List<(EntityWriteAction, string newValue)> result = new List<(EntityWriteAction, string newValue)>();
+                var action = await _gamificationManager.GetActionByNameAsync(ErmesConsts.GamificationActionConsts.DO_REPORT);
+                var person = await _personManager.GetPersonByIdAsync(personId);
+                if (action != null && action.Achievements != null && action.Achievements.Count > 0)
+                {
+                    var personReports = await _reportManager.GetReportsByPersonAsync(personId);
+                    foreach (var item in action.Achievements)
+                    {
+                        if (item is Medal)
+                        {
+                            if (item.Detail.Threshold == personReports.Count)
+                            {
+                                await _gamificationManager.InsertAudit(_session.LoggedUserPerson.Id, null, item.Id, null);
+                                person.Points += item.Detail.Points;
+                                result.Add((EntityWriteAction.MedalObtained, item.Name));
+                            }
+
+                        }
+                    }
+                }
+
+                return result;
+            }
+
+            //The list contains the information about the notification to be sent
+            var list = await _gamificationManager.UpdatePersonGamificationProfileAsync(_session.LoggedUserPerson.Id, ErmesConsts.GamificationActionConsts.DO_REPORT, AssignRewards);
+
+            foreach (var item in list)
+            {
+                NotificationEvent<GamificationNotificationDto> gamNotification = new NotificationEvent<GamificationNotificationDto>(0,
+                _session.LoggedUserPerson.Id,
+                new GamificationNotificationDto()
+                {
+                    PersonId = _session.LoggedUserPerson.Id,
+                    ActionName = ErmesConsts.GamificationActionConsts.DO_REPORT,
+                    NewValue = item.NewValue
+                },
+                item.Action,
+                true);
+                await _backgroundJobManager.EnqueueEventAsync(gamNotification);
+            }
+
             var res = ObjectMapper.Map<ReportDto>(report);
             res.IsEditable = true;
+            res.Points = p.Points;
+            res.LevelId = p.LevelId;
             return res;
         }
 

@@ -38,5 +38,10 @@ namespace Ermes.Reports
                        
         }
 
+        public async Task<List<Report>> GetReportsByPersonAsync(long personId)
+        {
+            return await Reports.Where(r => r.CreatorUserId.Value == personId).ToListAsync();
+        }
+
     }
 }

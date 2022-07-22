@@ -59,6 +59,7 @@ using Ermes.Answers;
 using Ermes.MapRequests.Dto;
 using Ermes.Layers;
 using Ermes.Layers.Dto;
+using Ermes.Gamification;
 
 namespace Ermes
 {
@@ -242,6 +243,16 @@ namespace Ermes
                             .ReverseMap()
                             .ForMember(entity => entity.Code, options => options.Ignore());
             configuration.CreateMap<MapRequests.MapRequest, MapRequestNotificationDto>();
+
+            configuration.CreateMap<Level, LevelDto>()
+                            .ForMember(dto => dto.PreviousLevelName, options => options.MapFrom(b => b.PreviousLevelId.HasValue ? b.PreviousLevel.Name : null))
+                            .ForMember(dto => dto.FollowingLevelName, options => options.MapFrom(b => b.FollowingLevelId.HasValue ? b.FollowingLevel.Name : null));
+
+            configuration.CreateMap<Person, GamificationBaseDto>()
+                .ForMember(dto => dto.LevelName, options => options.MapFrom(b => b.LevelId.HasValue ? b.Level.Name : null))
+                .ForMember(dto => dto.LevelId, options => options.MapFrom(b => b.LevelId))
+                .ForMember(dto => dto.Username, options => options.MapFrom(b => b.Username))
+                .ForMember(dto => dto.Points, options => options.MapFrom(b => b.Points));
             #region GeoJsons
             configuration.CreateMap<Communication, FeatureDto<GeoJsonItem>>()
                             .ForMember(fd => fd.Geometry, options => options.MapFrom(c => new GeoJsonWriter().Write(c.AreaOfInterest)))
