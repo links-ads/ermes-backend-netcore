@@ -76,11 +76,10 @@ namespace Ermes.Communications
             {
                 Geometry boundingBox = GeometryHelper.GetPolygonFromBoundaries(input.SouthWestBoundary, input.NorthEastBoundary);
                 query = _geoJsonBulkRepository.GetCommunications(input.StartDate.Value, input.EndDate.Value, boundingBox);
-                query = query.Include(a => a.Creator).Include(a => a.Creator.Organization);
+                query = query.Include(a => a.Creator).Include(a => a.Creator.Organization).Include(a => a.Receiver).Include(a => a.ReceiverTeam);
             }
             else
-
-                query = _communicationManager.Communications.Where(a => new NpgsqlRange<DateTime>(input.StartDate.Value, input.EndDate.Value).Contains(a.Duration));
+                query = _communicationManager.Communications.Include(a => a.Receiver).Include(a => a.ReceiverTeam).Where(a => new NpgsqlRange<DateTime>(input.StartDate.Value, input.EndDate.Value).Contains(a.Duration));
 
             query = query.DTFilterBy(input);
 
@@ -104,7 +103,7 @@ namespace Ermes.Communications
             result.Items = ObjectMapper.Map<List<CommunicationDto>>(items);
 
             return result;
-        }       
+        }
 
         private async Task<Communication> CreateCommunicationAsync(FeatureDto<CommunicationDto> featureDto)
         {
