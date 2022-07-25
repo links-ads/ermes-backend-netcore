@@ -194,6 +194,8 @@ namespace Ermes.Profile
             {
                 if (person.Username == null)
                     person.Username = response.successResponse.user.username;
+                if (person.Email == null)
+                    person.Email = response.successResponse.user.email;
                 return new GetProfileOutput()
                 {
                     Profile = await GetProfileInternal(person, response.successResponse.user, _personManager, _missionManager, _gamificationManager)

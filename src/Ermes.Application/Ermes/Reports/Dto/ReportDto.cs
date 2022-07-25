@@ -19,6 +19,7 @@ namespace Ermes.Reports.Dto
         public List<ReportExtensionData> ExtensionData { get; set; }
         public string Description { get; set; }
         public string Username { get; set; }
+        public string Email { get; set; }
         public string OrganizationName { get; set; }
         public SourceDeviceType Source { get; set; }
         public bool IsEditable { get; set; }
