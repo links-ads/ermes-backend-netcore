@@ -23,7 +23,7 @@ namespace Ermes.Persons
         protected IRepository<Role> RolesRepository { get; set; }
         protected IRepository<Organization> OrganizationsRepository { get; set; }
 
-        public IQueryable<Person> Persons { get { return PersonRepository.GetAll(); } }
+        public IQueryable<Person> Persons { get { return PersonRepository.GetAll().Include(a => a.Organization).Include(p => p.Team).Include(p => p.Level); } }
         public IQueryable<Role> Roles { get { return RolesRepository.GetAll(); } }
         public IQueryable<PersonAction> PersonActions { get { return PersonActionsRepository.GetAll(); } }
         public IQueryable<PersonRole> PersonRoles { get { return PersonRoleRepository.GetAll(); } }
@@ -50,12 +50,12 @@ namespace Ermes.Persons
 
         public async Task<Person> GetPersonByIdAsync(long personId)
         {
-            return await Persons.Include(p => p.Organization).Include(p => p.Team).Include(p => p.Level).SingleOrDefaultAsync(p => p.Id == personId);
+            return await Persons.SingleOrDefaultAsync(p => p.Id == personId);
         }
 
         public async Task<Person> GetPersonByFusionAuthUserGuidAsync(Guid userId, string username)
         {
-            var person = await PersonRepository.GetAll().Include(a => a.Organization).Include(p => p.Team).FirstOrDefaultAsync(a => a.FusionAuthUserGuid == userId);
+            var person = await Persons.FirstOrDefaultAsync(a => a.FusionAuthUserGuid == userId);
             if (person == null)
             {
                 if (userId.CompareTo(Guid.Empty) == 0)
@@ -79,7 +79,7 @@ namespace Ermes.Persons
         {
             using (var uow = UnitOfWorkManager.Begin())
             {
-                var person = await Persons.Include(a => a.Organization).Include(p => p.Team).FirstOrDefaultAsync(a => a.FusionAuthUserGuid == userId);
+                var person = await Persons.FirstOrDefaultAsync(a => a.FusionAuthUserGuid == userId);
                 if (person == null)
                 {
                     if (userId.CompareTo(Guid.Empty) == 0)
@@ -99,7 +99,7 @@ namespace Ermes.Persons
 
         public Person GetPersonByFusionAuthUserGuid(Guid userId)
         {
-            var person = Persons.Include(a => a.Organization).Include(p => p.Team).FirstOrDefault(a => a.FusionAuthUserGuid == userId);
+            var person = Persons.FirstOrDefault(a => a.FusionAuthUserGuid == userId);
             if (person == null)
             {
                 if (userId.CompareTo(Guid.Empty) == 0)
@@ -256,8 +256,8 @@ namespace Ermes.Persons
 
         public async Task<List<string>> GetPersonRoleNamesAsync(long personId)
         {
-            return await PersonRoles.
-                Include(pr => pr.Role)
+            return await PersonRoles
+                .Include(pr => pr.Role)
                 .Where(pr => pr.PersonId == personId)
                 .Select(pr => pr.Role.Name)
                 .ToListAsync();
