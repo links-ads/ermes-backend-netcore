@@ -189,7 +189,7 @@ namespace Ermes.Actions
                     ///It is not necessary to close an intervention for a first responder already in off Status
                     ///The activity name is a mandatory field for this service, even if it has no meaning; a default value of "Sorveglianza" is being sent
                     if (mustCreateIntervention && p_status.CurrentStatus == ActionStatusType.Off && old_status != null && old_status.Value != ActionStatusType.Off)
-                        await CreateInterventionAsync(personId, p_status.Location.Y, p_status.Location.X, p_status.Timestamp, ActionStatusType.Off);
+                        await CreateInterventionAsync(personId, p_status.Location?.Y, p_status.Location?.X, p_status.Timestamp, ActionStatusType.Off);
                     ///////////////
                     res.PersonAction = ObjectMapper.Map<PersonActionDto>(p_status);
                     break;
@@ -207,11 +207,11 @@ namespace Ermes.Actions
 
                     ////////////////
                     ///Section dedicated to CSI service integration, see issue #65 for details.
-                    ///It is not necessary to create a new Intervention if the first responder was in an active status
+                    ///It is not necessary to create a new Intervention if the first responder already is in an active status
                     if (mustCreateIntervention && (old_status == null || old_status.Value != ActionStatusType.Active))
                     {
                         var itaActivity = await _activityManager.getActivityTranslationByCoreIdAndLangAsync(input.PersonAction.ActivityId, "it");
-                        await CreateInterventionAsync(personId, p_activity.Location.Y, p_activity.Location.X, p_activity.Timestamp, ActionStatusType.Active, itaActivity.Name);
+                        await CreateInterventionAsync(personId, p_activity.Location?.Y, p_activity.Location?.X, p_activity.Timestamp, ActionStatusType.Active, itaActivity.Name);
                     }
                     ////////////////
                     res.PersonAction = ObjectMapper.Map<PersonActionDto>(p_activity);
@@ -227,7 +227,7 @@ namespace Ermes.Actions
             return res;
         }
 
-        protected async Task CreateInterventionAsync(long personId, double latitude, double longitude, DateTime timestamp, ActionStatusType status, string activityName = "Sorveglianza")
+        protected async Task CreateInterventionAsync(long personId, double? latitude, double? longitude, DateTime timestamp, ActionStatusType status, string activityName = "Sorveglianza")
         {
             var person = await _personManager.GetPersonByIdAsync(personId);
             /*
