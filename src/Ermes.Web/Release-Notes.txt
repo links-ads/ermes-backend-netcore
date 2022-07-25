@@ -1,6 +1,6 @@
 Ver.
 --------------------------------
-
+- Feature - Added Email property to Person entity (migration added)(#91)
 
 Ver. 3.7.5 - 2022-07-25
 --------------------------------

@@ -17,6 +17,7 @@ namespace Ermes.Persons
     public class Person : AuditedEntity<long>, IPersonBase
     {
         private const int MaxUsernameLength = 255;
+        private const int MaxEmailLength = 255;
         /// <summary>
         /// UserId assign to the user by Fusion Auth app
         /// </summary>
@@ -68,5 +69,8 @@ namespace Ermes.Persons
         [ForeignKey("LevelId")]
         public virtual Level Level { get; set; }
         public int? LevelId { get; set; }
+
+        [StringLength(MaxEmailLength)]
+        public string Email { get; set; }
     }
 }
