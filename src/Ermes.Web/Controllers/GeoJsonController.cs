@@ -13,6 +13,8 @@ using Ermes.Web.Controllers;
 using System;
 using Ermes.Authorization;
 using Ermes.Organizations;
+using System.Collections.Generic;
+using Ermes.Enums;
 
 namespace Ermes.Web.Controllers
 {
@@ -70,6 +72,26 @@ namespace Ermes.Web.Controllers
                 orgIdList = _organizationManager.GetOrganizationIds();
             else
                 orgIdList = _session.LoggedUserPerson.OrganizationId.HasValue ? new int[] { _session.LoggedUserPerson.OrganizationId.Value } : null;
+
+            //Admin can see everything
+            hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Communications.Communication_CanSeeCrossOrganization);
+            List<CommunicationScopeType> communicationScopeTypes = new List<CommunicationScopeType>() { CommunicationScopeType.Public, CommunicationScopeType.Wide };
+            if (!hasPermission)
+            {
+                foreach (var item in _session.Roles)
+                {
+                    if (item == AppRoles.CITIZEN)
+                        communicationScopeTypes.Add(CommunicationScopeType.Citizens);
+                    else
+                        communicationScopeTypes.Add(CommunicationScopeType.Restricted);
+                }
+            }
+            else
+            {
+                communicationScopeTypes.Add(CommunicationScopeType.Citizens);
+                communicationScopeTypes.Add(CommunicationScopeType.Restricted);
+            }
+
             string responseContent = _geoJsonBulkRepository.GetGeoJsonCollection(
                         input.StartDate, 
                         input.EndDate, 
@@ -86,9 +108,10 @@ namespace Ermes.Web.Controllers
                         input.MapRequestStatusTypes,
                         input.ReportVisibilityType,
                         input.ReportContentTypes,
+                        communicationScopeTypes,
                         AppConsts.Srid, 
                         _languageManager.CurrentLanguage.Name
-                    );
+            );
 
             // I need to return a JsonResult or in case of exception, Abp produces html instead of json. However, the real
             // JsonResult serializes the object I give him while I have an already serialized one.

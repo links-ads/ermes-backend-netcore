@@ -56,6 +56,7 @@ namespace Ermes.GeoJson
             List<MapRequestStatusType> mapRequestStatusTypes,
             VisibilityType visibilityType,
             List<ReportContentType> reportContentTypes,
+            List<CommunicationScopeType> communicationScopeTypes,
             int srid, 
             string language = "it"
         );
