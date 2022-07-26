@@ -1,6 +1,7 @@
 Ver.
 --------------------------------
 - Bugfix - Fix GetCommunication API, scope management added (#94)
+- Feature - DisplayName property  added where necessary (#95)
 
 Ver. 3.7.6 - 2022-07-25
 --------------------------------
