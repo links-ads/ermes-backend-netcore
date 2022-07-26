@@ -527,7 +527,8 @@ namespace Ermes.GeoJson
                     p.""Id"" as ""PersonId"",
                     p.""TeamId"",
                     null as ""Type"",
-                    coalesce(a.""ParentId"", a.""Id"") as ""activityFilter""
+                    coalesce(a.""ParentId"", a.""Id"") as ""activityFilter"",
+                    p.""Email""
                     FROM (
 	                    SELECT pa2.""PersonId"", MAX(pa2.""Timestamp"") as ""MaxTime""
                         FROM person_actions pa2

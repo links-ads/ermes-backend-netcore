@@ -63,7 +63,7 @@ namespace Ermes.GeoJson
             {
                 FeatureDto<GeoJsonItem> pad = ObjectMapper.Map<FeatureDto<GeoJsonItem>>(paa);
                 pad.Properties.Type = EntityType.PersonActionActivity.ToString();
-                pad.Properties.Details = L("GeoJsonDetail.PersonActionActivity", paa.Person.Username, ObjectMapper.Map<LocalizedActivityNameDto>(paa.Activity).Name);
+                pad.Properties.Details = L("GeoJsonDetail.PersonActionActivity", paa.Person.Email ?? paa.Person.Username, ObjectMapper.Map<LocalizedActivityNameDto>(paa.Activity).Name);
                 retval.Features.Add(pad);
             }
 
@@ -75,7 +75,7 @@ namespace Ermes.GeoJson
             {
                 FeatureDto<GeoJsonItem> pad = ObjectMapper.Map<FeatureDto<GeoJsonItem>>(pas);
                 pad.Properties.Type = EntityType.PersonActionStatus.ToString();
-                pad.Properties.Details = L("GeoJsonDetail.PersonActionStatus", pas.Person.Username, pas.StatusString);
+                pad.Properties.Details = L("GeoJsonDetail.PersonActionStatus", pas.Person.Email ?? pas.Person.Username, pas.StatusString);
                 retval.Features.Add(pad);
             }
 
@@ -87,7 +87,7 @@ namespace Ermes.GeoJson
             {
                 FeatureDto<GeoJsonItem> pad = ObjectMapper.Map<FeatureDto<GeoJsonItem>>(pat);
                 pad.Properties.Type = EntityType.PersonActionTracking.ToString();
-                pad.Properties.Details = L("GeoJsonDetail.PersonActionTracking", pat.Person.Username, pat.ExtensionData);
+                pad.Properties.Details = L("GeoJsonDetail.PersonActionTracking", pat.Person.Email ?? pat.Person.Username, pat.ExtensionData);
                 retval.Features.Add(pad);
             }
 

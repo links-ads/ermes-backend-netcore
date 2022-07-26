@@ -53,7 +53,7 @@ namespace Ermes.Persons
             return await Persons.SingleOrDefaultAsync(p => p.Id == personId);
         }
 
-        public async Task<Person> GetPersonByFusionAuthUserGuidAsync(Guid userId, string username)
+        public async Task<Person> GetPersonByFusionAuthUserGuidAsync(Guid userId, string email, string username)
         {
             var person = await Persons.FirstOrDefaultAsync(a => a.FusionAuthUserGuid == userId);
             if (person == null)
@@ -63,7 +63,8 @@ namespace Ermes.Persons
                 person = new Person()
                 {
                     FusionAuthUserGuid = userId,
-                    Username = username
+                    Username = username,
+                    Email = email
                 };
                 person.Id = PersonRepository.InsertAndGetId(person);
             }
@@ -252,6 +253,11 @@ namespace Ermes.Persons
         public Person GetPersonByUsername(string username)
         {
             return Persons.SingleOrDefault(p => p.Username == username);
+        }
+
+        public Person GetPersonByEmail(string email)
+        {
+            return Persons.SingleOrDefault(p => p.Email == email);
         }
 
         public async Task<List<string>> GetPersonRoleNamesAsync(long personId)

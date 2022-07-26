@@ -146,7 +146,7 @@ namespace Ermes.Import
                 foreach (IUserRow row in sheet.Rows)
                 {
                     UserDto user = new UserDto();
-                    var person = personManager.GetPersonByUsername(row.GetString("Username"));
+                    var person = personManager.GetPersonByEmail(row.GetString("Email"));
                     if (person != null)
                         throw new NotImplementedException();
                     else
@@ -185,20 +185,21 @@ namespace Ermes.Import
                         else
                             person.TeamId = teamId;
                     }
-                    
+
+                    var email =  row.GetString("Email");
+                    if (email == null || string.IsNullOrWhiteSpace(email))
+                        throw new UserFriendlyException(localizer.L("InvalidEmail"));
+                    else
+                        person.Email = user.Email = email;
 
                     var username = row.GetString("Username");
-                    if (username == null || string.IsNullOrWhiteSpace(username))
-                        throw new UserFriendlyException(localizer.L("InvalidUsername", username));
-                    else
-                        person.Username = user.Username  = username;
+                    person.Username = user.Username  = username;
 
                     var preferredLanguages = row.GetStringArray("PreferredLanguages").ToList();
                     if (preferredLanguages == null || preferredLanguages.Count == 0)
                         preferredLanguages.Add("en");
                     user.PreferredLanguages = preferredLanguages;
 
-                    user.Email = row.GetString("Email");
 
                     var timezone = row.GetString("Timezone");
                     if (timezone == null || string.IsNullOrWhiteSpace(timezone))
@@ -209,6 +210,7 @@ namespace Ermes.Import
                     if(password == null || string.IsNullOrWhiteSpace(password))
                         throw new UserFriendlyException(localizer.L("InvalidPassword", password));
                     user.Password = password;
+                    
                     user.Id = Guid.NewGuid();
                     person.FusionAuthUserGuid = user.Id;
                     person.IsNewUser = false;
