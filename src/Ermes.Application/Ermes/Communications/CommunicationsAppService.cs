@@ -84,7 +84,7 @@ namespace Ermes.Communications
             query = query.DTFilterBy(input);
 
             var person = _session.LoggedUserPerson;
-            query = query.DataOwnership(person.OrganizationId.HasValue ? new List<int>() { person.OrganizationId.Value } : null);
+            query = query.DataOwnership(person.OrganizationId.HasValue ? new List<int>() { person.OrganizationId.Value } : null, person);
 
             result.TotalCount = await query.CountAsync();
 
