@@ -89,7 +89,7 @@ namespace Ermes.Users
                     var list = new List<ProfileDto>();
                     foreach (var item in response.successResponse.users)
                     {
-                        var person = await _personManager.GetPersonByFusionAuthUserGuidAsync(item.id.Value, item.username);
+                        var person = await _personManager.GetPersonByFusionAuthUserGuidAsync(item.id.Value, item.email, item.username);
 
                         ProfileDto profile = await GetProfileInternal(person, item, _personManager, _missionManager, _gamificationManager);
 

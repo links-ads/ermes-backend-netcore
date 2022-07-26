@@ -22,6 +22,13 @@ namespace Ermes.Reports.Dto
         public List<ReportTarget> Targets { get; set; }
         public string Username { get; set; }
         public string Email { get; set; }
+        public string DisplayName
+        {
+            get
+            {
+                return Username ?? Email;
+            }
+        }
         public string OrganizationName { get; set; }
         public int? OrganizationId { get; set; }
         public SourceDeviceType Source { get; set; }

@@ -143,7 +143,7 @@ namespace Ermes.GeoJson
                         o.""Name"" as ""organizationName"",
                         o.""ParentId"" as ""organizationParentId"",
                         null as ""extensionData"",
-	                    p.""Username"" as ""creator"",
+	                    coalesce(p.""Username"", p.""Email"") as ""creator"",
                         null as ""statusFilter"",
                         0 as ""activityFilter"",
                         null as ""hazardFilter"",
@@ -173,7 +173,7 @@ namespace Ermes.GeoJson
                         o.""Name"" as ""organizationName"",
                         o.""ParentId"" as ""organizationParentId"",
                         null as ""extensionData"",
-                        p.""Username"" as ""creator"",
+                        coalesce(p.""Username"", p.""Email"") as ""creator"",
                         null as ""statusFilter"",
                         0 as ""activityFilter"",
                         null as ""hazardFilter"",
@@ -203,7 +203,7 @@ namespace Ermes.GeoJson
                         o.""Name"" as ""organizationName"",
                         o.""ParentId"" as ""organizationParentId"",
                         null as ""extensionData"",
-                        p.""Username"" as ""creator"",
+                        coalesce(p.""Username"", p.""Email"") as ""creator"",
                         null as ""statusFilter"",
                         0 as ""activityFilter"",
                         r.""Hazard"" as ""hazardFilter"",
@@ -233,7 +233,7 @@ namespace Ermes.GeoJson
                         o.""Name"" as ""organizationName"",
                         o.""ParentId"" as ""organizationParentId"",
                         null as ""extensionData"",
-                        p.""Username"" as ""creator"",
+                        coalesce(p.""Username"", p.""Email"") as ""creator"",
                         null as ""statusFilter"",
                         0 as ""activityFilter"",
                         null as ""hazardFilter"",
@@ -263,7 +263,7 @@ namespace Ermes.GeoJson
                         o.""Name"" as ""organizationName"",
                         o.""ParentId"" as ""organizationParentId"",
                         null as ""extensionData"",
-                        p.""Username"" as ""creator"",
+                        coalesce(p.""Username"", p.""Email"") as ""creator"",
                         null as ""statusFilter"",
                         0 as ""activityFilter"",
                         null as ""hazardFilter"",
@@ -293,7 +293,7 @@ namespace Ermes.GeoJson
 	                    o.""Name"" as ""organizationName"",
                         o.""ParentId"" as ""organizationParentId"",
                         pa.""CurrentExtensionData""::text as ""extensionData"",
-	                    p.""Username"" as ""creator"",
+	                    coalesce(p.""Username"", p.""Email"") as ""creator"",
                         pa.""CurrentStatus"" as ""statusFilter"",
                         coalesce(a.""ParentId"", a.""Id"") as ""activityFilter"",
                         null as ""hazardFilter"",
@@ -527,7 +527,8 @@ namespace Ermes.GeoJson
                     p.""Id"" as ""PersonId"",
                     p.""TeamId"",
                     null as ""Type"",
-                    coalesce(a.""ParentId"", a.""Id"") as ""activityFilter""
+                    coalesce(a.""ParentId"", a.""Id"") as ""activityFilter"",
+                    p.""Email""
                     FROM (
 	                    SELECT pa2.""PersonId"", MAX(pa2.""Timestamp"") as ""MaxTime""
                         FROM person_actions pa2
