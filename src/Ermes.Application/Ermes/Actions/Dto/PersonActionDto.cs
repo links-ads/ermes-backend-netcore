@@ -36,7 +36,6 @@ namespace Ermes.Actions.Dto
         public string DisplayName
         {
             get { return Username ?? Email; }
-            set { DisplayName = value; }
         }
         public PersonActionType Type { get; set; }
         public long PersonId { get; set; }
