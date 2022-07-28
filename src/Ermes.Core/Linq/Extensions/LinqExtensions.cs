@@ -186,9 +186,7 @@ namespace Ermes.Linq.Extensions
                         .Where(c => c.ScopeString != CommunicationScopeType.Restricted.ToString())
                         : query
                         .Where(c =>
-                            c.ScopeString != CommunicationScopeType.Citizens.ToString() &&
-                            (!c.ReceiverId.HasValue || person.Id == c.ReceiverId.Value) &&
-                            (!c.ReceiverTeamId.HasValue || person.TeamId == c.ReceiverTeamId.Value) &&
+                            c.RestrictionString != CommunicationRestrictionType.Citizen.ToString() &&
                             //Organization visibility
                             (c.Creator.OrganizationId.HasValue && organizationIdList.Contains(c.Creator.OrganizationId.Value)) ||
                             //Organization hierarchy

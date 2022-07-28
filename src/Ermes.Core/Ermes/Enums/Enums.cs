@@ -386,6 +386,7 @@ namespace Ermes.Enums
     [JsonConverter(typeof(StringEnumConverter))]
     public enum CommunicationRestrictionType
     {
+        None,
         Organization,
         Citizen,
         Professional
