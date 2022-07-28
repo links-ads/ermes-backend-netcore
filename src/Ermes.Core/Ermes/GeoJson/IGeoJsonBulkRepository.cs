@@ -35,11 +35,23 @@ namespace Ermes.GeoJson
             int[] activityIds, 
             Geometry boundingBox, 
             string search = "", 
-            string language = "it", 
-            CommunicationScopeType scope = CommunicationScopeType.Wide,
-            int? teamId = null,
-            long? personId = null
+            string language = "it"
         );
+
+        public string GetPersonActions(
+            DateTime StartDate,
+            DateTime EndDate,
+            int[] organizationIdList,
+            List<ActionStatusType> statusTypes,
+            int[] activityIds,
+            Geometry boundingBox,
+            string search = "",
+            string language = "it",
+            CommunicationScopeType scopeType = CommunicationScopeType.Restricted,
+            CommunicationRestrictionType restrictionType = CommunicationRestrictionType.Organization
+        );
+
+
         public string GetGeoJsonCollection(
             DateTime StartDate, 
             DateTime EndDate, 

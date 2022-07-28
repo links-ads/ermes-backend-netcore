@@ -74,15 +74,10 @@ namespace Ermes.EventHandlers
                 //Exclude persons in status = Off; citizens are by default in status = Ready
                 var statusTypes = new List<ActionStatusType>() { ActionStatusType.Active, ActionStatusType.Moving, ActionStatusType.Ready };
 
-                var items = _geoJsonBulkRepository.GetPersonActions(comm.Duration.LowerBound, comm.Duration.UpperBound, new int[] { eventData.Content.OrganizationId.Value }, statusTypes, null, comm.AreaOfInterest, null, "en", comm.Scope, comm.ReceiverTeamId, comm.ReceiverId);
+                var items = _geoJsonBulkRepository.GetPersonActions(comm.Duration.LowerBound, comm.Duration.UpperBound, new int[] { eventData.Content.OrganizationId.Value }, statusTypes, null, comm.AreaOfInterest, null, "en", comm.Scope, comm.Restriction);
                 var actions = JsonConvert.DeserializeObject<GetActionsOutput>(items);
                 if (actions.PersonActions == null)
                     actions.PersonActions = new List<PersonActionDto>();
-
-                if (eventData.Content.ReceiverTeamId.HasValue)
-                    actions.PersonActions = actions.PersonActions.Where(a => a.TeamId == eventData.Content.ReceiverTeamId.Value).ToList();
-                if (eventData.Content.ReceiverId.HasValue)
-                    actions.PersonActions = actions.PersonActions.Where(a => a.PersonId == eventData.Content.ReceiverId.Value).ToList();
                 
                 personIdList = actions.PersonActions.Select(a => a.PersonId).ToList();
             }
@@ -94,7 +89,6 @@ namespace Ermes.EventHandlers
             var receivers = _personManager
                                 .Persons
                                 .Include(p => p.Organization)
-                                //.Where(p => p.OrganizationId == orgId || (p.Organization.ParentId.HasValue && p.Organization.ParentId.Value == orgId))
                                 .Where(p => personIdList != null && personIdList.Contains(p.Id));
             await _notifierService.SendUserNotification(eventData.CreatorId, receivers, eventData.EntityId, ("Notification_Communication_Create_Body", bodyParams), (titleKey, null), eventData.Action, EntityType.Communication);
         }
