@@ -32,6 +32,11 @@ namespace Ermes.Actions.Dto
         public int ActivityId { get; set; }
         public string ActivityName { get; set; }
         public string Username { get; set; }
+        public string Email { get; set; }
+        public string DisplayName
+        {
+            get { return Username ?? Email; }
+        }
         public PersonActionType Type { get; set; }
         public long PersonId { get; set; }
         public int TeamId { get; set; }

@@ -222,6 +222,7 @@ namespace Ermes.Actions
             }
 
             res.PersonAction.Username = _session.LoggedUserPerson.Username;
+            res.PersonAction.Email = _session.LoggedUserPerson.Email;
             res.PersonAction.OrganizationId = _session.LoggedUserPerson.OrganizationId.HasValue ? _session.LoggedUserPerson.OrganizationId.Value : 0;
             Logger.Info("Ermes: InsertPersonAction executed by person: " + personId);
             return res;

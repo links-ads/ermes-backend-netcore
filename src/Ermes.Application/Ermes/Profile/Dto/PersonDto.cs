@@ -10,6 +10,11 @@ namespace Ermes.Profile.Dto
     {
         public long Id { get; set; }
         public string Username { get; set; }
+        public string Email { get; set; }
+        public string DisplayName { get {
+                return Username ?? Email;
+            } 
+        }
         public int? TeamId { get; set; }
         public string TeamName { get; set; }
         public int? OrganizationId { get; set; }

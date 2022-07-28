@@ -22,6 +22,14 @@ namespace Ermes.MapRequests.Dto
         public string ErrorMessage { get; set; }
         public OrganizationDto Organization { get; set; }
         public string Username { get; set; }
+        public string Email { get; set; }
+        public string DisplayName
+        {
+            get
+            {
+                return Username ?? Email;
+            }
+        }
         public int Resolution { get; set; } = 10;
     }
 }

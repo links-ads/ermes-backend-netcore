@@ -115,6 +115,7 @@ namespace Ermes.GeoJson
             List<MapRequestStatusType> mapRequestStatusTypes,
             VisibilityType visibilityType,
             List<ReportContentType> reportContentTypes,
+            List<CommunicationScopeType> communicationScopeTypes,
             int srid,
             string Language = "it"
             )
@@ -142,7 +143,7 @@ namespace Ermes.GeoJson
                         o.""Name"" as ""organizationName"",
                         o.""ParentId"" as ""organizationParentId"",
                         null as ""extensionData"",
-	                    p.""Username"" as ""creator"",
+	                    coalesce(p.""Username"", p.""Email"") as ""creator"",
                         null as ""statusFilter"",
                         0 as ""activityFilter"",
                         null as ""hazardFilter"",
@@ -152,7 +153,8 @@ namespace Ermes.GeoJson
                         null as ""mapRequestStatusFilter"",
                         null as ""mapRequestLayerFilter"",
                         null as ""reportContentTypeFilter"",
-                        null as ""reportIsPublicFilter""
+                        null as ""reportIsPublicFilter"",
+                        null as ""communicationScopeFilter""
                     from public.missions m
                     left join public.organizations o on o.""Id"" = m.""OrganizationId""
                     join public.persons p on p.""Id"" = m.""CreatorUserId""
@@ -171,7 +173,7 @@ namespace Ermes.GeoJson
                         o.""Name"" as ""organizationName"",
                         o.""ParentId"" as ""organizationParentId"",
                         null as ""extensionData"",
-                        p.""Username"" as ""creator"",
+                        coalesce(p.""Username"", p.""Email"") as ""creator"",
                         null as ""statusFilter"",
                         0 as ""activityFilter"",
                         null as ""hazardFilter"",
@@ -181,7 +183,8 @@ namespace Ermes.GeoJson
                         null as ""mapRequestStatusFilter"",
                         null as ""mapRequestLayerFilter"",
                         null as ""reportContentTypeFilter"",
-                        null as ""reportIsPublicFilter""
+                        null as ""reportIsPublicFilter"",
+                        c.""Scope"" as ""communicationScopeFilter""
                     from public.communications c
                     join public.persons p on p.""Id"" = c.""CreatorUserId""
                     left join public.organizations o on o.""Id"" = p.""OrganizationId""
@@ -200,7 +203,7 @@ namespace Ermes.GeoJson
                         o.""Name"" as ""organizationName"",
                         o.""ParentId"" as ""organizationParentId"",
                         null as ""extensionData"",
-                        p.""Username"" as ""creator"",
+                        coalesce(p.""Username"", p.""Email"") as ""creator"",
                         null as ""statusFilter"",
                         0 as ""activityFilter"",
                         r.""Hazard"" as ""hazardFilter"",
@@ -210,7 +213,8 @@ namespace Ermes.GeoJson
                         null as ""mapRequestStatusFilter"",
                         null as ""mapRequestLayerFilter"",
                         r.""ContentType"" as ""reportContentTypeFilter"",
-                        r.""IsPublic""::text as ""reportIsPublicFilter""
+                        r.""IsPublic""::text as ""reportIsPublicFilter"",
+                        null as ""communicationScopeFilter""
                     from public.reports r 
                     join public.persons p on p.""Id"" = r.""CreatorUserId""
                     left join public.organizations o on o.""Id"" = p.""OrganizationId""
@@ -229,7 +233,7 @@ namespace Ermes.GeoJson
                         o.""Name"" as ""organizationName"",
                         o.""ParentId"" as ""organizationParentId"",
                         null as ""extensionData"",
-                        p.""Username"" as ""creator"",
+                        coalesce(p.""Username"", p.""Email"") as ""creator"",
                         null as ""statusFilter"",
                         0 as ""activityFilter"",
                         null as ""hazardFilter"",
@@ -239,7 +243,8 @@ namespace Ermes.GeoJson
                         null as ""mapRequestStatusFilter"",
                         null as ""mapRequestLayerFilter"",
                         null as ""reportContentTypeFilter"",
-                        null as ""reportIsPublicFilter""
+                        null as ""reportIsPublicFilter"",
+                        null as ""communicationScopeFilter""
                     from public.reportrequests r2 
                     join public.persons p on p.""Id"" = r2.""CreatorUserId""
                     left join public.organizations o on o.""Id"" = p.""OrganizationId""
@@ -258,7 +263,7 @@ namespace Ermes.GeoJson
                         o.""Name"" as ""organizationName"",
                         o.""ParentId"" as ""organizationParentId"",
                         null as ""extensionData"",
-                        p.""Username"" as ""creator"",
+                        coalesce(p.""Username"", p.""Email"") as ""creator"",
                         null as ""statusFilter"",
                         0 as ""activityFilter"",
                         null as ""hazardFilter"",
@@ -268,7 +273,8 @@ namespace Ermes.GeoJson
                         mr.""Status"" as ""mapRequestStatusFilter"",
                         mr.""Layer"" as ""mapRequestLayerFilter"",
                         null as ""reportContentTypeFilter"",
-                        null as ""reportIsPublicFilter""
+                        null as ""reportIsPublicFilter"",
+                        null as ""communicationScopeFilter""
                     from public.map_requests mr
                     join public.persons p on p.""Id"" = mr.""CreatorUserId""
                     left join public.organizations o on o.""Id"" = p.""OrganizationId""
@@ -287,7 +293,7 @@ namespace Ermes.GeoJson
 	                    o.""Name"" as ""organizationName"",
                         o.""ParentId"" as ""organizationParentId"",
                         pa.""CurrentExtensionData""::text as ""extensionData"",
-	                    p.""Username"" as ""creator"",
+	                    coalesce(p.""Username"", p.""Email"") as ""creator"",
                         pa.""CurrentStatus"" as ""statusFilter"",
                         coalesce(a.""ParentId"", a.""Id"") as ""activityFilter"",
                         null as ""hazardFilter"",
@@ -297,7 +303,8 @@ namespace Ermes.GeoJson
                         null as ""mapRequestStatusFilter"",
                         null as ""mapRequestLayerFilter"",
                         null as ""reportContentTypeFilter"",
-                        null as ""reportIsPublicFilter""
+                        null as ""reportIsPublicFilter"",
+                        null as ""communicationScopeFilter""
                         FROM (
 	                        SELECT pa2.""PersonId"", MAX(pa2.""Timestamp"") as ""MaxTime""
                             FROM person_actions pa2
@@ -352,8 +359,8 @@ namespace Ermes.GeoJson
                     };
                     command.Parameters.Add(p);
                 }
-                else
-                    command.CommandText += @" and tmp.""organizationId"" is null";
+                //else
+                //    command.CommandText += @" and tmp.""organizationId"" is null";
 
                 if (statusTypes != null && statusTypes.Count > 0)
                 {
@@ -441,6 +448,16 @@ namespace Ermes.GeoJson
                     var p = new NpgsqlParameter("@reportContentTypes", NpgsqlDbType.Array | NpgsqlDbType.Text)
                     {
                         Value = reportContentTypes.Select(a => a.ToString()).ToArray()
+                    };
+                    command.Parameters.Add(p);
+                }
+
+                if (communicationScopeTypes != null && communicationScopeTypes.Count > 0)
+                {
+                    command.CommandText += @" and (tmp.""communicationScopeFilter"" is null or tmp.""communicationScopeFilter"" = any(array[@communicationScopeTypes]))";
+                    var p = new NpgsqlParameter("@communicationScopeTypes", NpgsqlDbType.Array | NpgsqlDbType.Text)
+                    {
+                        Value = communicationScopeTypes.Select(a => a.ToString()).ToArray()
                     };
                     command.Parameters.Add(p);
                 }
@@ -636,7 +653,8 @@ namespace Ermes.GeoJson
                     p.""Id"" as ""PersonId"",
                     p.""TeamId"",
                     null as ""Type"",
-                    coalesce(a.""ParentId"", a.""Id"") as ""activityFilter""
+                    coalesce(a.""ParentId"", a.""Id"") as ""activityFilter"",
+                    p.""Email""
                     FROM (
 	                    SELECT pa2.""PersonId"", MAX(pa2.""Timestamp"") as ""MaxTime""
                         FROM person_actions pa2

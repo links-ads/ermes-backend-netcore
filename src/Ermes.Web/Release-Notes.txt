@@ -1,5 +1,18 @@
 Ver.
 --------------------------------
+
+
+Ver. 3.7.7 - 2022-07-27
+--------------------------------
+- Bugfix - Fix GetCommunication API, scope management added (#94)
+- Feature - DisplayName property  added where necessary (#95)
+
+Ver. 3.7.6 - 2022-07-25
+--------------------------------
+- Feature - Added Email property to Person entity (migration added)(#91)
+
+Ver. 3.7.5 - 2022-07-25
+--------------------------------
 - Bugfix - CreatePersonAction, CreateInterventionAsync, fix for people that set their status to Active for the first time (#90)
 - Feature - First update for gamification (migration added)(#87)
 - Feature - Order of GetTips set based on CrisisPhase (#92)

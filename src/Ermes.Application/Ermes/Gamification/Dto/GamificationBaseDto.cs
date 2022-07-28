@@ -16,6 +16,14 @@ namespace Ermes.Gamification.Dto
         public int? LevelId { get; set; }
         public string LevelName { get; set; }
         public string Username { get; set; }
+        public string Email { get; set; }
+        public string DisplayName
+        {
+            get
+            {
+                return Username ?? Email;
+            }
+        }
         public int Position { get; set; }
     }
 }
