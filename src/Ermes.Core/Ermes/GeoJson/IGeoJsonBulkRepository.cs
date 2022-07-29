@@ -68,10 +68,11 @@ namespace Ermes.GeoJson
             List<MapRequestStatusType> mapRequestStatusTypes,
             VisibilityType visibilityType,
             List<ReportContentType> reportContentTypes,
-            List<CommunicationScopeType> communicationScopeTypes,
+            List<CommunicationRestrictionType> communicationRestrictionTypes,
             int srid, 
             string language = "it"
         );
+
         public List<Activation> GetPersonActivations(DateTime StartDate, DateTime EndDate, ActionStatusType statusType);
     }
 }

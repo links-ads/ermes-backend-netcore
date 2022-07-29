@@ -115,7 +115,7 @@ namespace Ermes.GeoJson
             List<MapRequestStatusType> mapRequestStatusTypes,
             VisibilityType visibilityType,
             List<ReportContentType> reportContentTypes,
-            List<CommunicationScopeType> communicationScopeTypes,
+            List<CommunicationRestrictionType> communicationRestrictionTypes,
             int srid,
             string Language = "it"
             )
@@ -154,7 +154,7 @@ namespace Ermes.GeoJson
                         null as ""mapRequestLayerFilter"",
                         null as ""reportContentTypeFilter"",
                         null as ""reportIsPublicFilter"",
-                        null as ""communicationScopeFilter""
+                        null as ""communicationRestrictionFilter""
                     from public.missions m
                     left join public.organizations o on o.""Id"" = m.""OrganizationId""
                     join public.persons p on p.""Id"" = m.""CreatorUserId""
@@ -184,7 +184,7 @@ namespace Ermes.GeoJson
                         null as ""mapRequestLayerFilter"",
                         null as ""reportContentTypeFilter"",
                         null as ""reportIsPublicFilter"",
-                        c.""Scope"" as ""communicationScopeFilter""
+                        c.""Restriction"" as ""communicationRestrictionFilter""
                     from public.communications c
                     join public.persons p on p.""Id"" = c.""CreatorUserId""
                     left join public.organizations o on o.""Id"" = p.""OrganizationId""
@@ -214,7 +214,7 @@ namespace Ermes.GeoJson
                         null as ""mapRequestLayerFilter"",
                         r.""ContentType"" as ""reportContentTypeFilter"",
                         r.""IsPublic""::text as ""reportIsPublicFilter"",
-                        null as ""communicationScopeFilter""
+                        null as ""communicationRestrictionFilter""
                     from public.reports r 
                     join public.persons p on p.""Id"" = r.""CreatorUserId""
                     left join public.organizations o on o.""Id"" = p.""OrganizationId""
@@ -244,7 +244,7 @@ namespace Ermes.GeoJson
                         null as ""mapRequestLayerFilter"",
                         null as ""reportContentTypeFilter"",
                         null as ""reportIsPublicFilter"",
-                        null as ""communicationScopeFilter""
+                        null as ""communicationRestrictionFilter""
                     from public.reportrequests r2 
                     join public.persons p on p.""Id"" = r2.""CreatorUserId""
                     left join public.organizations o on o.""Id"" = p.""OrganizationId""
@@ -274,7 +274,7 @@ namespace Ermes.GeoJson
                         mr.""Layer"" as ""mapRequestLayerFilter"",
                         null as ""reportContentTypeFilter"",
                         null as ""reportIsPublicFilter"",
-                        null as ""communicationScopeFilter""
+                        null as ""communicationRestrictionFilter""
                     from public.map_requests mr
                     join public.persons p on p.""Id"" = mr.""CreatorUserId""
                     left join public.organizations o on o.""Id"" = p.""OrganizationId""
@@ -304,7 +304,7 @@ namespace Ermes.GeoJson
                         null as ""mapRequestLayerFilter"",
                         null as ""reportContentTypeFilter"",
                         null as ""reportIsPublicFilter"",
-                        null as ""communicationScopeFilter""
+                        null as ""communicationRestrictionFilter""
                         FROM (
 	                        SELECT pa2.""PersonId"", MAX(pa2.""Timestamp"") as ""MaxTime""
                             FROM person_actions pa2
@@ -352,10 +352,16 @@ namespace Ermes.GeoJson
 
                 if (organizationIdList != null)
                 {
-                    command.CommandText += @" and (tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations]) or tmp.""organizationId"" is null)";
+                    command.CommandText += @" and (((tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations]) or tmp.""organizationId"" is null) and tmp.""type"" != 'Communication') or (tmp.""type"" = 'Communication' and tmp.""communicationRestrictionFilter"" = any(array[@restrictionTypes]) and (tmp.""communicationRestrictionFilter"" != 'Organization' or tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations]))))";
                     var p = new NpgsqlParameter("@organizations", NpgsqlDbType.Array | NpgsqlDbType.Integer)
                     {
                         Value = organizationIdList
+                    };
+
+                    command.Parameters.Add(p);
+                    p = new NpgsqlParameter("@restrictionTypes", NpgsqlDbType.Array | NpgsqlDbType.Text)
+                    {
+                        Value = communicationRestrictionTypes.Select(a => a.ToString()).ToArray()
                     };
                     command.Parameters.Add(p);
                 }
@@ -448,16 +454,6 @@ namespace Ermes.GeoJson
                     var p = new NpgsqlParameter("@reportContentTypes", NpgsqlDbType.Array | NpgsqlDbType.Text)
                     {
                         Value = reportContentTypes.Select(a => a.ToString()).ToArray()
-                    };
-                    command.Parameters.Add(p);
-                }
-
-                if (communicationScopeTypes != null && communicationScopeTypes.Count > 0)
-                {
-                    command.CommandText += @" and (tmp.""communicationScopeFilter"" is null or tmp.""communicationScopeFilter"" = any(array[@communicationScopeTypes]))";
-                    var p = new NpgsqlParameter("@communicationScopeTypes", NpgsqlDbType.Array | NpgsqlDbType.Text)
-                    {
-                        Value = communicationScopeTypes.Select(a => a.ToString()).ToArray()
                     };
                     command.Parameters.Add(p);
                 }
