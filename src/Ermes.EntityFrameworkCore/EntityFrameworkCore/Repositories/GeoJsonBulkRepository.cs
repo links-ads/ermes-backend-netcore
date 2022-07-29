@@ -99,6 +99,8 @@ namespace Ermes.GeoJson
         //}
 
 
+        //The visibility of the different entities is based on the organization of the creator of the entity,
+        //made exception for the Communication, where the visibility is defined by the Restriction property
         public string GetGeoJsonCollection(
             DateTime StartDate,
             DateTime EndDate,
