@@ -60,7 +60,7 @@ namespace Ermes.Gamification
 
         public async Task<Level> GetLevelByPointsAsync(int points)
         {
-            return await Levels.Where(l => l.LowerBound <= points && l.UpperBound >= points).SingleAsync();
+            return await Levels.Include(l => l.Barriers).Where(l => l.LowerBound <= points && l.UpperBound >= points).SingleAsync();
         }
 
         public async Task<GamificationAction> GetActionByCodeAsync(string code)
@@ -109,13 +109,18 @@ namespace Ermes.Gamification
 
             result.AddRange(await assignRewards(person.Id));
 
-
             var level = await GetLevelByPointsAsync(person.Points);
             if (level.Id != person.LevelId)
             {
-                result.Add((action.Points > 0 ? EntityWriteAction.LevelChangeUp : EntityWriteAction.LevelChangeDown, level.Name));
-                person.LevelId = level.Id;
-                await InsertAudit(person.Id, null, null, person.LevelId);
+                bool canChangeLevel = await CheckBarriersAsync(person, level);
+                if (canChangeLevel)
+                {
+                    result.Add((action.Points > 0 ? EntityWriteAction.LevelChangeUp : EntityWriteAction.LevelChangeDown, level.Name));
+                    person.LevelId = level.Id;
+                    await InsertAudit(person.Id, null, null, person.LevelId);
+                }
+                else
+                    Logger.InfoFormat("User {0} cannot improve his level because he's missing some barriers", person.Email);
             }
             
             return result;
@@ -144,6 +149,12 @@ namespace Ermes.Gamification
         public async Task<Level> GetDefaultLevel()
         {
             return await Levels.SingleOrDefaultAsync(l => !l.PreviousLevelId.HasValue);
+        }
+
+        public async Task<bool> CheckBarriersAsync(Person person, Level newLevel)
+        {
+            var barriers = newLevel.Barriers.Where(b => b.Level.Id == newLevel.Id).Select(b => b.RewardName).ToList();
+            return await GamificationAudits.Where(ga => ga.PersonId == person.Id).AnyAsync(ga => barriers.Contains(ga.Reward.Name));
         }
     }
 }
