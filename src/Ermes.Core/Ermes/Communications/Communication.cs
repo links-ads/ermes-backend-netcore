@@ -44,13 +44,16 @@ namespace Ermes.Communications
         [NotMapped]
         public CommunicationScopeType Scope { get; set; }
 
-        [ForeignKey("ReceiverId")]
-        public virtual Person Receiver { get; set; }
-        public virtual long? ReceiverId { get; set; }
+        [Required]
+        [Column("Restriction")]
+        public string RestrictionString
+        {
+            get { return Restriction.ToString(); }
+            private set { Restriction = value.ParseEnum<CommunicationRestrictionType>(); }
+        }
 
-        [ForeignKey("ReceiverTeamId")]
-        public virtual Team ReceiverTeam { get; set; }
-        public virtual int? ReceiverTeamId { get; set; }
+        [NotMapped]
+        public CommunicationRestrictionType Restriction { get; set; }
 
 
     }

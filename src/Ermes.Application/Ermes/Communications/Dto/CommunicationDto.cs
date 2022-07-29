@@ -5,6 +5,7 @@ using Ermes.Organizations.Dto;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace Ermes.Communications.Dto
@@ -18,9 +19,8 @@ namespace Ermes.Communications.Dto
         public PointPosition Centroid { get; set; }
         public string OrganizationName { get; set; }
         public CommunicationScopeType Scope { get; set; }
-        public long? ReceiverId { get; set; }
-        public string ReceiverName { get; set; }
-        public int? ReceiverTeamId { get; set; }
-        public string ReceiverTeamName { get; set; }
+        public CommunicationRestrictionType Restriction { get; set; }
+        [NotMapped]
+        public List<int> OrganizationIdList { get; set; }
     }
 }

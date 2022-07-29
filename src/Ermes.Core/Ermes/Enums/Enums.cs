@@ -379,9 +379,16 @@ namespace Ermes.Enums
     [JsonConverter(typeof(StringEnumConverter))]
     public enum CommunicationScopeType
     {
-        Restricted,  //Inside my organization
-        Citizens,    //Only citizens
-        Wide,      //Inside my organization + citizens (no persons belonging to other organization)
+        Restricted,  //Citizens, or professionals or inside my organization
         Public       //No restriction
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum CommunicationRestrictionType
+    {
+        None,
+        Organization,
+        Citizen,
+        Professional
     }
 }

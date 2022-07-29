@@ -1,6 +1,6 @@
 Ver.
 --------------------------------
-
+- Feature - Restriction property added to Communication entity (migration added)(#88)
 
 Ver. 3.7.7 - 2022-07-27
 --------------------------------

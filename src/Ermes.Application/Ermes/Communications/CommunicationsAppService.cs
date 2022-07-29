@@ -76,10 +76,10 @@ namespace Ermes.Communications
             {
                 Geometry boundingBox = GeometryHelper.GetPolygonFromBoundaries(input.SouthWestBoundary, input.NorthEastBoundary);
                 query = _geoJsonBulkRepository.GetCommunications(input.StartDate.Value, input.EndDate.Value, boundingBox);
-                query = query.Include(a => a.Creator).Include(a => a.Creator.Organization).Include(a => a.Receiver).Include(a => a.ReceiverTeam);
+                query = query.Include(a => a.Creator).Include(a => a.Creator.Organization);
             }
             else
-                query = _communicationManager.Communications.Include(a => a.Receiver).Include(a => a.ReceiverTeam).Where(a => new NpgsqlRange<DateTime>(input.StartDate.Value, input.EndDate.Value).Contains(a.Duration));
+                query = _communicationManager.Communications.Where(a => new NpgsqlRange<DateTime>(input.StartDate.Value, input.EndDate.Value).Contains(a.Duration));
 
             query = query.DTFilterBy(input);
 
@@ -118,7 +118,6 @@ namespace Ermes.Communications
             else
                 throw new UserFriendlyException(L("InvalidAOI"));
 
-            newCommunication.Receiver = null;
             newCommunication.Id = await _communicationManager.CreateOrUpdateCommunicationAsync(newCommunication);
 
             await CurrentUnitOfWork.SaveChangesAsync();

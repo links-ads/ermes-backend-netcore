@@ -183,16 +183,17 @@ namespace Ermes.Linq.Extensions
             {
                 return organizationIdList == null
                         ? query
-                        .Where(c => c.ScopeString != CommunicationScopeType.Restricted.ToString())
+                        .Where(c => c.ScopeString == CommunicationScopeType.Public.ToString() || c.RestrictionString == CommunicationRestrictionType.Citizen.ToString())
                         : query
                         .Where(c =>
-                            c.ScopeString != CommunicationScopeType.Citizens.ToString() &&
-                            (!c.ReceiverId.HasValue || person.Id == c.ReceiverId.Value) &&
-                            (!c.ReceiverTeamId.HasValue || person.TeamId == c.ReceiverTeamId.Value) &&
+                            c.ScopeString == CommunicationScopeType.Public.ToString() ||
+                            c.RestrictionString == CommunicationRestrictionType.Citizen.ToString() ||
+                            c.RestrictionString == CommunicationRestrictionType.Professional.ToString() || (
+                            c.RestrictionString == CommunicationRestrictionType.Organization.ToString() &&
                             //Organization visibility
                             (c.Creator.OrganizationId.HasValue && organizationIdList.Contains(c.Creator.OrganizationId.Value)) ||
                             //Organization hierarchy
-                            (c.Creator.Organization.ParentId.HasValue && organizationIdList.Contains(c.Creator.Organization.ParentId.Value))
+                            (c.Creator.Organization.ParentId.HasValue && organizationIdList.Contains(c.Creator.Organization.ParentId.Value)))
                         );
             }
         }

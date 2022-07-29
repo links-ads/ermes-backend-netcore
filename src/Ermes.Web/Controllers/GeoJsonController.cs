@@ -75,42 +75,43 @@ namespace Ermes.Web.Controllers
 
             //Admin can see everything
             hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Communications.Communication_CanSeeCrossOrganization);
-            List<CommunicationScopeType> communicationScopeTypes = new List<CommunicationScopeType>() { CommunicationScopeType.Public, CommunicationScopeType.Wide };
+            List<CommunicationRestrictionType> communicationRestrictionTypes = new List<CommunicationRestrictionType>() { CommunicationRestrictionType.None, CommunicationRestrictionType.Citizen };
             if (!hasPermission)
             {
                 foreach (var item in _session.Roles)
                 {
-                    if (item == AppRoles.CITIZEN)
-                        communicationScopeTypes.Add(CommunicationScopeType.Citizens);
-                    else
-                        communicationScopeTypes.Add(CommunicationScopeType.Restricted);
-                }
+                    if (item != AppRoles.CITIZEN)
+                    {
+                        communicationRestrictionTypes.Add(CommunicationRestrictionType.Professional);
+                        communicationRestrictionTypes.Add(CommunicationRestrictionType.Organization);
+                    }
+                }   
             }
             else
             {
-                communicationScopeTypes.Add(CommunicationScopeType.Citizens);
-                communicationScopeTypes.Add(CommunicationScopeType.Restricted);
+                communicationRestrictionTypes.Add(CommunicationRestrictionType.Professional);
+                communicationRestrictionTypes.Add(CommunicationRestrictionType.Organization);
             }
 
             string responseContent = _geoJsonBulkRepository.GetGeoJsonCollection(
-                        input.StartDate, 
-                        input.EndDate, 
-                        boundingBox, 
-                        input.EntityTypes, 
-                        orgIdList, 
-                        input.StatusTypes, 
-                        actIds, 
-                        input.HazardTypes, 
-                        input.ReportStatusTypes, 
-                        input.MissionStatusTypes, 
-                        input.MapRequestHazardTypes,
-                        input.MapRequestLayerTypes,
-                        input.MapRequestStatusTypes,
-                        input.ReportVisibilityType,
-                        input.ReportContentTypes,
-                        communicationScopeTypes,
-                        AppConsts.Srid, 
-                        _languageManager.CurrentLanguage.Name
+                    input.StartDate, 
+                    input.EndDate, 
+                    boundingBox, 
+                    input.EntityTypes, 
+                    orgIdList, 
+                    input.StatusTypes, 
+                    actIds, 
+                    input.HazardTypes, 
+                    input.ReportStatusTypes, 
+                    input.MissionStatusTypes, 
+                    input.MapRequestHazardTypes,
+                    input.MapRequestLayerTypes,
+                    input.MapRequestStatusTypes,
+                    input.ReportVisibilityType,
+                    input.ReportContentTypes,
+                    communicationRestrictionTypes,
+                    AppConsts.Srid, 
+                    _languageManager.CurrentLanguage.Name
             );
 
             // I need to return a JsonResult or in case of exception, Abp produces html instead of json. However, the real
