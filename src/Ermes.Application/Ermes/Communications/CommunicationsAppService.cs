@@ -58,7 +58,7 @@ namespace Ermes.Communications
             if (comm == null)
                 throw new UserFriendlyException(L("InvalidCommunicationId", commId));
 
-            if (comm.Creator.OrganizationId != _session.LoggedUserPerson.OrganizationId && comm.Creator.Organization.ParentId.HasValue && comm.Creator.Organization.ParentId.Value != _session.LoggedUserPerson.OrganizationId)
+            if (comm.Restriction == CommunicationRestrictionType.Organization && comm.Creator.OrganizationId != _session.LoggedUserPerson.OrganizationId && comm.Creator.Organization.ParentId.HasValue && comm.Creator.Organization.ParentId.Value != _session.LoggedUserPerson.OrganizationId)
                 throw new UserFriendlyException(L("EntityOutsideOrganization"));
 
             return comm;
@@ -176,7 +176,11 @@ namespace Ermes.Communications
                     - NorthEastBoundary: top-right corner of the bounding box for a spatial query format. (optional) (to be filled together with SouthWest property)
                 Output: list of CommunicationDto elements
 
-                N.B.: A person has visibility only on communications belonging to his organization
+                N.B.: The visibility depends on the 'Restriction' field of the Communication. More in the details:
+                    - None: both for pro and citizens
+                    - Citizen: both for pro and citizens (but the notification is only for citizens)
+                    - Professional: only for pro
+                    - Organization: only for pro within the same organization of the creator of the communication
             "
         )]
         public virtual async Task<DTResult<CommunicationDto>> GetCommunications(GetCommunicationsInput input)
@@ -228,10 +232,9 @@ namespace Ermes.Communications
             var hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Communications.Communication_CanSeeCrossOrganization);
             if (!hasPermission)
             {
-                //Father Org can see child contents
-                //false the contrary
+                //The visibility depends on the Restriction field of the Communication
                 if (
-                        comm.Creator.OrganizationId != _session.LoggedUserPerson.OrganizationId &&
+                        comm.Restriction == CommunicationRestrictionType.Organization && comm.Creator.OrganizationId != _session.LoggedUserPerson.OrganizationId &&
                         (
                             !comm.Creator.Organization.ParentId.HasValue ||
                             (
