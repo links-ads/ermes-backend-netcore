@@ -87,6 +87,11 @@ namespace Ermes.Web.Controllers
                     }
                 }   
             }
+            else
+            {
+                communicationRestrictionTypes.Add(CommunicationRestrictionType.Professional);
+                communicationRestrictionTypes.Add(CommunicationRestrictionType.Organization);
+            }
 
             string responseContent = _geoJsonBulkRepository.GetGeoJsonCollection(
                     input.StartDate, 

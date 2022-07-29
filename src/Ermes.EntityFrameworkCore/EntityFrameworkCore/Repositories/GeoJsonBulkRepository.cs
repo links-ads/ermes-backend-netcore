@@ -359,14 +359,17 @@ namespace Ermes.GeoJson
                     };
 
                     command.Parameters.Add(p);
-                    p = new NpgsqlParameter("@restrictionTypes", NpgsqlDbType.Array | NpgsqlDbType.Text)
-                    {
-                        Value = communicationRestrictionTypes.Select(a => a.ToString()).ToArray()
-                    };
-                    command.Parameters.Add(p);
                 }
-                //else
-                //    command.CommandText += @" and tmp.""organizationId"" is null";
+                else
+                {
+                    command.CommandText += @" and ((tmp.""organizationId"" is null and tmp.""type"" != 'Communication') or (tmp.""type"" = 'Communication' and tmp.""communicationRestrictionFilter"" = any(array[@restrictionTypes])))";
+                }
+
+                var parameter = new NpgsqlParameter("@restrictionTypes", NpgsqlDbType.Array | NpgsqlDbType.Text)
+                {
+                    Value = communicationRestrictionTypes.Select(a => a.ToString()).ToArray()
+                };
+                command.Parameters.Add(parameter);
 
                 if (statusTypes != null && statusTypes.Count > 0)
                 {
