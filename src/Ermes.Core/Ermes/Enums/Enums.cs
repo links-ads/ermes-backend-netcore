@@ -335,7 +335,6 @@ namespace Ermes.Enums
         ImpossibileFareMappingAttivita = 47,
         ImpossibileTrovareOrganizzazioneVolontario = 48,
         ImpossibileTrovareCoordinamentoOrganizzazione = 49
-
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
