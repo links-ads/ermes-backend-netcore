@@ -74,6 +74,7 @@ namespace Ermes.Operations
                     "0033" => ProcessedCodeType.InsertOUpdateFallito,
                     "0038" => ProcessedCodeType.EventoNonEsistente,
                     "0039" => ProcessedCodeType.TrovatiPiuInterventiAperti,
+                    "0047" => ProcessedCodeType.ImpossibileFareMappingAttivita,
                     _ => ProcessedCodeType.SistemaDiMateriaChiamanteNonEsistente,
                 };
             }
