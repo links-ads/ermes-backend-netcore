@@ -191,6 +191,8 @@ namespace Ermes.Web.Controllers
                 EntityWriteAction.Create);
             await _backgroundJobManager.EnqueueEventAsync(notification);
 
+            //TODO: add CSI service integration, send the report in background
+
             Person p = await _personManager.GetPersonByIdAsync(_session.LoggedUserPerson.Id);
 
             async Task<List<(EntityWriteAction, string NewValue)>> AssignRewards(long personId)

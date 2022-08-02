@@ -3,15 +3,17 @@ using Ermes.Enums;
 using Ermes.Helpers;
 using Ermes.Persons;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ermes.Operations
 {
     /*
         The goal of the table is to log every interaction of this module with services exposed by CSI.
-        There are two available services:
+        There are three available services:
             1) SearchVolontario: given a tax code of a first responder, returns an internal volter ID (anonymization of the fiscal code)
             2) InsertInterventiVolontari: communicate to Volter the beginning/end of an intervention made by a first responder
+            3) InserisciFromFaster: share a report created by a user with the control room
         Some information are duplicated
      */
 
@@ -52,6 +54,9 @@ namespace Ermes.Operations
         public VolterResponse Response { get; set; }
 
         public string ErrorMessage { get; set; }
+
+        [Column(TypeName = "jsonb")]
+        public PresidiResponse PresidiResponse { get; set; }
     }
 
     public class VolterResponse
@@ -80,6 +85,19 @@ namespace Ermes.Operations
         }
     }
 
+    public class PresidiResponse
+    {
+        public int status { get; set; }
+        public List<PresidiResponseItem> items { get; set; }
+    }
+
+    public class PresidiResponseItem
+    {
+        public int id { get; set; }
+        public string dataInserimento { get; set; }
+    }
+
+
     public interface IVolterAction
     {
         public string subjectCode { get; set; }
@@ -101,5 +119,15 @@ namespace Ermes.Operations
         public DateTime missionDate { get; set; }
         public string status { get; set; }
         public string operationId { get; set; }
+    }
+
+    public class InsertReport
+    {
+        public string mittente { get; set; }
+        public string descrizione { get; set; }
+        public double latitudine { get; set; }
+        public double longitudine { get; set; }
+        public string statoSegnalazioneLabel { get; set; }
+        public string fenomenoLabelList { get; set; }
     }
 }

@@ -2,10 +2,12 @@
 using Ermes.Enums;
 using Ermes.ExternalServices.Csi.Configuration;
 using Ermes.Operations;
+using Ermes.Reports;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -20,22 +22,28 @@ namespace Ermes.ExternalServices.Csi
         private readonly CsiConnectionProvider _connectionProvider;
         private static HttpClient CsiClient;
         private readonly OperationManager _operationManager;
+        private readonly ReportManager _reportManager;
         private const string SUBJECT_CODE = "FAS";
 
-        public CsiManager(CsiConnectionProvider connectionProvider, OperationManager operationManager)
+        public CsiManager(CsiConnectionProvider connectionProvider, OperationManager operationManager, ReportManager reportManager)
         {
             _connectionProvider = connectionProvider;
             CsiClient = GetCsiClient();
             _operationManager = operationManager;
+            _reportManager = reportManager;
         }
 
-        private HttpClient GetCsiClient()
+        private HttpClient GetCsiClient(bool presidi = false)
         {
             HttpClient client = new HttpClient();
-            var byteArray = Encoding.ASCII.GetBytes(string.Format("{0}:{1}", _connectionProvider.GetUsername(), _connectionProvider.GetPassword()));
+            byte[] byteArray;
+            if(presidi)
+                byteArray = Encoding.ASCII.GetBytes(string.Format("{0}:{1}", _connectionProvider.GetUsername_Presidi(), _connectionProvider.GetPassword_Presidi()));
+            else
+                byteArray = Encoding.ASCII.GetBytes(string.Format("{0}:{1}", _connectionProvider.GetUsername(), _connectionProvider.GetPassword()));
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            client.BaseAddress = new Uri(_connectionProvider.GetBaseUrl());
+            client.BaseAddress = new Uri(presidi ? _connectionProvider.GetBaseUrl_Presidi() : _connectionProvider.GetBaseUrl());
             return client;
         }
 
@@ -105,6 +113,43 @@ namespace Ermes.ExternalServices.Csi
             return await SendRequestInternal(request, op);
         }
 
+        public async Task InserisciFromFaster(int reportId)
+        {
+            var builder = new UriBuilder(CsiClient.BaseAddress + "/inserisciFromFaster");
+            var report = await _reportManager.GetReportByIdAsync(reportId);
+            if (report == null)
+                throw new UserFriendlyException(L("InvalidReportId", reportId));
+            
+            string requestBody = JsonConvert.SerializeObject(new InsertReport()
+            {
+                mittente = report.Creator.Username,
+                latitudine = report.Location.Y,
+                longitudine = report.Location.X,
+                descrizione = report.Description,
+                fenomenoLabelList = report.HazardString,
+                statoSegnalazioneLabel = report.StatusString
+            });
+
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri(builder.ToString()),
+                Content = new StringContent(requestBody, Encoding.UTF8, "application/json")
+            };
+
+            var op = new Operation()
+            {
+                Request = requestBody,
+                Type = VolterOperationType.InsertReport,
+                PersonId = report.CreatorUserId.Value,
+                PersonLegacyId = report.Creator.LegacyId ?? 0
+            };
+
+            op.Id = await _operationManager.InsertOrUpdateOperationAsync(op);
+
+            return await SendRequestPresidiInternal(request, op);
+        }
+
         private async Task<int> SendRequestInternal(HttpRequestMessage request, Operation op)
         {
             try
@@ -156,6 +201,47 @@ namespace Ermes.ExternalServices.Csi
             catch (Exception e)
             {
                 op.ErrorMessage = string.Format($"CSI Service not available: {e.Message}");
+            }
+
+            return -1;
+        }
+
+        private async Task<int> SendRequestPresidiInternal(HttpRequestMessage request, Operation op)
+        {
+            try
+            {
+                using CancellationTokenSource tokenSource = new CancellationTokenSource(4000);
+                HttpResponseMessage response = await CsiClient.SendAsync(request, cancellationToken: tokenSource.Token);
+                var responseValue = string.Empty;
+                if (response != null && response.StatusCode == HttpStatusCode.OK)
+                {
+                    Task task = response.Content.ReadAsStreamAsync().ContinueWith(t =>
+                    {
+                        var stream = t.Result;
+                        using var reader = new StreamReader(stream);
+                        responseValue = reader.ReadToEnd();
+                    });
+
+                    task.Wait();
+
+                    var result = JsonConvert.DeserializeObject<PresidiResponse>(responseValue);
+
+                    if (result.status == 200)
+                    {
+                        if (result.items != null && result.items.Count > 0)
+                            return result.items.First().id;
+                        else
+                            return 0;
+                    }
+                    else
+                        op.ErrorMessage = string.Format($"CSI Service InserisciFromFaster error {result.status}");
+                }
+                else
+                    op.ErrorMessage = string.Format($"CSI Service InserisciFromFaster not available, HTTP status code: {response.StatusCode}");
+            }
+            catch (Exception e)
+            {
+                op.ErrorMessage = string.Format($"CSI Service InserisciFromFaster not available: {e.Message}");
             }
 
             return -1;
