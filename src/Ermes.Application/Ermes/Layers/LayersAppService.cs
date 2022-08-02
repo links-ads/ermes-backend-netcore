@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Ermes.Layers
 {
-    [ErmesAuthorize(AppPermissions.Backoffice)]
+    [ErmesAuthorize()]
     public class LayersAppService : ErmesAppServiceBase, ILayersAppService
     {
         private readonly IImporterManager _importerMananger;
@@ -55,6 +55,8 @@ namespace Ermes.Layers
                     - End: end date
                     - Bbox: bounding box of the area of interest
                     - DataTypeIds: list of dataTypeIds to be considered
+                    - IncludeMapRequests: if true, the result will contain information about map requests
+                    - MapRequestCode: the result will contain information only about the map request corresponding to the inserted code. The format for this field is: <partner>.<mapRequestCode>
                 Output: list of available layers
                 Exception: Importer service not available
             "
@@ -69,7 +71,7 @@ namespace Ermes.Layers
                 //1) Get available list of layers from Importer Module
                 //2) Join this list with layer definition
                 //3) Group the result by GroupKey and SubGroupKey
-                input.MapRequestCode = input.MapRequestCode != null ? "links." + input.MapRequestCode : input.MapRequestCode;
+                
                 var res = await _importerMananger.GetLayers(input.DataTypeIds, input.Bbox, input.Start.Value, input.End.Value, input.MapRequestCode, input.IncludeMapRequests);
 
                 #region Example
