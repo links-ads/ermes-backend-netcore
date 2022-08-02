@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Ermes.Layers
 {
-    [ErmesAuthorize(AppPermissions.Backoffice)]
+    [ErmesAuthorize()]
     public class LayersAppService : ErmesAppServiceBase, ILayersAppService
     {
         private readonly IImporterManager _importerMananger;
