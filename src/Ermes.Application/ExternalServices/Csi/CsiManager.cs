@@ -1,8 +1,10 @@
-﻿using Abp.UI;
+﻿using Abp.Azure;
+using Abp.UI;
 using Ermes.Enums;
 using Ermes.ExternalServices.Csi.Configuration;
 using Ermes.Operations;
 using Ermes.Reports;
+using Ermes.Resources;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -21,16 +23,18 @@ namespace Ermes.ExternalServices.Csi
     {
         private readonly CsiConnectionProvider _connectionProvider;
         private static HttpClient CsiClient;
+        private static HttpClient CsiClientPresidi;
         private readonly OperationManager _operationManager;
-        private readonly ReportManager _reportManager;
         private const string SUBJECT_CODE = "FAS";
+        private readonly IAzureManager _azureManager;
 
-        public CsiManager(CsiConnectionProvider connectionProvider, OperationManager operationManager, ReportManager reportManager)
+        public CsiManager(CsiConnectionProvider connectionProvider, OperationManager operationManager, IAzureManager azureManager)
         {
             _connectionProvider = connectionProvider;
             CsiClient = GetCsiClient();
+            CsiClientPresidi = GetCsiClient(true);
             _operationManager = operationManager;
-            _reportManager = reportManager;
+            _azureManager = azureManager;
         }
 
         private HttpClient GetCsiClient(bool presidi = false)
@@ -113,22 +117,50 @@ namespace Ermes.ExternalServices.Csi
             return await SendRequestInternal(request, op);
         }
 
-        public async Task InserisciFromFaster(int reportId)
+        public async Task InserisciFromFaster(
+                long personId,
+                int personLegaycId,
+                int reportId,
+                string creator,
+                double latitude,
+                double longitude,
+                string description,
+                string hazard,
+                string status,
+                List<string> mediaURIs
+        )
         {
-            var builder = new UriBuilder(CsiClient.BaseAddress + "/inserisciFromFaster");
-            var report = await _reportManager.GetReportByIdAsync(reportId);
-            if (report == null)
-                throw new UserFriendlyException(L("InvalidReportId", reportId));
-            
-            string requestBody = JsonConvert.SerializeObject(new InsertReport()
+            var builder = new UriBuilder(CsiClientPresidi.BaseAddress + "/inserisciFromFaster");
+
+
+            //Do not want to store on local DB the fule byte array of the attachments;
+            //localbody will be stored in localDB without byte[], while bodys represent the full request sent to CSI service
+            InsertReport localBody = new InsertReport()
             {
-                mittente = report.Creator.Username,
-                latitudine = report.Location.Y,
-                longitudine = report.Location.X,
-                descrizione = report.Description,
-                fenomenoLabelList = report.HazardString,
-                statoSegnalazioneLabel = report.StatusString
-            });
+                mittente = creator,
+                latitudine = latitude,
+                longitudine = longitude,
+                descrizione = description,
+                fenomenoLabelList = new string[] { hazard },
+                statoSegnalazioneLabel = status,
+            };
+
+            InsertReport body = (InsertReport) localBody.Clone();
+
+            if (mediaURIs != null && mediaURIs.Count > 0)
+            {
+                var _azureReportStorageManager = _azureManager.GetStorageManager(ResourceManager.GetBasePath(ResourceManager.Reports.ContainerName));
+                foreach (var fileName in mediaURIs)
+                {
+                    string mediaPath = ResourceManager.Reports.GetMediaPath(reportId, fileName);
+                    ReportAttachment ra = new ReportAttachment(fileName, mediaPath);
+                    localBody.allegatiSegnalazione.Add(ra);
+                    var file = await _azureReportStorageManager.GetFile(ResourceManager.Reports.GetRelativeMediaPath(reportId, fileName));
+                    body.allegatiSegnalazione.Add(new ReportAttachment(fileName, mediaPath, file));
+                }
+            }
+
+            string requestBody = JsonConvert.SerializeObject(body);
 
             var request = new HttpRequestMessage
             {
@@ -139,15 +171,14 @@ namespace Ermes.ExternalServices.Csi
 
             var op = new Operation()
             {
-                Request = requestBody,
+                Request = JsonConvert.SerializeObject(localBody),
                 Type = VolterOperationType.InsertReport,
-                PersonId = report.CreatorUserId.Value,
-                PersonLegacyId = report.Creator.LegacyId ?? 0
+                PersonId = personId,
+                PersonLegacyId = personLegaycId
             };
 
             op.Id = await _operationManager.InsertOrUpdateOperationAsync(op);
-
-            return await SendRequestPresidiInternal(request, op);
+            await SendRequestPresidiInternal(request, op);
         }
 
         private async Task<int> SendRequestInternal(HttpRequestMessage request, Operation op)
@@ -211,7 +242,7 @@ namespace Ermes.ExternalServices.Csi
             try
             {
                 using CancellationTokenSource tokenSource = new CancellationTokenSource(4000);
-                HttpResponseMessage response = await CsiClient.SendAsync(request, cancellationToken: tokenSource.Token);
+                HttpResponseMessage response = await CsiClientPresidi.SendAsync(request, cancellationToken: tokenSource.Token);
                 var responseValue = string.Empty;
                 if (response != null && response.StatusCode == HttpStatusCode.OK)
                 {
@@ -228,8 +259,12 @@ namespace Ermes.ExternalServices.Csi
 
                     if (result.status == 200)
                     {
-                        if (result.items != null && result.items.Count > 0)
-                            return result.items.First().id;
+                        if (result.items != null)
+                        {
+                            op.OperationLegacyId = result.items.id;
+                            op.PresidiResponse = result;
+                            return op.OperationLegacyId;
+                        }
                         else
                             return 0;
                     }

@@ -5,6 +5,7 @@ using Ermes.Persons;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace Ermes.Operations
 {
@@ -42,6 +43,7 @@ namespace Ermes.Operations
         /// <summary>
         /// Internal volter ID for the operation.
         /// Duplication of OperationId inside Intervention class.
+        /// In case of InsertReport, it represent the legeacyId of the report inside CSI system
         /// </summary>
         
         public int OperationLegacyId { get; set; }
@@ -89,7 +91,7 @@ namespace Ermes.Operations
     public class PresidiResponse
     {
         public int status { get; set; }
-        public List<PresidiResponseItem> items { get; set; }
+        public PresidiResponseItem items { get; set; }
     }
 
     public class PresidiResponseItem
@@ -122,13 +124,62 @@ namespace Ermes.Operations
         public string operationId { get; set; }
     }
 
-    public class InsertReport
+    public class InsertReport: ICloneable
     {
+        public InsertReport()
+        {
+
+        }
+        public InsertReport(string mittente, string descrizione, List<string> notaList, double latitudine, double longitudine, string statoSegnalazioneLabel, string[] fenomenoLabelList, List<ReportAttachment> allegatiSegnalazione, List<ReportAttachment> allegatiComunicazione)
+        {
+            this.mittente = mittente;
+            this.descrizione = descrizione;
+            this.notaList = notaList.ToList();
+            this.latitudine = latitudine;
+            this.longitudine = longitudine;
+            this.statoSegnalazioneLabel = statoSegnalazioneLabel;
+            this.fenomenoLabelList = fenomenoLabelList.ToArray();
+            this.allegatiSegnalazione = allegatiSegnalazione.ToList();
+            this.allegatiComunicazione = allegatiComunicazione.ToList();
+        }
+
         public string mittente { get; set; }
         public string descrizione { get; set; }
+        public List<string> notaList { get; set; } = new List<string>();
         public double latitudine { get; set; }
         public double longitudine { get; set; }
         public string statoSegnalazioneLabel { get; set; }
-        public string fenomenoLabelList { get; set; }
+        public string[] fenomenoLabelList { get; set; }
+        public List<ReportAttachment> allegatiSegnalazione { get; set; } = new List<ReportAttachment>();
+        public List<ReportAttachment> allegatiComunicazione { get; set; } = new List<ReportAttachment>();
+
+        public object Clone()
+        {
+            return new InsertReport(mittente, descrizione, notaList, latitudine, longitudine, statoSegnalazioneLabel, fenomenoLabelList, allegatiSegnalazione, allegatiComunicazione);
+        }
+    }
+
+    public class ReportAttachment
+    {
+        public ReportAttachment()
+        {
+
+        }
+
+        public ReportAttachment(string name, string path)
+        {
+            nome = name;
+            this.path = path;
+        }
+
+        public ReportAttachment(string name, string path, byte[] file)
+        {
+            nome = name;
+            this.path = path;
+            this.file = file;
+        }
+        public string nome { get; set; }
+        public string path { get; set; }
+        public byte[] file { get; set; }
     }
 }

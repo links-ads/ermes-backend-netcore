@@ -14,6 +14,7 @@ using Ermes.EventHandlers;
 using Ermes.Gamification;
 using Ermes.Gamification.Dto;
 using Ermes.Helpers;
+using Ermes.Jobs;
 using Ermes.Missions;
 using Ermes.Net.MimeTypes;
 using Ermes.Persons;
@@ -24,6 +25,7 @@ using Ermes.Web.Controllers;
 using Ermes.Web.Controllers.Dto;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using NSwag.Annotations;
 using System;
 using System.Collections.Generic;
@@ -50,6 +52,7 @@ namespace Ermes.Web.Controllers
         private readonly ICognitiveServicesManager _cognitiveServicesManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IBackgroundJobManager _backgroundJobManager;
+        private readonly IOptions<ErmesSettings> _ermesSettings;
 
         public ReportsController(
                         CategoryManager categoryManager,
@@ -61,6 +64,7 @@ namespace Ermes.Web.Controllers
                         IHttpContextAccessor httpContextAccessor,
                         IAzureManager azureManager,
                         ICognitiveServicesManager cognitiveServicesManager,
+                        IOptions<ErmesSettings> ermesSettings,
                         IBackgroundJobManager backgroundJobManager
                     )
         {
@@ -74,6 +78,7 @@ namespace Ermes.Web.Controllers
             _azureManager = azureManager;
             _backgroundJobManager = backgroundJobManager;
             _cognitiveServicesManager = cognitiveServicesManager;
+            _ermesSettings = ermesSettings;
         }
 
         [Route("api/services/app/Reports/CreateOrUpdateReport")]
@@ -191,8 +196,19 @@ namespace Ermes.Web.Controllers
                 EntityWriteAction.Create);
             await _backgroundJobManager.EnqueueEventAsync(notification);
 
-            //TODO: add CSI service integration, send the report in background
+            /////FASTER CSI service integration
+            bool mustSendReport = _ermesSettings.Value != null && _ermesSettings.Value.ErmesProject == AppConsts.Ermes_Faster && _session.LoggedUserPerson.OrganizationId.HasValue;
+            if (mustSendReport)
+            {
+                _backgroundJobManager.Enqueue<SendReportJob, SendReportJobArgs>(
+                    new SendReportJobArgs
+                    {
+                        ReportId = report.Id
+                    });
+            }
+            ///////////////////
 
+            //Gamification section
             Person p = await _personManager.GetPersonByIdAsync(_session.LoggedUserPerson.Id);
 
             async Task<List<(EntityWriteAction, string NewValue)>> AssignRewards(long personId)
@@ -238,6 +254,7 @@ namespace Ermes.Web.Controllers
                 true);
                 await _backgroundJobManager.EnqueueEventAsync(gamNotification);
             }
+            //End of Gamification section
 
             var res = ObjectMapper.Map<ReportDto>(report);
             res.IsEditable = true;

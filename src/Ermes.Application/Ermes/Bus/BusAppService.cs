@@ -3,6 +3,7 @@ using Ermes.Attributes;
 using Ermes.Bus.Dto;
 using Ermes.Enums;
 using Ermes.EventHandlers;
+using Ermes.Jobs;
 using Ermes.Missions;
 using Ermes.Missions.Dto;
 using Ermes.Persons;
@@ -40,6 +41,19 @@ namespace Ermes.Bus
                 },
                 EntityWriteAction.StatusChange);
             await _backgroundJobManager.EnqueueEventAsync(notification);
+        }
+
+        public async Task TestCsiPresidiService()
+        {
+            bool mustSendReport = true;
+            if (mustSendReport)
+            {
+                _backgroundJobManager.Enqueue<SendReportJob, SendReportJobArgs>(
+                    new SendReportJobArgs
+                    {
+                        ReportId = 6
+                    });
+            }
         }
     }
 }
