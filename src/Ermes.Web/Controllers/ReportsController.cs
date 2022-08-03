@@ -201,21 +201,21 @@ namespace Ermes.Web.Controllers
                 EntityWriteAction.Create);
             await _backgroundJobManager.EnqueueEventAsync(notification);
 
-            /////FASTER CSI service integration
-            bool mustSendReport = _ermesSettings.Value != null && _ermesSettings.Value.ErmesProject == AppConsts.Ermes_Faster && _session.LoggedUserPerson.OrganizationId.HasValue;
-            if (mustSendReport)
-            {
-                var refOrg = await _organizationManager.GetOrganizationByIdAsync(report.Creator.OrganizationId.Value);
-                var housePartner = await SettingManager.GetSettingValueAsync(AppSettings.General.HouseOrganization);
-                if (refOrg.Name == housePartner || (refOrg.ParentId.HasValue && refOrg.Parent.Name == housePartner))
-                {
-                    _backgroundJobManager.Enqueue<SendReportJob, SendReportJobArgs>(
-                    new SendReportJobArgs
-                    {
-                        ReportId = report.Id
-                    });
-                }
-            }
+            /////FASTER CSI service integration, to be decommented when ready
+            //bool mustSendReport = _ermesSettings.Value != null && _ermesSettings.Value.ErmesProject == AppConsts.Ermes_Faster && _session.LoggedUserPerson.OrganizationId.HasValue;
+            //if (mustSendReport)
+            //{
+            //    var refOrg = await _organizationManager.GetOrganizationByIdAsync(report.Creator.OrganizationId.Value);
+            //    var housePartner = await SettingManager.GetSettingValueAsync(AppSettings.General.HouseOrganization);
+            //    if (refOrg.Name == housePartner || (refOrg.ParentId.HasValue && refOrg.Parent.Name == housePartner))
+            //    {
+            //        _backgroundJobManager.Enqueue<SendReportJob, SendReportJobArgs>(
+            //        new SendReportJobArgs
+            //        {
+            //            ReportId = report.Id
+            //        });
+            //    }
+            //}
             ///////////////////
 
             //Gamification section
