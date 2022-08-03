@@ -34,8 +34,10 @@ namespace Ermes.ExternalServices.Csi
         public CsiManager(CsiConnectionProvider connectionProvider, OperationManager operationManager, IAzureManager azureManager, CategoryManager categoryManager)
         {
             _connectionProvider = connectionProvider;
-            CsiClient = GetCsiClient();
-            CsiClientPresidi = GetCsiClient(true);
+            if(CsiClient == null)
+                CsiClient = GetCsiClient();
+            if(CsiClientPresidi == null)
+                CsiClientPresidi = GetCsiClient(true);
             _operationManager = operationManager;
             _azureManager = azureManager;
             _categoryManager = categoryManager;
