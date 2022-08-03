@@ -309,7 +309,8 @@ namespace Ermes.Enums
     {
         Registration,
         OpenIntervention,
-        CloseIntervention
+        CloseIntervention,
+        InsertReport
     }
 
     [JsonConverter(typeof(StringEnumConverter))]

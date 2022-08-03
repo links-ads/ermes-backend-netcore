@@ -26,6 +26,11 @@ namespace Ermes.Reports
             return await Reports.SingleOrDefaultAsync(r => r.Id == reportId);
         }
 
+        public Report GetReportById(int reportId)
+        {
+            return Reports.SingleOrDefault(r => r.Id == reportId);
+        }
+
         public async Task<int> InsertReportAsync(Report report)
         {
             return await ReportRepository.InsertAndGetIdAsync(report);

@@ -1,8 +1,10 @@
 ﻿using Abp.BackgroundJobs;
 using Ermes.Attributes;
 using Ermes.Bus.Dto;
+using Ermes.Configuration;
 using Ermes.Enums;
 using Ermes.EventHandlers;
+using Ermes.Jobs;
 using Ermes.Missions;
 using Ermes.Missions.Dto;
 using Ermes.Persons;
@@ -40,6 +42,21 @@ namespace Ermes.Bus
                 },
                 EntityWriteAction.StatusChange);
             await _backgroundJobManager.EnqueueEventAsync(notification);
+        }
+
+        public async Task TestCsiPresidiService()
+        {
+            bool mustSendReport = true;
+            //It must be "Protezione Civile Piemonte"
+            var housePartner = await SettingManager.GetSettingValueAsync(AppSettings.General.HouseOrganization);
+            if (mustSendReport)
+            {
+                _backgroundJobManager.Enqueue<SendReportJob, SendReportJobArgs>(
+                    new SendReportJobArgs
+                    {
+                        ReportId = 6
+                    });
+            }
         }
     }
 }
