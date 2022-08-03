@@ -36,7 +36,7 @@ namespace Ermes.Jobs
                 if (report == null || !report.CreatorUserId.HasValue)
                     throw new UserFriendlyException(L("InvalidReportId", args.ReportId));
 
-                AsyncHelper.RunSync(() => _csiManager.InserisciFromFaster(report.CreatorUserId.Value, report.Creator.LegacyId ?? 0, report.Id, report.Creator.Username, report.Location.Y, report.Location.X, report.Description, report.HazardString, report.StatusString, report.MediaURIs));
+                AsyncHelper.RunSync(() => _csiManager.InserisciFromFaster(report));
             }
         }
     }

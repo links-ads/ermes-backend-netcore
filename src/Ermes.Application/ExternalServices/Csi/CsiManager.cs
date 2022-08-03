@@ -1,5 +1,6 @@
 ﻿using Abp.Azure;
 using Abp.UI;
+using Ermes.Categories;
 using Ermes.Enums;
 using Ermes.ExternalServices.Csi.Configuration;
 using Ermes.Operations;
@@ -25,16 +26,21 @@ namespace Ermes.ExternalServices.Csi
         private static HttpClient CsiClient;
         private static HttpClient CsiClientPresidi;
         private readonly OperationManager _operationManager;
+        private readonly ReportManager _reportManager;
+        private readonly CategoryManager _categoryManager;
         private const string SUBJECT_CODE = "FAS";
         private readonly IAzureManager _azureManager;
+        private const string HEADER_APPLICATION_JSON = "application/json";
 
-        public CsiManager(CsiConnectionProvider connectionProvider, OperationManager operationManager, IAzureManager azureManager)
+        public CsiManager(CsiConnectionProvider connectionProvider, OperationManager operationManager, IAzureManager azureManager, ReportManager reportManager, CategoryManager categoryManager)
         {
             _connectionProvider = connectionProvider;
             CsiClient = GetCsiClient();
             CsiClientPresidi = GetCsiClient(true);
             _operationManager = operationManager;
             _azureManager = azureManager;
+            _reportManager = reportManager;
+            _categoryManager = categoryManager;
         }
 
         private HttpClient GetCsiClient(bool presidi = false)
@@ -46,7 +52,7 @@ namespace Ermes.ExternalServices.Csi
             else
                 byteArray = Encoding.ASCII.GetBytes(string.Format("{0}:{1}", _connectionProvider.GetUsername(), _connectionProvider.GetPassword()));
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(HEADER_APPLICATION_JSON));
             client.BaseAddress = new Uri(presidi ? _connectionProvider.GetBaseUrl_Presidi() : _connectionProvider.GetBaseUrl());
             return client;
         }
@@ -67,7 +73,7 @@ namespace Ermes.ExternalServices.Csi
             {
                 Method = HttpMethod.Get,
                 RequestUri = new Uri(builder.ToString()),
-                Content = new StringContent(requestBody, Encoding.UTF8, "application/json")
+                Content = new StringContent(requestBody, Encoding.UTF8, HEADER_APPLICATION_JSON)
             };
 
             var op = new Operation()
@@ -101,7 +107,7 @@ namespace Ermes.ExternalServices.Csi
             {
                 Method = HttpMethod.Post,
                 RequestUri = new Uri(builder.ToString()),
-                Content = new StringContent(requestBody, Encoding.UTF8, "application/json")
+                Content = new StringContent(requestBody, Encoding.UTF8, HEADER_APPLICATION_JSON)
             };
 
             var op = new Operation()
@@ -117,45 +123,53 @@ namespace Ermes.ExternalServices.Csi
             return await SendRequestInternal(request, op);
         }
 
-        public async Task InserisciFromFaster(
-                long personId,
-                int personLegaycId,
-                int reportId,
-                string creator,
-                double latitude,
-                double longitude,
-                string description,
-                string hazard,
-                string status,
-                List<string> mediaURIs
-        )
+        public async Task InserisciFromFaster(Report report)
         {
             var builder = new UriBuilder(CsiClientPresidi.BaseAddress + "/inserisciFromFaster");
-
-
+            
             //Do not want to store on local DB the fule byte array of the attachments;
-            //localbody will be stored in localDB without byte[], while bodys represent the full request sent to CSI service
+            //localbody will be stored in localDB without byte[], while body represents the full request sent to CSI service
             InsertReport localBody = new InsertReport()
             {
-                mittente = creator,
-                latitudine = latitude,
-                longitudine = longitude,
-                descrizione = description,
-                fenomenoLabelList = new string[] { hazard },
-                statoSegnalazioneLabel = status,
+                mittente = report.Creator.Email,
+                latitudine = report.Location.Y,
+                longitudine = report.Location.X,
+                descrizione = report.Description,
+                fenomenoLabelList = new string[] { report.HazardString },
+                statoSegnalazioneLabel = report.StatusString,
             };
+
+            if(report.ExtensionData != null && report.ExtensionData.Count > 0)
+            {
+                var categories = await _categoryManager.GetCategoriesAsync();
+                foreach (var item in report.ExtensionData)
+                {
+                    var category = categories.Single(c => c.Id == item.CategoryId);
+                    //TODO: complete the switch with the mnagement of all types of categories, based on the destination API
+                    switch (category.GroupKey)
+                    {
+                        case "People":
+                            ReportPeople people = new ReportPeople(category.Translations.Where(t => t.Language == "it").Select(c => c.Name).FirstOrDefault(), int.Parse(item.Value));
+                            localBody.peoples.Add(people);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+            }
 
             InsertReport body = (InsertReport) localBody.Clone();
 
-            if (mediaURIs != null && mediaURIs.Count > 0)
+            if (report.MediaURIs != null && report.MediaURIs.Count > 0)
             {
                 var _azureReportStorageManager = _azureManager.GetStorageManager(ResourceManager.GetBasePath(ResourceManager.Reports.ContainerName));
-                foreach (var fileName in mediaURIs)
+                foreach (var fileName in report.MediaURIs)
                 {
-                    string mediaPath = ResourceManager.Reports.GetMediaPath(reportId, fileName);
+                    string mediaPath = ResourceManager.Reports.GetMediaPath(report.Id, fileName);
                     ReportAttachment ra = new ReportAttachment(fileName, mediaPath);
                     localBody.allegatiSegnalazione.Add(ra);
-                    var file = await _azureReportStorageManager.GetFile(ResourceManager.Reports.GetRelativeMediaPath(reportId, fileName));
+                    var file = await _azureReportStorageManager.GetFile(ResourceManager.Reports.GetRelativeMediaPath(report.Id, fileName));
                     body.allegatiSegnalazione.Add(new ReportAttachment(fileName, mediaPath, file));
                 }
             }
@@ -166,15 +180,15 @@ namespace Ermes.ExternalServices.Csi
             {
                 Method = HttpMethod.Post,
                 RequestUri = new Uri(builder.ToString()),
-                Content = new StringContent(requestBody, Encoding.UTF8, "application/json")
+                Content = new StringContent(requestBody, Encoding.UTF8, HEADER_APPLICATION_JSON)
             };
 
             var op = new Operation()
             {
                 Request = JsonConvert.SerializeObject(localBody),
                 Type = VolterOperationType.InsertReport,
-                PersonId = personId,
-                PersonLegacyId = personLegaycId
+                PersonId = report.CreatorUserId.Value,
+                PersonLegacyId = report.Creator.LegacyId ?? 0
             };
 
             op.Id = await _operationManager.InsertOrUpdateOperationAsync(op);

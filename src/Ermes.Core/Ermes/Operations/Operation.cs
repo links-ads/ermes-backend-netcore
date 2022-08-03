@@ -45,7 +45,7 @@ namespace Ermes.Operations
         /// Duplication of OperationId inside Intervention class.
         /// In case of InsertReport, it represent the legeacyId of the report inside CSI system
         /// </summary>
-        
+
         public int OperationLegacyId { get; set; }
 
 
@@ -106,7 +106,7 @@ namespace Ermes.Operations
         public string subjectCode { get; set; }
     }
 
-    public class Registration: IVolterAction
+    public class Registration : IVolterAction
     {
         public string subjectCode { get; set; }
         public string fiscalCodeVoluntary { get; set; }
@@ -124,13 +124,13 @@ namespace Ermes.Operations
         public string operationId { get; set; }
     }
 
-    public class InsertReport: ICloneable
+    public class InsertReport : ICloneable
     {
         public InsertReport()
         {
 
         }
-        public InsertReport(string mittente, string descrizione, List<string> notaList, double latitudine, double longitudine, string statoSegnalazioneLabel, string[] fenomenoLabelList, List<ReportAttachment> allegatiSegnalazione, List<ReportAttachment> allegatiComunicazione)
+        public InsertReport(string mittente, string descrizione, List<string> notaList, double latitudine, double longitudine, string statoSegnalazioneLabel, string[] fenomenoLabelList, List<ReportAttachment> allegatiSegnalazione, List<ReportAttachment> allegatiComunicazione, List<ReportPeople> peoples)
         {
             this.mittente = mittente;
             this.descrizione = descrizione;
@@ -141,6 +141,7 @@ namespace Ermes.Operations
             this.fenomenoLabelList = fenomenoLabelList.ToArray();
             this.allegatiSegnalazione = allegatiSegnalazione.ToList();
             this.allegatiComunicazione = allegatiComunicazione.ToList();
+            this.peoples = peoples.ToList();
         }
 
         public string mittente { get; set; }
@@ -152,10 +153,11 @@ namespace Ermes.Operations
         public string[] fenomenoLabelList { get; set; }
         public List<ReportAttachment> allegatiSegnalazione { get; set; } = new List<ReportAttachment>();
         public List<ReportAttachment> allegatiComunicazione { get; set; } = new List<ReportAttachment>();
+        public List<ReportPeople> peoples { get; set; } = new List<ReportPeople>();
 
         public object Clone()
         {
-            return new InsertReport(mittente, descrizione, notaList, latitudine, longitudine, statoSegnalazioneLabel, fenomenoLabelList, allegatiSegnalazione, allegatiComunicazione);
+            return new InsertReport(mittente, descrizione, notaList, latitudine, longitudine, statoSegnalazioneLabel, fenomenoLabelList, allegatiSegnalazione, allegatiComunicazione, peoples);
         }
     }
 
@@ -181,5 +183,17 @@ namespace Ermes.Operations
         public string nome { get; set; }
         public string path { get; set; }
         public byte[] file { get; set; }
+    }
+
+    public class ReportPeople 
+    {
+        public ReportPeople(string label, int numPersone)
+        {
+            this.label = label;
+            this.numPersone = numPersone;
+        }
+
+        public string label { get; set; }
+        public int numPersone { get; set; }
     }
 }

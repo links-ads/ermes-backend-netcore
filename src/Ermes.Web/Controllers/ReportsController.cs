@@ -9,6 +9,7 @@ using Ermes;
 using Ermes.Attributes;
 using Ermes.Authorization;
 using Ermes.Categories;
+using Ermes.Configuration;
 using Ermes.Enums;
 using Ermes.EventHandlers;
 using Ermes.Gamification;
@@ -17,6 +18,7 @@ using Ermes.Helpers;
 using Ermes.Jobs;
 using Ermes.Missions;
 using Ermes.Net.MimeTypes;
+using Ermes.Organizations;
 using Ermes.Persons;
 using Ermes.Reports;
 using Ermes.Reports.Dto;
@@ -47,6 +49,7 @@ namespace Ermes.Web.Controllers
         private readonly ErmesAppSession _session;
         private readonly MissionManager _missionManager;
         private readonly PersonManager _personManager;
+        private readonly OrganizationManager _organizationManager;
         private readonly GamificationManager _gamificationManager;
         private readonly IAzureManager _azureManager;
         private readonly ICognitiveServicesManager _cognitiveServicesManager;
@@ -60,6 +63,7 @@ namespace Ermes.Web.Controllers
                         ErmesAppSession session,
                         MissionManager missionManager,
                         PersonManager personManager,
+                        OrganizationManager organizationManager,
                         GamificationManager gamificationManager,
                         IHttpContextAccessor httpContextAccessor,
                         IAzureManager azureManager,
@@ -74,6 +78,7 @@ namespace Ermes.Web.Controllers
             _session = session;
             _missionManager = missionManager;
             _personManager = personManager;
+            _organizationManager = organizationManager;
             _gamificationManager = gamificationManager;
             _azureManager = azureManager;
             _backgroundJobManager = backgroundJobManager;
@@ -200,11 +205,16 @@ namespace Ermes.Web.Controllers
             bool mustSendReport = _ermesSettings.Value != null && _ermesSettings.Value.ErmesProject == AppConsts.Ermes_Faster && _session.LoggedUserPerson.OrganizationId.HasValue;
             if (mustSendReport)
             {
-                _backgroundJobManager.Enqueue<SendReportJob, SendReportJobArgs>(
+                var refOrg = await _organizationManager.GetOrganizationByIdAsync(report.Creator.OrganizationId.Value);
+                var housePartner = await SettingManager.GetSettingValueAsync(AppSettings.General.HouseOrganization);
+                if (refOrg.Name == housePartner || (refOrg.ParentId.HasValue && refOrg.Parent.Name == housePartner))
+                {
+                    _backgroundJobManager.Enqueue<SendReportJob, SendReportJobArgs>(
                     new SendReportJobArgs
                     {
                         ReportId = report.Id
                     });
+                }
             }
             ///////////////////
 

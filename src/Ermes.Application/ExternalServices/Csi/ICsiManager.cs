@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Ermes.Operations;
+using Ermes.Reports;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,17 +20,6 @@ namespace Ermes.ExternalServices.Csi
             string status, 
             int? operationId = null
         );
-        Task InserisciFromFaster(
-            long personId,
-            int personLegaycId,
-            int reportId,
-            string creator,
-            double latitude,
-            double longitude,
-            string description,
-            string hazard,
-            string status,
-            List<string> mediaURIs
-        );
+        Task InserisciFromFaster(Report report);
     }
 }

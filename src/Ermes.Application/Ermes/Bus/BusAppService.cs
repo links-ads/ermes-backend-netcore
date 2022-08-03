@@ -1,6 +1,7 @@
 ﻿using Abp.BackgroundJobs;
 using Ermes.Attributes;
 using Ermes.Bus.Dto;
+using Ermes.Configuration;
 using Ermes.Enums;
 using Ermes.EventHandlers;
 using Ermes.Jobs;
@@ -46,6 +47,8 @@ namespace Ermes.Bus
         public async Task TestCsiPresidiService()
         {
             bool mustSendReport = true;
+            //It must be "Protezione Civile Piemonte"
+            var housePartner = await SettingManager.GetSettingValueAsync(AppSettings.General.HouseOrganization);
             if (mustSendReport)
             {
                 _backgroundJobManager.Enqueue<SendReportJob, SendReportJobArgs>(
