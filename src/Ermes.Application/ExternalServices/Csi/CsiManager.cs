@@ -26,20 +26,18 @@ namespace Ermes.ExternalServices.Csi
         private static HttpClient CsiClient;
         private static HttpClient CsiClientPresidi;
         private readonly OperationManager _operationManager;
-        private readonly ReportManager _reportManager;
         private readonly CategoryManager _categoryManager;
         private const string SUBJECT_CODE = "FAS";
         private readonly IAzureManager _azureManager;
         private const string HEADER_APPLICATION_JSON = "application/json";
 
-        public CsiManager(CsiConnectionProvider connectionProvider, OperationManager operationManager, IAzureManager azureManager, ReportManager reportManager, CategoryManager categoryManager)
+        public CsiManager(CsiConnectionProvider connectionProvider, OperationManager operationManager, IAzureManager azureManager, CategoryManager categoryManager)
         {
             _connectionProvider = connectionProvider;
             CsiClient = GetCsiClient();
             CsiClientPresidi = GetCsiClient(true);
             _operationManager = operationManager;
             _azureManager = azureManager;
-            _reportManager = reportManager;
             _categoryManager = categoryManager;
         }
 
