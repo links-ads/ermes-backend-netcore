@@ -1,7 +1,11 @@
 Ver. 3.7.9 - 2022-08-10
 --------------------------------
-- Feature - First implementation and integration of the new CSI service for sending reports (migrarion added)(#96)
 - Feature - GetRewards API added (#87)
+
+
+Ver. 3.8.0 - 2022-08-03
+--------------------------------
+- Feature - First implementation and integration of the new CSI service for sending reports (appsettings CSI added)(migration added)(#96)
 
 Ver. 3.7.8 - 2022-07-29
 --------------------------------
