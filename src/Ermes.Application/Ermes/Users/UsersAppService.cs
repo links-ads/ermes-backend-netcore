@@ -1,4 +1,5 @@
 ﻿using Abp.Application.Services.Dto;
+using Abp.BackgroundJobs;
 using Abp.UI;
 using Ermes.Attributes;
 using Ermes.Auth.Dto;
@@ -40,6 +41,7 @@ namespace Ermes.Users
         private readonly ErmesPermissionChecker _permissionChecker;
         private readonly IOptions<FusionAuthSettings> _fusionAuthSettings;
         private readonly IOptions<ErmesSettings> _ermesSettings;
+        private readonly IBackgroundJobManager _jobManager;
 
         public UsersAppService(
                     ErmesAppSession session,
@@ -50,7 +52,8 @@ namespace Ermes.Users
                     IOptions<ErmesSettings> ermesSettings,
                     OrganizationManager organizationManager,
                     TeamManager teamManager,
-                    ErmesPermissionChecker permissionChecker
+                    ErmesPermissionChecker permissionChecker,
+                    IBackgroundJobManager jobManager
             )
         {
             _session = session;
@@ -62,6 +65,7 @@ namespace Ermes.Users
             _teamManager = teamManager;
             _organizationManager = organizationManager;
             _permissionChecker = permissionChecker;
+            _jobManager = jobManager;
         }
 
         #region Private
@@ -91,7 +95,7 @@ namespace Ermes.Users
                     {
                         var person = await _personManager.GetPersonByFusionAuthUserGuidAsync(item.id.Value, item.email, item.username);
 
-                        ProfileDto profile = await GetProfileInternal(person, item, _personManager, _missionManager, _gamificationManager);
+                        ProfileDto profile = await GetProfileInternal(person, item, _personManager, _missionManager, _gamificationManager, _session, _jobManager);
 
                         list.Add(profile);
                     }
@@ -142,7 +146,7 @@ namespace Ermes.Users
 
             return new CreateOrUpdateUserOutput()
             {
-                Profile = await GetProfileInternal(person, currentUser, _personManager, _missionManager, _gamificationManager)
+                Profile = await GetProfileInternal(person, currentUser, _personManager, _missionManager, _gamificationManager, _session, _jobManager)
             };
         }
 

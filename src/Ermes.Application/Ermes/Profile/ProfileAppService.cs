@@ -1,4 +1,5 @@
 ﻿using Abp.Application.Services.Dto;
+using Abp.BackgroundJobs;
 using Abp.Domain.Uow;
 using Abp.Extensions;
 using Abp.Linq.Extensions;
@@ -9,8 +10,11 @@ using Ermes.Authorization;
 using Ermes.Configuration;
 using Ermes.Dto;
 using Ermes.Dto.Datatable;
+using Ermes.Enums;
+using Ermes.EventHandlers;
 using Ermes.ExternalServices.Csi;
 using Ermes.Gamification;
+using Ermes.Gamification.Dto;
 using Ermes.Linq.Extensions;
 using Ermes.Missions;
 using Ermes.Organizations;
@@ -45,6 +49,7 @@ namespace Ermes.Profile
         private readonly IOptions<ErmesSettings> _ermesSettings;
         private readonly ErmesPermissionChecker _permissionChecker;
         private readonly CsiManager _csiManager;
+        private readonly IBackgroundJobManager _jobManager;
         public ProfileAppService(ErmesAppSession session,
                     PersonManager personManger,
                     MissionManager missionManager,
@@ -54,7 +59,8 @@ namespace Ermes.Profile
                     ErmesPermissionChecker permissionChecker,
                     IOptions<FusionAuthSettings> fusionAuthSettings,
                     IOptions<ErmesSettings> ermesSettings,
-                    CsiManager csiManager)
+                    CsiManager csiManager,
+                    IBackgroundJobManager jobManager)
         {
             _session = session;
             _personManager = personManger;
@@ -66,6 +72,7 @@ namespace Ermes.Profile
             _ermesSettings = ermesSettings;
             _csiManager = csiManager;
             _gamificationManager = gamificationManager;
+            _jobManager = jobManager;
         }
 
         #region Private
@@ -198,7 +205,7 @@ namespace Ermes.Profile
                     person.Email = response.successResponse.user.email;
                 return new GetProfileOutput()
                 {
-                    Profile = await GetProfileInternal(person, response.successResponse.user, _personManager, _missionManager, _gamificationManager)
+                    Profile = await GetProfileInternal(person, response.successResponse.user, _personManager, _missionManager, _gamificationManager, _session, _jobManager)
                 };
             }
             else
@@ -248,14 +255,44 @@ namespace Ermes.Profile
                     }
                 }
             }
-
+            bool oldFirstLoginValue = person.IsFirstLogin, oldIsNewUserValue = person.IsNewUser;
+            
             person = await CreateOrUpdatePersonInternalAsync(person, user, input.OrganizationId, input.TeamId, input.IsFirstLogin, input.IsNewUser, rolesToAssign, _personManager);
+
+            var list = new List<(EntityWriteAction Action, string NewValue)>();
+            if (oldFirstLoginValue != person.IsFirstLogin && !person.IsFirstLogin) //send notification, the user has completed the tutorial
+            {
+                list = await _gamificationManager.UpdatePersonGamificationProfileAsync(person.Id, ErmesConsts.GamificationActionConsts.COMPLETE_WIZARD, null);
+                list.Add((EntityWriteAction.CompleteWizard, ErmesConsts.GamificationActionConsts.COMPLETE_WIZARD));
+            }
+
+            if(oldIsNewUserValue != person.IsNewUser && !person.IsNewUser)
+            {
+                list.AddRange(await _gamificationManager.UpdatePersonGamificationProfileAsync(person.Id, ErmesConsts.GamificationActionConsts.FIRST_LOGIN, null));
+                list.Add((EntityWriteAction.FirstLogin, ErmesConsts.GamificationActionConsts.FIRST_LOGIN));
+            }
+
+            foreach (var item in list)
+            {
+                NotificationEvent<GamificationNotificationDto> gamNotification = new NotificationEvent<GamificationNotificationDto>(0,
+                _session.LoggedUserPerson.Id,
+                new GamificationNotificationDto()
+                {
+                    PersonId = _session.LoggedUserPerson.Id,
+                    ActionName = item.Action.ToString(),
+                    NewValue = item.NewValue
+                },
+                item.Action,
+                true);
+                await _jobManager.EnqueueEventAsync(gamNotification);
+            }
+
             await CurrentUnitOfWork.SaveChangesAsync();
             if (user != null)
             {
                 return new UpdateProfileOutput()
                 {
-                    Profile = await GetProfileInternal(person, user, _personManager, _missionManager, _gamificationManager),
+                    Profile = await GetProfileInternal(person, user, _personManager, _missionManager, _gamificationManager, _session, _jobManager)
                 };
             }
             else

@@ -1,5 +1,6 @@
 ﻿using Abp.Domain.Repositories;
 using Abp.Domain.Services;
+using Ermes.Authorization;
 using Ermes.Enums;
 using Ermes.Gamification;
 using Ermes.Persons;
@@ -104,10 +105,15 @@ namespace Ermes.Gamification
                 return result;
             }
 
+            var personRole = await PersonManager.GetPersonRolesAsync(personId);
+            if(!personRole.Any(r => r.Role.Name == AppRoles.CITIZEN))
+                return result;
+
             person.Points += action.Points;
             await InsertAudit(person.Id, action.Id, null, null);
 
-            result.AddRange(await assignRewards(person.Id));
+            if(assignRewards != null)
+                result.AddRange(await assignRewards(person.Id));
 
             var level = await GetLevelByPointsAsync(person.Points);
             if (level.Id != person.LevelId)

@@ -1,8 +1,10 @@
 ﻿using Abp.Application.Services;
+using Abp.BackgroundJobs;
 using Abp.UI;
 using Ermes.Auth.Dto;
 using Ermes.Authorization;
 using Ermes.Enums;
+using Ermes.EventHandlers;
 using Ermes.Gamification;
 using Ermes.Gamification.Dto;
 using Ermes.Missions;
@@ -105,7 +107,7 @@ namespace Ermes
             return roleList;
         }
 
-        protected async Task<ProfileDto> GetProfileInternal(Person person, User user, PersonManager _personManager, MissionManager _missionManager, GamificationManager _gamificationManager)
+        protected async Task<ProfileDto> GetProfileInternal(Person person, User user, PersonManager _personManager, MissionManager _missionManager, GamificationManager _gamificationManager, ErmesAppSession _session, IBackgroundJobManager _backgroundJobManager)
         {
             ProfileDto profile = new ProfileDto()
             {

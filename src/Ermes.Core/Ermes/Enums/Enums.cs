@@ -213,7 +213,10 @@ namespace Ermes.Enums
         LevelChangeUp,
         LevelChangeDown,
         MedalObtained,
-        BadgeObtained
+        BadgeObtained,
+        FirstLogin,
+        CompleteWizard,
+        FirstReport
     }
 
     [JsonConverter(typeof(StringEnumConverter))]

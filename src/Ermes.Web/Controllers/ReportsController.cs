@@ -226,6 +226,17 @@ namespace Ermes.Web.Controllers
                 List<(EntityWriteAction, string newValue)> result = new List<(EntityWriteAction, string newValue)>();
                 var action = await _gamificationManager.GetActionByNameAsync(ErmesConsts.GamificationActionConsts.DO_REPORT);
                 var person = await _personManager.GetPersonByIdAsync(personId);
+
+                var reports = await _reportManager.GetReportsByPersonAsync(personId);
+                if(reports.Count == 1) // it user's first report, assign points
+                {
+                    var isFirstReportAction = await _gamificationManager.GetActionByNameAsync(ErmesConsts.GamificationActionConsts.FIRST_REPORT);
+                    await _gamificationManager.InsertAudit(_session.LoggedUserPerson.Id, isFirstReportAction.Id, null, null);
+                    person.Points += isFirstReportAction.Points;
+                    result.Add((EntityWriteAction.FirstReport, isFirstReportAction.Name));
+                }
+
+
                 if (action != null && action.Achievements != null && action.Achievements.Count > 0)
                 {
                     var personReports = await _reportManager.GetReportsByPersonAsync(personId);
@@ -257,7 +268,7 @@ namespace Ermes.Web.Controllers
                 new GamificationNotificationDto()
                 {
                     PersonId = _session.LoggedUserPerson.Id,
-                    ActionName = ErmesConsts.GamificationActionConsts.DO_REPORT,
+                    ActionName = item.Action.ToString(),
                     NewValue = item.NewValue
                 },
                 item.Action,
