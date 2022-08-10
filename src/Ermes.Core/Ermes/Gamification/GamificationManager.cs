@@ -23,6 +23,7 @@ namespace Ermes.Gamification
         public IQueryable<Medal> Medals { get { return RewardRepository.GetAll().OfType<Medal>(); } }
         public IQueryable<Badge> Badges { get { return RewardRepository.GetAll().OfType<Badge>(); } }
         public IQueryable<Award> Awards { get { return RewardRepository.GetAll().OfType<Award>(); } }
+        public IQueryable<Reward> Rewards { get { return RewardRepository.GetAll(); } }
         public IQueryable<GamificationAction> Actions { get { return ActionRepository.GetAll().Include(c => c.Achievements); } }
         public IQueryable<GamificationAudit> GamificationAudits { get { return AuditRepository.GetAll(); } }
         private readonly PersonManager PersonManager;
@@ -57,6 +58,11 @@ namespace Ermes.Gamification
         public async Task<List<Award>> GetAwardsAsync()
         {
             return await Awards.ToListAsync();
+        }
+
+        public async Task<List<Reward>> GetRewardsAsync()
+        {
+            return await Rewards.ToListAsync();
         }
 
         public async Task<Level> GetLevelByPointsAsync(int points)

@@ -19,5 +19,6 @@ namespace Ermes.Gamification
         Task<GamificationResponse> CheckPersonAnswer(CheckPersonAnswerInput input);
         Task<GetLevelsOutput> GetLevels();
         Task<GetLeaderboardOutput> GetLeaderboard();
+        Task<GetRewardsOutput> GetRewards();
     }
 }
