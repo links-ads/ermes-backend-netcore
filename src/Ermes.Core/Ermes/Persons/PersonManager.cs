@@ -26,7 +26,7 @@ namespace Ermes.Persons
         public IQueryable<Person> Persons { get { return PersonRepository.GetAll().Include(a => a.Organization).Include(p => p.Team).Include(p => p.Level); } }
         public IQueryable<Role> Roles { get { return RolesRepository.GetAll(); } }
         public IQueryable<PersonAction> PersonActions { get { return PersonActionsRepository.GetAll(); } }
-        public IQueryable<PersonRole> PersonRoles { get { return PersonRoleRepository.GetAll(); } }
+        public IQueryable<PersonRole> PersonRoles { get { return PersonRoleRepository.GetAll().Include(pr => pr.Role); } }
         public IQueryable<PersonTip> PersonTips { get { return PersonTipRepository.GetAll(); } }
         public IQueryable<PersonQuiz> PersonQuizzes { get { return PersonQuizRepository.GetAll(); } }
         public IQueryable<Organization> Organizations { get { return OrganizationsRepository.GetAll(); } }
@@ -263,7 +263,6 @@ namespace Ermes.Persons
         public async Task<List<string>> GetPersonRoleNamesAsync(long personId)
         {
             return await PersonRoles
-                .Include(pr => pr.Role)
                 .Where(pr => pr.PersonId == personId)
                 .Select(pr => pr.Role.Name)
                 .ToListAsync();
@@ -271,8 +270,7 @@ namespace Ermes.Persons
 
         public async Task<List<PersonRole>> GetPersonRolesAsync(long personId)
         {
-            return await PersonRoles.
-                 Include(pr => pr.Role)
+            return await PersonRoles
                 .Where(pr => pr.PersonId == personId)
                 .ToListAsync();
         }

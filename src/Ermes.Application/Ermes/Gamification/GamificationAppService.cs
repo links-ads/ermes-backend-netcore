@@ -193,7 +193,6 @@ namespace Ermes.Gamification
 
                 if (id > 0)
                 {
-                    
                     async Task<List<(EntityWriteAction, string NewValue)>> AssignRewards(long personId) {
                         List<(EntityWriteAction, string newValue)> result = new List<(EntityWriteAction, string newValue)>();
                         var action = await _gamificationManager.GetActionByNameAsync(ErmesConsts.GamificationActionConsts.READ_TIP);
@@ -234,7 +233,6 @@ namespace Ermes.Gamification
 
                         return result;
                     }
-
 
                     //The list contains the information about the notifications to be sent
                     var list = await _gamificationManager.UpdatePersonGamificationProfileAsync(_session.LoggedUserPerson.Id, ErmesConsts.GamificationActionConsts.READ_TIP, AssignRewards);

@@ -272,6 +272,20 @@ namespace Ermes.EventHandlers
                         bodyParams = new string[] { eventData.Content.NewValue };
                         break;
                     }
+                case EntityWriteAction.FirstLogin:
+                    {
+                        titleKey = "Notification_Gamification_FirstLogin_Title";
+                        bodyKey = "Notification_Gamification_FirstLogin_Body";
+                        bodyParams = new string[] { eventData.Content.NewValue };
+                        break;
+                    }
+                case EntityWriteAction.CompleteWizard:
+                    {
+                        titleKey = "Notification_Gamification_CompleteWizard_Title";
+                        bodyKey = "Notification_Gamification_CompleteWizard_Body";
+                        bodyParams = new string[] { eventData.Content.NewValue };
+                        break;
+                    }
                 default:
                     {
                         titleKey = "";
