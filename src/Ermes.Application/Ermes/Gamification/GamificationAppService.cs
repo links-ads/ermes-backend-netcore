@@ -1,8 +1,6 @@
 ﻿using Abp.Application.Services.Dto;
 using Abp.BackgroundJobs;
-using Abp.Domain.Uow;
 using Abp.Linq.Extensions;
-using Abp.UI;
 using Ermes.Answers;
 using Ermes.Attributes;
 using Ermes.Authorization;
@@ -193,18 +191,19 @@ namespace Ermes.Gamification
 
                 if (id > 0)
                 {
-                    async Task<List<(EntityWriteAction, string NewValue)>> AssignRewards(long personId) {
+                    async Task<List<(EntityWriteAction, string NewValue)>> AssignRewards(long personId)
+                    {
                         List<(EntityWriteAction, string newValue)> result = new List<(EntityWriteAction, string newValue)>();
                         var action = await _gamificationManager.GetActionByNameAsync(ErmesConsts.GamificationActionConsts.READ_TIP);
                         var person = await _personManager.GetPersonByIdAsync(personId);
-                        if(action != null && action.Achievements != null && action.Achievements.Count > 0)
+                        if (action != null && action.Achievements != null && action.Achievements.Count > 0)
                         {
                             var personTips = await _tipManager.GetTipsByPersonAsync(_session.LoggedUserPerson.Id);
                             foreach (var item in action.Achievements)
                             {
-                                if(item is Medal)
+                                if (item is Medal)
                                 {
-                                    if(item.Detail.Threshold == personTips.Count)
+                                    if (item.Detail.Threshold == personTips.Count)
                                     {
                                         await _gamificationManager.InsertAudit(_session.LoggedUserPerson.Id, null, item.Id, null);
                                         person.Points += item.Detail.Points;
@@ -212,7 +211,7 @@ namespace Ermes.Gamification
                                     }
 
                                 }
-                                else if(item is Badge)
+                                else if (item is Badge)
                                 {
                                     Badge badge = (Badge)item;
                                     if (badge.CrisisPhase != tip.CrisisPhaseKey)
@@ -220,7 +219,7 @@ namespace Ermes.Gamification
 
                                     var personTipsByPhase = personTips.Where(a => a.CrisisPhaseKey == tip.CrisisPhaseKey).ToList();
                                     var tipsByPhaseCount = _tipManager.Tips.Where(t => t.CrisisPhaseKeyString == tip.CrisisPhaseKeyString).Count();
-                                    if(tipsByPhaseCount == personTipsByPhase.Count)
+                                    if (tipsByPhaseCount == personTipsByPhase.Count)
                                     {
                                         await _gamificationManager.InsertAudit(_session.LoggedUserPerson.Id, null, item.Id, null);
                                         person.Points += badge.Detail.Points;
@@ -246,7 +245,7 @@ namespace Ermes.Gamification
                     result.Response.ErrorMessage = message;
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var message = string.Format("Error while inserting PersonTip: {0}", e.Message);
                 Logger.Error(message);
@@ -273,7 +272,7 @@ namespace Ermes.Gamification
             try
             {
                 var ans = await _answerManager.GetAnswerByCodeAsync(input.AnswerCode);
-                Quiz quiz = await  _quizManager.GetQuizByCodeAsync(ans.QuizCode);
+                Quiz quiz = await _quizManager.GetQuizByCodeAsync(ans.QuizCode);
                 if (ans.IsTheRightAnswer)
                 {
                     await _personManager.CreatePersonQuizAsync(_session.LoggedUserPerson.Id, ans.QuizCode);
@@ -380,7 +379,7 @@ namespace Ermes.Gamification
                             .ToList();
 
             var result = new GetLeaderboardOutput();
-            
+
             foreach (var item in subList)
             {
                 var newCompetitor = ObjectMapper.Map<GamificationBaseDto>(item.Person);
@@ -389,6 +388,17 @@ namespace Ermes.Gamification
             }
 
             return result;
+        }
+
+        public async Task<GetRewardsOutput> GetRewards()
+        {
+            var rew = await _gamificationManager.GetRewardsAsync();
+            return new GetRewardsOutput()
+            {
+                Awards = ObjectMapper.Map<List<AwardDto>>(rew.OfType<Award>().ToList()),
+                Medals = ObjectMapper.Map<List<MedalDto>>(rew.OfType<Medal>().ToList()),
+                Badges = ObjectMapper.Map<List<BadgeDto>>(rew.OfType<Badge>().ToList())
+            };
         }
     }
 }
