@@ -37,6 +37,30 @@ namespace Ermes.ExternalServices.Csi.Configuration
                 throw new ConfigurationErrorsException("A username is expected for CSI service");
 
             return _csiSettings.Value.Username;
+        }        
+        
+        public string GetBaseUrl_Presidi()
+        {
+            if (_csiSettings == null || _csiSettings.Value == null)
+                throw new ConfigurationErrorsException("A baseUrl_Presidi is expected for CSI service");
+
+            return _csiSettings.Value.BaseUrl_Presidi;
+        }
+
+        public string GetPassword_Presidi()
+        {
+            if (_csiSettings == null || _csiSettings.Value == null)
+                throw new ConfigurationErrorsException("A password_Presidi is expected for CSI service");
+
+            return _csiSettings.Value.Password_Presidi;
+        }
+
+        public string GetUsername_Presidi()
+        {
+            if (_csiSettings == null || _csiSettings.Value == null)
+                throw new ConfigurationErrorsException("A username_Presidi is expected for CSI service");
+
+            return _csiSettings.Value.Username_Presidi;
         }
     }
 }
