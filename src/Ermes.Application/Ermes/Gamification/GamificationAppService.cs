@@ -138,7 +138,7 @@ namespace Ermes.Gamification
             return result;
         }
 
-        private async Task SendNotification(List<(EntityWriteAction Action, string NewValue)> list, string actionName)
+        private async Task SendNotification(List<(EntityWriteAction Action, string NewValue)> list)
         {
             foreach (var item in list)
             {
@@ -147,7 +147,7 @@ namespace Ermes.Gamification
                 new GamificationNotificationDto()
                 {
                     PersonId = _session.LoggedUserPerson.Id,
-                    ActionName = actionName,
+                    ActionName = item.Action.ToString(),
                     NewValue = item.NewValue
                 },
                 item.Action,
@@ -236,7 +236,7 @@ namespace Ermes.Gamification
 
                     //The list contains the information about the notifications to be sent
                     var list = await _gamificationManager.UpdatePersonGamificationProfileAsync(_session.LoggedUserPerson.Id, ErmesConsts.GamificationActionConsts.READ_TIP, AssignRewards);
-                    await SendNotification(list, ErmesConsts.GamificationActionConsts.READ_TIP);
+                    await SendNotification(list);
                 }
                 else
                 {
@@ -322,7 +322,7 @@ namespace Ermes.Gamification
 
                     //The list contains the information about the notification to be sent
                     var list = await _gamificationManager.UpdatePersonGamificationProfileAsync(_session.LoggedUserPerson.Id, ErmesConsts.GamificationActionConsts.ANSWER_QUIZ, AssignRewards);
-                    await SendNotification(list, ErmesConsts.GamificationActionConsts.ANSWER_QUIZ);
+                    await SendNotification(list);
                 }
                 else
                 {

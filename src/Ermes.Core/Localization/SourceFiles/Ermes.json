@@ -83,6 +83,8 @@
     "Notification_Gamification_FirstLogin_Body": "You have completed the registration procedure",
     "Notification_Gamification_CompleteWizard_Title": "Wizard completed",
     "Notification_Gamification_CompleteWizard_Body": "You have completed the initial tutorial",
+    "Notification_Gamification_FirstReport_Title": "First report created",
+    "Notification_Gamification_FirstReport_Body": "You have successfully created the first report",
     "TeamNotInOrganization": "Team {0} does not belong to organization {1}",
     "EntityOutsideOrganization": "You do not have the visibility on this item",
     "MissingPermission": "You don't have the permission to perform this operation",

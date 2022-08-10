@@ -215,7 +215,8 @@ namespace Ermes.Enums
         MedalObtained,
         BadgeObtained,
         FirstLogin,
-        CompleteWizard
+        CompleteWizard,
+        FirstReport
     }
 
     [JsonConverter(typeof(StringEnumConverter))]

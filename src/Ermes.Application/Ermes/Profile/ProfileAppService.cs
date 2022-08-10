@@ -256,49 +256,37 @@ namespace Ermes.Profile
                 }
             }
             bool oldFirstLoginValue = person.IsFirstLogin, oldIsNewUserValue = person.IsNewUser;
-                        person = await CreateOrUpdatePersonInternalAsync(person, user, input.OrganizationId, input.TeamId, input.IsFirstLogin, input.IsNewUser, rolesToAssign, _personManager);
+            
+            person = await CreateOrUpdatePersonInternalAsync(person, user, input.OrganizationId, input.TeamId, input.IsFirstLogin, input.IsNewUser, rolesToAssign, _personManager);
 
             var list = new List<(EntityWriteAction Action, string NewValue)>();
             if (oldFirstLoginValue != person.IsFirstLogin && !person.IsFirstLogin) //send notification, the user has completed the tutorial
             {
                 list = await _gamificationManager.UpdatePersonGamificationProfileAsync(person.Id, ErmesConsts.GamificationActionConsts.COMPLETE_WIZARD, null);
                 list.Add((EntityWriteAction.CompleteWizard, ErmesConsts.GamificationActionConsts.COMPLETE_WIZARD));
-                foreach (var item in list)
-                {
-                    NotificationEvent<GamificationNotificationDto> gamNotification = new NotificationEvent<GamificationNotificationDto>(0,
-                    _session.LoggedUserPerson.Id,
-                    new GamificationNotificationDto()
-                    {
-                        PersonId = _session.LoggedUserPerson.Id,
-                        ActionName = ErmesConsts.GamificationActionConsts.COMPLETE_WIZARD,
-                        NewValue = item.NewValue
-                    },
-                    item.Action,
-                    true);
-                    await _jobManager.EnqueueEventAsync(gamNotification);
-                }
             }
 
             if(oldIsNewUserValue != person.IsNewUser && !person.IsNewUser)
             {
-                list = await _gamificationManager.UpdatePersonGamificationProfileAsync(person.Id, ErmesConsts.GamificationActionConsts.FIRST_LOGIN, null);
+                list.AddRange(await _gamificationManager.UpdatePersonGamificationProfileAsync(person.Id, ErmesConsts.GamificationActionConsts.FIRST_LOGIN, null));
                 list.Add((EntityWriteAction.FirstLogin, ErmesConsts.GamificationActionConsts.FIRST_LOGIN));
-                foreach (var item in list)
-                {
-                    NotificationEvent<GamificationNotificationDto> gamNotification = new NotificationEvent<GamificationNotificationDto>(0,
-                    _session.LoggedUserPerson.Id,
-                    new GamificationNotificationDto()
-                    {
-                        PersonId = _session.LoggedUserPerson.Id,
-                        ActionName = ErmesConsts.GamificationActionConsts.FIRST_LOGIN,
-                        NewValue = item.NewValue
-                    },
-                    item.Action,
-                    true);
-                    await _jobManager.EnqueueEventAsync(gamNotification);
-                }
             }
-      
+
+            foreach (var item in list)
+            {
+                NotificationEvent<GamificationNotificationDto> gamNotification = new NotificationEvent<GamificationNotificationDto>(0,
+                _session.LoggedUserPerson.Id,
+                new GamificationNotificationDto()
+                {
+                    PersonId = _session.LoggedUserPerson.Id,
+                    ActionName = item.Action.ToString(),
+                    NewValue = item.NewValue
+                },
+                item.Action,
+                true);
+                await _jobManager.EnqueueEventAsync(gamNotification);
+            }
+
             await CurrentUnitOfWork.SaveChangesAsync();
             if (user != null)
             {
