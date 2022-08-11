@@ -166,7 +166,7 @@ namespace Ermes.Gamification
         public async Task<bool> CheckBarriersAsync(Person person, Level newLevel)
         {
             var barriers = newLevel.Barriers.Where(b => b.Level.Id == newLevel.Id).Select(b => b.RewardName).ToList();
-            return await GamificationAudits.Where(ga => ga.PersonId == person.Id).AnyAsync(ga => barriers.Contains(ga.Reward.Name));
+            return await GamificationAudits.Where(ga => ga.PersonId == person.Id).AllAsync(ga => barriers.Contains(ga.Reward.Name));
         }
     }
 }
