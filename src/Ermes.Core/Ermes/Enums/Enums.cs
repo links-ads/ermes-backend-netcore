@@ -357,7 +357,8 @@ namespace Ermes.Enums
         Daily,
         OnDemand,
         H6,
-        H12
+        H12,
+        TwiceAWeek
     }
 
     [JsonConverter(typeof(StringEnumConverter))]

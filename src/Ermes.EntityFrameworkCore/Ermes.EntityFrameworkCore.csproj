@@ -102,6 +102,8 @@
     <Compile Include="Migrations\20220728151936_Communication_Restriction_Added.Designer.cs" />
     <Compile Include="Migrations\20220803073033_VolterOperations_PresidiResponse_Added.cs" />
     <Compile Include="Migrations\20220803073033_VolterOperations_PresidiResponse_Added.Designer.cs" />
+    <Compile Include="Migrations\20220912074513_Layers_UnitOfMeasure_Added.cs" />
+    <Compile Include="Migrations\20220912074513_Layers_UnitOfMeasure_Added.Designer.cs" />
     <Compile Include="Migrations\ErmesDbContextModelSnapshot.cs" />
     <Compile Include="Migrations\Seed\ModelBuilderExtensions.cs" />
   </ItemGroup>
