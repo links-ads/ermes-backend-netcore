@@ -282,6 +282,16 @@ namespace Ermes.Enums
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
+    public enum LayerImportStatusType
+    {
+        Created,
+        Accepted,
+        Processing,
+        Completed,
+        Error
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum MapRequestStatusType
     {
         RequestSubmitted,

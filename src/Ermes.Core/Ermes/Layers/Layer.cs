@@ -1,6 +1,7 @@
 ﻿using Abp.Domain.Entities;
 using Ermes.Enums;
 using Ermes.Helpers;
+using Ermes.MapRequests;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -59,6 +60,8 @@ namespace Ermes.Layers
 
         [StringLength(MaxUnitOfMeasureLength)]
         public string UnitOfMeasure { get; set; }
+
+        public virtual ICollection<MapRequestLayer> MapRequestLayers { get; set; }
 
     }
 }

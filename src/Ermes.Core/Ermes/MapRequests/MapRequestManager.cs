@@ -1,5 +1,6 @@
 ﻿using Abp.Domain.Repositories;
 using Abp.Domain.Services;
+using Ermes.Enums;
 using Ermes.Helpers;
 using Microsoft.EntityFrameworkCore;
 using NpgsqlTypes;
@@ -13,12 +14,14 @@ namespace Ermes.MapRequests
 {
     public class MapRequestManager : DomainService
     {
-        public IQueryable<MapRequest> MapRequests { get { return MapRequestRepository.GetAll().Include(a => a.Creator.Organization); } }
+        public IQueryable<MapRequest> MapRequests { get { return MapRequestRepository.GetAll().Include(a => a.Creator.Organization).Include(a => a.MapRequestLayers); } }
         protected IRepository<MapRequest> MapRequestRepository { get; set; }
+        protected IRepository<MapRequestLayer> MapRequestLayersRepository { get; set; }
 
-        public MapRequestManager(IRepository<MapRequest> mapRequestRepository)
+        public MapRequestManager(IRepository<MapRequest> mapRequestRepository, IRepository<MapRequestLayer> mapRequestLayersRepository)
         {
             MapRequestRepository = mapRequestRepository;
+            MapRequestLayersRepository = mapRequestLayersRepository;
         }
 
         public IQueryable<MapRequest> GetMapRequests(DateTime startDate, DateTime endDate)
@@ -28,12 +31,24 @@ namespace Ermes.MapRequests
                     .Where(m => m.Duration.Overlaps(range));
         }
 
-        public async Task<int> CreateOrUpdateMapRequestAsync(MapRequest mr)
+        public async Task<int> CreateOrUpdateMapRequestAsync(MapRequest mr, List<int> dataTypeIds)
         {
             //Code computation
             var lastCode = await MapRequests.Select(a => a.Code).OrderBy(a => a).LastOrDefaultAsync();
             mr.Code = EntityCodeHelper.GetNextCode(ErmesConsts.EntityCode.MapReqeust, lastCode);
-            return await MapRequestRepository.InsertOrUpdateAndGetIdAsync(mr);
+            var mapRequestId = await MapRequestRepository.InsertOrUpdateAndGetIdAsync(mr);
+
+            foreach (var dataTypeId in dataTypeIds)
+            {
+                await MapRequestLayersRepository.InsertAsync(new MapRequestLayer()
+                {
+                    LayerDataTypeId = dataTypeId,
+                    MapRequestCode = mr.Code,
+                    Status = LayerImportStatusType.Created
+                });
+            }
+
+            return mapRequestId;
         }
 
         public async Task<MapRequest> GetMapRequestByIdAsync(int mapReqId)

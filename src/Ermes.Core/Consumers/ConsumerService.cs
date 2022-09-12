@@ -9,6 +9,7 @@ using Ermes.Notifiers;
 using Ermes.Persons;
 using Newtonsoft.Json;
 using System;
+using System.Linq;
 using System.Transactions;
 
 namespace Ermes.Consumers
@@ -83,18 +84,35 @@ namespace Ermes.Consumers
                         Logger.ErrorFormat("HandleMapRequestStatusChange: MapRequest with Code {0} not found", eventData.request_code);
                         return;
                     }
-                    if (eventData.status_code == "200")
+
+                    var layer = mr.MapRequestLayers.SingleOrDefault(l => l.LayerDataTypeId == eventData.datatype_id);
+                    if (layer == null)
                     {
-                        mr.Status = MapRequestStatusType.ContentAvailable;
+                        Logger.ErrorFormat("HandleMapRequestStatusChange: Layer with DataTypeId {0} not found", eventData.datatype_id);
+                        return;
                     }
-                    else
+
+                    switch (eventData.status_code)
                     {
-                        //If at least one DatatypeId is available, do not change the overall status of the MapRequest
-                        if (mr.Status == MapRequestStatusType.RequestSubmitted)
-                        {
-                            mr.Status = MapRequestStatusType.ContentNotAvailable;
-                            mr.ErrorMessage = eventData.message;
-                        }
+                        case "200":
+                            layer.Status = LayerImportStatusType.Completed;
+                            mr.Status = MapRequestStatusType.ContentAvailable;
+                            break;
+                        case "201":
+                            layer.Status = LayerImportStatusType.Accepted;
+                            break;
+                        case "202":
+                            layer.Status = LayerImportStatusType.Processing;
+                            break;
+                        case "400":
+                        case "404":
+                        case "422":
+                        case "500":
+                            layer.Status = LayerImportStatusType.Error;
+                            layer.ErrorMessage = eventData.message;
+                            break;
+                        default:
+                            break;
                     }
 
                     CurrentUnitOfWork.SaveChanges();

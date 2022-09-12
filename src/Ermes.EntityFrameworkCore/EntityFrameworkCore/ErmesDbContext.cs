@@ -80,6 +80,7 @@ namespace Ermes.EntityFrameworkCore
         public virtual DbSet<Award> Awards { get; set; }
         public virtual DbSet<GamificationAudit> GamificationAudit { get; set; }
         public virtual DbSet<Gamification.Barrier> Barriers { get; set; }
+        public virtual DbSet<MapRequestLayer> MapRequestLayers { get; set; }
 
         public IEntityHistoryHelper EntityHistoryHelper { get; set; }
 
@@ -218,6 +219,22 @@ namespace Ermes.EntityFrameworkCore
                 .WithOne(a => a.Barrier)
                 .HasPrincipalKey<Reward>(r => r.Name)
                 .HasForeignKey<Gamification.Barrier>(b => b.RewardName)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<MapRequestLayer>()
+                .HasIndex(mrl => new { mrl.MapRequestCode, mrl.LayerDataTypeId })
+                .IsUnique(true);
+            modelBuilder.Entity<MapRequestLayer>()
+                .HasOne(mrl => mrl.MapRequest)
+                .WithMany(mr => mr.MapRequestLayers)
+                .HasPrincipalKey(mr => mr.Code)
+                .HasForeignKey(mrl => mrl.MapRequestCode)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<MapRequestLayer>()
+                .HasOne(mrl => mrl.Layer)
+                .WithMany(l => l.MapRequestLayers)
+                .HasPrincipalKey(l => l.DataTypeId)
+                .HasForeignKey(mrl => mrl.LayerDataTypeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             #region EntityHistory
