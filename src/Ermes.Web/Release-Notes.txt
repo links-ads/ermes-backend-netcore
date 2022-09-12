@@ -1,5 +1,9 @@
 Ver.
 --------------------------------
+
+
+Ver. 3.9.1 - 2022-09-12
+--------------------------------
 - Feature - MapRequestLayers table added and Abp.Importer update to support MapRequestCodes as input (migration added)(#99)
 
 Ver. 3.9.0 - 2022-09-12
