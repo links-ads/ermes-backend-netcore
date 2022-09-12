@@ -1,6 +1,6 @@
 Ver.
 --------------------------------
-
+- Feature - UnitOfMeasure property added to Layer class (migration added)(#98)
 
 Ver. 3.8.1 - 2022-08-10
 --------------------------------

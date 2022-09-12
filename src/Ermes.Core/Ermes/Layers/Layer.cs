@@ -12,6 +12,7 @@ namespace Ermes.Layers
     {
         public const int MaxGroupLength = 255;
         public const int MaxPartnerNameLength = 100;
+        public const int MaxUnitOfMeasureLength = 20;
 
         public int DataTypeId { get; set; }
 
@@ -55,6 +56,9 @@ namespace Ermes.Layers
         public FrequencyType Frequency { get; set; }
 
         public ICollection<LayerTranslation> Translations { get; set; }
+
+        [StringLength(MaxUnitOfMeasureLength)]
+        public string UnitOfMeasure { get; set; }
 
     }
 }
