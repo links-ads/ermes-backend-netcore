@@ -140,7 +140,7 @@ namespace Ermes.MapRequests
             else
                 throw new UserFriendlyException(L("InvalidAOI"));
 
-            newMR.Id = await _mapRequestManager.CreateOrUpdateMapRequestAsync(newMR);
+            newMR.Id = await _mapRequestManager.CreateOrUpdateMapRequestAsync(newMR, featureDto.Properties.DataTypeIds);
 
             await CurrentUnitOfWork.SaveChangesAsync();
 

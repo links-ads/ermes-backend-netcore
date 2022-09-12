@@ -27,10 +27,10 @@ namespace Abp.Importer
             GlobalConfiguration.Instance = new GlobalConfiguration(new Dictionary<string, string>(), apiKeyDict, new Dictionary<string, string>(), _connectionProvider.GetBaseUrl());
         }
 
-        public async Task<object> GetLayers(List<string> datatype_ids, string bbox, DateTime start, DateTime end, string request_code, bool includeMapRequests = false)
+        public async Task<object> GetLayers(List<string> datatype_ids, string bbox, DateTime start, DateTime end, List<string> request_codes, bool includeMapRequests = false)
         {
             var api = new DashboardApi();
-            return await api.GetLayersLayersGetAsync(datatype_ids, bbox, start, end, request_code, includeMapRequests);
+            return await api.GetLayersLayersGetAsync(datatype_ids, bbox, start, end, request_codes, includeMapRequests);
         }
 
         public async Task<object> GetTimeSeries(string datatype_id, string point, string attribute, DateTime start, DateTime end)
@@ -41,7 +41,7 @@ namespace Abp.Importer
 
         public async Task<object> GetMetadata(string metadata_id)
         {
-            var api = new DashboardApi();
+            var api = new DatalakeUtilsApi();
             return await api.GetMetadataMetadataGetAsync(metadata_id);
         }
     }

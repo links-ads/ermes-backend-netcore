@@ -52,56 +52,53 @@ namespace Abp.Importer.Model
         /// <param name="metadataId">metadataId (required).</param>
         /// <param name="bbox">bbox (required).</param>
         /// <param name="requestCode">requestCode.</param>
-        public GeoserverResourceSchema(string datatypeId = default(string), string workspaceName = default(string), string storeName = default(string), string layerName = default(string), string storageLocation = default(string), DateTime expireOn = default(DateTime), DateTime start = default(DateTime), DateTime end = default(DateTime), DateTime creationDate = default(DateTime), string resourceId = default(string), string metadataId = default(string), string bbox = default(string), string requestCode = default(string))
+        /// <param name="timestamps">timestamps.</param>
+        /// <param name="mosaic">mosaic (required).</param>
+        public GeoserverResourceSchema(string datatypeId = default(string), string workspaceName = default(string), string storeName = default(string), string layerName = default(string), string storageLocation = default(string), DateTime expireOn = default(DateTime), DateTime start = default(DateTime), DateTime end = default(DateTime), DateTime creationDate = default(DateTime), string resourceId = default(string), string metadataId = default(string), string bbox = default(string), string requestCode = default(string), string timestamps = default(string), bool mosaic = default(bool))
         {
             // to ensure "datatypeId" is required (not null)
-            if (datatypeId == null)
-            {
+            if (datatypeId == null) {
                 throw new ArgumentNullException("datatypeId is a required property for GeoserverResourceSchema and cannot be null");
             }
             this.DatatypeId = datatypeId;
             // to ensure "workspaceName" is required (not null)
-            if (workspaceName == null)
-            {
+            if (workspaceName == null) {
                 throw new ArgumentNullException("workspaceName is a required property for GeoserverResourceSchema and cannot be null");
             }
             this.WorkspaceName = workspaceName;
             // to ensure "storeName" is required (not null)
-            if (storeName == null)
-            {
+            if (storeName == null) {
                 throw new ArgumentNullException("storeName is a required property for GeoserverResourceSchema and cannot be null");
             }
             this.StoreName = storeName;
             // to ensure "layerName" is required (not null)
-            if (layerName == null)
-            {
+            if (layerName == null) {
                 throw new ArgumentNullException("layerName is a required property for GeoserverResourceSchema and cannot be null");
             }
             this.LayerName = layerName;
             this.Start = start;
             this.End = end;
             // to ensure "resourceId" is required (not null)
-            if (resourceId == null)
-            {
+            if (resourceId == null) {
                 throw new ArgumentNullException("resourceId is a required property for GeoserverResourceSchema and cannot be null");
             }
             this.ResourceId = resourceId;
             // to ensure "metadataId" is required (not null)
-            if (metadataId == null)
-            {
+            if (metadataId == null) {
                 throw new ArgumentNullException("metadataId is a required property for GeoserverResourceSchema and cannot be null");
             }
             this.MetadataId = metadataId;
             // to ensure "bbox" is required (not null)
-            if (bbox == null)
-            {
+            if (bbox == null) {
                 throw new ArgumentNullException("bbox is a required property for GeoserverResourceSchema and cannot be null");
             }
             this.Bbox = bbox;
+            this.Mosaic = mosaic;
             this.StorageLocation = storageLocation;
             this.ExpireOn = expireOn;
             this.CreationDate = creationDate;
             this.RequestCode = requestCode;
+            this.Timestamps = timestamps;
         }
 
         /// <summary>
@@ -183,6 +180,18 @@ namespace Abp.Importer.Model
         public string RequestCode { get; set; }
 
         /// <summary>
+        /// Gets or Sets Timestamps
+        /// </summary>
+        [DataMember(Name = "timestamps", EmitDefaultValue = true)]
+        public string Timestamps { get; set; }
+
+        /// <summary>
+        /// Gets or Sets Mosaic
+        /// </summary>
+        [DataMember(Name = "mosaic", IsRequired = true, EmitDefaultValue = true)]
+        public bool Mosaic { get; set; }
+
+        /// <summary>
         /// Returns the string presentation of the object
         /// </summary>
         /// <returns>String presentation of the object</returns>
@@ -203,6 +212,8 @@ namespace Abp.Importer.Model
             sb.Append("  MetadataId: ").Append(MetadataId).Append("\n");
             sb.Append("  Bbox: ").Append(Bbox).Append("\n");
             sb.Append("  RequestCode: ").Append(RequestCode).Append("\n");
+            sb.Append("  Timestamps: ").Append(Timestamps).Append("\n");
+            sb.Append("  Mosaic: ").Append(Mosaic).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
         }
@@ -302,6 +313,15 @@ namespace Abp.Importer.Model
                     this.RequestCode == input.RequestCode ||
                     (this.RequestCode != null &&
                     this.RequestCode.Equals(input.RequestCode))
+                ) && 
+                (
+                    this.Timestamps == input.Timestamps ||
+                    (this.Timestamps != null &&
+                    this.Timestamps.Equals(input.Timestamps))
+                ) && 
+                (
+                    this.Mosaic == input.Mosaic ||
+                    this.Mosaic.Equals(input.Mosaic)
                 );
         }
 
@@ -366,6 +386,11 @@ namespace Abp.Importer.Model
                 {
                     hashCode = (hashCode * 59) + this.RequestCode.GetHashCode();
                 }
+                if (this.Timestamps != null)
+                {
+                    hashCode = (hashCode * 59) + this.Timestamps.GetHashCode();
+                }
+                hashCode = (hashCode * 59) + this.Mosaic.GetHashCode();
                 return hashCode;
             }
         }

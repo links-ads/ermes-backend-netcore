@@ -44,7 +44,6 @@ namespace Ermes.MapRequests
         [NotMapped]
         public LayerType Layer { get; set; }
         public int Frequency { get; set; }
-        public List<int> DataTypeIds { get; set; }
 
         [Column("Status")]
         public string StatusString
@@ -65,5 +64,7 @@ namespace Ermes.MapRequests
         /// Number of meters per pixel
         /// </summary>
         public int Resolution { get; set; } = 10;
+
+        public virtual ICollection<MapRequestLayer> MapRequestLayers { get; set; }
     }
 }

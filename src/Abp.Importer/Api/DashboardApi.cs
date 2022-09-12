@@ -27,74 +27,69 @@ namespace Abp.Importer.Api
     {
         #region Synchronous Operations
         /// <summary>
-        /// Get Layers
+        /// Get Check Layers
         /// </summary>
         /// <remarks>
-        /// Gets the list of published layers given optional criteria.  :param datatype_ids: list of datatype_id to filter by, defaults to Query(None) :type datatype_ids: Optional[List[str]], optional :param bbox: bounding box string in the form \&quot;bottomleft-x,bottomleft-y,topright-x,topright-y\&quot;, defaults to Query(None) :type bbox: Optional[str], optional :param start: filter resources with start_date &gt;&#x3D; start, start in the form &#39;YYYY-MM-DD HH:MM:SS&#39;, defaults to Query(None) :type start: Optional[datetime], optional :param end: filter resources with end_date &lt;&#x3D; end, end in the form &#39;YYYY-MM-DD HH:MM:SS&#39;, defaults to Query(None) :type end: Optional[datetime], optional :type request_code: Optional[str], optional :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of layers grouped by datatype id :rtype: List[Dict[str,Dict[str,object]]]
+        /// Check if all the files are actually available,   :param delete_missings: delete all the layers not available :type delete_missings: boolean :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of resource models to be serialized :rtype: List[GeoserverResourceSchema]
         /// </remarks>
         /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="datatypeIds"> (optional)</param>
-        /// <param name="bbox"> (optional)</param>
-        /// <param name="start"> (optional)</param>
-        /// <param name="end"> (optional)</param>
-        /// <param name="requestCode"> (optional)</param>
-        /// <param name="includeMapRequests"> (optional, default to true)</param>
-        /// <param name="operationIndex">Index associated with the operation.</param>
-        /// <returns>Object</returns>
-        Object GetLayersLayersGet(List<string> datatypeIds = default(List<string>), string bbox = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string requestCode = default(string), bool? includeMapRequests = default(bool?), int operationIndex = 0);
-
-        /// <summary>
-        /// Get Layers
-        /// </summary>
-        /// <remarks>
-        /// Gets the list of published layers given optional criteria.  :param datatype_ids: list of datatype_id to filter by, defaults to Query(None) :type datatype_ids: Optional[List[str]], optional :param bbox: bounding box string in the form \&quot;bottomleft-x,bottomleft-y,topright-x,topright-y\&quot;, defaults to Query(None) :type bbox: Optional[str], optional :param start: filter resources with start_date &gt;&#x3D; start, start in the form &#39;YYYY-MM-DD HH:MM:SS&#39;, defaults to Query(None) :type start: Optional[datetime], optional :param end: filter resources with end_date &lt;&#x3D; end, end in the form &#39;YYYY-MM-DD HH:MM:SS&#39;, defaults to Query(None) :type end: Optional[datetime], optional :type request_code: Optional[str], optional :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of layers grouped by datatype id :rtype: List[Dict[str,Dict[str,object]]]
-        /// </remarks>
-        /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="datatypeIds"> (optional)</param>
-        /// <param name="bbox"> (optional)</param>
-        /// <param name="start"> (optional)</param>
-        /// <param name="end"> (optional)</param>
-        /// <param name="requestCode"> (optional)</param>
-        /// <param name="includeMapRequests"> (optional, default to true)</param>
-        /// <param name="operationIndex">Index associated with the operation.</param>
-        /// <returns>ApiResponse of Object</returns>
-        ApiResponse<Object> GetLayersLayersGetWithHttpInfo(List<string> datatypeIds = default(List<string>), string bbox = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string requestCode = default(string), bool? includeMapRequests = default(bool?), int operationIndex = 0);
-        /// <summary>
-        /// Get Metadata
-        /// </summary>
-        /// <remarks>
-        /// Gets the layer metadata given the metadata_id.  :param metadata_id: metadata_id of the layer. It is returned by the API /layers :type metadata_id: str
-        /// </remarks>
-        /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="metadataId"></param>
-        /// <param name="operationIndex">Index associated with the operation.</param>
-        /// <returns>Object</returns>
-        Object GetMetadataMetadataGet(string metadataId, int operationIndex = 0);
-
-        /// <summary>
-        /// Get Metadata
-        /// </summary>
-        /// <remarks>
-        /// Gets the layer metadata given the metadata_id.  :param metadata_id: metadata_id of the layer. It is returned by the API /layers :type metadata_id: str
-        /// </remarks>
-        /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="metadataId"></param>
-        /// <param name="operationIndex">Index associated with the operation.</param>
-        /// <returns>ApiResponse of Object</returns>
-        ApiResponse<Object> GetMetadataMetadataGetWithHttpInfo(string metadataId, int operationIndex = 0);
-        /// <summary>
-        /// Get Resources
-        /// </summary>
-        /// <remarks>
-        /// Gets stored resources following the given optional criteria.  :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of resource models to be serialized :rtype: List[GeoserverResourceSchema]
-        /// </remarks>
-        /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="datatypeIds"> (optional)</param>
-        /// <param name="resourceId"> (optional)</param>
-        /// <param name="includeDeleted"> (optional, default to false)</param>
-        /// <param name="operationIndex">Index associated with the operation.</param>
+        /// <param name="deleteMissings"> (optional, default to false)</param>
         /// <returns>List&lt;GeoserverResourceSchema&gt;</returns>
-        List<GeoserverResourceSchema> GetResourcesResourcesGet(List<string> datatypeIds = default(List<string>), string resourceId = default(string), bool? includeDeleted = default(bool?), int operationIndex = 0);
+        List<GeoserverResourceSchema> GetCheckLayersCheckLayersGet(bool? deleteMissings = default(bool?));
+
+        /// <summary>
+        /// Get Check Layers
+        /// </summary>
+        /// <remarks>
+        /// Check if all the files are actually available,   :param delete_missings: delete all the layers not available :type delete_missings: boolean :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of resource models to be serialized :rtype: List[GeoserverResourceSchema]
+        /// </remarks>
+        /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
+        /// <param name="deleteMissings"> (optional, default to false)</param>
+        /// <returns>ApiResponse of List&lt;GeoserverResourceSchema&gt;</returns>
+        ApiResponse<List<GeoserverResourceSchema>> GetCheckLayersCheckLayersGetWithHttpInfo(bool? deleteMissings = default(bool?));
+        /// <summary>
+        /// Get Layers
+        /// </summary>
+        /// <remarks>
+        /// Gets the list of published layers given optional criteria.  :param datatype_ids: list of datatype_id to filter by, defaults to Query(None) :type datatype_ids: Optional[List[str]], optional :param bbox: bounding box string in the form \&quot;bottomleft-x,bottomleft-y,topright-x,topright-y\&quot;, defaults to Query(None) :type bbox: Optional[str], optional :param start: filter resources with start_date &gt;&#x3D; start, start in the form &#39;YYYY-MM-DD HH:MM:SS&#39;, defaults to Query(None) :type start: Optional[datetime], optional :param end: filter resources with end_date &lt;&#x3D; end, end in the form &#39;YYYY-MM-DD HH:MM:SS&#39;, defaults to Query(None) :type end: Optional[datetime], optional :type request_codes: Optional[List[str]], optional :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of layers grouped by datatype id :rtype: List[Dict[str,Dict[str,object]]]
+        /// </remarks>
+        /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
+        /// <param name="datatypeIds"> (optional)</param>
+        /// <param name="bbox"> (optional)</param>
+        /// <param name="start"> (optional)</param>
+        /// <param name="end"> (optional)</param>
+        /// <param name="requestCodes"> (optional)</param>
+        /// <param name="includeMapRequests"> (optional, default to true)</param>
+        /// <returns>Object</returns>
+        Object GetLayersLayersGet(List<string> datatypeIds = default(List<string>), string bbox = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> requestCodes = default(List<string>), bool? includeMapRequests = default(bool?));
+
+        /// <summary>
+        /// Get Layers
+        /// </summary>
+        /// <remarks>
+        /// Gets the list of published layers given optional criteria.  :param datatype_ids: list of datatype_id to filter by, defaults to Query(None) :type datatype_ids: Optional[List[str]], optional :param bbox: bounding box string in the form \&quot;bottomleft-x,bottomleft-y,topright-x,topright-y\&quot;, defaults to Query(None) :type bbox: Optional[str], optional :param start: filter resources with start_date &gt;&#x3D; start, start in the form &#39;YYYY-MM-DD HH:MM:SS&#39;, defaults to Query(None) :type start: Optional[datetime], optional :param end: filter resources with end_date &lt;&#x3D; end, end in the form &#39;YYYY-MM-DD HH:MM:SS&#39;, defaults to Query(None) :type end: Optional[datetime], optional :type request_codes: Optional[List[str]], optional :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of layers grouped by datatype id :rtype: List[Dict[str,Dict[str,object]]]
+        /// </remarks>
+        /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
+        /// <param name="datatypeIds"> (optional)</param>
+        /// <param name="bbox"> (optional)</param>
+        /// <param name="start"> (optional)</param>
+        /// <param name="end"> (optional)</param>
+        /// <param name="requestCodes"> (optional)</param>
+        /// <param name="includeMapRequests"> (optional, default to true)</param>
+        /// <returns>ApiResponse of Object</returns>
+        ApiResponse<Object> GetLayersLayersGetWithHttpInfo(List<string> datatypeIds = default(List<string>), string bbox = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> requestCodes = default(List<string>), bool? includeMapRequests = default(bool?));
+        /// <summary>
+        /// Get Resources
+        /// </summary>
+        /// <remarks>
+        /// Gets stored resources following the given optional criteria.  :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of resource models to be serialized :rtype: List[GeoserverResourceSchema]
+        /// </remarks>
+        /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
+        /// <param name="datatypeIds"> (optional)</param>
+        /// <param name="resourceId"> (optional)</param>
+        /// <param name="includeDeleted"> (optional, default to false)</param>
+        /// <returns>List&lt;GeoserverResourceSchema&gt;</returns>
+        List<GeoserverResourceSchema> GetResourcesResourcesGet(List<string> datatypeIds = default(List<string>), string resourceId = default(string), bool? includeDeleted = default(bool?));
 
         /// <summary>
         /// Get Resources
@@ -106,9 +101,8 @@ namespace Abp.Importer.Api
         /// <param name="datatypeIds"> (optional)</param>
         /// <param name="resourceId"> (optional)</param>
         /// <param name="includeDeleted"> (optional, default to false)</param>
-        /// <param name="operationIndex">Index associated with the operation.</param>
         /// <returns>ApiResponse of List&lt;GeoserverResourceSchema&gt;</returns>
-        ApiResponse<List<GeoserverResourceSchema>> GetResourcesResourcesGetWithHttpInfo(List<string> datatypeIds = default(List<string>), string resourceId = default(string), bool? includeDeleted = default(bool?), int operationIndex = 0);
+        ApiResponse<List<GeoserverResourceSchema>> GetResourcesResourcesGetWithHttpInfo(List<string> datatypeIds = default(List<string>), string resourceId = default(string), bool? includeDeleted = default(bool?));
         /// <summary>
         /// Get Time Series
         /// </summary>
@@ -125,9 +119,8 @@ namespace Abp.Importer.Api
         /// <param name="dateStartCol"> (optional, default to &quot;date_start&quot;)</param>
         /// <param name="dateEndCol"> (optional, default to &quot;date_end&quot;)</param>
         /// <param name="creationDateCol"> (optional, default to &quot;computation_time&quot;)</param>
-        /// <param name="operationIndex">Index associated with the operation.</param>
         /// <returns>Object</returns>
-        Object GetTimeSeriesTimeSeriesGet(string datatypeId, string point, string attribute, DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string geomCol = default(string), string dateStartCol = default(string), string dateEndCol = default(string), string creationDateCol = default(string), int operationIndex = 0);
+        Object GetTimeSeriesTimeSeriesGet(string datatypeId, string point, string attribute, DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string geomCol = default(string), string dateStartCol = default(string), string dateEndCol = default(string), string creationDateCol = default(string));
 
         /// <summary>
         /// Get Time Series
@@ -145,9 +138,8 @@ namespace Abp.Importer.Api
         /// <param name="dateStartCol"> (optional, default to &quot;date_start&quot;)</param>
         /// <param name="dateEndCol"> (optional, default to &quot;date_end&quot;)</param>
         /// <param name="creationDateCol"> (optional, default to &quot;computation_time&quot;)</param>
-        /// <param name="operationIndex">Index associated with the operation.</param>
         /// <returns>ApiResponse of Object</returns>
-        ApiResponse<Object> GetTimeSeriesTimeSeriesGetWithHttpInfo(string datatypeId, string point, string attribute, DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string geomCol = default(string), string dateStartCol = default(string), string dateEndCol = default(string), string creationDateCol = default(string), int operationIndex = 0);
+        ApiResponse<Object> GetTimeSeriesTimeSeriesGetWithHttpInfo(string datatypeId, string point, string attribute, DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string geomCol = default(string), string dateStartCol = default(string), string dateEndCol = default(string), string creationDateCol = default(string));
         #endregion Synchronous Operations
     }
 
@@ -158,79 +150,74 @@ namespace Abp.Importer.Api
     {
         #region Asynchronous Operations
         /// <summary>
-        /// Get Layers
+        /// Get Check Layers
         /// </summary>
         /// <remarks>
-        /// Gets the list of published layers given optional criteria.  :param datatype_ids: list of datatype_id to filter by, defaults to Query(None) :type datatype_ids: Optional[List[str]], optional :param bbox: bounding box string in the form \&quot;bottomleft-x,bottomleft-y,topright-x,topright-y\&quot;, defaults to Query(None) :type bbox: Optional[str], optional :param start: filter resources with start_date &gt;&#x3D; start, start in the form &#39;YYYY-MM-DD HH:MM:SS&#39;, defaults to Query(None) :type start: Optional[datetime], optional :param end: filter resources with end_date &lt;&#x3D; end, end in the form &#39;YYYY-MM-DD HH:MM:SS&#39;, defaults to Query(None) :type end: Optional[datetime], optional :type request_code: Optional[str], optional :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of layers grouped by datatype id :rtype: List[Dict[str,Dict[str,object]]]
+        /// Check if all the files are actually available,   :param delete_missings: delete all the layers not available :type delete_missings: boolean :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of resource models to be serialized :rtype: List[GeoserverResourceSchema]
         /// </remarks>
         /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="datatypeIds"> (optional)</param>
-        /// <param name="bbox"> (optional)</param>
-        /// <param name="start"> (optional)</param>
-        /// <param name="end"> (optional)</param>
-        /// <param name="requestCode"> (optional)</param>
-        /// <param name="includeMapRequests"> (optional, default to true)</param>
-        /// <param name="operationIndex">Index associated with the operation.</param>
-        /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
-        /// <returns>Task of Object</returns>
-        System.Threading.Tasks.Task<Object> GetLayersLayersGetAsync(List<string> datatypeIds = default(List<string>), string bbox = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string requestCode = default(string), bool? includeMapRequests = default(bool?), int operationIndex = 0, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
-
-        /// <summary>
-        /// Get Layers
-        /// </summary>
-        /// <remarks>
-        /// Gets the list of published layers given optional criteria.  :param datatype_ids: list of datatype_id to filter by, defaults to Query(None) :type datatype_ids: Optional[List[str]], optional :param bbox: bounding box string in the form \&quot;bottomleft-x,bottomleft-y,topright-x,topright-y\&quot;, defaults to Query(None) :type bbox: Optional[str], optional :param start: filter resources with start_date &gt;&#x3D; start, start in the form &#39;YYYY-MM-DD HH:MM:SS&#39;, defaults to Query(None) :type start: Optional[datetime], optional :param end: filter resources with end_date &lt;&#x3D; end, end in the form &#39;YYYY-MM-DD HH:MM:SS&#39;, defaults to Query(None) :type end: Optional[datetime], optional :type request_code: Optional[str], optional :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of layers grouped by datatype id :rtype: List[Dict[str,Dict[str,object]]]
-        /// </remarks>
-        /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="datatypeIds"> (optional)</param>
-        /// <param name="bbox"> (optional)</param>
-        /// <param name="start"> (optional)</param>
-        /// <param name="end"> (optional)</param>
-        /// <param name="requestCode"> (optional)</param>
-        /// <param name="includeMapRequests"> (optional, default to true)</param>
-        /// <param name="operationIndex">Index associated with the operation.</param>
-        /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
-        /// <returns>Task of ApiResponse (Object)</returns>
-        System.Threading.Tasks.Task<ApiResponse<Object>> GetLayersLayersGetWithHttpInfoAsync(List<string> datatypeIds = default(List<string>), string bbox = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string requestCode = default(string), bool? includeMapRequests = default(bool?), int operationIndex = 0, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
-        /// <summary>
-        /// Get Metadata
-        /// </summary>
-        /// <remarks>
-        /// Gets the layer metadata given the metadata_id.  :param metadata_id: metadata_id of the layer. It is returned by the API /layers :type metadata_id: str
-        /// </remarks>
-        /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="metadataId"></param>
-        /// <param name="operationIndex">Index associated with the operation.</param>
-        /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
-        /// <returns>Task of Object</returns>
-        System.Threading.Tasks.Task<Object> GetMetadataMetadataGetAsync(string metadataId, int operationIndex = 0, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
-
-        /// <summary>
-        /// Get Metadata
-        /// </summary>
-        /// <remarks>
-        /// Gets the layer metadata given the metadata_id.  :param metadata_id: metadata_id of the layer. It is returned by the API /layers :type metadata_id: str
-        /// </remarks>
-        /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="metadataId"></param>
-        /// <param name="operationIndex">Index associated with the operation.</param>
-        /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
-        /// <returns>Task of ApiResponse (Object)</returns>
-        System.Threading.Tasks.Task<ApiResponse<Object>> GetMetadataMetadataGetWithHttpInfoAsync(string metadataId, int operationIndex = 0, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
-        /// <summary>
-        /// Get Resources
-        /// </summary>
-        /// <remarks>
-        /// Gets stored resources following the given optional criteria.  :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of resource models to be serialized :rtype: List[GeoserverResourceSchema]
-        /// </remarks>
-        /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="datatypeIds"> (optional)</param>
-        /// <param name="resourceId"> (optional)</param>
-        /// <param name="includeDeleted"> (optional, default to false)</param>
-        /// <param name="operationIndex">Index associated with the operation.</param>
+        /// <param name="deleteMissings"> (optional, default to false)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of List&lt;GeoserverResourceSchema&gt;</returns>
-        System.Threading.Tasks.Task<List<GeoserverResourceSchema>> GetResourcesResourcesGetAsync(List<string> datatypeIds = default(List<string>), string resourceId = default(string), bool? includeDeleted = default(bool?), int operationIndex = 0, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<List<GeoserverResourceSchema>> GetCheckLayersCheckLayersGetAsync(bool? deleteMissings = default(bool?), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <summary>
+        /// Get Check Layers
+        /// </summary>
+        /// <remarks>
+        /// Check if all the files are actually available,   :param delete_missings: delete all the layers not available :type delete_missings: boolean :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of resource models to be serialized :rtype: List[GeoserverResourceSchema]
+        /// </remarks>
+        /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
+        /// <param name="deleteMissings"> (optional, default to false)</param>
+        /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
+        /// <returns>Task of ApiResponse (List&lt;GeoserverResourceSchema&gt;)</returns>
+        System.Threading.Tasks.Task<ApiResponse<List<GeoserverResourceSchema>>> GetCheckLayersCheckLayersGetWithHttpInfoAsync(bool? deleteMissings = default(bool?), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        /// <summary>
+        /// Get Layers
+        /// </summary>
+        /// <remarks>
+        /// Gets the list of published layers given optional criteria.  :param datatype_ids: list of datatype_id to filter by, defaults to Query(None) :type datatype_ids: Optional[List[str]], optional :param bbox: bounding box string in the form \&quot;bottomleft-x,bottomleft-y,topright-x,topright-y\&quot;, defaults to Query(None) :type bbox: Optional[str], optional :param start: filter resources with start_date &gt;&#x3D; start, start in the form &#39;YYYY-MM-DD HH:MM:SS&#39;, defaults to Query(None) :type start: Optional[datetime], optional :param end: filter resources with end_date &lt;&#x3D; end, end in the form &#39;YYYY-MM-DD HH:MM:SS&#39;, defaults to Query(None) :type end: Optional[datetime], optional :type request_codes: Optional[List[str]], optional :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of layers grouped by datatype id :rtype: List[Dict[str,Dict[str,object]]]
+        /// </remarks>
+        /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
+        /// <param name="datatypeIds"> (optional)</param>
+        /// <param name="bbox"> (optional)</param>
+        /// <param name="start"> (optional)</param>
+        /// <param name="end"> (optional)</param>
+        /// <param name="requestCodes"> (optional)</param>
+        /// <param name="includeMapRequests"> (optional, default to true)</param>
+        /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
+        /// <returns>Task of Object</returns>
+        System.Threading.Tasks.Task<Object> GetLayersLayersGetAsync(List<string> datatypeIds = default(List<string>), string bbox = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> requestCodes = default(List<string>), bool? includeMapRequests = default(bool?), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <summary>
+        /// Get Layers
+        /// </summary>
+        /// <remarks>
+        /// Gets the list of published layers given optional criteria.  :param datatype_ids: list of datatype_id to filter by, defaults to Query(None) :type datatype_ids: Optional[List[str]], optional :param bbox: bounding box string in the form \&quot;bottomleft-x,bottomleft-y,topright-x,topright-y\&quot;, defaults to Query(None) :type bbox: Optional[str], optional :param start: filter resources with start_date &gt;&#x3D; start, start in the form &#39;YYYY-MM-DD HH:MM:SS&#39;, defaults to Query(None) :type start: Optional[datetime], optional :param end: filter resources with end_date &lt;&#x3D; end, end in the form &#39;YYYY-MM-DD HH:MM:SS&#39;, defaults to Query(None) :type end: Optional[datetime], optional :type request_codes: Optional[List[str]], optional :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of layers grouped by datatype id :rtype: List[Dict[str,Dict[str,object]]]
+        /// </remarks>
+        /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
+        /// <param name="datatypeIds"> (optional)</param>
+        /// <param name="bbox"> (optional)</param>
+        /// <param name="start"> (optional)</param>
+        /// <param name="end"> (optional)</param>
+        /// <param name="requestCodes"> (optional)</param>
+        /// <param name="includeMapRequests"> (optional, default to true)</param>
+        /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
+        /// <returns>Task of ApiResponse (Object)</returns>
+        System.Threading.Tasks.Task<ApiResponse<Object>> GetLayersLayersGetWithHttpInfoAsync(List<string> datatypeIds = default(List<string>), string bbox = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> requestCodes = default(List<string>), bool? includeMapRequests = default(bool?), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        /// <summary>
+        /// Get Resources
+        /// </summary>
+        /// <remarks>
+        /// Gets stored resources following the given optional criteria.  :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of resource models to be serialized :rtype: List[GeoserverResourceSchema]
+        /// </remarks>
+        /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
+        /// <param name="datatypeIds"> (optional)</param>
+        /// <param name="resourceId"> (optional)</param>
+        /// <param name="includeDeleted"> (optional, default to false)</param>
+        /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
+        /// <returns>Task of List&lt;GeoserverResourceSchema&gt;</returns>
+        System.Threading.Tasks.Task<List<GeoserverResourceSchema>> GetResourcesResourcesGetAsync(List<string> datatypeIds = default(List<string>), string resourceId = default(string), bool? includeDeleted = default(bool?), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <summary>
         /// Get Resources
@@ -242,10 +229,9 @@ namespace Abp.Importer.Api
         /// <param name="datatypeIds"> (optional)</param>
         /// <param name="resourceId"> (optional)</param>
         /// <param name="includeDeleted"> (optional, default to false)</param>
-        /// <param name="operationIndex">Index associated with the operation.</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of ApiResponse (List&lt;GeoserverResourceSchema&gt;)</returns>
-        System.Threading.Tasks.Task<ApiResponse<List<GeoserverResourceSchema>>> GetResourcesResourcesGetWithHttpInfoAsync(List<string> datatypeIds = default(List<string>), string resourceId = default(string), bool? includeDeleted = default(bool?), int operationIndex = 0, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<ApiResponse<List<GeoserverResourceSchema>>> GetResourcesResourcesGetWithHttpInfoAsync(List<string> datatypeIds = default(List<string>), string resourceId = default(string), bool? includeDeleted = default(bool?), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
         /// <summary>
         /// Get Time Series
         /// </summary>
@@ -262,10 +248,9 @@ namespace Abp.Importer.Api
         /// <param name="dateStartCol"> (optional, default to &quot;date_start&quot;)</param>
         /// <param name="dateEndCol"> (optional, default to &quot;date_end&quot;)</param>
         /// <param name="creationDateCol"> (optional, default to &quot;computation_time&quot;)</param>
-        /// <param name="operationIndex">Index associated with the operation.</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of Object</returns>
-        System.Threading.Tasks.Task<Object> GetTimeSeriesTimeSeriesGetAsync(string datatypeId, string point, string attribute, DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string geomCol = default(string), string dateStartCol = default(string), string dateEndCol = default(string), string creationDateCol = default(string), int operationIndex = 0, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Object> GetTimeSeriesTimeSeriesGetAsync(string datatypeId, string point, string attribute, DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string geomCol = default(string), string dateStartCol = default(string), string dateEndCol = default(string), string creationDateCol = default(string), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <summary>
         /// Get Time Series
@@ -283,10 +268,9 @@ namespace Abp.Importer.Api
         /// <param name="dateStartCol"> (optional, default to &quot;date_start&quot;)</param>
         /// <param name="dateEndCol"> (optional, default to &quot;date_end&quot;)</param>
         /// <param name="creationDateCol"> (optional, default to &quot;computation_time&quot;)</param>
-        /// <param name="operationIndex">Index associated with the operation.</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of ApiResponse (Object)</returns>
-        System.Threading.Tasks.Task<ApiResponse<Object>> GetTimeSeriesTimeSeriesGetWithHttpInfoAsync(string datatypeId, string point, string attribute, DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string geomCol = default(string), string dateStartCol = default(string), string dateEndCol = default(string), string creationDateCol = default(string), int operationIndex = 0, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<ApiResponse<Object>> GetTimeSeriesTimeSeriesGetWithHttpInfoAsync(string datatypeId, string point, string attribute, DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string geomCol = default(string), string dateStartCol = default(string), string dateEndCol = default(string), string creationDateCol = default(string), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
         #endregion Asynchronous Operations
     }
 
@@ -408,36 +392,172 @@ namespace Abp.Importer.Api
         }
 
         /// <summary>
-        /// Get Layers Gets the list of published layers given optional criteria.  :param datatype_ids: list of datatype_id to filter by, defaults to Query(None) :type datatype_ids: Optional[List[str]], optional :param bbox: bounding box string in the form \&quot;bottomleft-x,bottomleft-y,topright-x,topright-y\&quot;, defaults to Query(None) :type bbox: Optional[str], optional :param start: filter resources with start_date &gt;&#x3D; start, start in the form &#39;YYYY-MM-DD HH:MM:SS&#39;, defaults to Query(None) :type start: Optional[datetime], optional :param end: filter resources with end_date &lt;&#x3D; end, end in the form &#39;YYYY-MM-DD HH:MM:SS&#39;, defaults to Query(None) :type end: Optional[datetime], optional :type request_code: Optional[str], optional :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of layers grouped by datatype id :rtype: List[Dict[str,Dict[str,object]]]
+        /// Get Check Layers Check if all the files are actually available,   :param delete_missings: delete all the layers not available :type delete_missings: boolean :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of resource models to be serialized :rtype: List[GeoserverResourceSchema]
         /// </summary>
         /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="datatypeIds"> (optional)</param>
-        /// <param name="bbox"> (optional)</param>
-        /// <param name="start"> (optional)</param>
-        /// <param name="end"> (optional)</param>
-        /// <param name="requestCode"> (optional)</param>
-        /// <param name="includeMapRequests"> (optional, default to true)</param>
-        /// <param name="operationIndex">Index associated with the operation.</param>
-        /// <returns>Object</returns>
-        public Object GetLayersLayersGet(List<string> datatypeIds = default(List<string>), string bbox = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string requestCode = default(string), bool? includeMapRequests = default(bool?), int operationIndex = 0)
+        /// <param name="deleteMissings"> (optional, default to false)</param>
+        /// <returns>List&lt;GeoserverResourceSchema&gt;</returns>
+        public List<GeoserverResourceSchema> GetCheckLayersCheckLayersGet(bool? deleteMissings = default(bool?))
         {
-            Abp.Importer.Client.ApiResponse<Object> localVarResponse = GetLayersLayersGetWithHttpInfo(datatypeIds, bbox, start, end, requestCode, includeMapRequests);
+            Abp.Importer.Client.ApiResponse<List<GeoserverResourceSchema>> localVarResponse = GetCheckLayersCheckLayersGetWithHttpInfo(deleteMissings);
             return localVarResponse.Data;
         }
 
         /// <summary>
-        /// Get Layers Gets the list of published layers given optional criteria.  :param datatype_ids: list of datatype_id to filter by, defaults to Query(None) :type datatype_ids: Optional[List[str]], optional :param bbox: bounding box string in the form \&quot;bottomleft-x,bottomleft-y,topright-x,topright-y\&quot;, defaults to Query(None) :type bbox: Optional[str], optional :param start: filter resources with start_date &gt;&#x3D; start, start in the form &#39;YYYY-MM-DD HH:MM:SS&#39;, defaults to Query(None) :type start: Optional[datetime], optional :param end: filter resources with end_date &lt;&#x3D; end, end in the form &#39;YYYY-MM-DD HH:MM:SS&#39;, defaults to Query(None) :type end: Optional[datetime], optional :type request_code: Optional[str], optional :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of layers grouped by datatype id :rtype: List[Dict[str,Dict[str,object]]]
+        /// Get Check Layers Check if all the files are actually available,   :param delete_missings: delete all the layers not available :type delete_missings: boolean :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of resource models to be serialized :rtype: List[GeoserverResourceSchema]
+        /// </summary>
+        /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
+        /// <param name="deleteMissings"> (optional, default to false)</param>
+        /// <returns>ApiResponse of List&lt;GeoserverResourceSchema&gt;</returns>
+        public Abp.Importer.Client.ApiResponse<List<GeoserverResourceSchema>> GetCheckLayersCheckLayersGetWithHttpInfo(bool? deleteMissings = default(bool?))
+        {
+            Abp.Importer.Client.RequestOptions localVarRequestOptions = new Abp.Importer.Client.RequestOptions();
+
+            string[] _contentTypes = new string[] {
+            };
+
+            // to determine the Accept header
+            string[] _accepts = new string[] {
+                "application/json"
+            };
+
+            var localVarContentType = Abp.Importer.Client.ClientUtils.SelectHeaderContentType(_contentTypes);
+            if (localVarContentType != null)
+            {
+                localVarRequestOptions.HeaderParameters.Add("Content-Type", localVarContentType);
+            }
+
+            var localVarAccept = Abp.Importer.Client.ClientUtils.SelectHeaderAccept(_accepts);
+            if (localVarAccept != null)
+            {
+                localVarRequestOptions.HeaderParameters.Add("Accept", localVarAccept);
+            }
+
+            if (deleteMissings != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("", "delete_missings", deleteMissings));
+            }
+
+            // authentication (APIKeyHeader) required
+            if (!string.IsNullOrEmpty(this.Configuration.GetApiKeyWithPrefix("X-API-Key")))
+            {
+                localVarRequestOptions.HeaderParameters.Add("X-API-Key", this.Configuration.GetApiKeyWithPrefix("X-API-Key"));
+            }
+
+            // make the HTTP request
+            var localVarResponse = this.Client.Get<List<GeoserverResourceSchema>>("/check_layers", localVarRequestOptions, this.Configuration);
+            if (this.ExceptionFactory != null)
+            {
+                Exception _exception = this.ExceptionFactory("GetCheckLayersCheckLayersGet", localVarResponse);
+                if (_exception != null)
+                {
+                    throw _exception;
+                }
+            }
+
+            return localVarResponse;
+        }
+
+        /// <summary>
+        /// Get Check Layers Check if all the files are actually available,   :param delete_missings: delete all the layers not available :type delete_missings: boolean :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of resource models to be serialized :rtype: List[GeoserverResourceSchema]
+        /// </summary>
+        /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
+        /// <param name="deleteMissings"> (optional, default to false)</param>
+        /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
+        /// <returns>Task of List&lt;GeoserverResourceSchema&gt;</returns>
+        public async System.Threading.Tasks.Task<List<GeoserverResourceSchema>> GetCheckLayersCheckLayersGetAsync(bool? deleteMissings = default(bool?), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            Abp.Importer.Client.ApiResponse<List<GeoserverResourceSchema>> localVarResponse = await GetCheckLayersCheckLayersGetWithHttpInfoAsync(deleteMissings, cancellationToken).ConfigureAwait(false);
+            return localVarResponse.Data;
+        }
+
+        /// <summary>
+        /// Get Check Layers Check if all the files are actually available,   :param delete_missings: delete all the layers not available :type delete_missings: boolean :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of resource models to be serialized :rtype: List[GeoserverResourceSchema]
+        /// </summary>
+        /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
+        /// <param name="deleteMissings"> (optional, default to false)</param>
+        /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
+        /// <returns>Task of ApiResponse (List&lt;GeoserverResourceSchema&gt;)</returns>
+        public async System.Threading.Tasks.Task<Abp.Importer.Client.ApiResponse<List<GeoserverResourceSchema>>> GetCheckLayersCheckLayersGetWithHttpInfoAsync(bool? deleteMissings = default(bool?), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+
+            Abp.Importer.Client.RequestOptions localVarRequestOptions = new Abp.Importer.Client.RequestOptions();
+
+            string[] _contentTypes = new string[] {
+            };
+
+            // to determine the Accept header
+            string[] _accepts = new string[] {
+                "application/json"
+            };
+
+            var localVarContentType = Abp.Importer.Client.ClientUtils.SelectHeaderContentType(_contentTypes);
+            if (localVarContentType != null)
+            {
+                localVarRequestOptions.HeaderParameters.Add("Content-Type", localVarContentType);
+            }
+
+            var localVarAccept = Abp.Importer.Client.ClientUtils.SelectHeaderAccept(_accepts);
+            if (localVarAccept != null)
+            {
+                localVarRequestOptions.HeaderParameters.Add("Accept", localVarAccept);
+            }
+
+            if (deleteMissings != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("", "delete_missings", deleteMissings));
+            }
+
+            // authentication (APIKeyHeader) required
+            if (!string.IsNullOrEmpty(this.Configuration.GetApiKeyWithPrefix("X-API-Key")))
+            {
+                localVarRequestOptions.HeaderParameters.Add("X-API-Key", this.Configuration.GetApiKeyWithPrefix("X-API-Key"));
+            }
+
+            // make the HTTP request
+            var localVarResponse = await this.AsynchronousClient.GetAsync<List<GeoserverResourceSchema>>("/check_layers", localVarRequestOptions, this.Configuration, cancellationToken).ConfigureAwait(false);
+
+            if (this.ExceptionFactory != null)
+            {
+                Exception _exception = this.ExceptionFactory("GetCheckLayersCheckLayersGet", localVarResponse);
+                if (_exception != null)
+                {
+                    throw _exception;
+                }
+            }
+
+            return localVarResponse;
+        }
+
+        /// <summary>
+        /// Get Layers Gets the list of published layers given optional criteria.  :param datatype_ids: list of datatype_id to filter by, defaults to Query(None) :type datatype_ids: Optional[List[str]], optional :param bbox: bounding box string in the form \&quot;bottomleft-x,bottomleft-y,topright-x,topright-y\&quot;, defaults to Query(None) :type bbox: Optional[str], optional :param start: filter resources with start_date &gt;&#x3D; start, start in the form &#39;YYYY-MM-DD HH:MM:SS&#39;, defaults to Query(None) :type start: Optional[datetime], optional :param end: filter resources with end_date &lt;&#x3D; end, end in the form &#39;YYYY-MM-DD HH:MM:SS&#39;, defaults to Query(None) :type end: Optional[datetime], optional :type request_codes: Optional[List[str]], optional :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of layers grouped by datatype id :rtype: List[Dict[str,Dict[str,object]]]
         /// </summary>
         /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="datatypeIds"> (optional)</param>
         /// <param name="bbox"> (optional)</param>
         /// <param name="start"> (optional)</param>
         /// <param name="end"> (optional)</param>
-        /// <param name="requestCode"> (optional)</param>
+        /// <param name="requestCodes"> (optional)</param>
         /// <param name="includeMapRequests"> (optional, default to true)</param>
-        /// <param name="operationIndex">Index associated with the operation.</param>
+        /// <returns>Object</returns>
+        public Object GetLayersLayersGet(List<string> datatypeIds = default(List<string>), string bbox = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> requestCodes = default(List<string>), bool? includeMapRequests = default(bool?))
+        {
+            Abp.Importer.Client.ApiResponse<Object> localVarResponse = GetLayersLayersGetWithHttpInfo(datatypeIds, bbox, start, end, requestCodes, includeMapRequests);
+            return localVarResponse.Data;
+        }
+
+        /// <summary>
+        /// Get Layers Gets the list of published layers given optional criteria.  :param datatype_ids: list of datatype_id to filter by, defaults to Query(None) :type datatype_ids: Optional[List[str]], optional :param bbox: bounding box string in the form \&quot;bottomleft-x,bottomleft-y,topright-x,topright-y\&quot;, defaults to Query(None) :type bbox: Optional[str], optional :param start: filter resources with start_date &gt;&#x3D; start, start in the form &#39;YYYY-MM-DD HH:MM:SS&#39;, defaults to Query(None) :type start: Optional[datetime], optional :param end: filter resources with end_date &lt;&#x3D; end, end in the form &#39;YYYY-MM-DD HH:MM:SS&#39;, defaults to Query(None) :type end: Optional[datetime], optional :type request_codes: Optional[List[str]], optional :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of layers grouped by datatype id :rtype: List[Dict[str,Dict[str,object]]]
+        /// </summary>
+        /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
+        /// <param name="datatypeIds"> (optional)</param>
+        /// <param name="bbox"> (optional)</param>
+        /// <param name="start"> (optional)</param>
+        /// <param name="end"> (optional)</param>
+        /// <param name="requestCodes"> (optional)</param>
+        /// <param name="includeMapRequests"> (optional, default to true)</param>
         /// <returns>ApiResponse of Object</returns>
-        public Abp.Importer.Client.ApiResponse<Object> GetLayersLayersGetWithHttpInfo(List<string> datatypeIds = default(List<string>), string bbox = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string requestCode = default(string), bool? includeMapRequests = default(bool?), int operationIndex = 0)
+        public Abp.Importer.Client.ApiResponse<Object> GetLayersLayersGetWithHttpInfo(List<string> datatypeIds = default(List<string>), string bbox = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> requestCodes = default(List<string>), bool? includeMapRequests = default(bool?))
         {
             Abp.Importer.Client.RequestOptions localVarRequestOptions = new Abp.Importer.Client.RequestOptions();
 
@@ -477,17 +597,14 @@ namespace Abp.Importer.Api
             {
                 localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("", "end", end));
             }
-            if (requestCode != null)
+            if (requestCodes != null)
             {
-                localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("", "request_code", requestCode));
+                localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("multi", "request_codes", requestCodes));
             }
             if (includeMapRequests != null)
             {
                 localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("", "include_map_requests", includeMapRequests));
             }
-
-            localVarRequestOptions.Operation = "DashboardApi.GetLayersLayersGet";
-            localVarRequestOptions.OperationIndex = operationIndex;
 
             // authentication (APIKeyHeader) required
             if (!string.IsNullOrEmpty(this.Configuration.GetApiKeyWithPrefix("X-API-Key")))
@@ -510,38 +627,36 @@ namespace Abp.Importer.Api
         }
 
         /// <summary>
-        /// Get Layers Gets the list of published layers given optional criteria.  :param datatype_ids: list of datatype_id to filter by, defaults to Query(None) :type datatype_ids: Optional[List[str]], optional :param bbox: bounding box string in the form \&quot;bottomleft-x,bottomleft-y,topright-x,topright-y\&quot;, defaults to Query(None) :type bbox: Optional[str], optional :param start: filter resources with start_date &gt;&#x3D; start, start in the form &#39;YYYY-MM-DD HH:MM:SS&#39;, defaults to Query(None) :type start: Optional[datetime], optional :param end: filter resources with end_date &lt;&#x3D; end, end in the form &#39;YYYY-MM-DD HH:MM:SS&#39;, defaults to Query(None) :type end: Optional[datetime], optional :type request_code: Optional[str], optional :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of layers grouped by datatype id :rtype: List[Dict[str,Dict[str,object]]]
+        /// Get Layers Gets the list of published layers given optional criteria.  :param datatype_ids: list of datatype_id to filter by, defaults to Query(None) :type datatype_ids: Optional[List[str]], optional :param bbox: bounding box string in the form \&quot;bottomleft-x,bottomleft-y,topright-x,topright-y\&quot;, defaults to Query(None) :type bbox: Optional[str], optional :param start: filter resources with start_date &gt;&#x3D; start, start in the form &#39;YYYY-MM-DD HH:MM:SS&#39;, defaults to Query(None) :type start: Optional[datetime], optional :param end: filter resources with end_date &lt;&#x3D; end, end in the form &#39;YYYY-MM-DD HH:MM:SS&#39;, defaults to Query(None) :type end: Optional[datetime], optional :type request_codes: Optional[List[str]], optional :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of layers grouped by datatype id :rtype: List[Dict[str,Dict[str,object]]]
         /// </summary>
         /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="datatypeIds"> (optional)</param>
         /// <param name="bbox"> (optional)</param>
         /// <param name="start"> (optional)</param>
         /// <param name="end"> (optional)</param>
-        /// <param name="requestCode"> (optional)</param>
+        /// <param name="requestCodes"> (optional)</param>
         /// <param name="includeMapRequests"> (optional, default to true)</param>
-        /// <param name="operationIndex">Index associated with the operation.</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of Object</returns>
-        public async System.Threading.Tasks.Task<Object> GetLayersLayersGetAsync(List<string> datatypeIds = default(List<string>), string bbox = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string requestCode = default(string), bool? includeMapRequests = default(bool?), int operationIndex = 0, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public async System.Threading.Tasks.Task<Object> GetLayersLayersGetAsync(List<string> datatypeIds = default(List<string>), string bbox = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> requestCodes = default(List<string>), bool? includeMapRequests = default(bool?), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
-            Abp.Importer.Client.ApiResponse<Object> localVarResponse = await GetLayersLayersGetWithHttpInfoAsync(datatypeIds, bbox, start, end, requestCode, includeMapRequests, operationIndex, cancellationToken).ConfigureAwait(false);
+            Abp.Importer.Client.ApiResponse<Object> localVarResponse = await GetLayersLayersGetWithHttpInfoAsync(datatypeIds, bbox, start, end, requestCodes, includeMapRequests, cancellationToken).ConfigureAwait(false);
             return localVarResponse.Data;
         }
 
         /// <summary>
-        /// Get Layers Gets the list of published layers given optional criteria.  :param datatype_ids: list of datatype_id to filter by, defaults to Query(None) :type datatype_ids: Optional[List[str]], optional :param bbox: bounding box string in the form \&quot;bottomleft-x,bottomleft-y,topright-x,topright-y\&quot;, defaults to Query(None) :type bbox: Optional[str], optional :param start: filter resources with start_date &gt;&#x3D; start, start in the form &#39;YYYY-MM-DD HH:MM:SS&#39;, defaults to Query(None) :type start: Optional[datetime], optional :param end: filter resources with end_date &lt;&#x3D; end, end in the form &#39;YYYY-MM-DD HH:MM:SS&#39;, defaults to Query(None) :type end: Optional[datetime], optional :type request_code: Optional[str], optional :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of layers grouped by datatype id :rtype: List[Dict[str,Dict[str,object]]]
+        /// Get Layers Gets the list of published layers given optional criteria.  :param datatype_ids: list of datatype_id to filter by, defaults to Query(None) :type datatype_ids: Optional[List[str]], optional :param bbox: bounding box string in the form \&quot;bottomleft-x,bottomleft-y,topright-x,topright-y\&quot;, defaults to Query(None) :type bbox: Optional[str], optional :param start: filter resources with start_date &gt;&#x3D; start, start in the form &#39;YYYY-MM-DD HH:MM:SS&#39;, defaults to Query(None) :type start: Optional[datetime], optional :param end: filter resources with end_date &lt;&#x3D; end, end in the form &#39;YYYY-MM-DD HH:MM:SS&#39;, defaults to Query(None) :type end: Optional[datetime], optional :type request_codes: Optional[List[str]], optional :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of layers grouped by datatype id :rtype: List[Dict[str,Dict[str,object]]]
         /// </summary>
         /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="datatypeIds"> (optional)</param>
         /// <param name="bbox"> (optional)</param>
         /// <param name="start"> (optional)</param>
         /// <param name="end"> (optional)</param>
-        /// <param name="requestCode"> (optional)</param>
+        /// <param name="requestCodes"> (optional)</param>
         /// <param name="includeMapRequests"> (optional, default to true)</param>
-        /// <param name="operationIndex">Index associated with the operation.</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of ApiResponse (Object)</returns>
-        public async System.Threading.Tasks.Task<Abp.Importer.Client.ApiResponse<Object>> GetLayersLayersGetWithHttpInfoAsync(List<string> datatypeIds = default(List<string>), string bbox = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string requestCode = default(string), bool? includeMapRequests = default(bool?), int operationIndex = 0, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public async System.Threading.Tasks.Task<Abp.Importer.Client.ApiResponse<Object>> GetLayersLayersGetWithHttpInfoAsync(List<string> datatypeIds = default(List<string>), string bbox = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), List<string> requestCodes = default(List<string>), bool? includeMapRequests = default(bool?), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
 
             Abp.Importer.Client.RequestOptions localVarRequestOptions = new Abp.Importer.Client.RequestOptions();
@@ -582,17 +697,14 @@ namespace Abp.Importer.Api
             {
                 localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("", "end", end));
             }
-            if (requestCode != null)
+            if (requestCodes != null)
             {
-                localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("", "request_code", requestCode));
+                localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("multi", "request_codes", requestCodes));
             }
             if (includeMapRequests != null)
             {
                 localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("", "include_map_requests", includeMapRequests));
             }
-
-            localVarRequestOptions.Operation = "DashboardApi.GetLayersLayersGet";
-            localVarRequestOptions.OperationIndex = operationIndex;
 
             // authentication (APIKeyHeader) required
             if (!string.IsNullOrEmpty(this.Configuration.GetApiKeyWithPrefix("X-API-Key")))
@@ -616,169 +728,14 @@ namespace Abp.Importer.Api
         }
 
         /// <summary>
-        /// Get Metadata Gets the layer metadata given the metadata_id.  :param metadata_id: metadata_id of the layer. It is returned by the API /layers :type metadata_id: str
-        /// </summary>
-        /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="metadataId"></param>
-        /// <param name="operationIndex">Index associated with the operation.</param>
-        /// <returns>Object</returns>
-        public Object GetMetadataMetadataGet(string metadataId, int operationIndex = 0)
-        {
-            Abp.Importer.Client.ApiResponse<Object> localVarResponse = GetMetadataMetadataGetWithHttpInfo(metadataId);
-            return localVarResponse.Data;
-        }
-
-        /// <summary>
-        /// Get Metadata Gets the layer metadata given the metadata_id.  :param metadata_id: metadata_id of the layer. It is returned by the API /layers :type metadata_id: str
-        /// </summary>
-        /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="metadataId"></param>
-        /// <param name="operationIndex">Index associated with the operation.</param>
-        /// <returns>ApiResponse of Object</returns>
-        public Abp.Importer.Client.ApiResponse<Object> GetMetadataMetadataGetWithHttpInfo(string metadataId, int operationIndex = 0)
-        {
-            // verify the required parameter 'metadataId' is set
-            if (metadataId == null)
-            {
-                throw new Abp.Importer.Client.ApiException(400, "Missing required parameter 'metadataId' when calling DashboardApi->GetMetadataMetadataGet");
-            }
-
-            Abp.Importer.Client.RequestOptions localVarRequestOptions = new Abp.Importer.Client.RequestOptions();
-
-            string[] _contentTypes = new string[] {
-            };
-
-            // to determine the Accept header
-            string[] _accepts = new string[] {
-                "application/json"
-            };
-
-            var localVarContentType = Abp.Importer.Client.ClientUtils.SelectHeaderContentType(_contentTypes);
-            if (localVarContentType != null)
-            {
-                localVarRequestOptions.HeaderParameters.Add("Content-Type", localVarContentType);
-            }
-
-            var localVarAccept = Abp.Importer.Client.ClientUtils.SelectHeaderAccept(_accepts);
-            if (localVarAccept != null)
-            {
-                localVarRequestOptions.HeaderParameters.Add("Accept", localVarAccept);
-            }
-
-            localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("", "metadata_id", metadataId));
-
-            localVarRequestOptions.Operation = "DashboardApi.GetMetadataMetadataGet";
-            localVarRequestOptions.OperationIndex = operationIndex;
-
-            // authentication (APIKeyHeader) required
-            if (!string.IsNullOrEmpty(this.Configuration.GetApiKeyWithPrefix("X-API-Key")))
-            {
-                localVarRequestOptions.HeaderParameters.Add("X-API-Key", this.Configuration.GetApiKeyWithPrefix("X-API-Key"));
-            }
-
-            // make the HTTP request
-            var localVarResponse = this.Client.Get<Object>("/metadata", localVarRequestOptions, this.Configuration);
-            if (this.ExceptionFactory != null)
-            {
-                Exception _exception = this.ExceptionFactory("GetMetadataMetadataGet", localVarResponse);
-                if (_exception != null)
-                {
-                    throw _exception;
-                }
-            }
-
-            return localVarResponse;
-        }
-
-        /// <summary>
-        /// Get Metadata Gets the layer metadata given the metadata_id.  :param metadata_id: metadata_id of the layer. It is returned by the API /layers :type metadata_id: str
-        /// </summary>
-        /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="metadataId"></param>
-        /// <param name="operationIndex">Index associated with the operation.</param>
-        /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
-        /// <returns>Task of Object</returns>
-        public async System.Threading.Tasks.Task<Object> GetMetadataMetadataGetAsync(string metadataId, int operationIndex = 0, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
-        {
-            Abp.Importer.Client.ApiResponse<Object> localVarResponse = await GetMetadataMetadataGetWithHttpInfoAsync(metadataId, operationIndex, cancellationToken).ConfigureAwait(false);
-            return localVarResponse.Data;
-        }
-
-        /// <summary>
-        /// Get Metadata Gets the layer metadata given the metadata_id.  :param metadata_id: metadata_id of the layer. It is returned by the API /layers :type metadata_id: str
-        /// </summary>
-        /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
-        /// <param name="metadataId"></param>
-        /// <param name="operationIndex">Index associated with the operation.</param>
-        /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
-        /// <returns>Task of ApiResponse (Object)</returns>
-        public async System.Threading.Tasks.Task<Abp.Importer.Client.ApiResponse<Object>> GetMetadataMetadataGetWithHttpInfoAsync(string metadataId, int operationIndex = 0, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
-        {
-            // verify the required parameter 'metadataId' is set
-            if (metadataId == null)
-            {
-                throw new Abp.Importer.Client.ApiException(400, "Missing required parameter 'metadataId' when calling DashboardApi->GetMetadataMetadataGet");
-            }
-
-
-            Abp.Importer.Client.RequestOptions localVarRequestOptions = new Abp.Importer.Client.RequestOptions();
-
-            string[] _contentTypes = new string[] {
-            };
-
-            // to determine the Accept header
-            string[] _accepts = new string[] {
-                "application/json"
-            };
-
-            var localVarContentType = Abp.Importer.Client.ClientUtils.SelectHeaderContentType(_contentTypes);
-            if (localVarContentType != null)
-            {
-                localVarRequestOptions.HeaderParameters.Add("Content-Type", localVarContentType);
-            }
-
-            var localVarAccept = Abp.Importer.Client.ClientUtils.SelectHeaderAccept(_accepts);
-            if (localVarAccept != null)
-            {
-                localVarRequestOptions.HeaderParameters.Add("Accept", localVarAccept);
-            }
-
-            localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("", "metadata_id", metadataId));
-
-            localVarRequestOptions.Operation = "DashboardApi.GetMetadataMetadataGet";
-            localVarRequestOptions.OperationIndex = operationIndex;
-
-            // authentication (APIKeyHeader) required
-            if (!string.IsNullOrEmpty(this.Configuration.GetApiKeyWithPrefix("X-API-Key")))
-            {
-                localVarRequestOptions.HeaderParameters.Add("X-API-Key", this.Configuration.GetApiKeyWithPrefix("X-API-Key"));
-            }
-
-            // make the HTTP request
-            var localVarResponse = await this.AsynchronousClient.GetAsync<Object>("/metadata", localVarRequestOptions, this.Configuration, cancellationToken).ConfigureAwait(false);
-
-            if (this.ExceptionFactory != null)
-            {
-                Exception _exception = this.ExceptionFactory("GetMetadataMetadataGet", localVarResponse);
-                if (_exception != null)
-                {
-                    throw _exception;
-                }
-            }
-
-            return localVarResponse;
-        }
-
-        /// <summary>
         /// Get Resources Gets stored resources following the given optional criteria.  :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of resource models to be serialized :rtype: List[GeoserverResourceSchema]
         /// </summary>
         /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="datatypeIds"> (optional)</param>
         /// <param name="resourceId"> (optional)</param>
         /// <param name="includeDeleted"> (optional, default to false)</param>
-        /// <param name="operationIndex">Index associated with the operation.</param>
         /// <returns>List&lt;GeoserverResourceSchema&gt;</returns>
-        public List<GeoserverResourceSchema> GetResourcesResourcesGet(List<string> datatypeIds = default(List<string>), string resourceId = default(string), bool? includeDeleted = default(bool?), int operationIndex = 0)
+        public List<GeoserverResourceSchema> GetResourcesResourcesGet(List<string> datatypeIds = default(List<string>), string resourceId = default(string), bool? includeDeleted = default(bool?))
         {
             Abp.Importer.Client.ApiResponse<List<GeoserverResourceSchema>> localVarResponse = GetResourcesResourcesGetWithHttpInfo(datatypeIds, resourceId, includeDeleted);
             return localVarResponse.Data;
@@ -791,9 +748,8 @@ namespace Abp.Importer.Api
         /// <param name="datatypeIds"> (optional)</param>
         /// <param name="resourceId"> (optional)</param>
         /// <param name="includeDeleted"> (optional, default to false)</param>
-        /// <param name="operationIndex">Index associated with the operation.</param>
         /// <returns>ApiResponse of List&lt;GeoserverResourceSchema&gt;</returns>
-        public Abp.Importer.Client.ApiResponse<List<GeoserverResourceSchema>> GetResourcesResourcesGetWithHttpInfo(List<string> datatypeIds = default(List<string>), string resourceId = default(string), bool? includeDeleted = default(bool?), int operationIndex = 0)
+        public Abp.Importer.Client.ApiResponse<List<GeoserverResourceSchema>> GetResourcesResourcesGetWithHttpInfo(List<string> datatypeIds = default(List<string>), string resourceId = default(string), bool? includeDeleted = default(bool?))
         {
             Abp.Importer.Client.RequestOptions localVarRequestOptions = new Abp.Importer.Client.RequestOptions();
 
@@ -829,9 +785,6 @@ namespace Abp.Importer.Api
             {
                 localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("", "include_deleted", includeDeleted));
             }
-
-            localVarRequestOptions.Operation = "DashboardApi.GetResourcesResourcesGet";
-            localVarRequestOptions.OperationIndex = operationIndex;
 
             // authentication (APIKeyHeader) required
             if (!string.IsNullOrEmpty(this.Configuration.GetApiKeyWithPrefix("X-API-Key")))
@@ -860,12 +813,11 @@ namespace Abp.Importer.Api
         /// <param name="datatypeIds"> (optional)</param>
         /// <param name="resourceId"> (optional)</param>
         /// <param name="includeDeleted"> (optional, default to false)</param>
-        /// <param name="operationIndex">Index associated with the operation.</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of List&lt;GeoserverResourceSchema&gt;</returns>
-        public async System.Threading.Tasks.Task<List<GeoserverResourceSchema>> GetResourcesResourcesGetAsync(List<string> datatypeIds = default(List<string>), string resourceId = default(string), bool? includeDeleted = default(bool?), int operationIndex = 0, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public async System.Threading.Tasks.Task<List<GeoserverResourceSchema>> GetResourcesResourcesGetAsync(List<string> datatypeIds = default(List<string>), string resourceId = default(string), bool? includeDeleted = default(bool?), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
-            Abp.Importer.Client.ApiResponse<List<GeoserverResourceSchema>> localVarResponse = await GetResourcesResourcesGetWithHttpInfoAsync(datatypeIds, resourceId, includeDeleted, operationIndex, cancellationToken).ConfigureAwait(false);
+            Abp.Importer.Client.ApiResponse<List<GeoserverResourceSchema>> localVarResponse = await GetResourcesResourcesGetWithHttpInfoAsync(datatypeIds, resourceId, includeDeleted, cancellationToken).ConfigureAwait(false);
             return localVarResponse.Data;
         }
 
@@ -876,10 +828,9 @@ namespace Abp.Importer.Api
         /// <param name="datatypeIds"> (optional)</param>
         /// <param name="resourceId"> (optional)</param>
         /// <param name="includeDeleted"> (optional, default to false)</param>
-        /// <param name="operationIndex">Index associated with the operation.</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of ApiResponse (List&lt;GeoserverResourceSchema&gt;)</returns>
-        public async System.Threading.Tasks.Task<Abp.Importer.Client.ApiResponse<List<GeoserverResourceSchema>>> GetResourcesResourcesGetWithHttpInfoAsync(List<string> datatypeIds = default(List<string>), string resourceId = default(string), bool? includeDeleted = default(bool?), int operationIndex = 0, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public async System.Threading.Tasks.Task<Abp.Importer.Client.ApiResponse<List<GeoserverResourceSchema>>> GetResourcesResourcesGetWithHttpInfoAsync(List<string> datatypeIds = default(List<string>), string resourceId = default(string), bool? includeDeleted = default(bool?), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
 
             Abp.Importer.Client.RequestOptions localVarRequestOptions = new Abp.Importer.Client.RequestOptions();
@@ -916,9 +867,6 @@ namespace Abp.Importer.Api
             {
                 localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("", "include_deleted", includeDeleted));
             }
-
-            localVarRequestOptions.Operation = "DashboardApi.GetResourcesResourcesGet";
-            localVarRequestOptions.OperationIndex = operationIndex;
 
             // authentication (APIKeyHeader) required
             if (!string.IsNullOrEmpty(this.Configuration.GetApiKeyWithPrefix("X-API-Key")))
@@ -954,9 +902,8 @@ namespace Abp.Importer.Api
         /// <param name="dateStartCol"> (optional, default to &quot;date_start&quot;)</param>
         /// <param name="dateEndCol"> (optional, default to &quot;date_end&quot;)</param>
         /// <param name="creationDateCol"> (optional, default to &quot;computation_time&quot;)</param>
-        /// <param name="operationIndex">Index associated with the operation.</param>
         /// <returns>Object</returns>
-        public Object GetTimeSeriesTimeSeriesGet(string datatypeId, string point, string attribute, DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string geomCol = default(string), string dateStartCol = default(string), string dateEndCol = default(string), string creationDateCol = default(string), int operationIndex = 0)
+        public Object GetTimeSeriesTimeSeriesGet(string datatypeId, string point, string attribute, DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string geomCol = default(string), string dateStartCol = default(string), string dateEndCol = default(string), string creationDateCol = default(string))
         {
             Abp.Importer.Client.ApiResponse<Object> localVarResponse = GetTimeSeriesTimeSeriesGetWithHttpInfo(datatypeId, point, attribute, start, end, geomCol, dateStartCol, dateEndCol, creationDateCol);
             return localVarResponse.Data;
@@ -975,9 +922,8 @@ namespace Abp.Importer.Api
         /// <param name="dateStartCol"> (optional, default to &quot;date_start&quot;)</param>
         /// <param name="dateEndCol"> (optional, default to &quot;date_end&quot;)</param>
         /// <param name="creationDateCol"> (optional, default to &quot;computation_time&quot;)</param>
-        /// <param name="operationIndex">Index associated with the operation.</param>
         /// <returns>ApiResponse of Object</returns>
-        public Abp.Importer.Client.ApiResponse<Object> GetTimeSeriesTimeSeriesGetWithHttpInfo(string datatypeId, string point, string attribute, DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string geomCol = default(string), string dateStartCol = default(string), string dateEndCol = default(string), string creationDateCol = default(string), int operationIndex = 0)
+        public Abp.Importer.Client.ApiResponse<Object> GetTimeSeriesTimeSeriesGetWithHttpInfo(string datatypeId, string point, string attribute, DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string geomCol = default(string), string dateStartCol = default(string), string dateEndCol = default(string), string creationDateCol = default(string))
         {
             // verify the required parameter 'datatypeId' is set
             if (datatypeId == null)
@@ -1046,9 +992,6 @@ namespace Abp.Importer.Api
             {
                 localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("", "creation_date_col", creationDateCol));
             }
-
-            localVarRequestOptions.Operation = "DashboardApi.GetTimeSeriesTimeSeriesGet";
-            localVarRequestOptions.OperationIndex = operationIndex;
 
             // authentication (APIKeyHeader) required
             if (!string.IsNullOrEmpty(this.Configuration.GetApiKeyWithPrefix("X-API-Key")))
@@ -1083,12 +1026,11 @@ namespace Abp.Importer.Api
         /// <param name="dateStartCol"> (optional, default to &quot;date_start&quot;)</param>
         /// <param name="dateEndCol"> (optional, default to &quot;date_end&quot;)</param>
         /// <param name="creationDateCol"> (optional, default to &quot;computation_time&quot;)</param>
-        /// <param name="operationIndex">Index associated with the operation.</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of Object</returns>
-        public async System.Threading.Tasks.Task<Object> GetTimeSeriesTimeSeriesGetAsync(string datatypeId, string point, string attribute, DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string geomCol = default(string), string dateStartCol = default(string), string dateEndCol = default(string), string creationDateCol = default(string), int operationIndex = 0, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public async System.Threading.Tasks.Task<Object> GetTimeSeriesTimeSeriesGetAsync(string datatypeId, string point, string attribute, DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string geomCol = default(string), string dateStartCol = default(string), string dateEndCol = default(string), string creationDateCol = default(string), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
-            Abp.Importer.Client.ApiResponse<Object> localVarResponse = await GetTimeSeriesTimeSeriesGetWithHttpInfoAsync(datatypeId, point, attribute, start, end, geomCol, dateStartCol, dateEndCol, creationDateCol, operationIndex, cancellationToken).ConfigureAwait(false);
+            Abp.Importer.Client.ApiResponse<Object> localVarResponse = await GetTimeSeriesTimeSeriesGetWithHttpInfoAsync(datatypeId, point, attribute, start, end, geomCol, dateStartCol, dateEndCol, creationDateCol, cancellationToken).ConfigureAwait(false);
             return localVarResponse.Data;
         }
 
@@ -1105,10 +1047,9 @@ namespace Abp.Importer.Api
         /// <param name="dateStartCol"> (optional, default to &quot;date_start&quot;)</param>
         /// <param name="dateEndCol"> (optional, default to &quot;date_end&quot;)</param>
         /// <param name="creationDateCol"> (optional, default to &quot;computation_time&quot;)</param>
-        /// <param name="operationIndex">Index associated with the operation.</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of ApiResponse (Object)</returns>
-        public async System.Threading.Tasks.Task<Abp.Importer.Client.ApiResponse<Object>> GetTimeSeriesTimeSeriesGetWithHttpInfoAsync(string datatypeId, string point, string attribute, DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string geomCol = default(string), string dateStartCol = default(string), string dateEndCol = default(string), string creationDateCol = default(string), int operationIndex = 0, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public async System.Threading.Tasks.Task<Abp.Importer.Client.ApiResponse<Object>> GetTimeSeriesTimeSeriesGetWithHttpInfoAsync(string datatypeId, string point, string attribute, DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string geomCol = default(string), string dateStartCol = default(string), string dateEndCol = default(string), string creationDateCol = default(string), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             // verify the required parameter 'datatypeId' is set
             if (datatypeId == null)
@@ -1178,9 +1119,6 @@ namespace Abp.Importer.Api
             {
                 localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("", "creation_date_col", creationDateCol));
             }
-
-            localVarRequestOptions.Operation = "DashboardApi.GetTimeSeriesTimeSeriesGet";
-            localVarRequestOptions.OperationIndex = operationIndex;
 
             // authentication (APIKeyHeader) required
             if (!string.IsNullOrEmpty(this.Configuration.GetApiKeyWithPrefix("X-API-Key")))
