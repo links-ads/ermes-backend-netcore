@@ -1,6 +1,7 @@
 Ver.
 --------------------------------
 - Feature - Removed unused properties from MpaRequestDto class (#100)
+- Feature - LevelId substituted with LevelName (#101)
 
 Ver. 3.9.1 - 2022-09-12
 --------------------------------

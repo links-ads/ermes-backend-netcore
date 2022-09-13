@@ -281,6 +281,7 @@ namespace Ermes.Web.Controllers
             res.IsEditable = true;
             res.Points = p.Points;
             res.LevelId = p.LevelId;
+            res.LevelName = p.Level.Name;
             return res;
         }
 
