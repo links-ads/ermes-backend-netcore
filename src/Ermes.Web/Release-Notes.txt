@@ -1,6 +1,6 @@
 Ver.
 --------------------------------
-
+- Feature - Removed unused properties from MpaRequestDto class (#100)
 
 Ver. 3.9.1 - 2022-09-12
 --------------------------------
