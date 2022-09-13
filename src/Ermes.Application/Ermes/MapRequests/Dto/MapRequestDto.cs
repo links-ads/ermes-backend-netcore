@@ -14,10 +14,7 @@ namespace Ermes.MapRequests.Dto
         public string Code { get; set; }
         public RangeDto<DateTime> Duration { get; set; }
         public PointPosition Centroid { get; set; }
-        public HazardType Hazard { get; set; }
-        public LayerType Layer { get; set; }
         public int Frequency { get; set; }
-        public List<int> DataTypeIds { get; set; }
         public MapRequestStatusType Status { get; set; }
         public string ErrorMessage { get; set; }
         public OrganizationDto Organization { get; set; }

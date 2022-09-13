@@ -237,6 +237,7 @@ namespace Ermes.Missions
                 throw new UserFriendlyException(L("InvalidAOI"));
 
             newMission.Id = await _missionManager.InsertMissionAsync(newMission);
+            newMission.CurrentStatus = MissionStatusType.Created;
             await CurrentUnitOfWork.SaveChangesAsync();
 
             NotificationEvent<MissionNotificationDto> notification = new NotificationEvent<MissionNotificationDto>(newMission.Id,
