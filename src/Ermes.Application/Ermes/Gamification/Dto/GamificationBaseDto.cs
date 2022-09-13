@@ -12,6 +12,14 @@ namespace Ermes.Gamification.Dto
             Points = points;
             LevelId = levelId;
         }
+
+        public GamificationBaseDto(int points, int? levelId, string levelName)
+        {
+            Points = points;
+            LevelId = levelId;
+            LevelName = levelName;
+        }
+
         public int Points { get; set; }
         public int? LevelId { get; set; }
         public string LevelName { get; set; }

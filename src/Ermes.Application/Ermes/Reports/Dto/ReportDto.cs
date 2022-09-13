@@ -38,5 +38,6 @@ namespace Ermes.Reports.Dto
         public bool IsPublic { get; set; }
         public int Points { get; set; }
         public int? LevelId { get; set; }
+        public string LevelName { get; set; }
     }
 }
