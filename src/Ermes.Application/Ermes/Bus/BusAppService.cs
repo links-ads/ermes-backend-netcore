@@ -4,10 +4,13 @@ using Ermes.Bus.Dto;
 using Ermes.Configuration;
 using Ermes.Enums;
 using Ermes.EventHandlers;
+using Ermes.Gamification.Dto;
 using Ermes.Jobs;
 using Ermes.Missions;
 using Ermes.Missions.Dto;
 using Ermes.Persons;
+using Microsoft.AspNetCore.Http;
+using NetTopologySuite.Index.HPRtree;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -57,6 +60,22 @@ namespace Ermes.Bus
                         ReportId = 6
                     });
             }
+        }
+
+        public async Task TestGamificationNotification(TestBusConsumerTopicInput input)
+        {
+            var person = _personManager.GetPersonByUsername(input.Username);
+            NotificationEvent<GamificationNotificationDto> notification = new NotificationEvent<GamificationNotificationDto>(0,
+            person.Id,
+            new GamificationNotificationDto()
+            {
+                PersonId = person.Id,
+                ActionName = input.Action.ToString(),
+                NewValue = input.NewRewardName
+            },
+            input.Action,
+            true);
+            await _backgroundJobManager.EnqueueEventAsync(notification);
         }
     }
 }
