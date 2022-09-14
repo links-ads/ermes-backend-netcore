@@ -2,6 +2,7 @@ Ver.
 --------------------------------
 - Feature - Removed unused properties from MpaRequestDto class (#100)
 - Feature - LevelId substituted with LevelName (#101)
+- Feature - New test api for gamification notificaiton (#102)
 
 Ver. 3.9.1 - 2022-09-12
 --------------------------------
