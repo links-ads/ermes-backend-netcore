@@ -73,6 +73,7 @@ namespace Ermes.MapRequests
             {
                 Geometry boundingBox = GeometryHelper.GetPolygonFromBoundaries(input.SouthWestBoundary, input.NorthEastBoundary);
                 query = _geoJsonBulkRepository.GetMapRequests(input.StartDate.Value, input.EndDate.Value, boundingBox);
+                query = query.Include(a => a.Creator.Organization).Include(a => a.MapRequestLayers);
             }
             else
                 query = _mapRequestManager.MapRequests.Where(a => new NpgsqlRange<DateTime>(input.StartDate.Value, input.EndDate.Value).Contains(a.Duration));
