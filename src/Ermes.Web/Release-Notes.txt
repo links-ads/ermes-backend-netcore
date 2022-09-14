@@ -1,6 +1,6 @@
 Ver.
 --------------------------------
-
+- Feature - New test api for gamification notificaiton (#102)
 
 Ver. 3.9.1 - 2022-09-12
 --------------------------------
