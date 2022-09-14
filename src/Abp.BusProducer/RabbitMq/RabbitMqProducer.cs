@@ -55,7 +55,7 @@ namespace Abp.BusProducer.RabbitMq
                 props.ContentEncoding = "utf-8";
                 props.DeliveryMode = 2;
                 // Dashboard service
-                props.AppId = "brn";
+                props.AppId = "dsh";
 
                 channel.BasicPublish(exchange: exchange,
                                      routingKey: routingKey,
