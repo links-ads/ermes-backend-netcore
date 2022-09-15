@@ -14,6 +14,8 @@
     <EmbeddedResource Include="Localization\SourceFiles\*.json" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="Localization\SourceFiles\Ermes-fr.json" />
+    <None Remove="Localization\SourceFiles\Ermes-gr.json" />
     <None Remove="Localization\SourceFiles\Ermes-it.json" />
   </ItemGroup>
   <ItemGroup>
