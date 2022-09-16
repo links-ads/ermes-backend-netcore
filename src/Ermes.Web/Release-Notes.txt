@@ -1,5 +1,6 @@
 Ver.
 --------------------------------
+- Feature - Support for French and Greek added (#103)
 
 
 Ver. 3.9.2 - 2022-09-14
