@@ -15,7 +15,7 @@ namespace Ermes.Migrations
             migrationBuilder.Sql(
                 @"
                     update public.persons p2
-                    set ""Email"" = concat(""Username"", '@safers.com')
+                    set ""Email"" = concat(""Username"", '@europe.com')
                     where ""Username"" is not null
                 "
             );
