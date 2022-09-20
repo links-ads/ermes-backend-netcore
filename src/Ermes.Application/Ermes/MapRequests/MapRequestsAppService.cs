@@ -243,29 +243,34 @@ namespace Ermes.MapRequests
             return res;
         }
 
-        [OpenApiOperation("Delete Map Request",
+        [OpenApiOperation("Delete Map Requests",
             @"
-                Input: the code of the map request to be deleted (format <partner_name>.<maprequest_code>)
-                Output: object coming  if the operation has been excuted successfully, false otherwise
-                Exception: invalid map request code
-                Note: the map request will not be canceled, but its status will be set to canceled
+                Input: list of map request codes to be deleted (format <partner_name>.<maprequest_code>)
+                Output: list of map request codes succcessfully deleted
+                Exception: invalid input object
             "
         )]
-        public virtual async Task<object> DeleteMapRequest(string mapRequestCode)
+        public virtual async Task<List<string>> DeleteMapRequest(DeleteMapRequestInput input)
         {
-            var result = await _importerMananger.DeleteMapRequest(mapRequestCode);
-            if (result != null && mapRequestCode.Contains("links"))
-            {
-                string[] chunks = mapRequestCode.Split(".");
-                if (chunks.Length > 1)
+            var deletedMapRequestCodes = await _importerMananger.DeleteMapRequests(input.MapRequestCodes);
+            if (deletedMapRequestCodes != null && deletedMapRequestCodes.Count > 0)
+            { 
+                foreach(var mrCode in deletedMapRequestCodes)
                 {
-                    string code = chunks.ElementAt(1);
-                    var mr = await GetMapRequestAsync(code);
-                    await _mapRequestManager.DeleteMapRequestAsync(mr);
+                    if (mrCode.Contains(AppConsts.Ermes_House_Partner))//Need to update MapRequests created through LINKS' dashboard
+                    {
+                        string[] chunks = mrCode.Split(".");
+                        if (chunks.Length > 1)
+                        {
+                            string code = chunks.ElementAt(1);
+                            var mr = await GetMapRequestAsync(code);
+                            await _mapRequestManager.DeleteMapRequestAsync(mr);//MR is not deleted, its status is set to Canceled
+                        }
+                    }
                 }
             }
             
-            return result;
+            return deletedMapRequestCodes;
         }
 
         [OpenApiOperation("Create or Update a Map Request",
