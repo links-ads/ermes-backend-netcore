@@ -44,5 +44,11 @@ namespace Abp.Importer
             var api = new DatalakeUtilsApi();
             return await api.GetMetadataMetadataGetAsync(metadata_id);
         }
+
+        public async Task<object> DeleteMapRequest(string mapRequestCode)
+        {
+            var api = new DatalakeUtilsApi();
+            return await api.DeleteLayersDeleteLayerDeleteAsync(null, mapRequestCode);
+        }
     }
 }

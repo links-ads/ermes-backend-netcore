@@ -1,7 +1,9 @@
 ﻿using Abp.Application.Services.Dto;
 using Abp.BackgroundJobs;
+using Abp.Importer;
 using Abp.Linq.Extensions;
 using Abp.UI;
+using AutoMapper;
 using Ermes.Attributes;
 using Ermes.Authorization;
 using Ermes.Dto;
@@ -13,7 +15,9 @@ using Ermes.GeoJson;
 using Ermes.Helpers;
 using Ermes.Linq.Extensions;
 using Ermes.MapRequests.Dto;
+using Ermes.Notifiers.MessageBody;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
 using NpgsqlTypes;
@@ -34,12 +38,14 @@ namespace Ermes.MapRequests
         private readonly IGeoJsonBulkRepository _geoJsonBulkRepository;
         private readonly ErmesPermissionChecker _permissionChecker;
         private readonly IBackgroundJobManager _backgroundJobManager;
+        private readonly IImporterManager _importerMananger;
         public MapRequestsAppService(
             ErmesAppSession session,
             MapRequestManager mapRequestManager,
             IGeoJsonBulkRepository geoJsonBulkRepository,
             ErmesPermissionChecker permissionChecker,
-            IBackgroundJobManager backgroundJobManager
+            IBackgroundJobManager backgroundJobManager,
+            IImporterManager importerMananger
         )
         {
             _session = session;
@@ -47,18 +53,27 @@ namespace Ermes.MapRequests
             _geoJsonBulkRepository = geoJsonBulkRepository;
             _permissionChecker = permissionChecker;
             _backgroundJobManager = backgroundJobManager;
+            _importerMananger = importerMananger;
         }
 
         #region Private
         private async Task<MapRequest> GetMapRequestAsync(int mapRequestId)
         {
             var mapReq = await _mapRequestManager.GetMapRequestByIdAsync(mapRequestId);
-            if (mapReq == null)
-                throw new UserFriendlyException(L("InvalidEntityId", "MapRequest", mapRequestId));
+            return CheckMapRequestOwnership(mapReq);
+        }
+        private async Task<MapRequest> GetMapRequestAsync(string  mapRequestCode)
+        {
+            var mapReq = await _mapRequestManager.GetMapRequestByCodeAsync(mapRequestCode);
+            return CheckMapRequestOwnership(mapReq);
+        }
 
+        private MapRequest CheckMapRequestOwnership(MapRequest mapReq)
+        {
+            if (mapReq == null)
+                throw new UserFriendlyException(L("InvalidEntityId", "MapRequest", mapReq.Code));
             if (mapReq.Creator.OrganizationId != _session.LoggedUserPerson.OrganizationId && mapReq.Creator.Organization.ParentId.HasValue && mapReq.Creator.Organization.ParentId.Value != _session.LoggedUserPerson.OrganizationId)
                 throw new UserFriendlyException(L("EntityOutsideOrganization"));
-
             return mapReq;
         }
         private async Task<PagedResultDto<MapRequestDto>> InternalGetMapRequests(GetMapRequestsInput input, bool filterByOrganization = true)
@@ -188,14 +203,14 @@ namespace Ermes.MapRequests
         }
 
         [OpenApiOperation("Get MapRequest by Id",
-     @"
+            @"
                 Input: 
                         - Id: the id of the map request to be retrived
                         - IncludeArea: if true, the response will contain the geometry of the communication
                 Output: GeoJson feature, with CommunicationDto element in Properties field
                 Exception: invalid id of the map request
-             "
-)]
+            "
+        )]
         public virtual async Task<GetEntityByIdOutput<MapRequestDto>> GetMapRequestById(GetEntityByIdInput<int> input)
         {
             var mr = await GetMapRequestAsync(input.Id);
@@ -228,20 +243,29 @@ namespace Ermes.MapRequests
             return res;
         }
 
-        [OpenApiOperation("Delete a Map Request",
+        [OpenApiOperation("Delete Map Request",
             @"
-                Input: the id of the map request to be deleted
-                Output: true if the operation has been excuted successfully, false otherwise
-                Exception: invalid mission Id 
+                Input: the code of the map request to be deleted (format <partner_name>.<maprequest_code>)
+                Output: object coming  if the operation has been excuted successfully, false otherwise
+                Exception: invalid map request code
                 Note: the map request will not be canceled, but its status will be set to canceled
             "
         )]
-        public virtual async Task<bool> DeleteMapRequest(IdInput<int> input)
+        public virtual async Task<object> DeleteMapRequest(string mapRequestCode)
         {
-            var mr = await GetMapRequestAsync(input.Id);
-            await _mapRequestManager.DeleteMapRequestAsync(mr);
-
-            return true;
+            var result = await _importerMananger.DeleteMapRequest(mapRequestCode);
+            if (result != null && mapRequestCode.Contains("links"))
+            {
+                string[] chunks = mapRequestCode.Split(".");
+                if (chunks.Length > 1)
+                {
+                    string code = chunks.ElementAt(1);
+                    var mr = await GetMapRequestAsync(code);
+                    await _mapRequestManager.DeleteMapRequestAsync(mr);
+                }
+            }
+            
+            return result;
         }
 
         [OpenApiOperation("Create or Update a Map Request",

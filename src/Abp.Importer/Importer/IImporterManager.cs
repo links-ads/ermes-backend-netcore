@@ -10,5 +10,6 @@ namespace Abp.Importer
         Task<object> GetLayers(List<string> datatype_ids, string bbox, DateTime start, DateTime end, List<string> request_codes, bool includeMapRequest);
         Task<object> GetTimeSeries(string datatype_id, string point, string attribute, DateTime start, DateTime end);
         Task<object> GetMetadata(string metadata_id);
+        Task<object> DeleteMapRequest(string mapRequestCode);
     }
 }

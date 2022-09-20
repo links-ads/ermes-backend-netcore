@@ -1,6 +1,6 @@
 Ver.
 --------------------------------
-
+- Feature - Implementation of Delete Map Request api (#105)
 
 Ver. 3.9.2 - 2022-09-14
 --------------------------------
