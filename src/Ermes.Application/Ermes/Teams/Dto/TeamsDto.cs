@@ -17,7 +17,7 @@ namespace Ermes.Teams.Dto
         [Required]
         public int TeamId { get; set; }
         [Required]
-        public List<long> MembersIds { get; set; }
+        public List<Guid> MembersGuids { get; set; }
     }
     public class TeamDto
     {
