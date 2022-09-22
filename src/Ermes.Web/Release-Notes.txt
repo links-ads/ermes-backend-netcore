@@ -1,8 +1,8 @@
 Ver.
 --------------------------------
 - Feature - Support for French and Greek added (#103)
-
 - Feature - Implementation of Delete Map Request api (#105)
+- Feature - PersonId substituted with PersonGuid in AssignRolesToPerson, AssignOrganizationToPerson and SetTeamMembers API (#107)
 
 Ver. 3.9.2 - 2022-09-14
 --------------------------------
