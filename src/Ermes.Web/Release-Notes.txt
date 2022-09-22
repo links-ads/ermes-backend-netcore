@@ -1,6 +1,6 @@
 Ver.
 --------------------------------
-
+- Feature - PersonId substituted with PersonGuid in AssignRolesToPerson, AssignOrganizationToPerson and SetTeamMembers API (#107)
 
 Ver. 3.9.2 - 2022-09-14
 --------------------------------

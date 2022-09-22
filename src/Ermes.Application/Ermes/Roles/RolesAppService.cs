@@ -148,8 +148,9 @@ namespace Ermes.Roles
 
         [ErmesAuthorize(AppPermissions.Backoffice)]
         public virtual async Task<bool> AssignRolesToPerson(AssignRolesToPersonInput input)
-        {            
-            Person person = await _personManager.GetPersonByIdAsync(input.PersonId);
+        {
+            Person person = input.PersonId > 0 ? await _personManager.GetPersonByIdAsync(input.PersonId) : await _personManager.GetPersonByFusionAuthUserGuidAsync(input.PersonGuid);
+            
             if (person == null)
                throw new UserFriendlyException(L("InvalidPersonId"));
 
@@ -168,6 +169,8 @@ namespace Ermes.Roles
             if (response.statusCode == 200)
             {
                 await _personManager.DeletePersonRolesAsync(person.Id);
+                //Need to manually save changes, otherwise concurrency issues between delete and create
+                CurrentUnitOfWork.SaveChanges();
                 foreach(Role rta in rolesToAssign)
                 {
                     PersonRole pr = new PersonRole(){

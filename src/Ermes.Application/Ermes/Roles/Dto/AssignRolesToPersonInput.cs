@@ -11,5 +11,6 @@ namespace Ermes.Roles.Dto
         public List<string> Roles { get; set; }
         [Required]
         public long PersonId { get; set; }
+        public Guid PersonGuid { get; set; }
     }
 }
