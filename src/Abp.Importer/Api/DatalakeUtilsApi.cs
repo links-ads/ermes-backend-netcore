@@ -30,27 +30,27 @@ namespace Abp.Importer.Api
         /// Delete Layers
         /// </summary>
         /// <remarks>
-        /// Delete the resource associated to the layer from the datalake  :param datatype_ids: list of datatype_id to filter by, defaults to Query(None) :type datatype_ids: Optional[List[str]], optional :param request_code: list of codes associated to the map requests :type request_code: Optional[List[str]], optional :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of resources deleted :rtype: List[GeoserverResourceSchema]
+        /// Delete the resource associated to the layer from the datalake  :param datatype_ids: list of datatype_id to filter by, defaults to Query(None) :type datatype_ids: Optional[List[str]], optional :param request_code: list of codes associated to the map requests :type request_codes: Optional[List[str]], optional :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of resources deleted :rtype: List[GeoserverResourceSchema]
         /// </remarks>
         /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="datatypeIds"> (optional)</param>
-        /// <param name="requestCode"> (optional)</param>
+        /// <param name="requestCodes"> (optional)</param>
         /// <param name="resourceId"> (optional)</param>
         /// <returns>List&lt;GeoserverResourceSchema&gt;</returns>
-        List<GeoserverResourceSchema> DeleteLayersDeleteLayerDelete(List<string> datatypeIds = default(List<string>), string requestCode = default(string), string resourceId = default(string));
+        List<GeoserverResourceSchema> DeleteLayersDeleteLayerDelete(List<string> datatypeIds = default(List<string>), List<string> requestCodes = default(List<string>), string resourceId = default(string));
 
         /// <summary>
         /// Delete Layers
         /// </summary>
         /// <remarks>
-        /// Delete the resource associated to the layer from the datalake  :param datatype_ids: list of datatype_id to filter by, defaults to Query(None) :type datatype_ids: Optional[List[str]], optional :param request_code: list of codes associated to the map requests :type request_code: Optional[List[str]], optional :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of resources deleted :rtype: List[GeoserverResourceSchema]
+        /// Delete the resource associated to the layer from the datalake  :param datatype_ids: list of datatype_id to filter by, defaults to Query(None) :type datatype_ids: Optional[List[str]], optional :param request_code: list of codes associated to the map requests :type request_codes: Optional[List[str]], optional :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of resources deleted :rtype: List[GeoserverResourceSchema]
         /// </remarks>
         /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="datatypeIds"> (optional)</param>
-        /// <param name="requestCode"> (optional)</param>
+        /// <param name="requestCodes"> (optional)</param>
         /// <param name="resourceId"> (optional)</param>
         /// <returns>ApiResponse of List&lt;GeoserverResourceSchema&gt;</returns>
-        ApiResponse<List<GeoserverResourceSchema>> DeleteLayersDeleteLayerDeleteWithHttpInfo(List<string> datatypeIds = default(List<string>), string requestCode = default(string), string resourceId = default(string));
+        ApiResponse<List<GeoserverResourceSchema>> DeleteLayersDeleteLayerDeleteWithHttpInfo(List<string> datatypeIds = default(List<string>), List<string> requestCodes = default(List<string>), string resourceId = default(string));
         /// <summary>
         /// Get Metadata
         /// </summary>
@@ -85,29 +85,29 @@ namespace Abp.Importer.Api
         /// Delete Layers
         /// </summary>
         /// <remarks>
-        /// Delete the resource associated to the layer from the datalake  :param datatype_ids: list of datatype_id to filter by, defaults to Query(None) :type datatype_ids: Optional[List[str]], optional :param request_code: list of codes associated to the map requests :type request_code: Optional[List[str]], optional :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of resources deleted :rtype: List[GeoserverResourceSchema]
+        /// Delete the resource associated to the layer from the datalake  :param datatype_ids: list of datatype_id to filter by, defaults to Query(None) :type datatype_ids: Optional[List[str]], optional :param request_code: list of codes associated to the map requests :type request_codes: Optional[List[str]], optional :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of resources deleted :rtype: List[GeoserverResourceSchema]
         /// </remarks>
         /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="datatypeIds"> (optional)</param>
-        /// <param name="requestCode"> (optional)</param>
+        /// <param name="requestCodes"> (optional)</param>
         /// <param name="resourceId"> (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of List&lt;GeoserverResourceSchema&gt;</returns>
-        System.Threading.Tasks.Task<List<GeoserverResourceSchema>> DeleteLayersDeleteLayerDeleteAsync(List<string> datatypeIds = default(List<string>), string requestCode = default(string), string resourceId = default(string), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<List<GeoserverResourceSchema>> DeleteLayersDeleteLayerDeleteAsync(List<string> datatypeIds = default(List<string>), List<string> requestCodes = default(List<string>), string resourceId = default(string), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <summary>
         /// Delete Layers
         /// </summary>
         /// <remarks>
-        /// Delete the resource associated to the layer from the datalake  :param datatype_ids: list of datatype_id to filter by, defaults to Query(None) :type datatype_ids: Optional[List[str]], optional :param request_code: list of codes associated to the map requests :type request_code: Optional[List[str]], optional :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of resources deleted :rtype: List[GeoserverResourceSchema]
+        /// Delete the resource associated to the layer from the datalake  :param datatype_ids: list of datatype_id to filter by, defaults to Query(None) :type datatype_ids: Optional[List[str]], optional :param request_code: list of codes associated to the map requests :type request_codes: Optional[List[str]], optional :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of resources deleted :rtype: List[GeoserverResourceSchema]
         /// </remarks>
         /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="datatypeIds"> (optional)</param>
-        /// <param name="requestCode"> (optional)</param>
+        /// <param name="requestCodes"> (optional)</param>
         /// <param name="resourceId"> (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of ApiResponse (List&lt;GeoserverResourceSchema&gt;)</returns>
-        System.Threading.Tasks.Task<ApiResponse<List<GeoserverResourceSchema>>> DeleteLayersDeleteLayerDeleteWithHttpInfoAsync(List<string> datatypeIds = default(List<string>), string requestCode = default(string), string resourceId = default(string), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<ApiResponse<List<GeoserverResourceSchema>>> DeleteLayersDeleteLayerDeleteWithHttpInfoAsync(List<string> datatypeIds = default(List<string>), List<string> requestCodes = default(List<string>), string resourceId = default(string), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
         /// <summary>
         /// Get Metadata
         /// </summary>
@@ -252,28 +252,28 @@ namespace Abp.Importer.Api
         }
 
         /// <summary>
-        /// Delete Layers Delete the resource associated to the layer from the datalake  :param datatype_ids: list of datatype_id to filter by, defaults to Query(None) :type datatype_ids: Optional[List[str]], optional :param request_code: list of codes associated to the map requests :type request_code: Optional[List[str]], optional :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of resources deleted :rtype: List[GeoserverResourceSchema]
+        /// Delete Layers Delete the resource associated to the layer from the datalake  :param datatype_ids: list of datatype_id to filter by, defaults to Query(None) :type datatype_ids: Optional[List[str]], optional :param request_code: list of codes associated to the map requests :type request_codes: Optional[List[str]], optional :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of resources deleted :rtype: List[GeoserverResourceSchema]
         /// </summary>
         /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="datatypeIds"> (optional)</param>
-        /// <param name="requestCode"> (optional)</param>
+        /// <param name="requestCodes"> (optional)</param>
         /// <param name="resourceId"> (optional)</param>
         /// <returns>List&lt;GeoserverResourceSchema&gt;</returns>
-        public List<GeoserverResourceSchema> DeleteLayersDeleteLayerDelete(List<string> datatypeIds = default(List<string>), string requestCode = default(string), string resourceId = default(string))
+        public List<GeoserverResourceSchema> DeleteLayersDeleteLayerDelete(List<string> datatypeIds = default(List<string>), List<string> requestCodes = default(List<string>), string resourceId = default(string))
         {
-            Abp.Importer.Client.ApiResponse<List<GeoserverResourceSchema>> localVarResponse = DeleteLayersDeleteLayerDeleteWithHttpInfo(datatypeIds, requestCode, resourceId);
+            Abp.Importer.Client.ApiResponse<List<GeoserverResourceSchema>> localVarResponse = DeleteLayersDeleteLayerDeleteWithHttpInfo(datatypeIds, requestCodes, resourceId);
             return localVarResponse.Data;
         }
 
         /// <summary>
-        /// Delete Layers Delete the resource associated to the layer from the datalake  :param datatype_ids: list of datatype_id to filter by, defaults to Query(None) :type datatype_ids: Optional[List[str]], optional :param request_code: list of codes associated to the map requests :type request_code: Optional[List[str]], optional :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of resources deleted :rtype: List[GeoserverResourceSchema]
+        /// Delete Layers Delete the resource associated to the layer from the datalake  :param datatype_ids: list of datatype_id to filter by, defaults to Query(None) :type datatype_ids: Optional[List[str]], optional :param request_code: list of codes associated to the map requests :type request_codes: Optional[List[str]], optional :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of resources deleted :rtype: List[GeoserverResourceSchema]
         /// </summary>
         /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="datatypeIds"> (optional)</param>
-        /// <param name="requestCode"> (optional)</param>
+        /// <param name="requestCodes"> (optional)</param>
         /// <param name="resourceId"> (optional)</param>
         /// <returns>ApiResponse of List&lt;GeoserverResourceSchema&gt;</returns>
-        public Abp.Importer.Client.ApiResponse<List<GeoserverResourceSchema>> DeleteLayersDeleteLayerDeleteWithHttpInfo(List<string> datatypeIds = default(List<string>), string requestCode = default(string), string resourceId = default(string))
+        public Abp.Importer.Client.ApiResponse<List<GeoserverResourceSchema>> DeleteLayersDeleteLayerDeleteWithHttpInfo(List<string> datatypeIds = default(List<string>), List<string> requestCodes = default(List<string>), string resourceId = default(string))
         {
             Abp.Importer.Client.RequestOptions localVarRequestOptions = new Abp.Importer.Client.RequestOptions();
 
@@ -301,9 +301,9 @@ namespace Abp.Importer.Api
             {
                 localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("multi", "datatype_ids", datatypeIds));
             }
-            if (requestCode != null)
+            if (requestCodes != null)
             {
-                localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("", "request_code", requestCode));
+                localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("multi", "request_codes", requestCodes));
             }
             if (resourceId != null)
             {
@@ -331,30 +331,30 @@ namespace Abp.Importer.Api
         }
 
         /// <summary>
-        /// Delete Layers Delete the resource associated to the layer from the datalake  :param datatype_ids: list of datatype_id to filter by, defaults to Query(None) :type datatype_ids: Optional[List[str]], optional :param request_code: list of codes associated to the map requests :type request_code: Optional[List[str]], optional :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of resources deleted :rtype: List[GeoserverResourceSchema]
+        /// Delete Layers Delete the resource associated to the layer from the datalake  :param datatype_ids: list of datatype_id to filter by, defaults to Query(None) :type datatype_ids: Optional[List[str]], optional :param request_code: list of codes associated to the map requests :type request_codes: Optional[List[str]], optional :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of resources deleted :rtype: List[GeoserverResourceSchema]
         /// </summary>
         /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="datatypeIds"> (optional)</param>
-        /// <param name="requestCode"> (optional)</param>
+        /// <param name="requestCodes"> (optional)</param>
         /// <param name="resourceId"> (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of List&lt;GeoserverResourceSchema&gt;</returns>
-        public async System.Threading.Tasks.Task<List<GeoserverResourceSchema>> DeleteLayersDeleteLayerDeleteAsync(List<string> datatypeIds = default(List<string>), string requestCode = default(string), string resourceId = default(string), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public async System.Threading.Tasks.Task<List<GeoserverResourceSchema>> DeleteLayersDeleteLayerDeleteAsync(List<string> datatypeIds = default(List<string>), List<string> requestCodes = default(List<string>), string resourceId = default(string), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
-            Abp.Importer.Client.ApiResponse<List<GeoserverResourceSchema>> localVarResponse = await DeleteLayersDeleteLayerDeleteWithHttpInfoAsync(datatypeIds, requestCode, resourceId, cancellationToken).ConfigureAwait(false);
+            Abp.Importer.Client.ApiResponse<List<GeoserverResourceSchema>> localVarResponse = await DeleteLayersDeleteLayerDeleteWithHttpInfoAsync(datatypeIds, requestCodes, resourceId, cancellationToken).ConfigureAwait(false);
             return localVarResponse.Data;
         }
 
         /// <summary>
-        /// Delete Layers Delete the resource associated to the layer from the datalake  :param datatype_ids: list of datatype_id to filter by, defaults to Query(None) :type datatype_ids: Optional[List[str]], optional :param request_code: list of codes associated to the map requests :type request_code: Optional[List[str]], optional :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of resources deleted :rtype: List[GeoserverResourceSchema]
+        /// Delete Layers Delete the resource associated to the layer from the datalake  :param datatype_ids: list of datatype_id to filter by, defaults to Query(None) :type datatype_ids: Optional[List[str]], optional :param request_code: list of codes associated to the map requests :type request_codes: Optional[List[str]], optional :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: list of resources deleted :rtype: List[GeoserverResourceSchema]
         /// </summary>
         /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="datatypeIds"> (optional)</param>
-        /// <param name="requestCode"> (optional)</param>
+        /// <param name="requestCodes"> (optional)</param>
         /// <param name="resourceId"> (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of ApiResponse (List&lt;GeoserverResourceSchema&gt;)</returns>
-        public async System.Threading.Tasks.Task<Abp.Importer.Client.ApiResponse<List<GeoserverResourceSchema>>> DeleteLayersDeleteLayerDeleteWithHttpInfoAsync(List<string> datatypeIds = default(List<string>), string requestCode = default(string), string resourceId = default(string), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public async System.Threading.Tasks.Task<Abp.Importer.Client.ApiResponse<List<GeoserverResourceSchema>>> DeleteLayersDeleteLayerDeleteWithHttpInfoAsync(List<string> datatypeIds = default(List<string>), List<string> requestCodes = default(List<string>), string resourceId = default(string), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
 
             Abp.Importer.Client.RequestOptions localVarRequestOptions = new Abp.Importer.Client.RequestOptions();
@@ -383,9 +383,9 @@ namespace Abp.Importer.Api
             {
                 localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("multi", "datatype_ids", datatypeIds));
             }
-            if (requestCode != null)
+            if (requestCodes != null)
             {
-                localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("", "request_code", requestCode));
+                localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("multi", "request_codes", requestCodes));
             }
             if (resourceId != null)
             {

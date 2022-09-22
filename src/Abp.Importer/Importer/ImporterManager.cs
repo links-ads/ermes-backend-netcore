@@ -3,6 +3,7 @@ using Abp.Importer.Client;
 using Abp.Importer.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -43,6 +44,16 @@ namespace Abp.Importer
         {
             var api = new DatalakeUtilsApi();
             return await api.GetMetadataMetadataGetAsync(metadata_id);
+        }
+
+        public async Task<List<string>> DeleteMapRequests(List<string> mapRequestCodes)
+        {
+            var api = new DatalakeUtilsApi();
+            var result = new List<string>();
+            var deletedLayers = await api.DeleteLayersDeleteLayerDeleteAsync(null, mapRequestCodes);
+            if(deletedLayers != null && deletedLayers.Count > 0)
+                result = deletedLayers.Select(a => a.RequestCode).ToList();
+            return result;
         }
     }
 }

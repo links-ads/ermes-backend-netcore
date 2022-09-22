@@ -42,7 +42,7 @@ namespace Abp.Importer.Model
         /// <param name="loc">loc (required).</param>
         /// <param name="msg">msg (required).</param>
         /// <param name="type">type (required).</param>
-        public ValidationError(List<string> loc = default(List<string>), string msg = default(string), string type = default(string))
+        public ValidationError(List<AnyOfstringinteger> loc = default(List<AnyOfstringinteger>), string msg = default(string), string type = default(string))
         {
             // to ensure "loc" is required (not null)
             if (loc == null) {
@@ -65,7 +65,7 @@ namespace Abp.Importer.Model
         /// Gets or Sets Loc
         /// </summary>
         [DataMember(Name = "loc", IsRequired = true, EmitDefaultValue = true)]
-        public List<string> Loc { get; set; }
+        public List<AnyOfstringinteger> Loc { get; set; }
 
         /// <summary>
         /// Gets or Sets Msg
