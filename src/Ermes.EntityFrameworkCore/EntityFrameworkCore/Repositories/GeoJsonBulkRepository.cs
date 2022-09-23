@@ -119,6 +119,7 @@ namespace Ermes.GeoJson
             List<ReportContentType> reportContentTypes,
             List<CommunicationRestrictionType> communicationRestrictionTypes,
             int srid,
+            string personName,
             string Language = "it"
             )
         {
@@ -352,9 +353,10 @@ namespace Ermes.GeoJson
                     command.Parameters.Add(p);
                 }
 
+                //Professional cannot see citizens' position
                 if (organizationIdList != null)
                 {
-                    command.CommandText += @" and (((tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations]) or tmp.""organizationId"" is null) and tmp.""type"" != 'Communication') or (tmp.""type"" = 'Communication' and tmp.""communicationRestrictionFilter"" = any(array[@restrictionTypes]) and (tmp.""communicationRestrictionFilter"" != 'Organization' or tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations]))))";
+                    command.CommandText += @" and (((tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations])) and tmp.""type"" != 'Communication') or (tmp.""type"" = 'Communication' and tmp.""communicationRestrictionFilter"" = any(array[@restrictionTypes]) and (tmp.""communicationRestrictionFilter"" != 'Organization' or tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations]))))";
                     var p = new NpgsqlParameter("@organizations", NpgsqlDbType.Array | NpgsqlDbType.Integer)
                     {
                         Value = organizationIdList
@@ -362,9 +364,14 @@ namespace Ermes.GeoJson
 
                     command.Parameters.Add(p);
                 }
-                else
+                else //citizen can see himself
                 {
-                    command.CommandText += @" and ((tmp.""organizationId"" is null and tmp.""type"" != 'Communication') or (tmp.""type"" = 'Communication' and tmp.""communicationRestrictionFilter"" = any(array[@restrictionTypes])))";
+                    command.CommandText += @" and ((tmp.""creator"" = @personName and tmp.""type"" != 'Communication') or (tmp.""type"" = 'Communication' and tmp.""communicationRestrictionFilter"" = any(array[@restrictionTypes])))";
+                    var p = new NpgsqlParameter("@personName", NpgsqlDbType.Text)
+                    {
+                        Value = personName
+                    };
+                    command.Parameters.Add(p);
                 }
 
                 var parameter = new NpgsqlParameter("@restrictionTypes", NpgsqlDbType.Array | NpgsqlDbType.Text)
@@ -494,6 +501,7 @@ namespace Ermes.GeoJson
             List<ActionStatusType> statusTypes, 
             int[] activityIds, 
             Geometry boundingBox, 
+            string personName,
             string search = "", 
             string language = "it"
         )
@@ -521,7 +529,7 @@ namespace Ermes.GeoJson
 	                o.""Id"" as ""OrganizationId"",
 	                o.""Name"" as ""OrganizationName"",
                     o.""ParentId"" as ""OrganizationParentId"",
-	                p.""Username"",
+	                coalesce(p.""Username"", p.""Email"") as ""Username"",
                     null as ""Type"",
                     coalesce(a.""ParentId"", a.""Id"") as ""activityFilter""
                     FROM (
@@ -543,18 +551,25 @@ namespace Ermes.GeoJson
                 command.Parameters.Add(new NpgsqlParameter("@startDate", startDate));
                 command.Parameters.Add(new NpgsqlParameter("@endDate", endDate));
                 command.Parameters.Add(new NpgsqlParameter("@language", language));
+
+                //Professional cannot see citizens' position
                 if (organizationIdList != null)
                 {
-                    command.CommandText += @" and (tmp.""OrganizationId"" = any(array[@organizations]) or tmp.""OrganizationParentId"" = any(array[@organizations]) or tmp.""OrganizationId"" is null)";
+                    command.CommandText += @" and (tmp.""OrganizationId"" = any(array[@organizations]) or tmp.""OrganizationParentId"" = any(array[@organizations]))";
                     var p = new NpgsqlParameter("@organizations", NpgsqlDbType.Array | NpgsqlDbType.Integer)
                     {
                         Value = organizationIdList
                     };
                     command.Parameters.Add(p);
                 }
-                else //Get only citizen actions
+                else //citizen can see himself
                 {
-                    command.CommandText += @" and tmp.""OrganizationId"" is null";
+                    command.CommandText += @" and tmp.""Username"" = @personName";
+                    var p = new NpgsqlParameter("@personName", NpgsqlDbType.Text)
+                    {
+                        Value = personName
+                    };
+                    command.Parameters.Add(p);
                 }
 
                 if (boundingBox != null)

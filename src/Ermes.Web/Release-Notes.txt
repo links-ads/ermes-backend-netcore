@@ -1,6 +1,10 @@
 Ver.
 --------------------------------
+- Bugfix - Professional cannot see citizens' position, a citizen can see himself (#104)
 - Feature - Support for French and Greek added (#103)
+
+Ver. 3.9.3 - 2022-09-22
+--------------------------------
 - Feature - Implementation of Delete Map Request api (#105)
 - Feature - PersonId substituted with PersonGuid in AssignRolesToPerson, AssignOrganizationToPerson and SetTeamMembers API (#107)
 
