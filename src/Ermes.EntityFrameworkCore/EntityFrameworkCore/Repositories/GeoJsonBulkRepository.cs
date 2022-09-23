@@ -364,9 +364,9 @@ namespace Ermes.GeoJson
 
                     command.Parameters.Add(p);
                 }
-                else //citizen can see himself
+                else //citizen can see his position and the reports that are public
                 {
-                    command.CommandText += @" and ((tmp.""creator"" = @personName and tmp.""type"" != 'Communication') or (tmp.""type"" = 'Communication' and tmp.""communicationRestrictionFilter"" = any(array[@restrictionTypes])))";
+                    command.CommandText += @" and ((tmp.""type"" not in ('Person','Communication') and tmp.""organizationId"" is null) or (tmp.""creator"" = @personName and tmp.""type"" = 'Person') or (tmp.""type"" = 'Communication' and tmp.""communicationRestrictionFilter"" = any(array[@restrictionTypes])))";
                     var p = new NpgsqlParameter("@personName", NpgsqlDbType.Text)
                     {
                         Value = personName

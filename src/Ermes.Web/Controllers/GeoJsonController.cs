@@ -85,6 +85,8 @@ namespace Ermes.Web.Controllers
                         communicationRestrictionTypes.Add(CommunicationRestrictionType.Professional);
                         communicationRestrictionTypes.Add(CommunicationRestrictionType.Organization);
                     }
+                    else
+                        input.ReportVisibilityType = VisibilityType.Public;
                 }   
             }
             else
