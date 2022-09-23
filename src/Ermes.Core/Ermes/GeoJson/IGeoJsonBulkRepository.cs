@@ -34,6 +34,7 @@ namespace Ermes.GeoJson
             List<ActionStatusType> statusTypes, 
             int[] activityIds, 
             Geometry boundingBox, 
+            string personName,
             string search = "", 
             string language = "it"
         );
@@ -70,6 +71,7 @@ namespace Ermes.GeoJson
             List<ReportContentType> reportContentTypes,
             List<CommunicationRestrictionType> communicationRestrictionTypes,
             int srid, 
+            string personName,
             string language = "it"
         );
 

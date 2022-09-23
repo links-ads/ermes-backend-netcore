@@ -1,6 +1,6 @@
 Ver.
 --------------------------------
-
+- Bugfix - Professional cannot see citizens' position, a citizen can see himself (#104)
 
 Ver. 3.9.3 - 2022-09-22
 --------------------------------
