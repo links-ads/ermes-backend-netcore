@@ -356,7 +356,7 @@ namespace Ermes.GeoJson
                 //Professional cannot see citizens' position
                 if (organizationIdList != null)
                 {
-                    command.CommandText += @" and (((tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations])) and tmp.""type"" != 'Communication') or (tmp.""type"" = 'Communication' and tmp.""communicationRestrictionFilter"" = any(array[@restrictionTypes]) and (tmp.""communicationRestrictionFilter"" != 'Organization' or tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations]))))";
+                    command.CommandText += @" and (((tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations]) or (tmp.""organizationId"" is null and tmp.""type"" != 'Person')) and tmp.""type"" != 'Communication') or (tmp.""type"" = 'Communication' and tmp.""communicationRestrictionFilter"" = any(array[@restrictionTypes]) and (tmp.""communicationRestrictionFilter"" != 'Organization' or tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations]))))";
                     var p = new NpgsqlParameter("@organizations", NpgsqlDbType.Array | NpgsqlDbType.Integer)
                     {
                         Value = organizationIdList
