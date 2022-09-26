@@ -377,7 +377,7 @@ namespace Ermes.Reports
             //report can be created by citizens
             //they won't have an organizationId associated
             var hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Reports.Report_CanSeeCrossOrganization);
-            if (!hasPermission)
+            if (!hasPermission && !report.IsPublic)
             {
                 //Father Org can see child contents
                 //false the contrary
