@@ -252,10 +252,13 @@ namespace Ermes.MapRequests
         )]
         public virtual async Task<DeleteMapRequestOutput> DeleteMapRequest(DeleteMapRequestInput input)
         {
+            if (input.MapRequestCodes == null || input.MapRequestCodes.Count == 0)
+                throw new UserFriendlyException("InvalidInput");
+
             var deletedMapRequestCodes = await _importerMananger.DeleteMapRequests(input.MapRequestCodes);
-            if (deletedMapRequestCodes != null && deletedMapRequestCodes.Count > 0)
+            if (input.MapRequestCodes != null && input.MapRequestCodes.Count > 0)
             { 
-                foreach(var mrCode in deletedMapRequestCodes)
+                foreach(var mrCode in input.MapRequestCodes)
                 {
                     if (mrCode.Contains(AppConsts.Ermes_House_Partner))//Need to update MapRequests created through LINKS' dashboard
                     {
