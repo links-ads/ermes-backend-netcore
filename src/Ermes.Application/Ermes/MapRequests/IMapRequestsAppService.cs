@@ -14,6 +14,6 @@ namespace Ermes.MapRequests
         Task<DTResult<MapRequestDto>> GetMapRequests(GetMapRequestsInput input);
         Task<GetEntityByIdOutput<MapRequestDto>> GetMapRequestById(GetEntityByIdInput<int> input);
         Task<CreateOrUpdateMapRequestOutput> CreateOrUpdateMapRequest(CreateOrUpdateMapRequestInput input);
-        Task<List<string>> DeleteMapRequest(DeleteMapRequestInput input);
+        Task<DeleteMapRequestOutput> DeleteMapRequest(DeleteMapRequestInput input);
     }
 }
