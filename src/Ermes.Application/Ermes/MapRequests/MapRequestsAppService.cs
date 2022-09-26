@@ -250,7 +250,7 @@ namespace Ermes.MapRequests
                 Exception: invalid input object
             "
         )]
-        public virtual async Task<List<string>> DeleteMapRequest(DeleteMapRequestInput input)
+        public virtual async Task<DeleteMapRequestOutput> DeleteMapRequest(DeleteMapRequestInput input)
         {
             var deletedMapRequestCodes = await _importerMananger.DeleteMapRequests(input.MapRequestCodes);
             if (deletedMapRequestCodes != null && deletedMapRequestCodes.Count > 0)
@@ -262,7 +262,7 @@ namespace Ermes.MapRequests
                         string[] chunks = mrCode.Split(".");
                         if (chunks.Length > 1)
                         {
-                            string code = chunks.ElementAt(1);
+                            string code = chunks.LastOrDefault();
                             var mr = await GetMapRequestAsync(code);
                             await _mapRequestManager.DeleteMapRequestAsync(mr);//MR is not deleted, its status is set to Canceled
                         }
@@ -270,7 +270,7 @@ namespace Ermes.MapRequests
                 }
             }
             
-            return deletedMapRequestCodes;
+            return new DeleteMapRequestOutput() { DeletedMapRequestCodes = deletedMapRequestCodes };
         }
 
         [OpenApiOperation("Create or Update a Map Request",

@@ -52,7 +52,7 @@ namespace Abp.Importer
             var result = new List<string>();
             var deletedLayers = await api.DeleteLayersDeleteLayerDeleteAsync(null, mapRequestCodes);
             if(deletedLayers != null && deletedLayers.Count > 0)
-                result = deletedLayers.Select(a => a.RequestCode).ToList();
+                result = deletedLayers.Select(a => a.RequestCode).Distinct().ToList();
             return result;
         }
     }
