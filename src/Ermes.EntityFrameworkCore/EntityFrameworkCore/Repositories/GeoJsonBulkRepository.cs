@@ -356,7 +356,11 @@ namespace Ermes.GeoJson
                 //Professional cannot see citizens' position
                 if (organizationIdList != null)
                 {
-                    command.CommandText += @" and (((tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations]) or (tmp.""organizationId"" is null and tmp.""type"" != 'Person')) and tmp.""type"" != 'Communication') or (tmp.""type"" = 'Communication' and tmp.""communicationRestrictionFilter"" = any(array[@restrictionTypes]) and (tmp.""communicationRestrictionFilter"" != 'Organization' or tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations]))))";
+                    command.CommandText += @" 
+                        and (((tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations]) or tmp.""organizationId"" is null) and tmp.""type"" in ('Mission', 'MapRequest')) or 
+                        ((tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations]) or tmp.""reportIsPublicFilter"" = 'true') and tmp.""type"" = 'Report') or
+                        ((tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations])) and tmp.""type"" = 'Person') or
+                        (tmp.""type"" = 'Communication' and tmp.""communicationRestrictionFilter"" = any(array[@restrictionTypes]) and (tmp.""communicationRestrictionFilter"" != 'Organization' or tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations]))))";
                     var p = new NpgsqlParameter("@organizations", NpgsqlDbType.Array | NpgsqlDbType.Integer)
                     {
                         Value = organizationIdList
@@ -364,9 +368,14 @@ namespace Ermes.GeoJson
 
                     command.Parameters.Add(p);
                 }
-                else //citizen can see his position and the reports that are public
+                else //citizen can see his position, public reports and public public Communications
                 {
-                    command.CommandText += @" and ((tmp.""type"" not in ('Person','Communication') and tmp.""organizationId"" is null) or (tmp.""creator"" = @personName and tmp.""type"" = 'Person') or (tmp.""type"" = 'Communication' and tmp.""communicationRestrictionFilter"" = any(array[@restrictionTypes])))";
+                    command.CommandText += @"
+                        and (
+                                (tmp.""creator"" = @personName and tmp.""type"" = 'Person') or 
+                                (tmp.""reportIsPublicFilter"" = 'true' and tmp.""type"" = 'Report') or
+                                (tmp.""type"" = 'Communication' and tmp.""communicationRestrictionFilter"" = any(array[@restrictionTypes]))
+                            )";
                     var p = new NpgsqlParameter("@personName", NpgsqlDbType.Text)
                     {
                         Value = personName
