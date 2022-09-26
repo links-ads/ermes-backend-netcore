@@ -237,9 +237,9 @@ namespace Ermes.Teams
         {
             Team team = await CheckTeamInputValidity(input.TeamId);
             // De-associate persons no longer in team (EF should implicitly convert the contains in a SQL IN clause)
-            _personManager.Persons.Where(p => p.TeamId == input.TeamId).Where(p=> !input.MembersIds.Contains(p.Id)).ToList().ForEach(p => p.Team = null);
+            _personManager.Persons.Where(p => p.TeamId == input.TeamId).Where(p=> !input.MembersGuids.Contains(p.FusionAuthUserGuid)).ToList().ForEach(p => p.Team = null);
             // Get persons that will be members of team
-            List<Person> affectedPersons = _personManager.Persons.Where(p => input.MembersIds.Contains(p.Id)).ToList();
+            List<Person> affectedPersons = _personManager.Persons.Where(p => input.MembersGuids.Contains(p.FusionAuthUserGuid)).ToList();
 
             // Verify that at least one has mission management permissions
             /*List<int> memberRoles = _permissionManager.PersonRoles.Where(pr => input.MembersIds.Contains(pr.PersonId))
@@ -262,10 +262,10 @@ namespace Ermes.Teams
                     p.Team = team;
             });
             // Check if it was passed some unexistent user
-            input.MembersIds.RemoveAll(pi => affectedPersons.Select(p => p.Id).Contains(pi));
-            if(input.MembersIds.Count > 0)
+            input.MembersGuids.RemoveAll(pi => affectedPersons.Select(p => p.FusionAuthUserGuid).Contains(pi));
+            if(input.MembersGuids.Count > 0)
             {
-                throw new UserFriendlyException(L("UnexistentEntities", "Person", input.MembersIds.ToJsonString()));
+                throw new UserFriendlyException(L("UnexistentEntities", "Person", input.MembersGuids.ToJsonString()));
             }
             return true;
         }
