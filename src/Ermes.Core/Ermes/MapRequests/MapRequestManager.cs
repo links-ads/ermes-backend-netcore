@@ -60,6 +60,10 @@ namespace Ermes.MapRequests
         {
             return MapRequests.SingleOrDefault(a => a.Code == code);
         }
+        public async Task<MapRequest> GetMapRequestByCodeAsync(string code)
+        {
+            return await MapRequests.SingleOrDefaultAsync(a => a.Code == code);
+        }
 
         public async Task DeleteMapRequestAsync(MapRequest mr)
         {

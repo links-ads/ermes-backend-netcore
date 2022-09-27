@@ -85,6 +85,8 @@ namespace Ermes.Web.Controllers
                         communicationRestrictionTypes.Add(CommunicationRestrictionType.Professional);
                         communicationRestrictionTypes.Add(CommunicationRestrictionType.Organization);
                     }
+                    else
+                        input.ReportVisibilityType = VisibilityType.Public;
                 }   
             }
             else
@@ -92,7 +94,7 @@ namespace Ermes.Web.Controllers
                 communicationRestrictionTypes.Add(CommunicationRestrictionType.Professional);
                 communicationRestrictionTypes.Add(CommunicationRestrictionType.Organization);
             }
-
+            string personName = _session.LoggedUserPerson.Username ?? _session.LoggedUserPerson.Email;
             string responseContent = _geoJsonBulkRepository.GetGeoJsonCollection(
                     input.StartDate, 
                     input.EndDate, 
@@ -110,7 +112,8 @@ namespace Ermes.Web.Controllers
                     input.ReportVisibilityType,
                     input.ReportContentTypes,
                     communicationRestrictionTypes,
-                    AppConsts.Srid, 
+                    AppConsts.Srid,
+                    personName,
                     _languageManager.CurrentLanguage.Name
             );
 

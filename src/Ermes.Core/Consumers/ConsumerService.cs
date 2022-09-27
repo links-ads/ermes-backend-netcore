@@ -110,6 +110,8 @@ namespace Ermes.Consumers
                         case "500":
                             layer.Status = LayerImportStatusType.Error;
                             layer.ErrorMessage = eventData.message;
+                            if(mr.MapRequestLayers.All(a => a.Status == LayerImportStatusType.Error))
+                                mr.Status = MapRequestStatusType.ContentNotAvailable;
                             break;
                         default:
                             break;

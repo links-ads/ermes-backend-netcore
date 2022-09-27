@@ -101,7 +101,8 @@ namespace Ermes.Actions
                 orgIdList = _session.LoggedUserPerson.OrganizationId.HasValue ? new int[] { _session.LoggedUserPerson.OrganizationId.Value } : null;
 
 
-            var items = _geoJsonBulkRepository.GetPersonActions(start, end, orgIdList, input.StatusTypes, actIds, boundingBox, search, _languageManager.CurrentLanguage.Name);
+            string personName = _session.LoggedUserPerson.Username ?? _session.LoggedUserPerson.Email;
+            var items = _geoJsonBulkRepository.GetPersonActions(start, end, orgIdList, input.StatusTypes, actIds, boundingBox, personName, search, _languageManager.CurrentLanguage.Name);
 
             var actions = JsonConvert.DeserializeObject<GetActionsOutput>(items);
 

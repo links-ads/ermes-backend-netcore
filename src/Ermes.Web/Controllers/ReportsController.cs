@@ -218,70 +218,73 @@ namespace Ermes.Web.Controllers
             //}
             ///////////////////
 
-            //Gamification section
-            Person p = await _personManager.GetPersonByIdAsync(_session.LoggedUserPerson.Id);
-
-            async Task<List<(EntityWriteAction, string NewValue)>> AssignRewards(long personId)
-            {
-                List<(EntityWriteAction, string newValue)> result = new List<(EntityWriteAction, string newValue)>();
-                var action = await _gamificationManager.GetActionByNameAsync(ErmesConsts.GamificationActionConsts.DO_REPORT);
-                var person = await _personManager.GetPersonByIdAsync(personId);
-
-                var reports = await _reportManager.GetReportsByPersonAsync(personId);
-                if(reports.Count == 1) // it user's first report, assign points
-                {
-                    var isFirstReportAction = await _gamificationManager.GetActionByNameAsync(ErmesConsts.GamificationActionConsts.FIRST_REPORT);
-                    await _gamificationManager.InsertAudit(_session.LoggedUserPerson.Id, isFirstReportAction.Id, null, null);
-                    person.Points += isFirstReportAction.Points;
-                    result.Add((EntityWriteAction.FirstReport, isFirstReportAction.Name));
-                }
-
-
-                if (action != null && action.Achievements != null && action.Achievements.Count > 0)
-                {
-                    var personReports = await _reportManager.GetReportsByPersonAsync(personId);
-                    foreach (var item in action.Achievements)
-                    {
-                        if (item is Medal)
-                        {
-                            if (item.Detail.Threshold == personReports.Count)
-                            {
-                                await _gamificationManager.InsertAudit(_session.LoggedUserPerson.Id, null, item.Id, null);
-                                person.Points += item.Detail.Points;
-                                result.Add((EntityWriteAction.MedalObtained, item.Name));
-                            }
-
-                        }
-                    }
-                }
-
-                return result;
-            }
-
-            //The list contains the information about the notification to be sent
-            var list = await _gamificationManager.UpdatePersonGamificationProfileAsync(_session.LoggedUserPerson.Id, ErmesConsts.GamificationActionConsts.DO_REPORT, AssignRewards);
-
-            foreach (var item in list)
-            {
-                NotificationEvent<GamificationNotificationDto> gamNotification = new NotificationEvent<GamificationNotificationDto>(0,
-                _session.LoggedUserPerson.Id,
-                new GamificationNotificationDto()
-                {
-                    PersonId = _session.LoggedUserPerson.Id,
-                    ActionName = item.Action.ToString(),
-                    NewValue = item.NewValue
-                },
-                item.Action,
-                true);
-                await _backgroundJobManager.EnqueueEventAsync(gamNotification);
-            }
-            //End of Gamification section
-
             var res = ObjectMapper.Map<ReportDto>(report);
             res.IsEditable = true;
-            res.Points = p.Points;
-            res.LevelId = p.LevelId;
-            res.LevelName = p.Level.Name;
+
+            if (_session.Roles.Contains(AppRoles.CITIZEN))
+            {
+                //Gamification section
+                Person p = await _personManager.GetPersonByIdAsync(_session.LoggedUserPerson.Id);
+
+                async Task<List<(EntityWriteAction, string NewValue)>> AssignRewards(long personId)
+                {
+                    List<(EntityWriteAction, string newValue)> result = new List<(EntityWriteAction, string newValue)>();
+                    var action = await _gamificationManager.GetActionByNameAsync(ErmesConsts.GamificationActionConsts.DO_REPORT);
+                    var person = await _personManager.GetPersonByIdAsync(personId);
+
+                    var reports = await _reportManager.GetReportsByPersonAsync(personId);
+                    if (reports.Count == 1) // it user's first report, assign points
+                    {
+                        var isFirstReportAction = await _gamificationManager.GetActionByNameAsync(ErmesConsts.GamificationActionConsts.FIRST_REPORT);
+                        await _gamificationManager.InsertAudit(_session.LoggedUserPerson.Id, isFirstReportAction.Id, null, null);
+                        person.Points += isFirstReportAction.Points;
+                        result.Add((EntityWriteAction.FirstReport, isFirstReportAction.Name));
+                    }
+
+
+                    if (action != null && action.Achievements != null && action.Achievements.Count > 0)
+                    {
+                        var personReports = await _reportManager.GetReportsByPersonAsync(personId);
+                        foreach (var item in action.Achievements)
+                        {
+                            if (item is Medal)
+                            {
+                                if (item.Detail.Threshold == personReports.Count)
+                                {
+                                    await _gamificationManager.InsertAudit(_session.LoggedUserPerson.Id, null, item.Id, null);
+                                    person.Points += item.Detail.Points;
+                                    result.Add((EntityWriteAction.MedalObtained, item.Name));
+                                }
+
+                            }
+                        }
+                    }
+
+                    return result;
+                }
+
+                //The list contains the information about the notification to be sent
+                var list = await _gamificationManager.UpdatePersonGamificationProfileAsync(_session.LoggedUserPerson.Id, ErmesConsts.GamificationActionConsts.DO_REPORT, AssignRewards);
+
+                foreach (var item in list)
+                {
+                    NotificationEvent<GamificationNotificationDto> gamNotification = new NotificationEvent<GamificationNotificationDto>(0,
+                    _session.LoggedUserPerson.Id,
+                    new GamificationNotificationDto()
+                    {
+                        PersonId = _session.LoggedUserPerson.Id,
+                        ActionName = item.Action.ToString(),
+                        NewValue = item.NewValue
+                    },
+                    item.Action,
+                    true);
+                    await _backgroundJobManager.EnqueueEventAsync(gamNotification);
+                }
+
+                res.Points = p.Points;
+                res.LevelId = p.LevelId;
+                res.LevelName = p.Level?.Name;
+            }
             return res;
         }
 
