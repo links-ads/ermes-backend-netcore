@@ -268,6 +268,7 @@ namespace Ermes.MapRequests
                             string code = chunks.LastOrDefault();
                             var mr = await GetMapRequestAsync(code);
                             await _mapRequestManager.DeleteMapRequestAsync(mr);//MR is not deleted, its status is set to Canceled
+                            deletedMapRequestCodes.Add(mrCode);
                         }
                     }
                 }
