@@ -274,7 +274,7 @@ namespace Ermes.MapRequests
                 }
             }
             
-            return new DeleteMapRequestOutput() { DeletedMapRequestCodes = deletedMapRequestCodes };
+            return new DeleteMapRequestOutput() { DeletedMapRequestCodes = deletedMapRequestCodes.Distinct().ToList() };
         }
 
         [OpenApiOperation("Create or Update a Map Request",
