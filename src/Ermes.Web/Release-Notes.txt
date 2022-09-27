@@ -1,5 +1,9 @@
 Ver.
 --------------------------------
+
+
+Ver. 3.9.4 - 2022-09-27
+--------------------------------
 - Feature - Support for French and Greek added (#103)
 - Bugfix - Professional cannot see citizens' position, a citizen can see himself (#104)
 
