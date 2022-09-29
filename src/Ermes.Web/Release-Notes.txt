@@ -1,5 +1,9 @@
 Ver.
 --------------------------------
+
+
+Ver. 3.9.5 - 2022-09-29
+--------------------------------
 - Feature - TeamName property added in PersonActionDto class (#108)
 - Feature - Added TeamId as filter, added FusionAuthUserGuid in TeamMembers (#108)
 
