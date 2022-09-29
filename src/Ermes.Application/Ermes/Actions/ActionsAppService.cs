@@ -88,6 +88,7 @@ namespace Ermes.Actions
             var start = input.StartDate ?? DateTime.MinValue;
             var end = input.EndDate ?? DateTime.MaxValue;
             var actIds = input.ActivityIds?.ToArray();
+            var teamIds = input.TeamIds?.ToArray();
             var search = input.Search?.Value;
             Geometry boundingBox = null;
             if (input.NorthEastBoundary != null && input.SouthWestBoundary != null)
@@ -102,7 +103,7 @@ namespace Ermes.Actions
 
 
             string personName = _session.LoggedUserPerson.Username ?? _session.LoggedUserPerson.Email;
-            var items = _geoJsonBulkRepository.GetPersonActions(start, end, orgIdList, input.StatusTypes, actIds, boundingBox, personName, search, _languageManager.CurrentLanguage.Name);
+            var items = _geoJsonBulkRepository.GetPersonActions(start, end, orgIdList, input.StatusTypes, actIds, teamIds, boundingBox, personName, search, _languageManager.CurrentLanguage.Name);
 
             var actions = JsonConvert.DeserializeObject<GetActionsOutput>(items);
 

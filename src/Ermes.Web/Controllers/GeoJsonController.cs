@@ -66,6 +66,7 @@ namespace Ermes.Web.Controllers
                 boundingBox = GeometryHelper.GetPolygonFromBoundaries(input.SouthWestBoundary, input.NorthEastBoundary);
             input.EndDate = input.EndDate == DateTime.MinValue ? DateTime.MaxValue : input.EndDate;
             var actIds = input.ActivityIds?.ToArray();
+            var teamIds = input.TeamIds?.ToArray();
             int[] orgIdList;
             var hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Actions.Action_CanSeeCrossOrganization);
             if (hasPermission)
@@ -103,6 +104,7 @@ namespace Ermes.Web.Controllers
                     orgIdList, 
                     input.StatusTypes, 
                     actIds, 
+                    teamIds,
                     input.HazardTypes, 
                     input.ReportStatusTypes, 
                     input.MissionStatusTypes, 
