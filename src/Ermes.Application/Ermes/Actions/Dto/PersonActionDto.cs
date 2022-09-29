@@ -40,5 +40,6 @@ namespace Ermes.Actions.Dto
         public PersonActionType Type { get; set; }
         public long PersonId { get; set; }
         public int TeamId { get; set; }
+        public string TeamName { get; set; }
     }
 }

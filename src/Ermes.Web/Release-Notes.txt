@@ -1,6 +1,6 @@
 Ver.
 --------------------------------
-
+- Feature - TeamName property added in PersonActionDto class (#108)
 
 Ver. 3.9.4 - 2022-09-27
 --------------------------------

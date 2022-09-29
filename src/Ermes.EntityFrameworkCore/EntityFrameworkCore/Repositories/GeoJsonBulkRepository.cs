@@ -538,6 +538,8 @@ namespace Ermes.GeoJson
 	                o.""Id"" as ""OrganizationId"",
 	                o.""Name"" as ""OrganizationName"",
                     o.""ParentId"" as ""OrganizationParentId"",
+                    t.""Id"" as ""TeamId"",
+                    t.""Name"" as ""TeamName"",
 	                coalesce(p.""Username"", p.""Email"") as ""Username"",
                     null as ""Type"",
                     coalesce(a.""ParentId"", a.""Id"") as ""activityFilter""
@@ -549,6 +551,7 @@ namespace Ermes.GeoJson
                     INNER JOIN person_actions pa ON pa.""PersonId"" = r.""PersonId"" and r.""MaxTime"" = pa.""Timestamp""
                     join public.persons p on p.""Id"" = pa.""PersonId""
                     left join public.organizations o on o.""Id"" = p.""OrganizationId""
+                    left join public.teams t on t.""Id"" = p.""TeamId""
                     left join public.activities a on a.""Id"" = pa.""CurrentActivityId""
                     left join public.activity_translations at2 on at2.""CoreId"" = pa.""CurrentActivityId""
                     where (at2.""Language"" = @language or at2.""Language"" is null)
