@@ -143,17 +143,36 @@ namespace Ermes
             profile.CurrentMissions = ObjectMapper.Map<List<MissionDto>>(_missionManager.GetCurrentMissions(person));
 
             profile.User.Roles = await _personManager.GetPersonRoleNamesAsync(profile.PersonId);
-            if(profile.User.Roles.Count == 0) //assign default role to current user
+            if(profile.User.Roles.Count == 0)
             {
-                var defaultRole = await _personManager.GetDefaultRole();
-                await _personManager.InsertPersonRoleAsync(new PersonRole()
+                var reg = user?.registrations?.ElementAt(0);
+                if (reg != null) //look for roles from FusionAuth
                 {
-                    PersonId = person.Id,
-                    RoleId = defaultRole.Id
-                });
-                profile.User.Roles.Add(defaultRole.Name);
-                if (defaultRole.Name == AppRoles.CITIZEN)
-                    person.LevelId = (await _gamificationManager.GetDefaultLevel()).Id;
+                    var roles = await _personManager.GetRolesByName(reg.roles);
+                    foreach (var r in roles)
+                    {
+                        await _personManager.InsertPersonRoleAsync(new PersonRole()
+                        {
+                            PersonId = person.Id,
+                            RoleId = r.Id
+                        });
+                        profile.User.Roles.Add(r.Name);
+                        if (r.Name == AppRoles.CITIZEN)
+                            person.LevelId = (await _gamificationManager.GetDefaultLevel()).Id;
+                    }
+                }
+                else //assign default role
+                {
+                    var defaultRole = await _personManager.GetDefaultRole();
+                    await _personManager.InsertPersonRoleAsync(new PersonRole()
+                    {
+                        PersonId = person.Id,
+                        RoleId = defaultRole.Id
+                    });
+                    profile.User.Roles.Add(defaultRole.Name);
+                    if (defaultRole.Name == AppRoles.CITIZEN)
+                        person.LevelId = (await _gamificationManager.GetDefaultLevel()).Id;
+                }
             }
 
             if (profile.User.Timezone == null)
@@ -217,8 +236,7 @@ namespace Ermes
             {
                 person = new Person()
                 {
-                    FusionAuthUserGuid = user.id.Value,
-                    Username = user.username,
+                    FusionAuthUserGuid = user.id.Value
                 };
             }
 
@@ -226,7 +244,7 @@ namespace Ermes
             person.TeamId = teamId;
             person.IsFirstLogin = isFirstLogin;
             person.IsNewUser = isNewUser;
-
+            person.Username = user.username;
 
             Logger.Info("Ermes: Create or update Person: " + person.Username);
             long personId = await _personManager.InsertOrUpdatePersonAsync(person);
