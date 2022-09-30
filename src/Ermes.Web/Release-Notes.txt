@@ -1,6 +1,6 @@
 Ver.
 --------------------------------
-
+- Feature - Added visibility restriction in GetUsers API
 
 Ver. 3.9.5 - 2022-09-29
 --------------------------------
