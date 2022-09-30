@@ -332,14 +332,18 @@ namespace Ermes
             var fa_users = ObjectMapper.Map<List<User>>(users);
 
             fa_users.Select(u => {
-                u.registrations = new List<UserRegistration>() {
-                new UserRegistration()
-                {
-                    applicationId = new Guid(_fusionAuthSettings.Value.ApplicationId),
-                    roles = users.Where(user => user.Id == u.id).Single().Roles
-                }
-            }; return u;
-            }).ToList();
+                    u.registrations = new List<UserRegistration>() {
+                        new UserRegistration()
+                        {
+                            applicationId = new Guid(_fusionAuthSettings.Value.ApplicationId),
+                            roles = users.Where(user => user.Id == u.id).Single().Roles,
+                            verified = true
+                        }
+                    };
+                    u.verified = true;
+                    u.active = true;
+                    return u;
+                }).ToList();
             //Create user on FusionAuth
             var import = new ImportRequest()
             {
