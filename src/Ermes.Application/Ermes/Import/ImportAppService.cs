@@ -289,17 +289,17 @@ s            "
                 //create data structure
                 var result = await UsersImporter.ImportUsersAsync(filename, contentType, _personManager, _organizationManager, _teamManager, _localizer);
                 
-                //add user to FusionAuth
-                await ImportUsersInternalAsync(result.Accounts.Select(a => a.Item1).ToList(), _fusionAuthSettings);
-
                 //add person on project DB
                 foreach (var tuple in result.Accounts)
                 {
                     var rolesToAssgin = await _personManager.GetRolesByName(tuple.Item1.Roles);
                     //check roles, organizations, teams and permission association
                     List<Role> rolesToAssign = await GetRolesAndCheckOrganizationAndTeam(tuple.Item1.Roles, tuple.Item2.OrganizationId, tuple.Item2.TeamId, tuple.Item2.Id, _personManager, _organizationManager, _teamManager, _session, _permissionChecker);
-                    await CreateOrUpdatePersonInternalAsync(null, ObjectMapper.Map<User>(tuple.Item1), tuple.Item2.OrganizationId, tuple.Item2.TeamId, tuple.Item2.IsFirstLogin, tuple.Item2.IsNewUser, rolesToAssign, _personManager);
+                    await CreateOrUpdatePersonInternalAsync(tuple.Item2, ObjectMapper.Map<User>(tuple.Item1), tuple.Item2.OrganizationId, tuple.Item2.TeamId, tuple.Item2.IsFirstLogin, tuple.Item2.IsNewUser, rolesToAssign, _personManager);
                 }
+
+                //If everything is ok, add users to FusionAuth
+                await ImportUsersInternalAsync(result.Accounts.Select(a => a.Item1).ToList(), _fusionAuthSettings);
 
                 return ObjectMapper.Map<ImportResultDto>(result);
             }, new ImportUsersResourceContainer(), AcceptedUsersSourceMimeTypes);
