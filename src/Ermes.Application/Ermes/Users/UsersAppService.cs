@@ -30,7 +30,7 @@ using System.Threading.Tasks;
 namespace Ermes.Users
 {
     [ErmesAuthorize(AppPermissions.Backoffice)]
-    public class UsersAppService: ErmesAppServiceBase, IUsersAppService
+    public class UsersAppService : ErmesAppServiceBase, IUsersAppService
     {
         private readonly ErmesAppSession _session;
         private readonly PersonManager _personManager;
@@ -87,16 +87,23 @@ namespace Ermes.Users
             });
             if (response.WasSuccessful())
             {
+                var currentOrgId = _session.LoggedUserPerson.OrganizationId;
                 result.TotalCount = response.successResponse.total.HasValue ? (int)response.successResponse.total : 0;
                 if (result.TotalCount > 0)
                 {
                     var list = new List<ProfileDto>();
+                    var permission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Users.Users_CanCreateCitizenOrPersonCrossOrganization);
                     foreach (var item in response.successResponse.users)
                     {
                         var person = await _personManager.GetPersonByFusionAuthUserGuidAsync(item.id.Value, item.email, item.username);
+                        if (!permission) //admin can see everyone
+                        {
+                            //do not return citizens
+                            if (!currentOrgId.HasValue || !person.OrganizationId.HasValue || (currentOrgId.Value != person.OrganizationId && person.Organization.ParentId != currentOrgId))
+                                continue;
+                        }
 
                         ProfileDto profile = await GetProfileInternal(person, item, _personManager, _missionManager, _gamificationManager, _session, _jobManager);
-
                         list.Add(profile);
                     }
                     result.Items = list;
