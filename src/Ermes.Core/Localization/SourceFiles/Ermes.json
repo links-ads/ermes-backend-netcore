@@ -97,6 +97,7 @@
     "InvalidCategoryRangeValue": "Invalid Category Range Value: {0}",
     "InvalidCategoryNumericValue": "Invalid Category Numeric Value: {0}",
     "DoNotTakePartToGamification": "You do not take part to gamification",
-    "InvalidEmail": "Invalid email address"
+    "InvalidEmail": "Invalid email address",
+    "InvalidVolterTaxCode": "Invalid tax code"
   }
 }
