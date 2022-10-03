@@ -14,6 +14,7 @@ namespace Ermes.Actions.Dto
         public DateTime? EndDate { get; set; }
         public List<ActionStatusType> StatusTypes { get; set; }
         public List<int> ActivityIds { get; set; }
+        public List<int> TeamIds { get; set; }
         public PointPosition NorthEastBoundary { get; set; }
         public PointPosition SouthWestBoundary { get; set; }
     }

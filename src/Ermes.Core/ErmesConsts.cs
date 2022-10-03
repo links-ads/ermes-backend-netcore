@@ -41,5 +41,15 @@
         {
             public const string MapReqeust = "mr";
         }
+
+        public class GamificationActionConsts
+        {
+            public const string READ_TIP = "ReadTip";
+            public const string ANSWER_QUIZ = "AnswerQuiz";
+            public const string DO_REPORT = "DoReport";
+            public const string FIRST_REPORT = "FirstReport";
+            public const string FIRST_LOGIN = "FirstLogin";
+            public const string COMPLETE_WIZARD = "CompleteWizard";
+        }
     }
 }

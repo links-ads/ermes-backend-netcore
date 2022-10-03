@@ -11,5 +11,8 @@ namespace Ermes.Bus.Dto
         public int MissionId { get; set; }
         public MissionStatusType Status { get; set; }
         public string Username { get; set; }
+        public string Email { get; set; }
+        public EntityWriteAction Action { get; set; }
+        public string NewRewardName { get; set; }
     }
 }

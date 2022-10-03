@@ -1,11 +1,16 @@
-﻿using Abp.UI;
+﻿using Abp.Azure;
+using Abp.UI;
+using Ermes.Categories;
 using Ermes.Enums;
 using Ermes.ExternalServices.Csi.Configuration;
 using Ermes.Operations;
+using Ermes.Reports;
+using Ermes.Resources;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -19,23 +24,36 @@ namespace Ermes.ExternalServices.Csi
     {
         private readonly CsiConnectionProvider _connectionProvider;
         private static HttpClient CsiClient;
+        private static HttpClient CsiClientPresidi;
         private readonly OperationManager _operationManager;
+        private readonly CategoryManager _categoryManager;
         private const string SUBJECT_CODE = "FAS";
+        private readonly IAzureManager _azureManager;
+        private const string HEADER_APPLICATION_JSON = "application/json";
 
-        public CsiManager(CsiConnectionProvider connectionProvider, OperationManager operationManager)
+        public CsiManager(CsiConnectionProvider connectionProvider, OperationManager operationManager, IAzureManager azureManager, CategoryManager categoryManager)
         {
             _connectionProvider = connectionProvider;
-            CsiClient = GetCsiClient();
+            if(CsiClient == null)
+                CsiClient = GetCsiClient();
+            if(CsiClientPresidi == null)
+                CsiClientPresidi = GetCsiClient(true);
             _operationManager = operationManager;
+            _azureManager = azureManager;
+            _categoryManager = categoryManager;
         }
 
-        private HttpClient GetCsiClient()
+        private HttpClient GetCsiClient(bool presidi = false)
         {
             HttpClient client = new HttpClient();
-            var byteArray = Encoding.ASCII.GetBytes(string.Format("{0}:{1}", _connectionProvider.GetUsername(), _connectionProvider.GetPassword()));
+            byte[] byteArray;
+            if(presidi)
+                byteArray = Encoding.ASCII.GetBytes(string.Format("{0}:{1}", _connectionProvider.GetUsername_Presidi(), _connectionProvider.GetPassword_Presidi()));
+            else
+                byteArray = Encoding.ASCII.GetBytes(string.Format("{0}:{1}", _connectionProvider.GetUsername(), _connectionProvider.GetPassword()));
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            client.BaseAddress = new Uri(_connectionProvider.GetBaseUrl());
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(HEADER_APPLICATION_JSON));
+            client.BaseAddress = new Uri(presidi ? _connectionProvider.GetBaseUrl_Presidi() : _connectionProvider.GetBaseUrl());
             return client;
         }
 
@@ -55,7 +73,7 @@ namespace Ermes.ExternalServices.Csi
             {
                 Method = HttpMethod.Get,
                 RequestUri = new Uri(builder.ToString()),
-                Content = new StringContent(requestBody, Encoding.UTF8, "application/json")
+                Content = new StringContent(requestBody, Encoding.UTF8, HEADER_APPLICATION_JSON)
             };
 
             var op = new Operation()
@@ -89,7 +107,7 @@ namespace Ermes.ExternalServices.Csi
             {
                 Method = HttpMethod.Post,
                 RequestUri = new Uri(builder.ToString()),
-                Content = new StringContent(requestBody, Encoding.UTF8, "application/json")
+                Content = new StringContent(requestBody, Encoding.UTF8, HEADER_APPLICATION_JSON)
             };
 
             var op = new Operation()
@@ -103,6 +121,78 @@ namespace Ermes.ExternalServices.Csi
             op.Id = await _operationManager.InsertOrUpdateOperationAsync(op);
 
             return await SendRequestInternal(request, op);
+        }
+
+        public async Task InserisciFromFaster(Report report)
+        {
+            var builder = new UriBuilder(CsiClientPresidi.BaseAddress + "/inserisciFromFaster");
+            
+            //Do not want to store on local DB the fule byte array of the attachments;
+            //localbody will be stored in localDB without byte[], while body represents the full request sent to CSI service
+            InsertReport localBody = new InsertReport()
+            {
+                mittente = report.Creator.Email,
+                latitudine = report.Location.Y,
+                longitudine = report.Location.X,
+                descrizione = report.Description,
+                fenomenoLabelList = new string[] { report.HazardString },
+                statoSegnalazioneLabel = report.StatusString,
+            };
+
+            if(report.ExtensionData != null && report.ExtensionData.Count > 0)
+            {
+                var categories = await _categoryManager.GetCategoriesAsync();
+                foreach (var item in report.ExtensionData)
+                {
+                    var category = categories.Single(c => c.Id == item.CategoryId);
+                    //TODO: complete the switch with the mnagement of all types of categories, based on the destination API
+                    switch (category.GroupKey)
+                    {
+                        case "People":
+                            ReportPeople people = new ReportPeople(category.Translations.Where(t => t.Language == "it").Select(c => c.Name).FirstOrDefault(), int.Parse(item.Value));
+                            localBody.peoples.Add(people);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+            }
+
+            InsertReport body = (InsertReport) localBody.Clone();
+
+            if (report.MediaURIs != null && report.MediaURIs.Count > 0)
+            {
+                var _azureReportStorageManager = _azureManager.GetStorageManager(ResourceManager.GetBasePath(ResourceManager.Reports.ContainerName));
+                foreach (var fileName in report.MediaURIs)
+                {
+                    string mediaPath = ResourceManager.Reports.GetMediaPath(report.Id, fileName);
+                    ReportAttachment ra = new ReportAttachment(fileName, mediaPath);
+                    localBody.allegatiSegnalazione.Add(ra);
+                    var file = await _azureReportStorageManager.GetFile(ResourceManager.Reports.GetRelativeMediaPath(report.Id, fileName));
+                    body.allegatiSegnalazione.Add(new ReportAttachment(fileName, mediaPath, file));
+                }
+            }
+
+            string requestBody = JsonConvert.SerializeObject(body);
+
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri(builder.ToString()),
+                Content = new StringContent(requestBody, Encoding.UTF8, HEADER_APPLICATION_JSON)
+            };
+
+            var op = new Operation()
+            {
+                Request = JsonConvert.SerializeObject(localBody),
+                Type = VolterOperationType.InsertReport,
+                PersonId = report.CreatorUserId.Value,
+                PersonLegacyId = report.Creator.LegacyId ?? 0
+            };
+
+            op.Id = await _operationManager.InsertOrUpdateOperationAsync(op);
+            await SendRequestPresidiInternal(request, op);
         }
 
         private async Task<int> SendRequestInternal(HttpRequestMessage request, Operation op)
@@ -156,6 +246,51 @@ namespace Ermes.ExternalServices.Csi
             catch (Exception e)
             {
                 op.ErrorMessage = string.Format($"CSI Service not available: {e.Message}");
+            }
+
+            return -1;
+        }
+
+        private async Task<int> SendRequestPresidiInternal(HttpRequestMessage request, Operation op)
+        {
+            try
+            {
+                using CancellationTokenSource tokenSource = new CancellationTokenSource(4000);
+                HttpResponseMessage response = await CsiClientPresidi.SendAsync(request, cancellationToken: tokenSource.Token);
+                var responseValue = string.Empty;
+                if (response != null && response.StatusCode == HttpStatusCode.OK)
+                {
+                    Task task = response.Content.ReadAsStreamAsync().ContinueWith(t =>
+                    {
+                        var stream = t.Result;
+                        using var reader = new StreamReader(stream);
+                        responseValue = reader.ReadToEnd();
+                    });
+
+                    task.Wait();
+
+                    var result = JsonConvert.DeserializeObject<PresidiResponse>(responseValue);
+
+                    if (result.status == 200)
+                    {
+                        if (result.items != null)
+                        {
+                            op.OperationLegacyId = result.items.id;
+                            op.PresidiResponse = result;
+                            return op.OperationLegacyId;
+                        }
+                        else
+                            return 0;
+                    }
+                    else
+                        op.ErrorMessage = string.Format($"CSI Service InserisciFromFaster error {result.status}");
+                }
+                else
+                    op.ErrorMessage = string.Format($"CSI Service InserisciFromFaster not available, HTTP status code: {response.StatusCode}");
+            }
+            catch (Exception e)
+            {
+                op.ErrorMessage = string.Format($"CSI Service InserisciFromFaster not available: {e.Message}");
             }
 
             return -1;

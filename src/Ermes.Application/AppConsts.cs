@@ -41,6 +41,7 @@ namespace Ermes
         public const string Ermes_Faster = "FASTER";
         public const string Ermes_Shelter = "SHELTER";
         public const string Ermes_Safers = "SAFERS";
+        public const string Ermes_House_Partner = "links";
 
         ///<summary>
         /// CSI service consts

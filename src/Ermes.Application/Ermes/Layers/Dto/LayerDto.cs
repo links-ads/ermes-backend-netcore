@@ -19,6 +19,7 @@ namespace Ermes.Layers.Dto
         public LayerType Type { get; set; }
         public FormatType Format { get; set; }
         public FrequencyType Frequency { get; set; }
+        public string UnitOfMeasure { get; set; }
         public List<LayerDetailsDto> Details { get; set; }
     }
 }

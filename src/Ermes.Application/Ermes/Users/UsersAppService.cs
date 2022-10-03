@@ -1,9 +1,11 @@
 ﻿using Abp.Application.Services.Dto;
+using Abp.BackgroundJobs;
 using Abp.UI;
 using Ermes.Attributes;
 using Ermes.Auth.Dto;
 using Ermes.Authorization;
 using Ermes.Dto.Datatable;
+using Ermes.Gamification;
 using Ermes.Helpers;
 using Ermes.Missions;
 using Ermes.Organizations;
@@ -28,36 +30,42 @@ using System.Threading.Tasks;
 namespace Ermes.Users
 {
     [ErmesAuthorize(AppPermissions.Backoffice)]
-    public class UsersAppService: ErmesAppServiceBase, IUsersAppService
+    public class UsersAppService : ErmesAppServiceBase, IUsersAppService
     {
         private readonly ErmesAppSession _session;
         private readonly PersonManager _personManager;
         private readonly MissionManager _missionManager;
+        private readonly GamificationManager _gamificationManager;
         private readonly OrganizationManager _organizationManager;
         private readonly TeamManager _teamManager;
         private readonly ErmesPermissionChecker _permissionChecker;
         private readonly IOptions<FusionAuthSettings> _fusionAuthSettings;
         private readonly IOptions<ErmesSettings> _ermesSettings;
+        private readonly IBackgroundJobManager _jobManager;
 
         public UsersAppService(
                     ErmesAppSession session,
                     PersonManager personManger,
                     MissionManager missionManager,
+                    GamificationManager gamificationManager,
                     IOptions<FusionAuthSettings> fusionAuthSettings,
                     IOptions<ErmesSettings> ermesSettings,
                     OrganizationManager organizationManager,
                     TeamManager teamManager,
-                    ErmesPermissionChecker permissionChecker
+                    ErmesPermissionChecker permissionChecker,
+                    IBackgroundJobManager jobManager
             )
         {
             _session = session;
             _personManager = personManger;
             _missionManager = missionManager;
+            _gamificationManager = gamificationManager;
             _fusionAuthSettings = fusionAuthSettings;
             _ermesSettings = ermesSettings;
             _teamManager = teamManager;
             _organizationManager = organizationManager;
             _permissionChecker = permissionChecker;
+            _jobManager = jobManager;
         }
 
         #region Private
@@ -79,16 +87,23 @@ namespace Ermes.Users
             });
             if (response.WasSuccessful())
             {
+                var currentOrgId = _session.LoggedUserPerson.OrganizationId;
                 result.TotalCount = response.successResponse.total.HasValue ? (int)response.successResponse.total : 0;
                 if (result.TotalCount > 0)
                 {
                     var list = new List<ProfileDto>();
+                    var permission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Users.Users_CanCreateCitizenOrPersonCrossOrganization);
                     foreach (var item in response.successResponse.users)
                     {
-                        var person = await _personManager.GetPersonByFusionAuthUserGuidAsync(item.id.Value, item.username);
+                        var person = await _personManager.GetPersonByFusionAuthUserGuidAsync(item.id.Value, item.email, item.username);
+                        if (!permission) //admin can see everyone
+                        {
+                            //do not return citizens
+                            if (!currentOrgId.HasValue || !person.OrganizationId.HasValue || (currentOrgId.Value != person.OrganizationId && person.Organization.ParentId != currentOrgId))
+                                continue;
+                        }
 
-                        ProfileDto profile = await GetProfileInternal(person, item, _personManager, _missionManager);
-
+                        ProfileDto profile = await GetProfileInternal(person, item, _personManager, _missionManager, _gamificationManager, _session, _jobManager);
                         list.Add(profile);
                     }
                     result.Items = list;
@@ -138,7 +153,7 @@ namespace Ermes.Users
 
             return new CreateOrUpdateUserOutput()
             {
-                Profile = await GetProfileInternal(person, currentUser, _personManager, _missionManager)
+                Profile = await GetProfileInternal(person, currentUser, _personManager, _missionManager, _gamificationManager, _session, _jobManager)
             };
         }
 

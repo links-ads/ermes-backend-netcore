@@ -10,7 +10,7 @@ namespace Ermes.Layers.Dto
         public string Bbox { get; set; }
         public DateTime? Start { get; set; }
         public DateTime? End { get; set; }
-        public string MapRequestCode { get; set; }
+        public List<string> MapRequestCodes { get; set; }
         public bool IncludeMapRequests { get; set; }
     }
 }

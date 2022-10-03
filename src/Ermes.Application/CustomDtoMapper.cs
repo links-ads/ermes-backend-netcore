@@ -59,6 +59,7 @@ using Ermes.Answers;
 using Ermes.MapRequests.Dto;
 using Ermes.Layers;
 using Ermes.Layers.Dto;
+using Ermes.Gamification;
 
 namespace Ermes
 {
@@ -76,7 +77,6 @@ namespace Ermes
             configuration.CreateMap<User, UserDto>()
                             .ReverseMap()
                             .ForMember(entity => entity.passwordChangeRequired, options => options.MapFrom(dto => false))
-                            .ForMember(entity => entity.verified, options => options.MapFrom(dto => true))
                             .ForMember(entity => entity.active, options => options.MapFrom(dto => true));
             configuration.CreateMap<UserRegistration, UserRegistrationDto>().ReverseMap();
             configuration.CreateMap<Organization, OrganizationDto>()
@@ -128,6 +128,7 @@ namespace Ermes
                             .ForMember(dto => dto.Timestamp, options => options.MapFrom(a => a.Timestamp.ToUniversalTime()))
                             .ForMember(dto => dto.OrganizationName, options => options.MapFrom(a => a.Creator.OrganizationId.HasValue ? a.Creator.Organization.Name : null))
                             .ForMember(dto => dto.Username, options => options.MapFrom(a => a.CreatorUserId.HasValue ? a.Creator.Username : null))
+                            .ForMember(dto => dto.Email, options => options.MapFrom(a => a.CreatorUserId.HasValue ? a.Creator.Email : null))
                             .ForMember(dto => dto.MediaURIs, options => options.MapFrom(a => a.MediaURIs.Select(s => MediaURIMapper(s, a.Id)).OrderByDescending(a => a.MediaType == MediaType.Image).ToList()))
                             .ReverseMap()
                             .ForMember(entity => entity.Location, options => options.MapFrom(a => new Point(a.Location.Longitude, a.Location.Latitude)))
@@ -142,6 +143,7 @@ namespace Ermes
                             .ForMember(dto => dto.OrganizationId, options => options.MapFrom(a => a.Creator.OrganizationId))
                             .ForMember(dto => dto.OrganizationName, options => options.MapFrom(a => a.Creator.OrganizationId.HasValue ? a.Creator.Organization.Name : null))
                             .ForMember(dto => dto.Username, options => options.MapFrom(a => a.CreatorUserId.HasValue ? a.Creator.Username : null))
+                            .ForMember(dto => dto.Email, options => options.MapFrom(a => a.CreatorUserId.HasValue ? a.Creator.Email : null))
                             .AfterMap((src, dest) => dest.MediaURIs = dest.MediaURIs.Select(a => ResourceManager.Reports.GetMediaPath(dest.Id, a)).ToList());
             configuration.CreateMap<ReportRequest, ReportRequestDto>()
                             .ForMember(dto => dto.OrganizationId, options => options.MapFrom(b => b.Creator.OrganizationId))
@@ -235,11 +237,24 @@ namespace Ermes
                             .ForMember(dto => dto.Centroid, options => options.MapFrom(b => new PointPosition(b.AreaOfInterest.Centroid.X, b.AreaOfInterest.Centroid.Y)))
                             .ForMember(dto => dto.Organization, options => options.MapFrom(b => b.Creator.Organization))
                             .ForMember(dto => dto.Username, options => options.MapFrom(b => b.Creator.Username))
+                            .ForMember(dto => dto.Email, options => options.MapFrom(b => b.Creator.Email))
                             .AfterMap((src, dest) => dest.Duration.LowerBound = dest.Duration.LowerBound.ToUniversalTime())
                             .AfterMap((src, dest) => dest.Duration.UpperBound = dest.Duration.UpperBound.ToUniversalTime())
                             .ReverseMap()
                             .ForMember(entity => entity.Code, options => options.Ignore());
             configuration.CreateMap<MapRequests.MapRequest, MapRequestNotificationDto>();
+            configuration.CreateMap<MapRequests.MapRequestLayer, MapRequestLayerDto>();
+
+            configuration.CreateMap<Level, LevelDto>()
+                            .ForMember(dto => dto.PreviousLevelName, options => options.MapFrom(b => b.PreviousLevelId.HasValue ? b.PreviousLevel.Name : null))
+                            .ForMember(dto => dto.FollowingLevelName, options => options.MapFrom(b => b.FollowingLevelId.HasValue ? b.FollowingLevel.Name : null));
+
+            configuration.CreateMap<Person, GamificationBaseDto>()
+                .ForMember(dto => dto.LevelName, options => options.MapFrom(b => b.LevelId.HasValue ? b.Level.Name : null))
+                .ForMember(dto => dto.LevelId, options => options.MapFrom(b => b.LevelId))
+                .ForMember(dto => dto.Username, options => options.MapFrom(b => b.Username))
+                .ForMember(dto => dto.Email, options => options.MapFrom(b => b.Email))
+                .ForMember(dto => dto.Points, options => options.MapFrom(b => b.Points));
             #region GeoJsons
             configuration.CreateMap<Communication, FeatureDto<GeoJsonItem>>()
                             .ForMember(fd => fd.Geometry, options => options.MapFrom(c => new GeoJsonWriter().Write(c.AreaOfInterest)))

@@ -8,6 +8,9 @@ namespace Ermes.ExternalServices.Csi.Configuration
     {
         string GetUsername();
         string GetPassword();
-        string GetBaseUrl();
+        string GetBaseUrl();        
+        string GetUsername_Presidi();
+        string GetPassword_Presidi();
+        string GetBaseUrl_Presidi();
     }
 }

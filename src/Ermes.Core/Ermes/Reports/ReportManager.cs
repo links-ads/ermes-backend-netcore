@@ -26,6 +26,11 @@ namespace Ermes.Reports
             return await Reports.SingleOrDefaultAsync(r => r.Id == reportId);
         }
 
+        public Report GetReportById(int reportId)
+        {
+            return Reports.SingleOrDefault(r => r.Id == reportId);
+        }
+
         public async Task<int> InsertReportAsync(Report report)
         {
             return await ReportRepository.InsertAndGetIdAsync(report);
@@ -36,6 +41,11 @@ namespace Ermes.Reports
             return Reports
                        .Where(r => r.Timestamp >= startDate && r.Timestamp <= endDate);
                        
+        }
+
+        public async Task<List<Report>> GetReportsByPersonAsync(long personId)
+        {
+            return await Reports.Where(r => r.CreatorUserId.Value == personId).ToListAsync();
         }
 
     }

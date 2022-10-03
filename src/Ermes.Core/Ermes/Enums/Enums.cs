@@ -177,6 +177,7 @@ namespace Ermes.Enums
         PersonActionStatus = 70,
         PersonActionActivity = 80,
         Person = 90,
+        Gamification = 100
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -208,7 +209,14 @@ namespace Ermes.Enums
         Create,
         Update,
         Delete,
-        StatusChange
+        StatusChange,
+        LevelChangeUp,
+        LevelChangeDown,
+        MedalObtained,
+        BadgeObtained,
+        FirstLogin,
+        CompleteWizard,
+        FirstReport
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -274,6 +282,16 @@ namespace Ermes.Enums
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
+    public enum LayerImportStatusType
+    {
+        Created,
+        Accepted,
+        Processing,
+        Completed,
+        Error
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum MapRequestStatusType
     {
         RequestSubmitted,
@@ -304,7 +322,8 @@ namespace Ermes.Enums
     {
         Registration,
         OpenIntervention,
-        CloseIntervention
+        CloseIntervention,
+        InsertReport
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -329,7 +348,6 @@ namespace Ermes.Enums
         ImpossibileFareMappingAttivita = 47,
         ImpossibileTrovareOrganizzazioneVolontario = 48,
         ImpossibileTrovareCoordinamentoOrganizzazione = 49
-
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -349,6 +367,42 @@ namespace Ermes.Enums
         Daily,
         OnDemand,
         H6,
-        H12
+        H12,
+        TwiceAWeek
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum CompetenceType
+    {
+        Onboarding,
+        Learning,
+        Mastering,
+        Reporting,
+        Reviewing
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum MedalType
+    {
+        Bronze,
+        Silver,
+        Gold,
+        Platinum
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum CommunicationScopeType
+    {
+        Restricted,  //Citizens, or professionals or inside my organization
+        Public       //No restriction
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum CommunicationRestrictionType
+    {
+        None,
+        Organization,
+        Citizen,
+        Professional
     }
 }

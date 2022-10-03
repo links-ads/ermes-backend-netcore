@@ -1,6 +1,63 @@
 Ver.
 --------------------------------
+- Feature - Added visibility restriction in GetUsers API
+
+Ver. 3.9.5 - 2022-09-29
+--------------------------------
+- Feature - TeamName property added in PersonActionDto class (#108)
+- Feature - Added TeamId as filter, added FusionAuthUserGuid in TeamMembers (#108)
+
+Ver. 3.9.4 - 2022-09-27
+--------------------------------
+- Feature - Support for French and Greek added (#103)
+- Bugfix - Professional cannot see citizens' position, a citizen can see himself (#104)
+
+Ver. 3.9.3 - 2022-09-22
+--------------------------------
+- Feature - Implementation of Delete Map Request api (#105)
+- Feature - PersonId substituted with PersonGuid in AssignRolesToPerson, AssignOrganizationToPerson and SetTeamMembers API (#107)
+
+Ver. 3.9.2 - 2022-09-14
+--------------------------------
+- Feature - Removed unused properties from MpaRequestDto class (#100)
+- Feature - LevelId substituted with LevelName (#101)
+- Feature - New test api for gamification notification (#102)
+
+Ver. 3.9.1 - 2022-09-12
+--------------------------------
+- Feature - MapRequestLayers table added and Abp.Importer update to support MapRequestCodes as input (migration added)(#99)
+
+Ver. 3.9.0 - 2022-09-12
+--------------------------------
+- Feature - UnitOfMeasure property added to Layer class (migration added)(#98)
+
+Ver. 3.8.1 - 2022-08-10
+--------------------------------
+- Feature - GetRewards API added (#87)
+
+Ver. 3.8.0 - 2022-08-03
+--------------------------------
+- Feature - First implementation and integration of the new CSI service for sending reports (appsettings CSI added)(migration added)(#96)
+
+Ver. 3.7.8 - 2022-07-29
+--------------------------------
+- Feature - Restriction property added to Communication entity (migration added)(#88)
+
+Ver. 3.7.7 - 2022-07-27
+--------------------------------
+- Bugfix - Fix GetCommunication API, scope management added (#94)
+- Feature - DisplayName property  added where necessary (#95)
+
+Ver. 3.7.6 - 2022-07-25
+--------------------------------
+- Feature - Added Email property to Person entity (migration added)(#91)
+
+Ver. 3.7.5 - 2022-07-25
+--------------------------------
 - Bugfix - CreatePersonAction, CreateInterventionAsync, fix for people that set their status to Active for the first time (#90)
+- Feature - First update for gamification (migration added)(#87)
+- Feature - Order of GetTips set based on CrisisPhase (#92)
+- Feature - Scope property added to Communication entity (migration added)(#88)
 
 Ver. 3.7.2 - 2022-04-26
 --------------------------------

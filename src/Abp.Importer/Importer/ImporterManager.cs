@@ -3,6 +3,7 @@ using Abp.Importer.Client;
 using Abp.Importer.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -27,10 +28,10 @@ namespace Abp.Importer
             GlobalConfiguration.Instance = new GlobalConfiguration(new Dictionary<string, string>(), apiKeyDict, new Dictionary<string, string>(), _connectionProvider.GetBaseUrl());
         }
 
-        public async Task<object> GetLayers(List<string> datatype_ids, string bbox, DateTime start, DateTime end, string request_code, bool includeMapRequests = false)
+        public async Task<object> GetLayers(List<string> datatype_ids, string bbox, DateTime start, DateTime end, List<string> request_codes, bool includeMapRequests = false)
         {
             var api = new DashboardApi();
-            return await api.GetLayersLayersGetAsync(datatype_ids, bbox, start, end, request_code, includeMapRequests);
+            return await api.GetLayersLayersGetAsync(datatype_ids, bbox, start, end, request_codes, includeMapRequests);
         }
 
         public async Task<object> GetTimeSeries(string datatype_id, string point, string attribute, DateTime start, DateTime end)
@@ -41,8 +42,18 @@ namespace Abp.Importer
 
         public async Task<object> GetMetadata(string metadata_id)
         {
-            var api = new DashboardApi();
+            var api = new DatalakeUtilsApi();
             return await api.GetMetadataMetadataGetAsync(metadata_id);
+        }
+
+        public async Task<List<string>> DeleteMapRequests(List<string> mapRequestCodes)
+        {
+            var api = new DatalakeUtilsApi();
+            var result = new List<string>();
+            var deletedLayers = await api.DeleteLayersDeleteLayerDeleteAsync(null, mapRequestCodes);
+            if(deletedLayers != null && deletedLayers.Count > 0)
+                result = deletedLayers.Select(a => a.RequestCode).Distinct().ToList();
+            return result;
         }
     }
 }

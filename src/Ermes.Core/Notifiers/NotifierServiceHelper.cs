@@ -3,6 +3,7 @@ using Ermes.MapRequests;
 using Ermes.Notifiers.MessageBody;
 using NetTopologySuite.IO;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Ermes.Notifiers
@@ -27,10 +28,11 @@ namespace Ermes.Notifiers
             {
                 case EntityType.MapRequest:
                     var mr = await _mapRequestManager.GetMapRequestByIdAsync(entityId);
-                    payloads = new string[mr.DataTypeIds.Count];
-                    dataTypeIds = new int[mr.DataTypeIds.Count];
+                    int numOfLayers = mr.MapRequestLayers.Count;
+                    payloads = new string[numOfLayers];
+                    dataTypeIds = new int[numOfLayers];
                     entityIdentifier = mr.Code;
-                    for (int i = 0; i < mr.DataTypeIds.Count; i++)
+                    for (int i = 0; i < numOfLayers; i++)
                     {
                         MapRequestBody body = new MapRequestBody()
                         {
@@ -39,13 +41,13 @@ namespace Ermes.Notifiers
                             request_code = mr.Code,
                             geometry = mr.AreaOfInterest,
                             frequency = mr.Frequency,
-                            datatype_id = mr.DataTypeIds[i],
+                            datatype_id = mr.MapRequestLayers.ElementAt(i).LayerDataTypeId,
                             resolution = mr.Resolution
                         };
                         payloads[i] = writer.Write(body);
                         dataTypeIds[i] = body.datatype_id;
                     }
-                    
+
                     break;
                 default:
                     break;

@@ -16,6 +16,10 @@ namespace Ermes.Auth.Dto
         public string MobilePhone { get; set; }
         public List<string> PreferredLanguages { get; set; }
         public string Username { get; set; }
+        public string DisplayName { get {
+                return Username ?? Email;
+            }
+        }
         public string Password { get; set; }
         public List<string> Roles { get; set; }
         public string Timezone { get; set; }

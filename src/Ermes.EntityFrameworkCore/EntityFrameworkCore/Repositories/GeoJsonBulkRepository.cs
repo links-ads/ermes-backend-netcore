@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 using Abp;
 using Ermes.Activations;
 using Ermes.MapRequests;
+using static Ermes.Authorization.AppPermissions;
 
 namespace Ermes.GeoJson
 {
@@ -99,6 +100,8 @@ namespace Ermes.GeoJson
         //}
 
 
+        //The visibility of the different entities is based on the organization of the creator of the entity,
+        //made exception for the Communication, where the visibility is defined by the Restriction property
         public string GetGeoJsonCollection(
             DateTime StartDate,
             DateTime EndDate,
@@ -107,6 +110,7 @@ namespace Ermes.GeoJson
             int[] organizationIdList,
             List<ActionStatusType> statusTypes,
             int[] activityIds,
+            int[] teamIds,
             List<HazardType> hazardTypes,
             List<GeneralStatus> reportStatusTypes,
             List<MissionStatusType> missionStatusTypes,
@@ -115,7 +119,9 @@ namespace Ermes.GeoJson
             List<MapRequestStatusType> mapRequestStatusTypes,
             VisibilityType visibilityType,
             List<ReportContentType> reportContentTypes,
+            List<CommunicationRestrictionType> communicationRestrictionTypes,
             int srid,
+            string personName,
             string Language = "it"
             )
         {
@@ -135,14 +141,14 @@ namespace Ermes.GeoJson
                         to_char(upper(m.""Duration""), 'YYYY-MM-DD""T""HH24:MI:SSZ') as ""endDate"", 
                         lower(m.""Duration"") as ""startDateFilter"", 
                         upper(m.""Duration"") as ""endDateFilter"", 
-                        'Mission' as ""type"" ,
+                        'Mission' as ""type"",
                         ST_CENTROID(m.""AreaOfInterest"") as ""location"",
                         m.""CurrentStatus""  as ""status"",
                         o.""Id"" as ""organizationId"",
                         o.""Name"" as ""organizationName"",
                         o.""ParentId"" as ""organizationParentId"",
                         null as ""extensionData"",
-	                    p.""Username"" as ""creator"",
+	                    coalesce(p.""Username"", p.""Email"") as ""creator"",
                         null as ""statusFilter"",
                         0 as ""activityFilter"",
                         null as ""hazardFilter"",
@@ -152,7 +158,9 @@ namespace Ermes.GeoJson
                         null as ""mapRequestStatusFilter"",
                         null as ""mapRequestLayerFilter"",
                         null as ""reportContentTypeFilter"",
-                        null as ""reportIsPublicFilter""
+                        null as ""reportIsPublicFilter"",
+                        null as ""communicationRestrictionFilter"",
+                        0 as ""teamFilter""
                     from public.missions m
                     left join public.organizations o on o.""Id"" = m.""OrganizationId""
                     join public.persons p on p.""Id"" = m.""CreatorUserId""
@@ -171,7 +179,7 @@ namespace Ermes.GeoJson
                         o.""Name"" as ""organizationName"",
                         o.""ParentId"" as ""organizationParentId"",
                         null as ""extensionData"",
-                        p.""Username"" as ""creator"",
+                        coalesce(p.""Username"", p.""Email"") as ""creator"",
                         null as ""statusFilter"",
                         0 as ""activityFilter"",
                         null as ""hazardFilter"",
@@ -181,7 +189,9 @@ namespace Ermes.GeoJson
                         null as ""mapRequestStatusFilter"",
                         null as ""mapRequestLayerFilter"",
                         null as ""reportContentTypeFilter"",
-                        null as ""reportIsPublicFilter""
+                        null as ""reportIsPublicFilter"",
+                        c.""Restriction"" as ""communicationRestrictionFilter"",
+                        0 as ""teamFilter""
                     from public.communications c
                     join public.persons p on p.""Id"" = c.""CreatorUserId""
                     left join public.organizations o on o.""Id"" = p.""OrganizationId""
@@ -200,7 +210,7 @@ namespace Ermes.GeoJson
                         o.""Name"" as ""organizationName"",
                         o.""ParentId"" as ""organizationParentId"",
                         null as ""extensionData"",
-                        p.""Username"" as ""creator"",
+                        coalesce(p.""Username"", p.""Email"") as ""creator"",
                         null as ""statusFilter"",
                         0 as ""activityFilter"",
                         r.""Hazard"" as ""hazardFilter"",
@@ -210,7 +220,9 @@ namespace Ermes.GeoJson
                         null as ""mapRequestStatusFilter"",
                         null as ""mapRequestLayerFilter"",
                         r.""ContentType"" as ""reportContentTypeFilter"",
-                        r.""IsPublic""::text as ""reportIsPublicFilter""
+                        r.""IsPublic""::text as ""reportIsPublicFilter"",
+                        null as ""communicationRestrictionFilter"",
+                        0 as ""teamFilter""
                     from public.reports r 
                     join public.persons p on p.""Id"" = r.""CreatorUserId""
                     left join public.organizations o on o.""Id"" = p.""OrganizationId""
@@ -229,7 +241,7 @@ namespace Ermes.GeoJson
                         o.""Name"" as ""organizationName"",
                         o.""ParentId"" as ""organizationParentId"",
                         null as ""extensionData"",
-                        p.""Username"" as ""creator"",
+                        coalesce(p.""Username"", p.""Email"") as ""creator"",
                         null as ""statusFilter"",
                         0 as ""activityFilter"",
                         null as ""hazardFilter"",
@@ -239,7 +251,9 @@ namespace Ermes.GeoJson
                         null as ""mapRequestStatusFilter"",
                         null as ""mapRequestLayerFilter"",
                         null as ""reportContentTypeFilter"",
-                        null as ""reportIsPublicFilter""
+                        null as ""reportIsPublicFilter"",
+                        null as ""communicationRestrictionFilter"",
+                        0 as ""teamFilter""
                     from public.reportrequests r2 
                     join public.persons p on p.""Id"" = r2.""CreatorUserId""
                     left join public.organizations o on o.""Id"" = p.""OrganizationId""
@@ -258,7 +272,7 @@ namespace Ermes.GeoJson
                         o.""Name"" as ""organizationName"",
                         o.""ParentId"" as ""organizationParentId"",
                         null as ""extensionData"",
-                        p.""Username"" as ""creator"",
+                        coalesce(p.""Username"", p.""Email"") as ""creator"",
                         null as ""statusFilter"",
                         0 as ""activityFilter"",
                         null as ""hazardFilter"",
@@ -268,7 +282,9 @@ namespace Ermes.GeoJson
                         mr.""Status"" as ""mapRequestStatusFilter"",
                         mr.""Layer"" as ""mapRequestLayerFilter"",
                         null as ""reportContentTypeFilter"",
-                        null as ""reportIsPublicFilter""
+                        null as ""reportIsPublicFilter"",
+                        null as ""communicationRestrictionFilter"",
+                        0 as ""teamFilter""
                     from public.map_requests mr
                     join public.persons p on p.""Id"" = mr.""CreatorUserId""
                     left join public.organizations o on o.""Id"" = p.""OrganizationId""
@@ -287,7 +303,7 @@ namespace Ermes.GeoJson
 	                    o.""Name"" as ""organizationName"",
                         o.""ParentId"" as ""organizationParentId"",
                         pa.""CurrentExtensionData""::text as ""extensionData"",
-	                    p.""Username"" as ""creator"",
+	                    coalesce(p.""Username"", p.""Email"") as ""creator"",
                         pa.""CurrentStatus"" as ""statusFilter"",
                         coalesce(a.""ParentId"", a.""Id"") as ""activityFilter"",
                         null as ""hazardFilter"",
@@ -297,7 +313,9 @@ namespace Ermes.GeoJson
                         null as ""mapRequestStatusFilter"",
                         null as ""mapRequestLayerFilter"",
                         null as ""reportContentTypeFilter"",
-                        null as ""reportIsPublicFilter""
+                        null as ""reportIsPublicFilter"",
+                        null as ""communicationRestrictionFilter"",
+                        t.""Id"" as ""TeamId""
                         FROM (
 	                        SELECT pa2.""PersonId"", MAX(pa2.""Timestamp"") as ""MaxTime""
                             FROM person_actions pa2
@@ -306,6 +324,7 @@ namespace Ermes.GeoJson
                     INNER JOIN person_actions pa ON pa.""PersonId"" = r.""PersonId"" and r.""MaxTime"" = pa.""Timestamp""
                     join public.persons p on p.""Id"" = pa.""PersonId""
                     left join public.organizations o on o.""Id"" = p.""OrganizationId""
+                    left join public.teams t on t.""Id"" = p.""TeamId""
                     left join public.activities a on a.""Id"" = pa.""CurrentActivityId""
                     left join public.activity_translations at2 on at2.""CoreId"" = pa.""CurrentActivityId""
                     where (at2.""Language"" = @language or at2.""Language"" is null)
@@ -343,17 +362,41 @@ namespace Ermes.GeoJson
                     command.Parameters.Add(p);
                 }
 
+                //Professional cannot see citizens' position
                 if (organizationIdList != null)
                 {
-                    command.CommandText += @" and (tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations]) or tmp.""organizationId"" is null)";
+                    command.CommandText += @" 
+                        and (((tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations]) or tmp.""organizationId"" is null) and tmp.""type"" in ('Mission', 'MapRequest')) or 
+                        ((tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations]) or tmp.""reportIsPublicFilter"" = 'true') and tmp.""type"" = 'Report') or
+                        ((tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations])) and tmp.""type"" = 'Person') or
+                        (tmp.""type"" = 'Communication' and tmp.""communicationRestrictionFilter"" = any(array[@restrictionTypes]) and (tmp.""communicationRestrictionFilter"" != 'Organization' or tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations]))))";
                     var p = new NpgsqlParameter("@organizations", NpgsqlDbType.Array | NpgsqlDbType.Integer)
                     {
                         Value = organizationIdList
                     };
+
                     command.Parameters.Add(p);
                 }
-                else
-                    command.CommandText += @" and tmp.""organizationId"" is null";
+                else //citizen can see his position, public reports and public public Communications
+                {
+                    command.CommandText += @"
+                        and (
+                                (tmp.""creator"" = @personName and tmp.""type"" = 'Person') or 
+                                (tmp.""reportIsPublicFilter"" = 'true' and tmp.""type"" = 'Report') or
+                                (tmp.""type"" = 'Communication' and tmp.""communicationRestrictionFilter"" = any(array[@restrictionTypes]))
+                            )";
+                    var p = new NpgsqlParameter("@personName", NpgsqlDbType.Text)
+                    {
+                        Value = personName
+                    };
+                    command.Parameters.Add(p);
+                }
+
+                var parameter = new NpgsqlParameter("@restrictionTypes", NpgsqlDbType.Array | NpgsqlDbType.Text)
+                {
+                    Value = communicationRestrictionTypes.Select(a => a.ToString()).ToArray()
+                };
+                command.Parameters.Add(parameter);
 
                 if (statusTypes != null && statusTypes.Count > 0)
                 {
@@ -374,6 +417,17 @@ namespace Ermes.GeoJson
                     };
                     command.Parameters.Add(p);
                 }
+
+                if (teamIds != null && teamIds.Length > 0)
+                {
+                    command.CommandText += @" and (tmp.""teamFilter"" = 0 or tmp.""teamFilter"" = any(array[@teamIds]))";
+                    var p = new NpgsqlParameter("@teamIds", NpgsqlDbType.Array | NpgsqlDbType.Integer)
+                    {
+                        Value = teamIds
+                    };
+                    command.Parameters.Add(p);
+                }
+
 
                 if (hazardTypes != null && hazardTypes.Count > 0)
                 {
@@ -469,7 +523,167 @@ namespace Ermes.GeoJson
             }
         }
 
-        public string GetPersonActions(DateTime startDate, DateTime endDate, int[] organizationIdList, List<ActionStatusType> statusTypes, int[] activityIds, Geometry boundingBox, string search = "", string language = "it")
+        public string GetPersonActions(
+            DateTime startDate, 
+            DateTime endDate, 
+            int[] organizationIdList, 
+            List<ActionStatusType> statusTypes, 
+            int[] activityIds, 
+            int[] teamIds, 
+            Geometry boundingBox, 
+            string personName,
+            string search = "", 
+            string language = "it"
+        )
+        {
+            var result = new List<object>();
+            ErmesDbContext context = _dbContextProvider.GetDbContext();
+            using (var command = context.Database.GetDbConnection().CreateCommand())
+            {
+                command.CommandText = @"
+                select json_build_object(
+                    'PersonActions', json_agg(tmp.*)
+                ) as collection
+                from (
+                    SELECT pa.""Id"",
+                    pa.""DeviceId"",
+                    pa.""DeviceName"",
+                    ST_Y((pa.""Location"")::geometry) as ""Latitude"",
+                    ST_X((pa.""Location"")::geometry) as ""Longitude"",
+                    pa.""CurrentExtensionData""::text as ""ExtensionData"",
+                    pa.""Location"",
+                    pa.""CurrentActivityId"" as ""ActivityId"",
+                    at2.""Name"" as ""ActivityName"",
+	                pa.""Timestamp"", 
+	                pa.""CurrentStatus"" as ""Status"",
+	                o.""Id"" as ""OrganizationId"",
+	                o.""Name"" as ""OrganizationName"",
+                    o.""ParentId"" as ""OrganizationParentId"",
+                    t.""Id"" as ""TeamId"",
+                    t.""Name"" as ""TeamName"",
+	                coalesce(p.""Username"", p.""Email"") as ""Username"",
+                    null as ""Type"",
+                    coalesce(a.""ParentId"", a.""Id"") as ""activityFilter""
+                    FROM (
+	                    SELECT pa2.""PersonId"", MAX(pa2.""Timestamp"") as ""MaxTime""
+                        FROM person_actions pa2
+                        GROUP BY pa2.""PersonId""
+                    ) r
+                    INNER JOIN person_actions pa ON pa.""PersonId"" = r.""PersonId"" and r.""MaxTime"" = pa.""Timestamp""
+                    join public.persons p on p.""Id"" = pa.""PersonId""
+                    left join public.organizations o on o.""Id"" = p.""OrganizationId""
+                    left join public.teams t on t.""Id"" = p.""TeamId""
+                    left join public.activities a on a.""Id"" = pa.""CurrentActivityId""
+                    left join public.activity_translations at2 on at2.""CoreId"" = pa.""CurrentActivityId""
+                    where (at2.""Language"" = @language or at2.""Language"" is null)
+                ) as ""tmp""
+                where (tmp.""Timestamp"" >= @startDate and tmp.""Timestamp"" <= @endDate)
+                ";
+
+                command.CommandType = CommandType.Text;
+                command.Parameters.Add(new NpgsqlParameter("@startDate", startDate));
+                command.Parameters.Add(new NpgsqlParameter("@endDate", endDate));
+                command.Parameters.Add(new NpgsqlParameter("@language", language));
+
+                //Professional cannot see citizens' position
+                if (organizationIdList != null)
+                {
+                    command.CommandText += @" and (tmp.""OrganizationId"" = any(array[@organizations]) or tmp.""OrganizationParentId"" = any(array[@organizations]))";
+                    var p = new NpgsqlParameter("@organizations", NpgsqlDbType.Array | NpgsqlDbType.Integer)
+                    {
+                        Value = organizationIdList
+                    };
+                    command.Parameters.Add(p);
+                }
+                else //citizen can see himself
+                {
+                    command.CommandText += @" and tmp.""Username"" = @personName";
+                    var p = new NpgsqlParameter("@personName", NpgsqlDbType.Text)
+                    {
+                        Value = personName
+                    };
+                    command.Parameters.Add(p);
+                }
+
+                if (boundingBox != null)
+                {
+                    command.CommandText += @" and ST_INTERSECTS(tmp.""Location"", @boundingBox)";
+                    var p = new NpgsqlParameter("@boundingBox", NpgsqlDbType.Geography)
+                    {
+                        Value = boundingBox
+                    };
+                    command.Parameters.Add(p);
+                }
+
+                if (statusTypes != null && statusTypes.Count > 0)
+                {
+                    command.CommandText += @" and (tmp.""Status"" is null or tmp.""Status"" = any(array[@statusTypes]))";
+                    var p = new NpgsqlParameter("@statusTypes", NpgsqlDbType.Array | NpgsqlDbType.Text)
+                    {
+                        Value = statusTypes.Select(a => a.ToString()).ToArray()
+                    };
+                    command.Parameters.Add(p);
+                }
+
+                if (activityIds != null && activityIds.Length > 0)
+                {
+                    command.CommandText += @" and ((tmp.""Status"" is null or tmp.""Status"" != 'Active') or (tmp.""Status"" = 'Active' and (tmp.""activityFilter""= 0 or tmp.""activityFilter"" = any(array[@activityIds]))))";
+                    var p = new NpgsqlParameter("@activityIds", NpgsqlDbType.Array | NpgsqlDbType.Integer)
+                    {
+                        Value = activityIds
+                    };
+                    command.Parameters.Add(p);
+                }
+
+                if (teamIds != null && teamIds.Length > 0)
+                {
+                    command.CommandText += @" and tmp.""TeamId"" = any(array[@teamIds])";
+                    var p = new NpgsqlParameter("@teamIds", NpgsqlDbType.Array | NpgsqlDbType.Integer)
+                    {
+                        Value = teamIds
+                    };
+                    command.Parameters.Add(p);
+                }
+
+                if (search != null && search != "")
+                {
+                    search = "%" + search + "%";
+                    command.CommandText += @" and tmp.""Username"" like @search ";
+                    var p = new NpgsqlParameter("@search", NpgsqlDbType.Text)
+                    {
+                        Value = search
+                    };
+                    command.Parameters.Add(p);
+                }
+
+                using (var rows = command.ExecuteReader())
+                {
+                    if (rows.Read())
+                    {
+                        var res = rows.GetString("collection");
+                        return res;
+                    }
+                    else
+                        return null;
+
+
+                }
+            }
+        }
+
+        //Extended version to retrieve the receivers of a communications
+        public string GetPersonActions(
+            DateTime startDate, 
+            DateTime endDate, 
+            int[] organizationIdList, 
+            List<ActionStatusType> statusTypes, 
+            int[] activityIds, 
+            Geometry boundingBox, 
+            string search = "", 
+            string language = "it", 
+            CommunicationScopeType scopeType = CommunicationScopeType.Restricted,
+            CommunicationRestrictionType restrictionType = CommunicationRestrictionType.Organization
+        )
         {
             var result = new List<object>();
             ErmesDbContext context = _dbContextProvider.GetDbContext();
@@ -495,8 +709,11 @@ namespace Ermes.GeoJson
 	                o.""Name"" as ""OrganizationName"",
                     o.""ParentId"" as ""OrganizationParentId"",
 	                p.""Username"",
+                    p.""Id"" as ""PersonId"",
+                    p.""TeamId"",
                     null as ""Type"",
-                    coalesce(a.""ParentId"", a.""Id"") as ""activityFilter""
+                    coalesce(a.""ParentId"", a.""Id"") as ""activityFilter"",
+                    p.""Email""
                     FROM (
 	                    SELECT pa2.""PersonId"", MAX(pa2.""Timestamp"") as ""MaxTime""
                         FROM person_actions pa2
@@ -516,18 +733,26 @@ namespace Ermes.GeoJson
                 command.Parameters.Add(new NpgsqlParameter("@startDate", startDate));
                 command.Parameters.Add(new NpgsqlParameter("@endDate", endDate));
                 command.Parameters.Add(new NpgsqlParameter("@language", language));
-                if (organizationIdList != null)
+                if (scopeType == CommunicationScopeType.Restricted)
                 {
-                    command.CommandText += @" and (tmp.""OrganizationId"" = any(array[@organizations]) or tmp.""OrganizationParentId"" = any(array[@organizations]) or tmp.""OrganizationId"" is null)";
-                    var p = new NpgsqlParameter("@organizations", NpgsqlDbType.Array | NpgsqlDbType.Integer)
+                    switch (restrictionType)
                     {
-                        Value = organizationIdList
-                    };
-                    command.Parameters.Add(p);
-                }
-                else //Get only citizen actions
-                {
-                    command.CommandText += @" and tmp.""OrganizationId"" is null";
+                        case CommunicationRestrictionType.Professional:
+                            command.CommandText += @" and tmp.""OrganizationId"" is not null";
+                            break;
+                        case CommunicationRestrictionType.Citizen:
+                            command.CommandText += @" and tmp.""OrganizationId"" is null";
+                            break;
+                        case CommunicationRestrictionType.Organization:
+                        default:
+                            command.CommandText += @" and (tmp.""OrganizationId"" = any(array[@organizations]) or tmp.""OrganizationParentId"" = any(array[@organizations]))";
+                            var p = new NpgsqlParameter("@organizations", NpgsqlDbType.Array | NpgsqlDbType.Integer)
+                            {
+                                Value = organizationIdList
+                            };
+                            command.Parameters.Add(p);
+                            break;
+                    }
                 }
 
                 if (boundingBox != null)

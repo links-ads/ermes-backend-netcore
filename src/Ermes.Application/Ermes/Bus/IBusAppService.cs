@@ -10,5 +10,7 @@ namespace Ermes.Bus
     public interface IBusAppService : IBackofficeApi
     {
         Task TestBusConsumerTopic(TestBusConsumerTopicInput input);
+        Task TestGamificationNotification(TestBusConsumerTopicInput input);
+        Task TestCsiPresidiService();
     }
 }

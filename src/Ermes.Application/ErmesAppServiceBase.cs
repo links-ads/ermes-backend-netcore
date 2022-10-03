@@ -1,8 +1,12 @@
 ﻿using Abp.Application.Services;
+using Abp.BackgroundJobs;
 using Abp.UI;
 using Ermes.Auth.Dto;
 using Ermes.Authorization;
 using Ermes.Enums;
+using Ermes.EventHandlers;
+using Ermes.Gamification;
+using Ermes.Gamification.Dto;
 using Ermes.Missions;
 using Ermes.Missions.Dto;
 using Ermes.Organizations;
@@ -103,7 +107,7 @@ namespace Ermes
             return roleList;
         }
 
-        protected async Task<ProfileDto> GetProfileInternal(Person person, User user, PersonManager _personManager, MissionManager _missionManager)
+        protected async Task<ProfileDto> GetProfileInternal(Person person, User user, PersonManager _personManager, MissionManager _missionManager, GamificationManager _gamificationManager, ErmesAppSession _session, IBackgroundJobManager _backgroundJobManager)
         {
             ProfileDto profile = new ProfileDto()
             {
@@ -111,6 +115,8 @@ namespace Ermes
                 IsFirstLogin = person.IsFirstLogin,
                 IsNewUser = person.IsNewUser,
                 LegacyId = person.LegacyId,
+                Points = person.Points,
+                Level = person.LevelId.HasValue ? person.Level.Name : null,
                 User = ObjectMapper.Map<UserDto>(user)
             };
 
@@ -137,15 +143,36 @@ namespace Ermes
             profile.CurrentMissions = ObjectMapper.Map<List<MissionDto>>(_missionManager.GetCurrentMissions(person));
 
             profile.User.Roles = await _personManager.GetPersonRoleNamesAsync(profile.PersonId);
-            if(profile.User.Roles.Count == 0) //assign default role to current user
+            if(profile.User.Roles.Count == 0)
             {
-                var defaultRole = await _personManager.GetDefaultRole();
-                await _personManager.InsertPersonRoleAsync(new PersonRole()
+                var reg = user?.registrations?.ElementAt(0);
+                if (reg != null) //look for roles from FusionAuth
                 {
-                    PersonId = person.Id,
-                    RoleId = defaultRole.Id
-                });
-                profile.User.Roles.Add(defaultRole.Name);
+                    var roles = await _personManager.GetRolesByName(reg.roles);
+                    foreach (var r in roles)
+                    {
+                        await _personManager.InsertPersonRoleAsync(new PersonRole()
+                        {
+                            PersonId = person.Id,
+                            RoleId = r.Id
+                        });
+                        profile.User.Roles.Add(r.Name);
+                        if (r.Name == AppRoles.CITIZEN)
+                            person.LevelId = (await _gamificationManager.GetDefaultLevel()).Id;
+                    }
+                }
+                else //assign default role
+                {
+                    var defaultRole = await _personManager.GetDefaultRole();
+                    await _personManager.InsertPersonRoleAsync(new PersonRole()
+                    {
+                        PersonId = person.Id,
+                        RoleId = defaultRole.Id
+                    });
+                    profile.User.Roles.Add(defaultRole.Name);
+                    if (defaultRole.Name == AppRoles.CITIZEN)
+                        person.LevelId = (await _gamificationManager.GetDefaultLevel()).Id;
+                }
             }
 
             if (profile.User.Timezone == null)
@@ -154,6 +181,9 @@ namespace Ermes
             //set Default language, but does not update User profile on FusionAuth
             if (profile.User.PreferredLanguages == null || profile.User.PreferredLanguages.Count == 0)
                 profile.User.PreferredLanguages = new List<string>() { AppConsts.DefaultLanguage };
+
+            profile.Medals = ObjectMapper.Map<List<MedalDto>>(await _gamificationManager.GetPersonMedalsAsync(profile.PersonId));
+            profile.Badges = ObjectMapper.Map<List<BadgeDto>>(await _gamificationManager.GetPersonBadgesAsync(profile.PersonId));
 
             return profile;
         }
@@ -206,8 +236,7 @@ namespace Ermes
             {
                 person = new Person()
                 {
-                    FusionAuthUserGuid = user.id.Value,
-                    Username = user.username,
+                    FusionAuthUserGuid = user.id.Value
                 };
             }
 
@@ -215,7 +244,7 @@ namespace Ermes
             person.TeamId = teamId;
             person.IsFirstLogin = isFirstLogin;
             person.IsNewUser = isNewUser;
-
+            person.Username = user.username;
 
             Logger.Info("Ermes: Create or update Person: " + person.Username);
             long personId = await _personManager.InsertOrUpdatePersonAsync(person);
@@ -233,6 +262,21 @@ namespace Ermes
                     RoleId = rta.Id
                 };
                 await _personManager.InsertPersonRoleAsync(pr);
+
+                //If citizen, set Ready as default state;
+                //This allows to send communications to citizens, since they cannot change their status from the UI of the Chatbot;
+                //Communication are not sent to person in Off status
+                if (rta.Name == AppRoles.CITIZEN)
+                {
+                    await _personManager.InsertPersonActionStatusAsync(new PersonActionStatus()
+                    {
+                        CurrentStatus = ActionStatusType.Ready,
+                        PersonId = personId,
+                        Timestamp = DateTime.UtcNow,
+                        Status = ActionStatusType.Ready,
+                        CreatorUserId = personId
+                    });
+                }
             }
 
             await CurrentUnitOfWork.SaveChangesAsync();
@@ -288,14 +332,18 @@ namespace Ermes
             var fa_users = ObjectMapper.Map<List<User>>(users);
 
             fa_users.Select(u => {
-                u.registrations = new List<UserRegistration>() {
-                new UserRegistration()
-                {
-                    applicationId = new Guid(_fusionAuthSettings.Value.ApplicationId),
-                    roles = users.Where(user => user.Id == u.id).Single().Roles
-                }
-            }; return u;
-            }).ToList();
+                    u.registrations = new List<UserRegistration>() {
+                        new UserRegistration()
+                        {
+                            applicationId = new Guid(_fusionAuthSettings.Value.ApplicationId),
+                            roles = users.Where(user => user.Id == u.id).Single().Roles,
+                            verified = true
+                        }
+                    };
+                    u.verified = true;
+                    u.active = true;
+                    return u;
+                }).ToList();
             //Create user on FusionAuth
             var import = new ImportRequest()
             {

@@ -10,17 +10,22 @@ namespace Ermes.Persons.Cache
     {
         public PersonCacheDto(Person p)
         {
-            // Should use automap here
-            this.Id = p.Id;
-            this.OrganizationId = p.OrganizationId;
-            this.RegistrationToken = p.RegistrationToken;
-            this.TeamId = p.TeamId;
-            this.Username = p.Username;
+            if (p != null)
+            {
+                // Should use automap here
+                Id = p.Id;
+                OrganizationId = p.OrganizationId;
+                RegistrationToken = p.RegistrationToken;
+                TeamId = p.TeamId;
+                Username = p.Username;
+                Email = p.Email;
+            }
         }
         public long Id { get; private set; }
         public int? OrganizationId { get; private set; }
         public int? TeamId { get; private set; }
         public string Username { get; private set; }
+        public string Email { get; private set; }
         public string RegistrationToken { get; private set; }
 
     }

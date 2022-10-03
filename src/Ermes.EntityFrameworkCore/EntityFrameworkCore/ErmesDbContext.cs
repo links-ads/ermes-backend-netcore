@@ -1,40 +1,36 @@
 ﻿using Abp.EntityFrameworkCore;
-using Ermes.Persons;
-using Ermes.Organizations;
-using Microsoft.EntityFrameworkCore;
-using Ermes.Activities;
-using Ermes.Migrations.Seed;
-using Ermes.CompetenceAreas;
-using Ermes.Roles;
-using Ermes.Permissions;
-using Ermes.Missions;
-using System.Linq;
-using Ermes.Categories;
-using System;
-using Ermes.Reports;
-using Ermes.ReportRequests;
-using Ermes.Communications;
-using Ermes.Notifications;
-using Ermes.Preferences;
-using Ermes.Teams;
-using Abp.Authorization;
-using Ermes.Exceptions;
-using System.Threading.Tasks;
-using System.Threading;
 using Abp.UI;
-using Abp.Localization;
-using Ermes.Localization;
-using Abp.Events.Bus.Entities;
-using Ermes.EntityHistory;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using System.Collections.Generic;
-using Ermes.Tips;
-using Ermes.Quizzes;
+using Ermes.Activities;
 using Ermes.Answers;
-using Ermes.MapRequests;
+using Ermes.Categories;
+using Ermes.Communications;
+using Ermes.CompetenceAreas;
+using Ermes.EntityHistory;
+using Ermes.Exceptions;
+using Ermes.Gamification;
 using Ermes.Layers;
+using Ermes.Localization;
+using Ermes.MapRequests;
+using Ermes.Missions;
+using Ermes.Notifications;
 using Ermes.Operations;
+using Ermes.Organizations;
+using Ermes.Permissions;
+using Ermes.Persons;
+using Ermes.Preferences;
+using Ermes.Quizzes;
+using Ermes.ReportRequests;
+using Ermes.Reports;
+using Ermes.Roles;
+using Ermes.Teams;
+using Ermes.Tips;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Ermes.EntityFrameworkCore
 {
@@ -75,6 +71,17 @@ namespace Ermes.EntityFrameworkCore
         public virtual DbSet<Layer> Layers { get; set; }
         public virtual DbSet<LayerTranslation> LayerTranslations { get; set; }
         public virtual DbSet<Operation> Operations { get; set; }
+        public virtual DbSet<Level> Levels { get; set; }
+        public virtual DbSet<GamificationAction> GamificationActions { get; set; }
+        public virtual DbSet<Reward> Rewards { get; set; }
+        public virtual DbSet<Achievement> Achievements { get; set; }
+        public virtual DbSet<Medal> Medals { get; set; }
+        public virtual DbSet<Badge> Badges { get; set; }
+        public virtual DbSet<Award> Awards { get; set; }
+        public virtual DbSet<GamificationAudit> GamificationAudit { get; set; }
+        public virtual DbSet<Gamification.Barrier> Barriers { get; set; }
+        public virtual DbSet<MapRequestLayer> MapRequestLayers { get; set; }
+
         public IEntityHistoryHelper EntityHistoryHelper { get; set; }
 
         private readonly ErmesLocalizationHelper _localizer;
@@ -185,6 +192,49 @@ namespace Ermes.EntityFrameworkCore
                 .HasPrincipalKey(t => t.Code)
                 .HasForeignKey(pt => pt.QuizCode)
                 .IsRequired(true)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<GamificationAction>().HasIndex(i => i.Code).IsUnique();
+
+            modelBuilder.Entity<Achievement>()
+                .HasOne<GamificationAction>(a => a.GamificationAction)
+                .WithMany(a => a.Achievements)
+                .HasPrincipalKey(a => a.Code)
+                .HasForeignKey(a => a.GamificationActionCode)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Gamification.Barrier>()
+                .HasIndex(b => new { b.LevelName, b.RewardName }).IsUnique(true);
+
+            modelBuilder.Entity<Gamification.Barrier>()
+                .HasOne<Level>(b => b.Level)
+                .WithMany(l => l.Barriers)
+                .HasPrincipalKey(l => l.Name)
+                .HasForeignKey(b => b.LevelName)
+                .IsRequired(true)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Gamification.Barrier>()
+                .HasOne<Reward>(b => b.Reward)
+                .WithOne(a => a.Barrier)
+                .HasPrincipalKey<Reward>(r => r.Name)
+                .HasForeignKey<Gamification.Barrier>(b => b.RewardName)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<MapRequestLayer>()
+                .HasIndex(mrl => new { mrl.MapRequestCode, mrl.LayerDataTypeId })
+                .IsUnique(true);
+            modelBuilder.Entity<MapRequestLayer>()
+                .HasOne(mrl => mrl.MapRequest)
+                .WithMany(mr => mr.MapRequestLayers)
+                .HasPrincipalKey(mr => mr.Code)
+                .HasForeignKey(mrl => mrl.MapRequestCode)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<MapRequestLayer>()
+                .HasOne(mrl => mrl.Layer)
+                .WithMany(l => l.MapRequestLayers)
+                .HasPrincipalKey(l => l.DataTypeId)
+                .HasForeignKey(mrl => mrl.LayerDataTypeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             #region EntityHistory

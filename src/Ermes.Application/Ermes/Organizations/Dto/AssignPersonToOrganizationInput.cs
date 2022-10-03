@@ -9,5 +9,6 @@ namespace Ermes.Organizations.Dto
     {
         public int OrganizationId { get; set; }
         public long PersonId { get; set; }
+        public Guid PersonGuid { get; set; }
     }
 }

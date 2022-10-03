@@ -211,14 +211,14 @@ namespace Ermes.Organizations
 
         public virtual async Task<bool> AssignPersonToOrganization(AssignPersonToOrganizationInput input)
         {
-            if (input.PersonId > 0 && input.OrganizationId > 0)
+            if ((input.PersonId > 0 || input.PersonGuid != null) && input.OrganizationId > 0)
             {
-                var person = await _personManager.GetPersonByIdAsync(input.PersonId);
+                Person person = input.PersonId > 0 ? await _personManager.GetPersonByIdAsync(input.PersonId) : await _personManager.GetPersonByFusionAuthUserGuidAsync(input.PersonGuid);
                 var organization = await _organizationManager.GetOrganizationByIdAsync(input.OrganizationId);
                 if (person != null && organization != null)
                 {
                     person.OrganizationId = organization.Id;
-                    Logger.InfoFormat("Ermes: AssignPersonToOrganization, PersonId = {0}, OrganizationId = {1}", person.Id, organization.Id);
+                    Logger.InfoFormat("Ermes: AssignPersonToOrganization, PersonId = {0}, OrganizationId = {1}", person.FusionAuthUserGuid, organization.Id);
                     return true;
                 }
                 else

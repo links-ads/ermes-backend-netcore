@@ -13,6 +13,8 @@ using Ermes.Web.Controllers;
 using System;
 using Ermes.Authorization;
 using Ermes.Organizations;
+using System.Collections.Generic;
+using Ermes.Enums;
 
 namespace Ermes.Web.Controllers
 {
@@ -64,31 +66,58 @@ namespace Ermes.Web.Controllers
                 boundingBox = GeometryHelper.GetPolygonFromBoundaries(input.SouthWestBoundary, input.NorthEastBoundary);
             input.EndDate = input.EndDate == DateTime.MinValue ? DateTime.MaxValue : input.EndDate;
             var actIds = input.ActivityIds?.ToArray();
+            var teamIds = input.TeamIds?.ToArray();
             int[] orgIdList;
             var hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Actions.Action_CanSeeCrossOrganization);
             if (hasPermission)
                 orgIdList = _organizationManager.GetOrganizationIds();
             else
                 orgIdList = _session.LoggedUserPerson.OrganizationId.HasValue ? new int[] { _session.LoggedUserPerson.OrganizationId.Value } : null;
+
+            //Admin can see everything
+            hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Communications.Communication_CanSeeCrossOrganization);
+            List<CommunicationRestrictionType> communicationRestrictionTypes = new List<CommunicationRestrictionType>() { CommunicationRestrictionType.None, CommunicationRestrictionType.Citizen };
+            if (!hasPermission)
+            {
+                foreach (var item in _session.Roles)
+                {
+                    if (item != AppRoles.CITIZEN)
+                    {
+                        communicationRestrictionTypes.Add(CommunicationRestrictionType.Professional);
+                        communicationRestrictionTypes.Add(CommunicationRestrictionType.Organization);
+                    }
+                    else
+                        input.ReportVisibilityType = VisibilityType.Public;
+                }   
+            }
+            else
+            {
+                communicationRestrictionTypes.Add(CommunicationRestrictionType.Professional);
+                communicationRestrictionTypes.Add(CommunicationRestrictionType.Organization);
+            }
+            string personName = _session.LoggedUserPerson.Username ?? _session.LoggedUserPerson.Email;
             string responseContent = _geoJsonBulkRepository.GetGeoJsonCollection(
-                        input.StartDate, 
-                        input.EndDate, 
-                        boundingBox, 
-                        input.EntityTypes, 
-                        orgIdList, 
-                        input.StatusTypes, 
-                        actIds, 
-                        input.HazardTypes, 
-                        input.ReportStatusTypes, 
-                        input.MissionStatusTypes, 
-                        input.MapRequestHazardTypes,
-                        input.MapRequestLayerTypes,
-                        input.MapRequestStatusTypes,
-                        input.ReportVisibilityType,
-                        input.ReportContentTypes,
-                        AppConsts.Srid, 
-                        _languageManager.CurrentLanguage.Name
-                    );
+                    input.StartDate, 
+                    input.EndDate, 
+                    boundingBox, 
+                    input.EntityTypes, 
+                    orgIdList, 
+                    input.StatusTypes, 
+                    actIds, 
+                    teamIds,
+                    input.HazardTypes, 
+                    input.ReportStatusTypes, 
+                    input.MissionStatusTypes, 
+                    input.MapRequestHazardTypes,
+                    input.MapRequestLayerTypes,
+                    input.MapRequestStatusTypes,
+                    input.ReportVisibilityType,
+                    input.ReportContentTypes,
+                    communicationRestrictionTypes,
+                    AppConsts.Srid,
+                    personName,
+                    _languageManager.CurrentLanguage.Name
+            );
 
             // I need to return a JsonResult or in case of exception, Abp produces html instead of json. However, the real
             // JsonResult serializes the object I give him while I have an already serialized one.

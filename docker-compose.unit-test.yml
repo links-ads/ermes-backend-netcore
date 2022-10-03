@@ -1,0 +1,27 @@
+#docker-compose.test.yml (Extended config for TEST env.)
+version: '3.5'
+
+services:
+  ermes-pgsql:
+    image: 'ermes-pgsql'
+    build:
+      context: .
+      dockerfile: src/containers/postgresql/Dockerfile
+    restart: unless-stopped  
+    container_name: 'ermes-pgsql-${ENVTYPE_UNITTEST}'
+    networks:
+      - ermes-net
+    environment:
+      POSTGRES_PASSWORD: ${ERMES_PASSWORD_UNITTEST}
+      DB_PASSWORD: ${ERMES_PASSWORD_UNITTEST}
+      DB_NAME: ${ERMES_DB_UNITTEST}
+      DB_USER: ${ERMES_USER_UNITTEST}
+    ports:
+      - '${PGSQL_PORT_UNITTEST}:5432'
+
+networks:
+  ermes-net:
+    name: ermes-net-${ENVTYPE_TEST}
+
+volumes:
+  ermeslogstest:

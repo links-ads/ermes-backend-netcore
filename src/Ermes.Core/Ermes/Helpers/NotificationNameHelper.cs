@@ -13,16 +13,14 @@ namespace Ermes.Helpers
             string topicName = "mm." + type.ToString().ToLowerInvariant();
             switch (projectName)
             {
-                case "FASTER":
+                case ErmesConsts.FasterProjectName:
                     break;
-                case "SAFERS":
+                case ErmesConsts.ShelterProjectName:
+                case ErmesConsts.SafersProjectName:
                     if (type == EntityType.MapRequest)
                         topicName = string.Format("request.{0}.links.{1}", dataTypeId, entityIdentifier);
                     else
                         topicName += "." + action.ToString().ToLowerInvariant();
-                    break;
-                case "SHELTER":
-                    topicName += "." + action.ToString().ToLowerInvariant();
                     break;
                 default:
                     break;

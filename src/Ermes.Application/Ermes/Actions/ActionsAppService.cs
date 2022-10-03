@@ -88,6 +88,7 @@ namespace Ermes.Actions
             var start = input.StartDate ?? DateTime.MinValue;
             var end = input.EndDate ?? DateTime.MaxValue;
             var actIds = input.ActivityIds?.ToArray();
+            var teamIds = input.TeamIds?.ToArray();
             var search = input.Search?.Value;
             Geometry boundingBox = null;
             if (input.NorthEastBoundary != null && input.SouthWestBoundary != null)
@@ -101,7 +102,8 @@ namespace Ermes.Actions
                 orgIdList = _session.LoggedUserPerson.OrganizationId.HasValue ? new int[] { _session.LoggedUserPerson.OrganizationId.Value } : null;
 
 
-            var items = _geoJsonBulkRepository.GetPersonActions(start, end, orgIdList, input.StatusTypes, actIds, boundingBox, search, _languageManager.CurrentLanguage.Name);
+            string personName = _session.LoggedUserPerson.Username ?? _session.LoggedUserPerson.Email;
+            var items = _geoJsonBulkRepository.GetPersonActions(start, end, orgIdList, input.StatusTypes, actIds, teamIds, boundingBox, personName, search, _languageManager.CurrentLanguage.Name);
 
             var actions = JsonConvert.DeserializeObject<GetActionsOutput>(items);
 
@@ -222,6 +224,7 @@ namespace Ermes.Actions
             }
 
             res.PersonAction.Username = _session.LoggedUserPerson.Username;
+            res.PersonAction.Email = _session.LoggedUserPerson.Email;
             res.PersonAction.OrganizationId = _session.LoggedUserPerson.OrganizationId.HasValue ? _session.LoggedUserPerson.OrganizationId.Value : 0;
             Logger.Info("Ermes: InsertPersonAction executed by person: " + personId);
             return res;

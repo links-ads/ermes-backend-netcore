@@ -27,7 +27,33 @@ namespace Ermes.GeoJson
         public IQueryable<PersonActionStatus> GetPersonActionStatuses(DateTime startDate, DateTime endDate, Geometry boundingBox);
         public IQueryable<PersonActionActivity> GetPersonActionActivities(DateTime startDate, DateTime endDate, Geometry boundingBox);
         //public IQueryable<PersonAction> GetPersonActions(DateTime startDate, DateTime endDate, Geometry boundingBox);
-        public string GetPersonActions(DateTime StartDate, DateTime EndDate, int[] organizationIdList, List<ActionStatusType> statusTypes, int[] activityIds, Geometry boundingBox, string search = "", string language = "it");
+        public string GetPersonActions(
+            DateTime StartDate, 
+            DateTime EndDate, 
+            int[] organizationIdList, 
+            List<ActionStatusType> statusTypes, 
+            int[] activityIds,
+            int[] teamIds,
+            Geometry boundingBox, 
+            string personName,
+            string search = "", 
+            string language = "it"
+        );
+
+        public string GetPersonActions(
+            DateTime StartDate,
+            DateTime EndDate,
+            int[] organizationIdList,
+            List<ActionStatusType> statusTypes,
+            int[] activityIds,
+            Geometry boundingBox,
+            string search = "",
+            string language = "it",
+            CommunicationScopeType scopeType = CommunicationScopeType.Restricted,
+            CommunicationRestrictionType restrictionType = CommunicationRestrictionType.Organization
+        );
+
+
         public string GetGeoJsonCollection(
             DateTime StartDate, 
             DateTime EndDate, 
@@ -36,6 +62,7 @@ namespace Ermes.GeoJson
             int[] organizationIdList, 
             List<ActionStatusType> statusTypes, 
             int[] activityIds, 
+            int[] teamIds, 
             List<HazardType> hazardTypes, 
             List<GeneralStatus> reportStatusTypes, 
             List<MissionStatusType> missionStatusTypes, 
@@ -44,9 +71,12 @@ namespace Ermes.GeoJson
             List<MapRequestStatusType> mapRequestStatusTypes,
             VisibilityType visibilityType,
             List<ReportContentType> reportContentTypes,
+            List<CommunicationRestrictionType> communicationRestrictionTypes,
             int srid, 
+            string personName,
             string language = "it"
         );
+
         public List<Activation> GetPersonActivations(DateTime StartDate, DateTime EndDate, ActionStatusType statusType);
     }
 }

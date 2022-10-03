@@ -16,5 +16,8 @@ namespace Ermes.Communications.Dto
         public string Message { get; set; }
         public RangeDto<DateTime> Duration { get; set; }
         public PointPosition Centroid { get; set; }
+        public CommunicationScopeType Scope { get; set; }
+        public CommunicationRestrictionType Restriction { get; set; }
+
     }
 }

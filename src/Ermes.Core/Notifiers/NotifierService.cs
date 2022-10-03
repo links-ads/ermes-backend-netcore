@@ -38,7 +38,7 @@ namespace Ermes.Notifiers
             string[] serializedPayloads;
             int[] dataTypeIds = null;
             string entityIdentifier = "";
-            if (_ermesSettings.Value.ErmesProject != ErmesConsts.SafersProjectName) //FASTER, SHELTER
+            if (_ermesSettings.Value.ErmesProject == ErmesConsts.FasterProjectName) //FASTER
             {
                 BusDto<T> busPayload = new BusDto<T>
                 {
@@ -51,7 +51,7 @@ namespace Ermes.Notifiers
                 serializedPayloads = new string[1];
                 serializedPayloads[0] = JsonSerializer.Serialize(busPayload, options);
             }
-            else //SAFERS
+            else //SAFERS, SHELTER
             {
                 if (containsGeometry)
                 {
@@ -122,13 +122,14 @@ namespace Ermes.Notifiers
             }
         }
 
-        public async Task SendUserNotification(long creatorId, IEnumerable<Person> receivers, int entityId, (string Key, string[] Params) body, (string Key, string[] Params) title, EntityWriteAction action, EntityType entityType)
+        public async Task SendUserNotification(long creatorId, IEnumerable<Person> receivers, int entityId, (string Key, string[] Params) body, (string Key, string[] Params) title, EntityWriteAction action, EntityType entityType, bool includeCreator = false)
         {
             string failureMessage = null;
             try
             {
                 // Exclude creator from list of receivers
-                receivers = receivers?.Where(p => p.Id != creatorId);
+                if(!includeCreator)
+                    receivers = receivers?.Where(p => p.Id != creatorId);
 
                 //Retrieve registration token of receivers
                 if (receivers != null && receivers.Count() > 0)

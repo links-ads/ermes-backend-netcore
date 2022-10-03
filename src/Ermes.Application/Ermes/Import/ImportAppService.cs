@@ -40,6 +40,7 @@ using Ermes.Tips;
 using Ermes.Quizzes;
 using Ermes.Answers;
 using Ermes.Layers;
+using Ermes.Gamification;
 
 namespace Ermes.Import
 {
@@ -59,6 +60,7 @@ namespace Ermes.Import
         private readonly TeamManager _teamManager;
         private readonly TipManager _tipManager;
         private readonly QuizManager _quizManager;
+        private readonly GamificationManager _gamificationManager;
         private readonly AnswerManager _answerManager;
         private readonly LayerManager _layerManager;
         private readonly ErmesPermissionChecker _permissionChecker;
@@ -81,7 +83,8 @@ namespace Ermes.Import
             TipManager tipManager,
             QuizManager quizManager,
             LayerManager layerManager,
-            AnswerManager answerManager)
+            AnswerManager answerManager,
+            GamificationManager gamificationManager)
         {
             _httpContextAccessor = httpContextAccessor;
             _appFolders = appFolders;
@@ -100,6 +103,7 @@ namespace Ermes.Import
             _quizManager = quizManager;
             _answerManager = answerManager;
             _layerManager = layerManager;
+            _gamificationManager = gamificationManager;
         }
 
         private async Task UploadImportSourceAndCleanup(IImportResourceContainer resourceContainer, bool success, IFormFile file, String tempFilePath)
@@ -285,17 +289,17 @@ s            "
                 //create data structure
                 var result = await UsersImporter.ImportUsersAsync(filename, contentType, _personManager, _organizationManager, _teamManager, _localizer);
                 
-                //add user to FusionAuth
-                await ImportUsersInternalAsync(result.Accounts.Select(a => a.Item1).ToList(), _fusionAuthSettings);
-
                 //add person on project DB
                 foreach (var tuple in result.Accounts)
                 {
                     var rolesToAssgin = await _personManager.GetRolesByName(tuple.Item1.Roles);
                     //check roles, organizations, teams and permission association
                     List<Role> rolesToAssign = await GetRolesAndCheckOrganizationAndTeam(tuple.Item1.Roles, tuple.Item2.OrganizationId, tuple.Item2.TeamId, tuple.Item2.Id, _personManager, _organizationManager, _teamManager, _session, _permissionChecker);
-                    await CreateOrUpdatePersonInternalAsync(null, ObjectMapper.Map<User>(tuple.Item1), tuple.Item2.OrganizationId, tuple.Item2.TeamId, tuple.Item2.IsFirstLogin, tuple.Item2.IsNewUser, rolesToAssign, _personManager);
+                    await CreateOrUpdatePersonInternalAsync(tuple.Item2, ObjectMapper.Map<User>(tuple.Item1), tuple.Item2.OrganizationId, tuple.Item2.TeamId, tuple.Item2.IsFirstLogin, tuple.Item2.IsNewUser, rolesToAssign, _personManager);
                 }
+
+                //If everything is ok, add users to FusionAuth
+                await ImportUsersInternalAsync(result.Accounts.Select(a => a.Item1).ToList(), _fusionAuthSettings);
 
                 return ObjectMapper.Map<ImportResultDto>(result);
             }, new ImportUsersResourceContainer(), AcceptedUsersSourceMimeTypes);
@@ -332,7 +336,7 @@ s            "
                 Import (creating or updating) a list of tips and relative translations.
                 Input: attach as form-data an excel (.xls or .xlsx) file with the correct format
                 Output: An import result dto, containing a summary of insertions and updates
-s            "
+            "
        )]
         [ErmesAuthorize(AppPermissions.Imports.Import_Gamification)]
         public virtual async Task<ImportResultDto> ImportTips(IFormFile file)
