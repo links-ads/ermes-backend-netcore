@@ -97,6 +97,7 @@
     "InvalidCategoryRangeValue": "Μη έγκυρη τιμή εύρους κατηγορίας: {0}",
     "InvalidCategoryNumericValue": "Μη έγκυρη αριθμητική τιμή κατηγορίας: {0}",
     "DoNotTakePartToGamification": "Δεν συμμετέχεις στο gamification",
-    "InvalidEmail": "Μη έγκυρη διεύθυνση e-mail"
+    "InvalidEmail": "Μη έγκυρη διεύθυνση e-mail",
+    "InvalidVolterTaxCode": "Invalid tax code"
   }
 }

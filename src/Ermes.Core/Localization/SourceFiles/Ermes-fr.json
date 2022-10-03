@@ -77,7 +77,7 @@
     "Notification_Gamification_LevelChangeDown_Body": "Vous avez été rétrogradé '{0}'",
     "Notification_Gamification_MedalObtained_Title": "Nouvelle Médaille",
     "Notification_Gamification_MedalObtained_Body": "Vous avez gagné une nouvelle médaille: {0}",
-    "Notification_Gamification_BadgeObtained_Title":  "Nouvel insigne",
+    "Notification_Gamification_BadgeObtained_Title": "Nouvel insigne",
     "Notification_Gamification_BadgeObtained_Body": "Vous avez gagné un nouveau badge: {0}",
     "Notification_Gamification_FirstLogin_Title": "Première connexion",
     "Notification_Gamification_FirstLogin_Body": "Vous avez terminé la procédure d'inscription",
@@ -97,6 +97,7 @@
     "InvalidCategoryRangeValue": "Valeur de plage de catégorie non valide: {0}",
     "InvalidCategoryNumericValue": "Valeur numérique de catégorie non valide: {0}",
     "DoNotTakePartToGamification": "Vous ne participez pas à la gamification",
-    "InvalidEmail": "Adresse e-mail invalide"
+    "InvalidEmail": "Adresse e-mail invalide",
+    "InvalidVolterTaxCode": "Invalid tax code"
   }
 }

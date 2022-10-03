@@ -11,6 +11,8 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Ermes.MapRequests;
+using Ermes.Configuration;
+using Abp.BusProducer;
 
 namespace Ermes.Notifiers
 {
@@ -19,22 +21,31 @@ namespace Ermes.Notifiers
         private readonly INotifierBase _notifierBase;
         private readonly NotificationManager _notificationManager;
         private readonly IOptions<ErmesSettings> _ermesSettings;
+        private readonly IOptions<BusProducerSettings> _busProducerSettings;
         private readonly NotifierServiceHelper _helper;
 
         public NotifierService(
                 INotifierBase notifierBase,
                 NotificationManager notificationManager,
                 NotifierServiceHelper helper,
-                IOptions<ErmesSettings> ermesSettings)
+                IOptions<ErmesSettings> ermesSettings,
+                IOptions<BusProducerSettings> busProducerSettings)
         {
             _notifierBase = notifierBase;
             _notificationManager = notificationManager;
             _ermesSettings = ermesSettings;
             _helper = helper;
+            _busProducerSettings = busProducerSettings;
         }
 
         public async Task SendBusNotification<T>(long creatorId, int entityId, T content, EntityWriteAction action, EntityType entityType, bool containsGeometry = false)
         {
+            if (!_busProducerSettings.Value.IsEnabled)
+            {
+                Logger.Info("######### Bus Producer disabled ########");
+                return;
+            }
+
             string[] serializedPayloads;
             int[] dataTypeIds = null;
             string entityIdentifier = "";
@@ -101,6 +112,12 @@ namespace Ermes.Notifiers
 
         public async Task SendTestBusNotification<T>(long creatorId, int entityId, T content, EntityWriteAction action, EntityType entityType, string topicName)
         {
+            if (!_busProducerSettings.Value.IsEnabled)
+            {
+                Logger.Info("######### Bus Producer disabled ########");
+                return;
+            }
+
             BusDto<T> busPayload = new BusDto<T>
             {
                 Content = content,
