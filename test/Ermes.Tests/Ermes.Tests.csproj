@@ -13,16 +13,6 @@
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="appsettings.test.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="appsettings.test.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\src\Ermes.Application\Ermes.Application.csproj" />
     <ProjectReference Include="..\..\src\Ermes.EntityFrameworkCore\Ermes.EntityFrameworkCore.csproj" />
     <ProjectReference Include="..\..\src\FusionAuthNetCore\FusionAuthNetCore.csproj" />
