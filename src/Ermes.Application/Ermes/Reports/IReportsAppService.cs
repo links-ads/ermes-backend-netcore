@@ -19,6 +19,5 @@ namespace Ermes.Reports
         Task<int> CreateOrUpdateReportRequest(CreateOrUpdateReportRequestInput input);
         Task<GetEntityByIdOutput<ReportRequestDto>> GetReportRequestById(GetEntityByIdInput<int> input);
         Task<bool> DeleteReportRequest(IdInput<int> input);
-
     }
 }
