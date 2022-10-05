@@ -69,5 +69,11 @@ namespace Ermes.MapRequests
         {
             mr.Status = Enums.MapRequestStatusType.Canceled;
         }
+
+        public async Task DeleteMapRequestsByPersonIdAsync(long personId)
+        {
+            await MapRequestLayersRepository.DeleteAsync(ml => ml.CreatorUserId.HasValue && ml.CreatorUserId.Value == personId);
+            await MapRequestRepository.DeleteAsync(mr => mr.CreatorUserId.HasValue && mr.CreatorUserId.Value == personId);
+        }
     }
 }

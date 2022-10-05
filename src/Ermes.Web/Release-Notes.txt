@@ -2,6 +2,7 @@ Ver.
 --------------------------------
 - Feature - Added visibility restriction in GetUsers API
 - Feature - Possbility to disable bus producer from settings added
+- Feature - Delete profile API added (#109)
 
 Ver. 3.9.5 - 2022-09-29
 --------------------------------

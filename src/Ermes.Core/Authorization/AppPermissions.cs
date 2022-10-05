@@ -63,6 +63,7 @@ namespace Ermes.Authorization
             public const string Profile = "Profile";
             public const string Profile_Create = "Profile.Create";
             public const string Profile_Update = "Profile.Update";
+            public const string Profile_Delete = "Profile.Delete";
         }
 
         public static class Actions

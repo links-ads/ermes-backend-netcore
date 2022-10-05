@@ -76,5 +76,10 @@ namespace Ermes.Missions
             return Missions
                     .Where(m => m.Duration.Overlaps(range));
         }
+
+        public async Task DeleteMissionsByPersonIdAsync(long personId)
+        {
+            await MissionRepository.DeleteAsync(m => (m.CreatorUserId.HasValue && m.CreatorUserId.Value == personId) || (m.CoordinatorPersonId.HasValue && m.CoordinatorPersonId.Value == personId));
+        }
     }
 }
