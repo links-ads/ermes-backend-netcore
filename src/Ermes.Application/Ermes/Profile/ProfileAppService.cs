@@ -334,7 +334,7 @@ namespace Ermes.Profile
             if (input == null || input.Id == null)
                 throw new UserFriendlyException(L("InvalidGuid", input));
 
-            var hasPermission = _permissionChecker.IsGranted(AppPermissions.Profiles.Profile_Delete);
+            var hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Profiles.Profile_Delete);
             if (!hasPermission)
                 throw new UserFriendlyException("MissingPermission");
 
@@ -350,7 +350,7 @@ namespace Ermes.Profile
             await _personManager.DeletePersonRolesByPersonIdAsync(person.Id);
 
             var roles = await _personManager.GetPersonRoleNamesAsync(person.Id);
-            if(roles.Any(r => r == AppRoles.CITIZEN))//remove gamification items
+            if (roles.Any(r => r == AppRoles.CITIZEN))//remove gamification items
             {
                 await _gamificationManager.DeleteAuditByPersonIdAsync(person.Id);
                 await _personManager.DeletePersonQuizzesByPersonIdAsync(person.Id);
@@ -358,10 +358,14 @@ namespace Ermes.Profile
             }
 
             var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
-            await client.DeleteUserAsync(input.Id);
-
+            var response = await client.DeleteUserAsync(input.Id);
+            if (!response.WasSuccessful())
+            {
+                var fa_error = FusionAuth.ManageErrorResponse(response);
+                throw new UserFriendlyException(fa_error.ErrorCode, fa_error.HasTranslation ? L(fa_error.Message) : fa_error.Message);
+            }
+            
             await _personManager.DeletePersonByIdAsync(person.Id);
-
             return true;
         }
 
