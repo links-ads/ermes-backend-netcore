@@ -47,6 +47,10 @@ namespace Ermes.Reports
         {
             return await Reports.Where(r => r.CreatorUserId.Value == personId).ToListAsync();
         }
+        public async Task DeleteReportsByPersonIdAsync(long personId)
+        {
+            await ReportRepository.DeleteAsync(r => r.CreatorUserId.HasValue & r.CreatorUserId.Value == personId);
+        }
 
     }
 }

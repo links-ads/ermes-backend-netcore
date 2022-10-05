@@ -35,5 +35,10 @@ namespace Ermes.Communications
         {
             await CommunicationRepository.DeleteAsync(co);
         }
+
+        public async Task DeleteCommunicationsByPersonIdAsync(long personId)
+        {
+            await CommunicationRepository.DeleteAsync(c => c.CreatorUserId.HasValue && c.CreatorUserId.Value == personId);
+        }
     }
 }

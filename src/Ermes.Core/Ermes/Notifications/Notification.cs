@@ -62,8 +62,6 @@ namespace Ermes.Notifications
         [StringLength(MaxMessageLength)]
         public string Message { get; set; }
 
-        //Nullable
-        //No creator for warning notifications, such as exceding working hours
         [ForeignKey("CreatorId")]
         public Person Creator { get; set; }
         public long? CreatorId { get; set; }

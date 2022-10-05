@@ -35,5 +35,10 @@ namespace Ermes.Operations
         {
             return await OperationRepository.InsertOrUpdateAndGetIdAsync(operation);
         }
+
+        public async Task DeleteOperationsByPersonIdAsync(long personId)
+        {
+            await OperationRepository.DeleteAsync(a => (a.CreatorUserId.HasValue && a.CreatorUserId.Value == personId) || a.PersonId == personId);
+        }
     }
 }
