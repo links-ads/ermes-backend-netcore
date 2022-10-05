@@ -1,0 +1,49 @@
+#docker-compose.shelter.demo.yml (Extended config for Shelter Demo env.)
+version: '3.5'
+
+services:
+  shelter.web:
+    depends_on:
+      - shelter-pgsql
+    image: 'shelter.web'
+    build:
+      context: .
+      dockerfile: src/Ermes.Web/Dockerfile
+    restart: unless-stopped  
+    environment:
+      - ASPNETCORE_ENVIRONMENT=ShelterDemo
+      - GOOGLE_APPLICATION_CREDENTIALS=firebasekey-shelter.json
+    ports:
+      - '${SHELTER_WEB_PORT_DEMO}:80'
+    container_name: 'shelter-web-${ENVTYPE_SHELTER_DEMO}'
+    networks:
+      - shelter-net
+    volumes:
+      - shelterlogsdemo:/app/App_Data/Logs/      
+    env_file:
+      - ./.env    
+
+  shelter-pgsql:
+    image: 'shelter-pgsql'
+    build:
+      context: .
+      dockerfile: src/containers/postgresql/Dockerfile
+    restart: unless-stopped  
+    container_name: 'shelter-pgsql-${ENVTYPE_SHELTER_DEMO}'
+    networks:
+      - shelter-net    
+    environment:
+      POSTGRES_PASSWORD: ${SHELTER_PASSWORD_DEMO}
+      DB_PASSWORD: ${SHELTER_PASSWORD_DEMO}
+      DB_NAME: ${SHELTER_DB_DEMO}
+      DB_USER: ${SHELTER_USER_DEMO}
+    ports:
+      - '${PGSQL_PORT_SHELTER_DEMO}:5432'
+
+networks:
+  shelter-net:
+    name: shelter-net-${ENVTYPE_SHELTER_DEMO}
+
+volumes:
+  shelterlogsdemo:
+

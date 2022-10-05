@@ -39,7 +39,13 @@ namespace Ermes.Tests
             );
 
             var builder = new DbContextOptionsBuilder<ErmesDbContext>();
-            builder.UseInMemoryDatabase("Test").UseInternalServiceProvider(serviceProvider);
+
+            //builder.UseInMemoryDatabase("Test").UseInternalServiceProvider(serviceProvider);
+            //There's no possibility at the momento of writing to have a in-memory version of the PostgreSQL database
+            string connectionString = "Server=localhost; Database=safers; User ID=safersadmin; Password=linksfoundation_2021!; Port=5452;";
+            builder.UseNpgsql(connectionString,
+                x => x.UseNetTopologySuite(geographyAsDefault: true)
+            );
 
             IocManager.IocContainer.Register(
                 Component
