@@ -7,6 +7,7 @@ using Abp.UI;
 using Ermes.Attributes;
 using Ermes.Auth.Dto;
 using Ermes.Authorization;
+using Ermes.Communications;
 using Ermes.Configuration;
 using Ermes.Dto;
 using Ermes.Dto.Datatable;
@@ -16,11 +17,15 @@ using Ermes.ExternalServices.Csi;
 using Ermes.Gamification;
 using Ermes.Gamification.Dto;
 using Ermes.Linq.Extensions;
+using Ermes.MapRequests;
 using Ermes.Missions;
+using Ermes.Notifications;
+using Ermes.Operations;
 using Ermes.Organizations;
 using Ermes.Organizations.Dto;
 using Ermes.Persons;
 using Ermes.Profile.Dto;
+using Ermes.Reports;
 using Ermes.Roles;
 using Ermes.Teams;
 using FusionAuthNetCore;
@@ -45,6 +50,11 @@ namespace Ermes.Profile
         private readonly GamificationManager _gamificationManager;
         private readonly TeamManager _teamManager;
         private readonly OrganizationManager _organizationManager;
+        private readonly NotificationManager _notificationManager;
+        private readonly OperationManager _operationManager;
+        private readonly ReportManager _reportManager;
+        private readonly MapRequestManager _mapRequestManager;
+        private readonly CommunicationManager _communicationManager;
         private readonly IOptions<FusionAuthSettings> _fusionAuthSettings;
         private readonly IOptions<ErmesSettings> _ermesSettings;
         private readonly ErmesPermissionChecker _permissionChecker;
@@ -56,6 +66,11 @@ namespace Ermes.Profile
                     GamificationManager gamificationManager,
                     TeamManager teamManager,
                     OrganizationManager organizationManager,
+                    NotificationManager notificationManager,
+                    OperationManager operationManager,
+                    ReportManager reportManager,
+                    MapRequestManager mapRequestManager,
+                    CommunicationManager communicationManager,
                     ErmesPermissionChecker permissionChecker,
                     IOptions<FusionAuthSettings> fusionAuthSettings,
                     IOptions<ErmesSettings> ermesSettings,
@@ -73,6 +88,11 @@ namespace Ermes.Profile
             _csiManager = csiManager;
             _gamificationManager = gamificationManager;
             _jobManager = jobManager;
+            _notificationManager = notificationManager;
+            _operationManager = operationManager;
+            _reportManager = reportManager;
+            _communicationManager = communicationManager;
+            _mapRequestManager = mapRequestManager;
         }
 
         #region Private
@@ -304,12 +324,45 @@ namespace Ermes.Profile
 
         [OpenApiOperation("Delete profile",
             @"
-                To be implemented
+                Completely remove the person from the system
+                Input: Guid provided by FusionAuth
+                Output: true is the user, and all the associated resources, have been properly deleted
             "
         )]
-        public virtual async Task<bool> DeleteProfile(IdInput<int> input)
+        public virtual async Task<bool> DeleteProfile(IdInput<Guid> input)
         {
-            throw new NotImplementedException();
+            if (input == null || input.Id == null)
+                throw new UserFriendlyException(L("InvalidGuid", input));
+
+            var hasPermission = _permissionChecker.IsGranted(AppPermissions.Profiles.Profile_Delete);
+            if (!hasPermission)
+                throw new UserFriendlyException("MissingPermission");
+
+            var person = await _personManager.GetPersonByFusionAuthUserGuidAsync(input.Id);
+
+            await _notificationManager.DeleteNotificationsByPersonIdAsync(person.Id);
+            await _operationManager.DeleteOperationsByPersonIdAsync(person.Id);
+            await _reportManager.DeleteReportsByPersonIdAsync(person.Id);
+            await _communicationManager.DeleteCommunicationsByPersonIdAsync(person.Id);
+            await _mapRequestManager.DeleteMapRequestsByPersonIdAsync(person.Id);
+            await _missionManager.DeleteMissionsByPersonIdAsync(person.Id);
+            await _personManager.DeletePersonActionsByPersonIdAsync(person.Id);
+            await _personManager.DeletePersonRolesByPersonIdAsync(person.Id);
+
+            var roles = await _personManager.GetPersonRoleNamesAsync(person.Id);
+            if(roles.Any(r => r == AppRoles.CITIZEN))//remove gamification items
+            {
+                await _gamificationManager.DeleteAuditByPersonIdAsync(person.Id);
+                await _personManager.DeletePersonQuizzesByPersonIdAsync(person.Id);
+                await _personManager.DeletePersonTipsByPersonIdAsync(person.Id);
+            }
+
+            var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
+            await client.DeleteUserAsync(input.Id);
+
+            await _personManager.DeletePersonByIdAsync(person.Id);
+
+            return true;
         }
 
         [OpenApiOperation("Update Registration Token",

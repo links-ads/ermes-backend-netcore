@@ -320,5 +320,30 @@ namespace Ermes.Persons
             await PersonQuizRepository.InsertAsync(newItem);
         }
 
+        public async Task DeletePersonActionsByPersonIdAsync(long personId)
+        {
+            await PersonActionsRepository.DeleteAsync(a => a.PersonId == personId || (a.CreatorUserId.HasValue && a.CreatorUserId.Value == personId));
+        }
+
+        public async Task DeletePersonRolesByPersonIdAsync(long personId)
+        {
+            await PersonRoleRepository.DeleteAsync(a => a.PersonId == personId || (a.CreatorUserId.HasValue && a.CreatorUserId.Value == personId));
+        }
+
+        public async Task DeletePersonQuizzesByPersonIdAsync(long personId)
+        {
+            await PersonQuizRepository.DeleteAsync(a => a.PersonId == personId || (a.CreatorUserId.HasValue && a.CreatorUserId.Value == personId));
+        }
+
+        public async Task DeletePersonTipsByPersonIdAsync(long personId)
+        {
+            await PersonTipRepository.DeleteAsync(a => a.PersonId == personId || (a.CreatorUserId.HasValue && a.CreatorUserId.Value == personId));
+        }
+
+        public async Task DeletePersonByIdAsync(long personId)
+        {
+            await PersonRepository.DeleteAsync(p => p.Id == personId);
+        }
+
     }
 }

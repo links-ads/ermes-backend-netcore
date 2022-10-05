@@ -168,5 +168,10 @@ namespace Ermes.Gamification
             var barriers = newLevel.Barriers.Where(b => b.Level.Id == newLevel.Id).Select(b => b.RewardName).ToList();
             return await GamificationAudits.Where(ga => ga.PersonId == person.Id).AllAsync(ga => barriers.Contains(ga.Reward.Name));
         }
+
+        public async Task DeleteAuditByPersonIdAsync(long personId)
+        {
+            await AuditRepository.DeleteAsync(a => a.PersonId == personId);
+        }
     }
 }

@@ -35,7 +35,8 @@ namespace Ermes.Authorization
             AppPermissions.Reports.Report_CanSeeCrossOrganization,
             AppPermissions.Actions.Action_CanSeeCrossOrganization,
             AppPermissions.MapRequests.MapRequest_CanSeeCrossOrganization,
-            AppPermissions.Communications.Communication_CanSeeCrossOrganization
+            AppPermissions.Communications.Communication_CanSeeCrossOrganization,
+            AppPermissions.Profiles.Profile_Delete
         };
 
         public static readonly string[] ORGANIZATION_MANAGER_PERMISSION_LIST = new string[]
