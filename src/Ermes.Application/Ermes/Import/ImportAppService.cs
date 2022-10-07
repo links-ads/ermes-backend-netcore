@@ -287,7 +287,7 @@ s            "
             return await LoadFileAndImport(async (filename, contentType) =>
             {
                 //create data structure
-                var result = await UsersImporter.ImportUsersAsync(filename, contentType, _personManager, _organizationManager, _teamManager, _localizer);
+                var result = await UsersImporter.ImportUsersAsync(filename, contentType, _personManager, _organizationManager, _teamManager, _localizer, _gamificationManager);
                 
                 //add person on project DB
                 foreach (var tuple in result.Accounts)

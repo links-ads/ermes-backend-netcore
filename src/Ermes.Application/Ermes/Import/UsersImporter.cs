@@ -23,6 +23,7 @@ using Ermes.Auth.Dto;
 using Ermes.Teams;
 using io.fusionauth.domain;
 using Ermes.Authorization;
+using Ermes.Gamification;
 
 namespace Ermes.Import
 {
@@ -120,7 +121,7 @@ namespace Ermes.Import
         }
 
         #endregion
-        public static async Task<ImportUsersDto> ImportUsersAsync(string filename, string contentType, PersonManager personManager, OrganizationManager organizationManager, TeamManager teamManager, ErmesLocalizationHelper localizer)
+        public static async Task<ImportUsersDto> ImportUsersAsync(string filename, string contentType, PersonManager personManager, OrganizationManager organizationManager, TeamManager teamManager, ErmesLocalizationHelper localizer, GamificationManager gamificationManager)
         {
             IUserTable users;
             ImportUsersDto result = new ImportUsersDto() {
@@ -172,8 +173,10 @@ namespace Ermes.Import
                     else
                     {
                         //must be a citizen
-                        if(user.Roles.Count(r => r == AppRoles.CITIZEN) == 0)
+                        if (user.Roles.Count(r => r == AppRoles.CITIZEN) == 0)
                             throw new UserFriendlyException(localizer.L("InvalidOrganizationId", organizationId));
+                        else
+                            person.LevelId = (await gamificationManager.GetDefaultLevel()).Id;
                     }
 
                     var teamId = row.GetInt("TeamId");
