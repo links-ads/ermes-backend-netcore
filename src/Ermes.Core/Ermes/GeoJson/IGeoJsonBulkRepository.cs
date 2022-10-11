@@ -74,6 +74,7 @@ namespace Ermes.GeoJson
             List<CommunicationRestrictionType> communicationRestrictionTypes,
             int srid, 
             string personName,
+            int? organizationParentId,
             string language = "it"
         );
 

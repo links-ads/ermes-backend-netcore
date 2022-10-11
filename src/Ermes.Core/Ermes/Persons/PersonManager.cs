@@ -53,6 +53,11 @@ namespace Ermes.Persons
             return await Persons.SingleOrDefaultAsync(p => p.Id == personId);
         }
 
+        public Person GetPersonById(long personId)
+        {
+            return Persons.SingleOrDefault(p => p.Id == personId);
+        }
+
         public async Task<Person> GetPersonByFusionAuthUserGuidAsync(Guid userId, string email, string username)
         {
             var person = await Persons.FirstOrDefaultAsync(a => a.FusionAuthUserGuid == userId);

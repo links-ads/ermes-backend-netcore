@@ -122,3 +122,4 @@ src/Ermes.Web/firebasekey*
 src/Ermes.Web/wwwroot/Temp/Downloads/*
 *.env
 NuGet.Config
+test/Ermes.Tests/appsettings.*
