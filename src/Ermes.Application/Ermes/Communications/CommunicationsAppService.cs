@@ -24,6 +24,7 @@ using Ermes.EventHandlers;
 using Ermes.GeoJson;
 using NetTopologySuite.Geometries;
 using Ermes.Authorization;
+using Ermes.Organizations;
 
 namespace Ermes.Communications
 {
@@ -32,6 +33,8 @@ namespace Ermes.Communications
     {
         private readonly ErmesAppSession _session;
         private readonly CommunicationManager _communicationManager;
+        private readonly PersonManager _personManager;
+        private readonly OrganizationManager _organizationManager;
         private readonly IBackgroundJobManager _backgroundJobManager;
         private readonly IGeoJsonBulkRepository _geoJsonBulkRepository;
         private readonly ErmesPermissionChecker _permissionChecker;
@@ -41,7 +44,9 @@ namespace Ermes.Communications
                 CommunicationManager communicationManager,
                 IBackgroundJobManager backgroundJobManager,
                 IGeoJsonBulkRepository geoJsonBulkRepository,
-                ErmesPermissionChecker permissionChecker
+                ErmesPermissionChecker permissionChecker,
+                PersonManager personManager,
+                OrganizationManager organizationManager
             )
         {
             _session = session;
@@ -49,6 +54,8 @@ namespace Ermes.Communications
             _backgroundJobManager = backgroundJobManager;
             _geoJsonBulkRepository = geoJsonBulkRepository;
             _permissionChecker = permissionChecker;
+            _personManager = personManager;
+            _organizationManager = organizationManager;
         }
 
         #region Private
@@ -88,8 +95,19 @@ namespace Ermes.Communications
             //Admin can see everything
             var hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Communications.Communication_CanSeeCrossOrganization);
 
-            if(!hasPermission)
-                query = query.DataOwnership(person.OrganizationId.HasValue ? new List<int>() { person.OrganizationId.Value } : null, person);
+            if (!hasPermission)
+            {
+                List<int> orgIdList = null;
+                if(person.OrganizationId.HasValue)
+                    orgIdList = new List<int>() { person.OrganizationId.Value };
+                var p = await _personManager.GetPersonByIdAsync(person.Id);
+                Organization parent = await _organizationManager.GetParentOrganizationAsync(p.Organization.ParentId);
+                if (parent != null) {
+                    orgIdList ??= new List<int>();
+                    orgIdList.Add(parent.Id);
+                }
+                query = query.DataOwnership(orgIdList, person);
+            }
 
             result.TotalCount = await query.CountAsync();
 

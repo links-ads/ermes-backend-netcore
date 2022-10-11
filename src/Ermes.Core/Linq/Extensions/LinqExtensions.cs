@@ -88,8 +88,7 @@ namespace Ermes.Linq.Extensions
             public IQueryable<Mission> Resolve(IQueryable<Mission> query, List<int> organizationIdList, IPersonBase person, VisibilityType visibility)
             {
                 return organizationIdList == null
-                            ? query
-                            //TODO: implement ADMIN visibility by using permission                            
+                            ? query                     
                             : 
                             query
                             .Where(m => organizationIdList.Contains(m.OrganizationId) || (m.Organization.ParentId.HasValue && organizationIdList.Contains(m.Organization.ParentId.Value)));
@@ -187,7 +186,6 @@ namespace Ermes.Linq.Extensions
                         : query
                         .Where(c =>
                             c.ScopeString == CommunicationScopeType.Public.ToString() ||
-                            c.RestrictionString == CommunicationRestrictionType.Citizen.ToString() ||
                             c.RestrictionString == CommunicationRestrictionType.Professional.ToString() || (
                             c.RestrictionString == CommunicationRestrictionType.Organization.ToString() &&
                             //Organization visibility

@@ -69,7 +69,7 @@ namespace Ermes.Organizations
             await OrganizationCARepository.DeleteAsync(id);
         }
 
-        public int[]GetOrganizationIds()
+        public int[] GetOrganizationIds()
         {
             return Organizations.Select(a => a.Id).ToArray();
         }
@@ -88,6 +88,18 @@ namespace Ermes.Organizations
             }
 
             return true;
+        }
+
+        public async Task<Organization> GetParentOrganizationAsync(int? parentId)
+        {
+            if (parentId.HasValue)
+                return await Organizations.SingleAsync(o => o.Id == parentId.Value);
+            else
+                return null;
+        }
+        public Organization GetParentOrganization(int? parentId)
+        {
+            return (parentId.HasValue ? Organizations.Single(o => o.Id == parentId.Value) : null);
         }
     }
 }

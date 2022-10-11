@@ -15,6 +15,7 @@ using Ermes.Authorization;
 using Ermes.Organizations;
 using System.Collections.Generic;
 using Ermes.Enums;
+using Ermes.Persons;
 
 namespace Ermes.Web.Controllers
 {
@@ -25,14 +26,22 @@ namespace Ermes.Web.Controllers
         ILanguageManager _languageManager;
         private readonly ErmesAppSession _session;
         private readonly OrganizationManager _organizationManager;
+        private readonly PersonManager _personManager;
         private readonly ErmesPermissionChecker _permissionChecker;
-        public GeoJsonController(IGeoJsonBulkRepository geoJsonBulkRepository, ErmesAppSession session, ILanguageManager languageManager, ErmesPermissionChecker permissionChecker, OrganizationManager organizationManager)
+        public GeoJsonController(
+            IGeoJsonBulkRepository geoJsonBulkRepository, 
+            ErmesAppSession session, 
+            ILanguageManager languageManager, 
+            ErmesPermissionChecker permissionChecker, 
+            OrganizationManager organizationManager,
+            PersonManager personManager)
         {
             _geoJsonBulkRepository = geoJsonBulkRepository;
             _languageManager = languageManager;
             _session = session;
             _permissionChecker = permissionChecker;
             _organizationManager = organizationManager;
+            _personManager = personManager;
         }
 
         private class PreserializedJsonResult : JsonResult
@@ -76,7 +85,8 @@ namespace Ermes.Web.Controllers
 
             //Admin can see everything
             hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Communications.Communication_CanSeeCrossOrganization);
-            List<CommunicationRestrictionType> communicationRestrictionTypes = new List<CommunicationRestrictionType>() { CommunicationRestrictionType.None, CommunicationRestrictionType.Citizen };
+            List<CommunicationRestrictionType> communicationRestrictionTypes = 
+                new List<CommunicationRestrictionType>() { CommunicationRestrictionType.None };
             if (!hasPermission)
             {
                 foreach (var item in _session.Roles)
@@ -87,7 +97,10 @@ namespace Ermes.Web.Controllers
                         communicationRestrictionTypes.Add(CommunicationRestrictionType.Organization);
                     }
                     else
+                    {
+                        communicationRestrictionTypes.Add(CommunicationRestrictionType.Citizen);
                         input.ReportVisibilityType = VisibilityType.Public;
+                    }
                 }   
             }
             else
@@ -95,7 +108,9 @@ namespace Ermes.Web.Controllers
                 communicationRestrictionTypes.Add(CommunicationRestrictionType.Professional);
                 communicationRestrictionTypes.Add(CommunicationRestrictionType.Organization);
             }
-            string personName = _session.LoggedUserPerson.Username ?? _session.LoggedUserPerson.Email;
+
+            Person person = _personManager.GetPersonById(_session.LoggedUserPerson.Id);
+            string personName = person.Username ?? person.Email;
             string responseContent = _geoJsonBulkRepository.GetGeoJsonCollection(
                     input.StartDate, 
                     input.EndDate, 
@@ -116,6 +131,7 @@ namespace Ermes.Web.Controllers
                     communicationRestrictionTypes,
                     AppConsts.Srid,
                     personName,
+                    person.OrganizationId.HasValue ? person.Organization.ParentId : null,
                     _languageManager.CurrentLanguage.Name
             );
 
@@ -128,3 +144,35 @@ namespace Ermes.Web.Controllers
 
     }
 }
+
+/*
+ * VISIBILITY RULES:
+ * 
+ * 1) Missions and MapRequest: follow hierarchy rule, from top to bottom
+ * 2) Reports: public reports can be seen by everyone, private reports follow hierarchy rule, from top to bottom
+ * 3) Communications: visibility is defined by Scope + Restriction properties:
+ *      - Scope == Public --> can be seen by everyone (Restriction is None by default)
+ *      - Scope == Restricted  --> need to check Restriction:
+ *              * Restriction == Citizen --> can be seen only by citizens
+ *              * Restriction == Professional --> can be seen by professionals from any organization
+ *              * Restriction == Organization --> follow hierarchy rule, in BOTH directions
+ * 4) Persons: a citizen can only see his own position, a professional cannot see citizens' position, but he can see the position of persons 
+ *             inside his organization or child organizations
+ * 
+ * 
+ * NOTIFICATION RECEIVERS:
+ * 
+ * 1) Missions: the notification will be sent to:
+ *      - CoordinatorPersonId --> only to that person
+ *      - CoordinatorTeamId --> to all members of the team
+ *      - OrganizationId --> to all members of the same organization of the creator (NOT sent to children organization)
+ * 2) Communications: notification si sent only to active persons (Status != Off) inside the AOI of the communication
+ *      Additional criteria is defined by Scope + Restriction
+ *      - Scope == Public --> sent to everyone
+ *      - Scope == Restricted  --> need to check Restriction:
+ *              * Restriction == Citizen --> all persons without organizationId
+ *              * Restriction == Professional --> all persons with organizationId
+ *              * Restriction == Organization --> follow hierarchy rule, from top to bottom
+ *3) Reports: only bus notification
+ *4) Gamification: notification sent to the current logged person
+ */
