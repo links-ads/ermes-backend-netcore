@@ -122,6 +122,7 @@ namespace Ermes.GeoJson
             List<CommunicationRestrictionType> communicationRestrictionTypes,
             int srid,
             string personName,
+            int? parentId,
             string Language = "it"
             )
         {
@@ -369,15 +370,28 @@ namespace Ermes.GeoJson
                         and (((tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations]) or tmp.""organizationId"" is null) and tmp.""type"" in ('Mission', 'MapRequest')) or 
                         ((tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations]) or tmp.""reportIsPublicFilter"" = 'true') and tmp.""type"" = 'Report') or
                         ((tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations])) and tmp.""type"" = 'Person') or
-                        (tmp.""type"" = 'Communication' and tmp.""communicationRestrictionFilter"" = any(array[@restrictionTypes]) and (tmp.""communicationRestrictionFilter"" != 'Organization' or tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations]))))";
+                        (tmp.""type"" = 'Communication' and tmp.""communicationRestrictionFilter"" = any(array[@restrictionTypes]) and (tmp.""communicationRestrictionFilter"" != 'Organization' or tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations])";
+                    
+                    
                     var p = new NpgsqlParameter("@organizations", NpgsqlDbType.Array | NpgsqlDbType.Integer)
                     {
                         Value = organizationIdList
                     };
 
                     command.Parameters.Add(p);
+                    if (parentId.HasValue) {
+                        command.CommandText += @" or tmp.""organizationId"" = @organizationParentId)))";
+                        var p2 = new NpgsqlParameter("@organizationParentId", NpgsqlDbType.Integer)
+                        {
+                            Value = parentId
+                        };
+
+                        command.Parameters.Add(p2);
+                    }
+                    else
+                        command.CommandText += ")))";
                 }
-                else //citizen can see his position, public reports and public public Communications
+                else //a citizen can see: his position, public reports and public public Communications
                 {
                     command.CommandText += @"
                         and (
@@ -671,7 +685,7 @@ namespace Ermes.GeoJson
             }
         }
 
-        //Extended version to retrieve the receivers of a communications
+        //Extended version to retrieve the receivers of a communication
         public string GetPersonActions(
             DateTime startDate, 
             DateTime endDate, 
