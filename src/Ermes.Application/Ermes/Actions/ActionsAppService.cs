@@ -109,7 +109,7 @@ namespace Ermes.Actions
 
             List<PersonActionDto> data = new List<PersonActionDto>();
             if (actions.PersonActions != null)
-                data = actions.PersonActions.Skip(input.MaxResultCount * input.SkipCount).Take(input.MaxResultCount).ToList();
+                data = actions.PersonActions.Skip(input.SkipCount).Take(input.MaxResultCount).ToList();
             else
                 actions.PersonActions = new List<PersonActionDto>();
 
