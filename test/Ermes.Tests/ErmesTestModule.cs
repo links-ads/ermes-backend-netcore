@@ -41,7 +41,8 @@ namespace Ermes.Tests
             var builder = new DbContextOptionsBuilder<ErmesDbContext>();
 
             //builder.UseInMemoryDatabase("Test").UseInternalServiceProvider(serviceProvider);
-            //There's no possibility at the momento of writing to have a in-memory version of the PostgreSQL database
+            //There's no possibility at the moment of writing to have a in-memory version of the PostgreSQL database
+            //The initial setup creates this builder objects, but all the Tests refer to remote API (and remote Demo Database)
             string connectionString = "Server=localhost; Database=safers; User ID=safersadmin; Password=linksfoundation_2021!; Port=5452;";
             builder.UseNpgsql(connectionString,
                 x => x.UseNetTopologySuite(geographyAsDefault: true)
