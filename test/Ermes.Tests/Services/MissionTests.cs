@@ -1,10 +1,12 @@
 ﻿using Ermes.Dto.Datatable;
 using Ermes.Missions.Dto;
 using Ermes.Reports.Dto;
+using Ermes.Tests.Geometry;
 using Newtonsoft.Json;
 using Shouldly;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,6 +16,7 @@ namespace Ermes.Tests.Services
 {
     public class MissionTests: ErmesTestBase
     {
+        private const string TYPE_MISSION = "Mission";
         public MissionTests()
         {
 
@@ -72,6 +75,29 @@ namespace Ermes.Tests.Services
             responseValue.ShouldNotBeNull();
             var apiOutput = JsonConvert.DeserializeObject<DTResult<MissionDto>>(responseValue);
             apiOutput.data.Count.ShouldBe(1);
+        }
+
+        [Fact]
+        public async Task Should_Compare_With_GeoJson_Created()
+        {
+            var token = await GetToken(USERNAME_OM);
+            token.ShouldNotBeNull();
+            var client = GetApiClient(token);
+            Uri uri = new Uri(client.BaseAddress, "Missions/GetMissions" + BASE_QUERY_PARAMS + "&status[0]=Created");
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
+            var responseValue = await SendHttpRequest(request, client);
+            responseValue.ShouldNotBeNull();
+            var apiOutput = JsonConvert.DeserializeObject<DTResult<ReportDto>>(responseValue);
+            int itemsCount = apiOutput.data.Count;
+            itemsCount.ShouldBe(1);
+
+            uri = new Uri(client.BaseAddress, "GeoJson/GetFeatureCollection" + BASE_QUERY_PARAMS + "&EntityTypes[0]=Mission&missionStatusTypes[0]=Created");
+            HttpRequestMessage request2 = new HttpRequestMessage(HttpMethod.Get, uri);
+            var responseValue2 = await SendHttpRequest(request2, client);
+            responseValue2.ShouldNotBeNull();
+
+            var apiOutput2 = JsonConvert.DeserializeObject<Test_FeatureCollectionBase>(responseValue2);
+            apiOutput2.Features.Where(f => f.Properties.Type == TYPE_MISSION).ToList().Count.ShouldBe(itemsCount);
         }
     }
 }
