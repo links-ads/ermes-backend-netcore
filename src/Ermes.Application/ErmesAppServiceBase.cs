@@ -245,7 +245,6 @@ namespace Ermes
             person.IsFirstLogin = isFirstLogin;
             person.IsNewUser = isNewUser;
             person.Username = user.username;
-            person.Email = user.email;
 
             Logger.Info("Ermes: Create or update Person: " + person.Username);
             long personId = await _personManager.InsertOrUpdatePersonAsync(person);
