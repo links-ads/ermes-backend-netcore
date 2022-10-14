@@ -86,7 +86,7 @@ namespace Ermes.Tests.Services
             responseValue.ShouldNotBeNull();
             var apiOutput = JsonConvert.DeserializeObject<DTResult<ReportDto>>(responseValue);
             int reportCount = apiOutput.data.Count;
-            reportCount.ShouldBe(3);
+            reportCount.ShouldBe(2);
 
             uri = new Uri(client.BaseAddress, "GeoJson/GetFeatureCollection" + BASE_QUERY_PARAMS + "&EntityTypes[0]=Report&reportVisibilityType=Private");
             HttpRequestMessage request2 = new HttpRequestMessage(HttpMethod.Get, uri);
@@ -109,7 +109,7 @@ namespace Ermes.Tests.Services
             responseValue.ShouldNotBeNull();
             var apiOutput = JsonConvert.DeserializeObject<DTResult<ReportDto>>(responseValue);
             int reportCount = apiOutput.data.Count;
-            reportCount.ShouldBe(4);
+            reportCount.ShouldBe(2);
 
             uri = new Uri(client.BaseAddress, "GeoJson/GetFeatureCollection" + BASE_QUERY_PARAMS + "&EntityTypes[0]=Report&reportVisibilityType=Public");
             HttpRequestMessage request2 = new HttpRequestMessage(HttpMethod.Get, uri);
