@@ -52,6 +52,20 @@ namespace Ermes.Tests.Services
         }
 
         [Fact]
+        public async Task Should_Get_Reports_With_Bbox()
+        {
+            var token = await GetToken(USERNAME_OM);
+            token.ShouldNotBeNull();
+            var client = GetApiClient(token);
+            Uri uri = new Uri(client.BaseAddress, "Reports/GetReports" + BASE_QUERY_PARAMS + BBOX_QUERY_TORINO);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
+            var responseValue = await SendHttpRequest(request, client);
+            responseValue.ShouldNotBeNull();
+            var apiOutput = JsonConvert.DeserializeObject<DTResult<ReportDto>>(responseValue);
+            apiOutput.data.Count.ShouldBe(1);
+        }
+
+        [Fact]
         public async Task Should_Compare_With_GeoJson_All()
         {
             var token = await GetToken(USERNAME_OM);
