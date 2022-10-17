@@ -150,6 +150,8 @@ namespace Ermes.Users
             }
 
             person = await CreateOrUpdatePersonInternalAsync(person, currentUser, input.OrganizationId, input.TeamId, input.IsFirstLogin, input.IsNewUser, rolesToAssign, _personManager);
+            if (input.User != null && input.User.Email != null && input.User.Email != string.Empty)
+                person.Email = input.User.Email;
 
             return new CreateOrUpdateUserOutput()
             {
