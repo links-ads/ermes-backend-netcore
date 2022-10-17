@@ -206,8 +206,8 @@ namespace Ermes.MapRequests
             @"
                 Input: 
                         - Id: the id of the map request to be retrived
-                        - IncludeArea: if true, the response will contain the geometry of the communication
-                Output: GeoJson feature, with CommunicationDto element in Properties field
+                        - IncludeArea: if true, the response will contain the geometry of the Map Request
+                Output: GeoJson feature, with MapRequestDto element in Properties field
                 Exception: invalid id of the map request
             "
         )]
