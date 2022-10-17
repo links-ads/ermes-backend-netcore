@@ -241,7 +241,8 @@ namespace Ermes
             }
 
             person.OrganizationId = organizationId;
-            person.TeamId = teamId;
+            if(teamId.HasValue)
+                person.TeamId = teamId;
             person.IsFirstLogin = isFirstLogin;
             person.IsNewUser = isNewUser;
             person.Username = user.username;
