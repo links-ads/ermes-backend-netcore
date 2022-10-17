@@ -98,13 +98,16 @@ namespace Ermes.Communications
             if (!hasPermission)
             {
                 List<int> orgIdList = null;
-                if(person.OrganizationId.HasValue)
+                if (person.OrganizationId.HasValue)
+                {
                     orgIdList = new List<int>() { person.OrganizationId.Value };
-                var p = await _personManager.GetPersonByIdAsync(person.Id);
-                Organization parent = await _organizationManager.GetParentOrganizationAsync(p.Organization.ParentId);
-                if (parent != null) {
-                    orgIdList ??= new List<int>();
-                    orgIdList.Add(parent.Id);
+                    var p = await _personManager.GetPersonByIdAsync(person.Id);
+                    Organization parent = await _organizationManager.GetParentOrganizationAsync(p.Organization.ParentId);
+                    if (parent != null)
+                    {
+                        orgIdList ??= new List<int>();
+                        orgIdList.Add(parent.Id);
+                    }
                 }
                 query = query.DataOwnership(orgIdList, person);
             }
