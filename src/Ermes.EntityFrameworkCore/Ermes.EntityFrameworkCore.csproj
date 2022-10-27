@@ -106,6 +106,8 @@
     <Compile Include="Migrations\20220912074513_Layers_UnitOfMeasure_Added.Designer.cs" />
     <Compile Include="Migrations\20220912125920_MapRequestLayers_Added.cs" />
     <Compile Include="Migrations\20220912125920_MapRequestLayers_Added.Designer.cs" />
+    <Compile Include="Migrations\20221027101629_Layer_Order_Added.cs" />
+    <Compile Include="Migrations\20221027101629_Layer_Order_Added.Designer.cs" />
     <Compile Include="Migrations\ErmesDbContextModelSnapshot.cs" />
     <Compile Include="Migrations\Seed\ModelBuilderExtensions.cs" />
   </ItemGroup>

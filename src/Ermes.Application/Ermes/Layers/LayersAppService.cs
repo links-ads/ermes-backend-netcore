@@ -31,6 +31,7 @@ namespace Ermes.Layers
             result.LayerGroups =
                         layers
                         .Select(a => ObjectMapper.Map<LayerDto>(a))
+                        .OrderBy(l => l.Order)
                         .GroupBy(a => new { a.GroupKey, a.Group })
                         .Select(a => new LayerGroupDto()
                         {
@@ -134,6 +135,7 @@ namespace Ermes.Layers
                         joinedLayerList
                         .Select(a => new { LayerDto = ObjectMapper.Map<LayerDto>(a.Layer), a.Details })
                         .Select(a => { a.LayerDto.Details = a.Details; return a.LayerDto; })
+                        .OrderBy(l => l.Order)
                         .GroupBy(a => new { a.GroupKey, a.Group })
                         .Select(a => new LayerGroupDto()
                         {

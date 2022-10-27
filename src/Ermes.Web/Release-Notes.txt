@@ -1,6 +1,6 @@
 Ver.
 --------------------------------
-
+- Feature - Property Order added to Layer class (migration added)(sdk to be updated)(#113)
 
 Ver. 3.10.0 - 202210-27
 --------------------------------
