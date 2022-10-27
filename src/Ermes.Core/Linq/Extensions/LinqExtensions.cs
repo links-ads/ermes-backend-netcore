@@ -109,10 +109,12 @@ namespace Ermes.Linq.Extensions
                                     .Where(r => !r.Creator.OrganizationId.HasValue)
                             : query
                             .Where(r =>
-                                    //Organization visibility
-                                    (r.Creator.OrganizationId.HasValue && organizationIdList.Contains(r.Creator.OrganizationId.Value)) ||
-                                    //Organization hierarchy
-                                    (r.Creator.Organization.ParentId.HasValue && organizationIdList.Contains(r.Creator.Organization.ParentId.Value))
+                                    !r.IsPublic && (
+                                        //Organization visibility
+                                        (r.Creator.OrganizationId.HasValue && organizationIdList.Contains(r.Creator.OrganizationId.Value)) ||
+                                        //Organization hierarchy
+                                        (r.Creator.Organization.ParentId.HasValue && organizationIdList.Contains(r.Creator.Organization.ParentId.Value))
+                                    )
                                 );
                     case VisibilityType.Public:
                         //Only public reports
