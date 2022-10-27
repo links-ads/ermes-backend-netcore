@@ -312,9 +312,9 @@ namespace Ermes.Enums
     [JsonConverter(typeof(StringEnumConverter))]
     public enum VisibilityType
     {
-        Private = 0,
+        All = 0,
         Public = 10,
-        All = 20,
+        Private = 20,
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
