@@ -365,11 +365,12 @@ namespace Ermes.Missions
         public virtual async Task<bool> UpdateMissionStatus(UpdateMissionStatusInput input)
         {
             Mission mission = await GetMissionAsync(input.MissionId);
-            if (mission.OrganizationId != _session.LoggedUserPerson.OrganizationId)
+            Person person = await _personManager.GetPersonByIdAsync(_session.LoggedUserPerson.Id);
+            if (mission.OrganizationId != person.OrganizationId)
                 throw new UserFriendlyException(L("EntityOutsideOrganization"));
-            if (mission.CoordinatorPersonId.HasValue && mission.CoordinatorPersonId.Value != _session.LoggedUserPerson.Id)
+            if (mission.CoordinatorPersonId.HasValue && mission.CoordinatorPersonId.Value != person.Id)
                 throw new UserFriendlyException(L("Forbidden_InsufficientRoleOrUnassociatedEntity"));
-            if(mission.CoordinatorTeamId.HasValue && mission.CoordinatorTeamId.Value != _session.LoggedUserPerson.TeamId)
+            if(mission.CoordinatorTeamId.HasValue && mission.CoordinatorTeamId.Value != person.TeamId)
                 throw new UserFriendlyException(L("Forbidden_InsufficientRoleOrUnassociatedEntity"));
 
             if (_missionManager.CheckNewStatus(mission.CurrentStatus, input.Status))

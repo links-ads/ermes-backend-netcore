@@ -241,7 +241,8 @@ namespace Ermes
             }
 
             person.OrganizationId = organizationId;
-            person.TeamId = teamId;
+            if(teamId.HasValue)
+                person.TeamId = teamId;
             person.IsFirstLogin = isFirstLogin;
             person.IsNewUser = isNewUser;
             person.Username = user.username;
@@ -265,7 +266,7 @@ namespace Ermes
 
                 //If citizen, set Ready as default state;
                 //This allows to send communications to citizens, since they cannot change their status from the UI of the Chatbot;
-                //Communication are not sent to person in Off status
+                //Communications are not sent to persons in Off status
                 if (rta.Name == AppRoles.CITIZEN)
                 {
                     await _personManager.InsertPersonActionStatusAsync(new PersonActionStatus()
