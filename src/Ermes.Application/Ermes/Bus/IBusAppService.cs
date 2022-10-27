@@ -12,5 +12,6 @@ namespace Ermes.Bus
         Task TestBusConsumerTopic(TestBusConsumerTopicInput input);
         Task TestGamificationNotification(TestBusConsumerTopicInput input);
         Task TestCsiPresidiService();
+        Task<bool> TestVolterTaxCodeService();
     }
 }

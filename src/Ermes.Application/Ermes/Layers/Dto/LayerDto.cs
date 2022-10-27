@@ -21,5 +21,6 @@ namespace Ermes.Layers.Dto
         public FrequencyType Frequency { get; set; }
         public string UnitOfMeasure { get; set; }
         public List<LayerDetailsDto> Details { get; set; }
+        public int Order { get; set; }
     }
 }

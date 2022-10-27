@@ -66,7 +66,7 @@ namespace Ermes.Import
                         layer.CanBeVisualized = row.GetBoolean("Can be visualized");
                         layer.Frequency = row.GetEnum<FrequencyType>("Update Frequency");
                         layer.UnitOfMeasure = row.GetString("Unit of measure");
-
+                        layer.Order = row.GetInt("Order");
                         await layerManager.InsertOrUpdateLayerAsync(layer);
                         context.SaveChanges();
                     }

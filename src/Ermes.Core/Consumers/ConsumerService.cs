@@ -116,7 +116,7 @@ namespace Ermes.Consumers
                         default:
                             break;
                     }
-
+                    
                     CurrentUnitOfWork.SaveChanges();
                 }
                 catch (Exception e)

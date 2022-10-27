@@ -1,8 +1,13 @@
 Ver.
 --------------------------------
+- Feature - Property Order added to Layer class (migration added)(sdk to be updated)(#113)
+
+Ver. 3.10.0 - 202210-27
+--------------------------------
 - Bugfix - Fix Communication visibility (#110)
 - Bugfix - Fix update of the TeamId, UpdateMissionStatus based on person and not on cache
 - Bugfix - Fix sort for person actions (#112)
+- Feature - Added test api to check if Tax code Volter service is available (#111)
 
 Ver. 3.9.6 - 2022-10-05
 --------------------------------

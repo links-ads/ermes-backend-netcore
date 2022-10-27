@@ -63,5 +63,7 @@ namespace Ermes.Layers
 
         public virtual ICollection<MapRequestLayer> MapRequestLayers { get; set; }
 
+        public int Order { get; set; }
+
     }
 }
