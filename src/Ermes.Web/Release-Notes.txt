@@ -1,5 +1,9 @@
 Ver.
 --------------------------------
+
+
+Ver. 3.10.0 - 202210-27
+--------------------------------
 - Bugfix - Fix Communication visibility (#110)
 - Bugfix - Fix update of the TeamId, UpdateMissionStatus based on person and not on cache
 - Bugfix - Fix sort for person actions (#112)
