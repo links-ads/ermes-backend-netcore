@@ -20,11 +20,14 @@ namespace Ermes.Tests
     public class ErmesTestBase : AbpIntegratedTestBase<ErmesTestModule>
     {
         public const string USERNAME_OM = "organization.manager.1";
+        public const string USERNAME_OM_2 = "organization.manager.2";
         public const string USERNAME_OM_CHILD = "organization.manager.child.1";
         public const string USERNAME_FR = "first.responder.1";
         public const string USERNAME_ADMIN = "admin";
         public const string USERNAME_CITIZEN = "citizen.1";
         public const string BASE_QUERY_PARAMS = "?maxResultCount=100";
+        public const string BBOX_QUERY_TORINO = "&NorthEastBoundary.Latitude=45.30763149682434&NorthEastBoundary.Longitude=8.631841450276&SouthWestBoundary.Latitude=44.63036795644422&SouthWestBoundary.Longitude=6.412728016083349";
+        public const string BBOX_QUERY_RAVENNA = "&NorthEastBoundary.Latitude=45.39731048904352&NorthEastBoundary.Longitude=13.646984902066492&SouthWestBoundary.Latitude=44.342646703818104&SouthWestBoundary.Longitude=10.197151773408791";
 
         public ErmesTestBase()
         {
