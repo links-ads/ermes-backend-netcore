@@ -1,8 +1,11 @@
 Ver.
 --------------------------------
+
+Ver. 4.0.0 - 2022-11-02
+--------------------------------
 - Feature - Property Order added to Layer class (migration added)(sdk to be updated)(#113)
 
-Ver. 3.10.0 - 202210-27
+Ver. 3.10.0 - 2022-10-27
 --------------------------------
 - Bugfix - Fix Communication visibility (#110)
 - Bugfix - Fix update of the TeamId, UpdateMissionStatus based on person and not on cache
