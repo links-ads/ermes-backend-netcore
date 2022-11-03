@@ -48,7 +48,7 @@ namespace Ermes.ExternalServices.Csi
             HttpClient client = new HttpClient();
             byte[] byteArray;
             if(presidi)
-                byteArray = Encoding.ASCII.GetBytes(string.Format("{0}:{1}", _connectionProvider.GetUsername_Presidi(), _connectionProvider.GetPassword_Presidi()));
+               byteArray = Encoding.ASCII.GetBytes(string.Format("{0}:{1}", _connectionProvider.GetUsername_Presidi(), _connectionProvider.GetPassword_Presidi()));
             else
                 byteArray = Encoding.ASCII.GetBytes(string.Format("{0}:{1}", _connectionProvider.GetUsername(), _connectionProvider.GetPassword()));
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
@@ -126,7 +126,7 @@ namespace Ermes.ExternalServices.Csi
         public async Task InserisciFromFaster(Report report)
         {
             var builder = new UriBuilder(CsiClientPresidi.BaseAddress + "/inserisciFromFaster");
-            
+
             //Do not want to store on local DB the fule byte array of the attachments;
             //localbody will be stored in localDB without byte[], while body represents the full request sent to CSI service
             InsertReport localBody = new InsertReport()
@@ -137,6 +137,10 @@ namespace Ermes.ExternalServices.Csi
                 descrizione = report.Description,
                 fenomenoLabelList = new string[] { report.HazardString },
                 statoSegnalazioneLabel = report.StatusString,
+                notaList = new List<string>(),
+                peoples = new List<ReportPeople>(),
+                allegatiSegnalazione = new List<ReportAttachment>(),
+                allegatiComunicazione = new List<ReportAttachment>(),
             };
 
             if(report.ExtensionData != null && report.ExtensionData.Count > 0)
