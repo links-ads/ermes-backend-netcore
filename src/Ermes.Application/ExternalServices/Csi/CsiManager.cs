@@ -45,12 +45,18 @@ namespace Ermes.ExternalServices.Csi
 
         private HttpClient GetCsiClient(bool presidi = false)
         {
-            HttpClient client = new HttpClient();
+            HttpClient client;
             byte[] byteArray;
-            if(presidi)
-               byteArray = Encoding.ASCII.GetBytes(string.Format("{0}:{1}", _connectionProvider.GetUsername_Presidi(), _connectionProvider.GetPassword_Presidi()));
+            if (presidi)
+            {
+                client = new HttpClient(new HttpClientHandler() { UseProxy = false });
+                byteArray = Encoding.ASCII.GetBytes(string.Format("{0}:{1}", _connectionProvider.GetUsername_Presidi(), _connectionProvider.GetPassword_Presidi()));
+            }
             else
+            {
+                client = new HttpClient();
                 byteArray = Encoding.ASCII.GetBytes(string.Format("{0}:{1}", _connectionProvider.GetUsername(), _connectionProvider.GetPassword()));
+            }
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(HEADER_APPLICATION_JSON));
             client.BaseAddress = new Uri(presidi ? _connectionProvider.GetBaseUrl_Presidi() : _connectionProvider.GetBaseUrl());
