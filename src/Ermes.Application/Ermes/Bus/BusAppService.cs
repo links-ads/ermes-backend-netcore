@@ -54,7 +54,7 @@ namespace Ermes.Bus
             await _backgroundJobManager.EnqueueEventAsync(notification);
         }
 
-        public async Task TestCsiPresidiService()
+        public async Task TestCsiPresidiService(IdInput<int> input)
         {
             bool mustSendReport = true;
             //It must be "Protezione Civile Piemonte"
@@ -64,7 +64,7 @@ namespace Ermes.Bus
                 _backgroundJobManager.Enqueue<SendReportJob, SendReportJobArgs>(
                     new SendReportJobArgs
                     {
-                        ReportId = 6
+                        ReportId = input.Id
                     });
             }
         }

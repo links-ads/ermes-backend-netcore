@@ -1,4 +1,5 @@
 ﻿using Ermes.Bus.Dto;
+using Ermes.Dto;
 using Ermes.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace Ermes.Bus
     {
         Task TestBusConsumerTopic(TestBusConsumerTopicInput input);
         Task TestGamificationNotification(TestBusConsumerTopicInput input);
-        Task TestCsiPresidiService();
+        Task TestCsiPresidiService(IdInput<int> input);
         Task<bool> TestVolterTaxCodeService();
     }
 }

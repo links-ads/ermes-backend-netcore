@@ -45,12 +45,19 @@ namespace Ermes.ExternalServices.Csi
 
         private HttpClient GetCsiClient(bool presidi = false)
         {
-            HttpClient client = new HttpClient();
+            HttpClient client;
             byte[] byteArray;
-            if(presidi)
+            if (presidi)
+            {
+                //In this case it's necessary to skip the proxy, because it blocks requests coming from api-test.faster-project.cloud
+                client = new HttpClient(new HttpClientHandler() { UseProxy = false });
                 byteArray = Encoding.ASCII.GetBytes(string.Format("{0}:{1}", _connectionProvider.GetUsername_Presidi(), _connectionProvider.GetPassword_Presidi()));
+            }
             else
+            {
+                client = new HttpClient();
                 byteArray = Encoding.ASCII.GetBytes(string.Format("{0}:{1}", _connectionProvider.GetUsername(), _connectionProvider.GetPassword()));
+            }
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(HEADER_APPLICATION_JSON));
             client.BaseAddress = new Uri(presidi ? _connectionProvider.GetBaseUrl_Presidi() : _connectionProvider.GetBaseUrl());
@@ -126,8 +133,8 @@ namespace Ermes.ExternalServices.Csi
         public async Task InserisciFromFaster(Report report)
         {
             var builder = new UriBuilder(CsiClientPresidi.BaseAddress + "/inserisciFromFaster");
-            
-            //Do not want to store on local DB the fule byte array of the attachments;
+
+            //Do not want to store on local DB the full byte array of the attachments;
             //localbody will be stored in localDB without byte[], while body represents the full request sent to CSI service
             InsertReport localBody = new InsertReport()
             {
@@ -137,6 +144,10 @@ namespace Ermes.ExternalServices.Csi
                 descrizione = report.Description,
                 fenomenoLabelList = new string[] { report.HazardString },
                 statoSegnalazioneLabel = report.StatusString,
+                notaList = new List<string>(),
+                peoples = new List<ReportPeople>(),
+                allegatiSegnalazione = new List<ReportAttachment>(),
+                allegatiComunicazione = new List<ReportAttachment>(),
             };
 
             if(report.ExtensionData != null && report.ExtensionData.Count > 0)
