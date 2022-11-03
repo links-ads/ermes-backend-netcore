@@ -1,5 +1,6 @@
 Ver.
 --------------------------------
+- Feature - CSI service integration when a new report is created (#96)
 
 Ver. 4.0.0 - 2022-11-02
 --------------------------------

@@ -49,6 +49,7 @@ namespace Ermes.ExternalServices.Csi
             byte[] byteArray;
             if (presidi)
             {
+                //In this case it's necessary to skip the proxy, because it blocks requests coming from api-test.faster-project.cloud
                 client = new HttpClient(new HttpClientHandler() { UseProxy = false });
                 byteArray = Encoding.ASCII.GetBytes(string.Format("{0}:{1}", _connectionProvider.GetUsername_Presidi(), _connectionProvider.GetPassword_Presidi()));
             }
@@ -133,7 +134,7 @@ namespace Ermes.ExternalServices.Csi
         {
             var builder = new UriBuilder(CsiClientPresidi.BaseAddress + "/inserisciFromFaster");
 
-            //Do not want to store on local DB the fule byte array of the attachments;
+            //Do not want to store on local DB the full byte array of the attachments;
             //localbody will be stored in localDB without byte[], while body represents the full request sent to CSI service
             InsertReport localBody = new InsertReport()
             {
