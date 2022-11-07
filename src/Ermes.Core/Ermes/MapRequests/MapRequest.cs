@@ -66,5 +66,14 @@ namespace Ermes.MapRequests
         public int Resolution { get; set; } = 10;
 
         public virtual ICollection<MapRequestLayer> MapRequestLayers { get; set; }
+
+        [NotMapped]
+        public int ExpectedUpdates
+        {
+            get
+            {
+                return (int)(Duration.UpperBound - Duration.LowerBound).TotalDays / Frequency;
+            }
+        }
     }
 }

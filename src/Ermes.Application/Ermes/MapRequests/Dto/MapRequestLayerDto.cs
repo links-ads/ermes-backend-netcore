@@ -10,6 +10,7 @@ namespace Ermes.MapRequests.Dto
         public int LayerDataTypeId { get; set; }
         public string MapRequestCode { get; set; }
         public LayerImportStatusType Status { get; set; }
-        public string ErrorMessage { get; set; }
+        public int ReceivedUpdates { get; set; }
+        public MapRequestLayerErrorDto ErrorMessages { get; set; }
     }
 }

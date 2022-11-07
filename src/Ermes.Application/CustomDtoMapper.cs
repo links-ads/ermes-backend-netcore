@@ -244,6 +244,7 @@ namespace Ermes
                             .ForMember(entity => entity.Code, options => options.Ignore());
             configuration.CreateMap<MapRequests.MapRequest, MapRequestNotificationDto>();
             configuration.CreateMap<MapRequests.MapRequestLayer, MapRequestLayerDto>();
+            configuration.CreateMap<MapRequests.MapRequestLayerError, MapRequestLayerErrorDto>();
 
             configuration.CreateMap<Level, LevelDto>()
                             .ForMember(dto => dto.PreviousLevelName, options => options.MapFrom(b => b.PreviousLevelId.HasValue ? b.PreviousLevel.Name : null))

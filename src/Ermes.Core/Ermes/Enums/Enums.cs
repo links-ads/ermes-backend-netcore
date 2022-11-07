@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using System;
 
 namespace Ermes.Enums
 {
@@ -287,8 +288,7 @@ namespace Ermes.Enums
         Created,
         Accepted,
         Processing,
-        Completed,
-        Error
+        Completed
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -296,6 +296,7 @@ namespace Ermes.Enums
     {
         RequestSubmitted,
         ContentAvailable,
+        [Obsolete] //kept for retrocompatibility
         ContentNotAvailable,
         Canceled
     }

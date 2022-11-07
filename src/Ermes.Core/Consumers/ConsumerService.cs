@@ -9,6 +9,7 @@ using Ermes.Notifiers;
 using Ermes.Persons;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Transactions;
 
@@ -95,8 +96,10 @@ namespace Ermes.Consumers
                     switch (eventData.status_code)
                     {
                         case "200":
-                            layer.Status = LayerImportStatusType.Completed;
                             mr.Status = MapRequestStatusType.ContentAvailable;
+                            layer.ReceivedUpdates++;
+                            if (layer.ReceivedUpdates == mr.ExpectedUpdates)
+                                layer.Status = LayerImportStatusType.Completed;
                             break;
                         case "201":
                             layer.Status = LayerImportStatusType.Accepted;
@@ -108,10 +111,15 @@ namespace Ermes.Consumers
                         case "404":
                         case "422":
                         case "500":
-                            layer.Status = LayerImportStatusType.Error;
-                            layer.ErrorMessage = eventData.message;
-                            if(mr.MapRequestLayers.All(a => a.Status == LayerImportStatusType.Error))
-                                mr.Status = MapRequestStatusType.ContentNotAvailable;
+                            layer.ErrorMessages ??= new List<MapRequestLayerError>();
+                            layer.ErrorMessages.Add(new MapRequestLayerError(eventData.message, eventData.acquisition_date != null && eventData.acquisition_date != DateTime.MinValue ? eventData.acquisition_date : DateTime.UtcNow));
+                            layer.ErrorMessages.OrderBy(a => a.AcquisitionDate).ToList();
+                            layer.ReceivedUpdates++;
+                            if (layer.ReceivedUpdates == mr.ExpectedUpdates)
+                            {
+                                layer.Status = LayerImportStatusType.Completed;
+                                mr.Status = MapRequestStatusType.ContentAvailable;
+                            }
                             break;
                         default:
                             break;
