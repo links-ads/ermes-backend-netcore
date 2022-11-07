@@ -15,8 +15,6 @@ namespace Ermes.MapRequests
 
     public class MapRequestLayer: CreationAuditedEntity
     {
-        public const int MaxErrorMessageLength = 2000;
-
         public virtual Layer Layer { get; set; }
         public int LayerDataTypeId { get; set; }
 
@@ -32,7 +30,24 @@ namespace Ermes.MapRequests
         [NotMapped]
         public LayerImportStatusType Status { get; set; }
 
-        [StringLength(MaxErrorMessageLength)]
-        public string ErrorMessage { get; set; }
+        public int ReceivedUpdates { get; set; }
+
+        [Column(TypeName = "jsonb")]
+        public List<MapRequestLayerError> ErrorMessages { get; set; }
+    }
+
+    public class MapRequestLayerError
+    {
+        public MapRequestLayerError()
+        {
+
+        }
+        public MapRequestLayerError(string message, DateTime acquisitionDate)
+        {
+            Message = message;
+            AcquisitionDate = acquisitionDate;
+        }
+        public string Message { get; set; }
+        public DateTime AcquisitionDate { get; set; }
     }
 }

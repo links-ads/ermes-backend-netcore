@@ -1,6 +1,7 @@
 Ver.
 --------------------------------
 - Feature - CSI service integration when a new report is created (#96)
+- Feature - Maprequest with frequency > 0 management added (migration added)(#114)
 
 Ver. 4.0.0 - 2022-11-02
 --------------------------------

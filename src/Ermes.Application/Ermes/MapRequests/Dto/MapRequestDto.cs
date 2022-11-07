@@ -17,7 +17,6 @@ namespace Ermes.MapRequests.Dto
         public int Frequency { get; set; }
         public List<int> DataTypeIds { get; set; }
         public MapRequestStatusType Status { get; set; }
-        public string ErrorMessage { get; set; }
         public OrganizationDto Organization { get; set; }
         public string Username { get; set; }
         public string Email { get; set; }
@@ -30,5 +29,6 @@ namespace Ermes.MapRequests.Dto
         }
         public int Resolution { get; set; } = 10;
         public List<MapRequestLayerDto> MapRequestLayers { get; set; }
+        //public int ExpectedUpdates { get; set; }
     }
 }

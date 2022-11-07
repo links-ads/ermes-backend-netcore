@@ -93,8 +93,8 @@ namespace Ermes.EntityFrameworkCore
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //It's necessary to create a specific value-comparer for extensionData prop
-            //This allow the update of this field
+            //It's necessary to create a specific value-comparer for jsonb properties
+            //This allow the update of this kind of field
             //see https://stackoverflow.com/questions/62021228/entity-framework-not-detecting-jsonb-properties-changes-in-c-sharp
             //and https://docs.microsoft.com/en-us/ef/core/modeling/value-comparers?tabs=ef5
             modelBuilder
@@ -106,7 +106,17 @@ namespace Ermes.EntityFrameworkCore
                     (c1, c2) => c1.SequenceEqual(c2),
                     c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
                     c => c.ToList())
-                );
+            );
+            modelBuilder
+                .Entity<MapRequestLayer>()
+                .Property(r => r.ErrorMessages)
+                .Metadata
+                .SetValueComparer(
+                new ValueComparer<List<MapRequestLayerError>>(
+                    (c1, c2) => c1.SequenceEqual(c2),
+                    c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                    c => c.ToList())
+            );
             modelBuilder.Entity<PersonActionActivity>();
             modelBuilder.Entity<PersonActionTracking>();
             modelBuilder.Entity<PersonActionStatus>();

@@ -13,5 +13,6 @@ namespace Ermes.Consumers.RabbitMq
         public string status_code { get; set; }
         public int datatype_id { get; set; }
         public string type { get; set; }
+        public DateTime acquisition_date { get; set; }
     }
 }
