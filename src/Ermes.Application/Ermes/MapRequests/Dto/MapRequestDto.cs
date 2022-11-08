@@ -29,6 +29,5 @@ namespace Ermes.MapRequests.Dto
         }
         public int Resolution { get; set; } = 10;
         public List<MapRequestLayerDto> MapRequestLayers { get; set; }
-        //public int ExpectedUpdates { get; set; }
     }
 }

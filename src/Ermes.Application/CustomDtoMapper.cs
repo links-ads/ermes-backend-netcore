@@ -236,7 +236,6 @@ namespace Ermes
             configuration.CreateMap<MapRequests.MapRequest, MapRequestDto>()
                             .ForMember(dto => dto.Centroid, options => options.MapFrom(b => new PointPosition(b.AreaOfInterest.Centroid.X, b.AreaOfInterest.Centroid.Y)))
                             .ForMember(dto => dto.Organization, options => options.MapFrom(b => b.Creator.Organization))
-                            .ForMember(dto => dto.MapRequestLayers, options => options.Ignore())
                             .ForMember(dto => dto.Username, options => options.MapFrom(b => b.Creator.Username))
                             .ForMember(dto => dto.Email, options => options.MapFrom(b => b.Creator.Email))
                             .AfterMap((src, dest) => dest.Duration.LowerBound = dest.Duration.LowerBound.ToUniversalTime())
@@ -246,7 +245,8 @@ namespace Ermes
             configuration.CreateMap<MapRequests.MapRequest, MapRequestNotificationDto>();
             configuration.CreateMap<MapRequests.MapRequestLayer, MapRequestLayerDto>()
                             .ReverseMap();
-            configuration.CreateMap<MapRequests.MapRequestLayerError, MapRequestLayerErrorDto>().ReverseMap();
+            configuration.CreateMap<MapRequests.MapRequestLayerError, MapRequestLayerErrorDto>()
+                            .ReverseMap();
 
             configuration.CreateMap<Level, LevelDto>()
                             .ForMember(dto => dto.PreviousLevelName, options => options.MapFrom(b => b.PreviousLevelId.HasValue ? b.PreviousLevel.Name : null))
