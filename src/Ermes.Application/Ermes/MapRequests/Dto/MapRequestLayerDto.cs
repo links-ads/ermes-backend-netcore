@@ -1,7 +1,6 @@
-﻿using Ermes.Enums;
-using System;
+﻿using Abp.AutoMapper;
+using Ermes.Enums;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Ermes.MapRequests.Dto
 {
@@ -11,6 +10,6 @@ namespace Ermes.MapRequests.Dto
         public string MapRequestCode { get; set; }
         public LayerImportStatusType Status { get; set; }
         public int ReceivedUpdates { get; set; }
-        public MapRequestLayerErrorDto ErrorMessages { get; set; }
+        public List<MapRequestLayerErrorDto> ErrorMessages { get; set; }
     }
 }
