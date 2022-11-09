@@ -4,11 +4,11 @@ version: '3.5'
 services:
   shelter.web:
     environment:
-      - ASPNETCORE_ENVIRONMENT=ShelterLocal
+      - ASPNETCORE_ENVIRONMENT=local
       - GOOGLE_APPLICATION_CREDENTIALS=firebasekey-dev.json
     ports:
       - '${SHELTER_WEB_PORT_LOCAL}:80'
-    container_name: 'shelter-web-${ENVTYPE_SHELTER_LOCAL}'
+    container_name: 'shelter-web-${ENVTYPE_LOCAL}'
     env_file: 
       - ./.env
     depends_on:
@@ -20,7 +20,7 @@ services:
     restart: unless-stopped      
 
   shelter-pgsql:
-    container_name: 'shelter-pgsql-${ENVTYPE_SHELTER_LOCAL}'
+    container_name: 'shelter-pgsql-${ENVTYPE_LOCAL}'
     environment:
       POSTGRES_PASSWORD: ${SHELTER_PASSWORD_LOCAL}
       DB_PASSWORD: ${SHELTER_PASSWORD_LOCAL}

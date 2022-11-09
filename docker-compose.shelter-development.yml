@@ -11,11 +11,11 @@ services:
       dockerfile: src/Ermes.Web/Dockerfile
     restart: unless-stopped  
     environment:
-      - ASPNETCORE_ENVIRONMENT=ShelterDevelopment
+      - ASPNETCORE_ENVIRONMENT=dev
       - GOOGLE_APPLICATION_CREDENTIALS=firebasekey-shelter.json
     ports:
       - '${SHELTER_WEB_PORT_DEV}:80'
-    container_name: 'shelter-web-${ENVTYPE_SHELTER_DEV}'
+    container_name: 'shelter-web-${ENVTYPE_DEV}'
     networks:
       - shelter-net
     volumes:
@@ -29,7 +29,7 @@ services:
       context: .
       dockerfile: src/containers/postgresql/Dockerfile
     restart: unless-stopped  
-    container_name: 'shelter-pgsql-${ENVTYPE_SHELTER_DEV}'
+    container_name: 'shelter-pgsql-${ENVTYPE_DEV}'
     networks:
       - shelter-net    
     environment:
