@@ -42,7 +42,7 @@ services:
 
 networks:
   shelter-net:
-    name: shelter-net-${ENVTYPE_SHELTER_DEV}
+    name: shelter-net-${ENVTYPE_DEV}
 
 volumes:
   shelterlogsdev:
