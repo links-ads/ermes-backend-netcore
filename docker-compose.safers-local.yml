@@ -4,7 +4,7 @@ version: '3.5'
 services:
   safers.web:
     environment:
-      - ASPNETCORE_ENVIRONMENT=SafersLocal
+      - ASPNETCORE_ENVIRONMENT=${ENVTYPE_SAFERS_LOCAL}
       - GOOGLE_APPLICATION_CREDENTIALS=firebasekey-dev.json
     ports:
       - '${SAFERS_WEB_PORT_LOCAL}:80'

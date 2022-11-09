@@ -24,58 +24,7 @@ namespace Migrator
         {
             _appConfiguration = AppConfigurations.Get(env.ContentRootPath, env.EnvironmentName);
 
-            string filename;
-            if (_appConfiguration["App:ErmesProject"] == AppConsts.Ermes_Safers)
-            {
-                switch (_appConfiguration["App:Environment"])
-                {
-                    case "dev":
-                        filename = "appsettings.SafersDevelopment.json";
-                        break;
-                    case "test":
-                        filename = "appsettings.SafersTest.json";
-                        break;
-                    case "local":
-                    default:
-                        filename = "appsettings.json";
-                        break;
-                }
-            }
-            else if(_appConfiguration["App:ErmesProject"] == AppConsts.Ermes_Shelter)
-            {
-                switch (_appConfiguration["App:Environment"])
-                {
-                    case "dev":
-                        filename = "appsettings.ShelterDevelopment.json";
-                        break;
-                    case "test":
-                        filename = "appsettings.ShelterTest.json";
-                        break;
-                    case "local":
-                    default:
-                        filename = "appsettings.json";
-                        break;
-                }
-            }
-            else
-            {
-                switch (_appConfiguration["App:Environment"])
-                {
-                    case "dev":
-                        filename = "appsettings.FasterDevelopment.json";
-                        break;
-                    case "test":
-                        filename = "appsettings.FasterTest.json";
-                        break;
-                    case "prod":
-                        filename = "appsettings.FasterProduction.json";
-                        break;
-                    case "local":
-                    default:
-                        filename = "appsettings.json";
-                        break;
-                }
-            }
+            string filename = string.Format("appsettings.{0}.json", _appConfiguration["App:Environment"]);
 
             Console.WriteLine("Executing builder with filename: "+ filename);
             var builder = new ConfigurationBuilder()

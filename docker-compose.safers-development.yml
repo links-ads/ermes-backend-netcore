@@ -11,11 +11,11 @@ services:
       dockerfile: src/Ermes.Web/Dockerfile
     restart: unless-stopped  
     environment:
-      - ASPNETCORE_ENVIRONMENT=SafersDevelopment
+      - ASPNETCORE_ENVIRONMENT=${ENVTYPE_DEV}
       - GOOGLE_APPLICATION_CREDENTIALS=firebasekey-safers.json
     ports:
       - '${SAFERS_WEB_PORT_DEV}:80'
-    container_name: 'safers-web-${ENVTYPE_SAFERS_DEV}'
+    container_name: 'safers-web-${ENVTYPE_DEV}'
     networks:
       - safers-net
     volumes:
@@ -29,7 +29,7 @@ services:
       context: .
       dockerfile: src/containers/postgresql/Dockerfile
     restart: unless-stopped  
-    container_name: 'safers-pgsql-${ENVTYPE_SAFERS_DEV}'
+    container_name: 'safers-pgsql-${ENVTYPE_DEV}'
     networks:
       - safers-net    
     volumes:
@@ -44,7 +44,7 @@ services:
 
 networks:
   safers-net:
-    name: safers-net-${ENVTYPE_SAFERS_DEV}
+    name: safers-net-${ENVTYPE_DEV}
 
 volumes:
   saferslogsdev:

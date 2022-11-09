@@ -5,17 +5,17 @@ services:
   safers.web:
     depends_on:
       - safers-pgsql
-    image: 'safers.web:${ENVTYPE_SAFERS_TEST}'
+    image: 'safers.web:${ENVTYPE_TEST}'
     build:
       context: .
       dockerfile: src/Ermes.Web/Dockerfile
     restart: unless-stopped  
     environment:
-      - ASPNETCORE_ENVIRONMENT=SafersTest
+      - ASPNETCORE_ENVIRONMENT=${ENVTYPE_TEST}
       - GOOGLE_APPLICATION_CREDENTIALS=firebasekey-safers.json
     ports:
       - '${SAFERS_WEB_PORT_TEST}:80'
-    container_name: 'safers-web-${ENVTYPE_SAFERS_TEST}'
+    container_name: 'safers-web-${ENVTYPE_TEST}'
     networks:
       - safers-net
     volumes:
@@ -29,7 +29,7 @@ services:
       context: .
       dockerfile: src/containers/postgresql/Dockerfile
     restart: unless-stopped  
-    container_name: 'safers-pgsql-${ENVTYPE_SAFERS_TEST}'
+    container_name: 'safers-pgsql-${ENVTYPE_TEST}'
     networks:
       - safers-net    
     volumes:
@@ -44,7 +44,7 @@ services:
 
 networks:
   safers-net:
-    name: safers-net-${ENVTYPE_SAFERS_TEST}
+    name: safers-net-${ENVTYPE_TEST}
 
 volumes:
   saferslogstest:
