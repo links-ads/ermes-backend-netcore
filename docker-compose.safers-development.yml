@@ -5,7 +5,7 @@ services:
   safers.web:
     depends_on:
       - safers-pgsql
-    image: 'safers.web:${ENVTYPE_SAFERS_DEV}'
+    image: 'safers.web:${ENVTYPE_DEV}'
     build:
       context: .
       dockerfile: src/Ermes.Web/Dockerfile
