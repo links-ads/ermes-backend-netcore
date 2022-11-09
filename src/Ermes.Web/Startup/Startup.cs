@@ -187,7 +187,7 @@ namespace Ermes.Web.Startup
         {
             app.UseAbp(); //Initializes ABP framework.
 
-            if (env.IsEnvironment("development") || env.IsEnvironment("local"))
+            if (env.IsEnvironment("dev") || env.IsEnvironment("local"))
             {
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();

@@ -26,7 +26,7 @@
 
         public struct Environments
         {
-            public const string Dev = "Development";
+            public const string Dev = "dev";
             public const string Test = "Test";
             public const string Prod = "Production";
         }

@@ -11,7 +11,7 @@ services:
       dockerfile: src/Ermes.Web/Dockerfile
     restart: unless-stopped  
     environment:
-      - ASPNETCORE_ENVIRONMENT=${ENVTYPE_DEV}
+      - ASPNETCORE_ENVIRONMENT=dev
       - GOOGLE_APPLICATION_CREDENTIALS=firebasekey-safers.json
     ports:
       - '${SAFERS_WEB_PORT_DEV}:80'
