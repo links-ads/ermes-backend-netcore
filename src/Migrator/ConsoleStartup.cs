@@ -77,7 +77,7 @@ namespace Migrator
                 }
             }
 
-            Console.WriteLine("Executing builder");
+            Console.WriteLine("Executing builder with filename: "+ filename);
             var builder = new ConfigurationBuilder()
                 .AddJsonFile(filename, optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables();
