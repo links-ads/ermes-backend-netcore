@@ -5,7 +5,7 @@ services:
   shelter.web:
     depends_on:
       - shelter-pgsql
-    image: 'shelter.web'
+    image: 'shelter.web:${ENVTYPE_DEMO}'
     build:
       context: .
       dockerfile: src/Ermes.Web/Dockerfile
