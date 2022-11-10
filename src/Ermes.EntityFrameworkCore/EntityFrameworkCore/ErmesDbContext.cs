@@ -85,6 +85,11 @@ namespace Ermes.EntityFrameworkCore
         public IEntityHistoryHelper EntityHistoryHelper { get; set; }
 
         private readonly ErmesLocalizationHelper _localizer;
+
+        public ErmesDbContext(DbContextOptions<ErmesDbContext> options) : base(options)
+        {
+
+        }
         public ErmesDbContext(DbContextOptions<ErmesDbContext> options, ErmesLocalizationHelper localizer)
             : base(options)
         {

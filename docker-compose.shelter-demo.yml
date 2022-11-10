@@ -5,17 +5,17 @@ services:
   shelter.web:
     depends_on:
       - shelter-pgsql
-    image: 'shelter.web'
+    image: 'shelter.web:${ENVTYPE_DEMO}'
     build:
       context: .
       dockerfile: src/Ermes.Web/Dockerfile
     restart: unless-stopped  
     environment:
-      - ASPNETCORE_ENVIRONMENT=ShelterDemo
+      - ASPNETCORE_ENVIRONMENT=demo
       - GOOGLE_APPLICATION_CREDENTIALS=firebasekey-shelter.json
     ports:
       - '${SHELTER_WEB_PORT_DEMO}:80'
-    container_name: 'shelter-web-${ENVTYPE_SHELTER_DEMO}'
+    container_name: 'shelter-web-${ENVTYPE_DEMO}'
     networks:
       - shelter-net
     volumes:
@@ -29,7 +29,7 @@ services:
       context: .
       dockerfile: src/containers/postgresql/Dockerfile
     restart: unless-stopped  
-    container_name: 'shelter-pgsql-${ENVTYPE_SHELTER_DEMO}'
+    container_name: 'shelter-pgsql-${ENVTYPE_DEMO}'
     networks:
       - shelter-net    
     environment:
@@ -42,7 +42,7 @@ services:
 
 networks:
   shelter-net:
-    name: shelter-net-${ENVTYPE_SHELTER_DEMO}
+    name: shelter-net-${ENVTYPE_DEMO}
 
 volumes:
   shelterlogsdemo:

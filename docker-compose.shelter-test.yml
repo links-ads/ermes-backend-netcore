@@ -5,17 +5,17 @@ services:
   shelter.web:
     depends_on:
       - shelter-pgsql
-    image: 'shelter.web'
+    image: 'shelter.web:${ENVTYPE_TEST}'
     build:
       context: .
       dockerfile: src/Ermes.Web/Dockerfile
     restart: unless-stopped  
     environment:
-      - ASPNETCORE_ENVIRONMENT=ShelterTest
+      - ASPNETCORE_ENVIRONMENT=${ENVTYPE_TEST}
       - GOOGLE_APPLICATION_CREDENTIALS=firebasekey-shelter.json
     ports:
       - '${SHELTER_WEB_PORT_TEST}:80'
-    container_name: 'shelter-web-${ENVTYPE_SHELTER_TEST}'
+    container_name: 'shelter-web-${ENVTYPE_TEST}'
     networks:
       - shelter-net
     volumes:
@@ -29,7 +29,7 @@ services:
       context: .
       dockerfile: src/containers/postgresql/Dockerfile
     restart: unless-stopped  
-    container_name: 'shelter-pgsql-${ENVTYPE_SHELTER_TEST}'
+    container_name: 'shelter-pgsql-${ENVTYPE_TEST}'
     networks:
       - shelter-net    
     environment:
@@ -42,7 +42,7 @@ services:
 
 networks:
   shelter-net:
-    name: shelter-net-${ENVTYPE_SHELTER_TEST}
+    name: shelter-net-${ENVTYPE_TEST}
 
 volumes:
   shelterlogstest:

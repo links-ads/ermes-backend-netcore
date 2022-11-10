@@ -5,13 +5,13 @@ services:
   faster.web:
     depends_on:
       - faster-pgsql
-    image: 'faster.web'
+    image: 'faster.web:${ENVTYPE_DEV}'
     build:
       context: .
       dockerfile: src/Ermes.Web/Dockerfile
     restart: unless-stopped
     environment:
-      - ASPNETCORE_ENVIRONMENT=FasterDevelopment
+      - ASPNETCORE_ENVIRONMENT=dev
       - GOOGLE_APPLICATION_CREDENTIALS=firebasekey-faster.json
     ports:
       - '${FASTER_WEB_PORT_DEV}:80'

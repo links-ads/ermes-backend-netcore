@@ -5,13 +5,13 @@ services:
   faster.web:
     depends_on:
       - faster-pgsql
-    image: 'faster.web'
+    image: 'faster.web:${ENVTYPE_TEST}'
     build:
       context: .
       dockerfile: src/Ermes.Web/Dockerfile
     restart: unless-stopped  
     environment:
-      - ASPNETCORE_ENVIRONMENT=FasterTest
+      - ASPNETCORE_ENVIRONMENT=test
       - GOOGLE_APPLICATION_CREDENTIALS=firebasekey-faster.json
     ports:
       - '${FASTER_WEB_PORT_TEST}:80'
