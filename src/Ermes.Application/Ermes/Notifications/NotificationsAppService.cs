@@ -2,17 +2,14 @@
 using Abp.Linq.Extensions;
 using Ermes.Attributes;
 using Ermes.Dto.Datatable;
-using Ermes.Helpers;
 using Ermes.Linq.Extensions;
 using Ermes.Notifications.Dto;
-using Ermes.Persons;
 using Microsoft.EntityFrameworkCore;
 using NpgsqlTypes;
 using NSwag.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Ermes.Notifications
@@ -22,17 +19,14 @@ namespace Ermes.Notifications
     {
         private readonly NotificationManager _notificationManager;
         private readonly ErmesAppSession _session;
-        private readonly PersonManager _personManager;
 
         public NotificationsAppService(
                 NotificationManager notificationManager,
-                ErmesAppSession session,
-                PersonManager personManager
+                ErmesAppSession session
             )
         {
             _notificationManager = notificationManager;
             _session = session;
-            _personManager = personManager;
         }
         #region Private
         private async Task<PagedResultDto<NotificationDto>> InternalGetNotifications(GetNotificationsInput input, bool filterByOrganization = true)

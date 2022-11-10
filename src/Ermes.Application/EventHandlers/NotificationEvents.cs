@@ -20,6 +20,7 @@ using Microsoft.EntityFrameworkCore;
 using Ermes.MapRequests;
 using Ermes.MapRequests.Dto;
 using Ermes.Gamification.Dto;
+using Ermes.Teams.Dto;
 
 namespace Ermes.EventHandlers
 {
@@ -304,6 +305,30 @@ namespace Ermes.EventHandlers
             var receivers = _personManager.Persons.Where(p => p.Id == eventData.Content.PersonId);
 
             await _notifierService.SendUserNotification(eventData.CreatorId, receivers, eventData.EntityId, (bodyKey, bodyParams), (titleKey, null), eventData.Action, EntityType.Gamification, eventData.IncludeCreator);
+        }
+    }
+
+    public class TeamNotificationEventHandler : IAsyncEventHandler<NotificationEvent<TeamNotificationDto>>, ITransientDependency
+    {
+        private readonly NotifierService _notifierService;
+        private readonly PersonManager _personManager;
+        public TeamNotificationEventHandler(NotifierService notifierService, PersonManager personManager)
+        {
+            _notifierService = notifierService;
+            _personManager = personManager;
+        }
+
+        [UnitOfWork]
+        public virtual async Task HandleEventAsync(NotificationEvent<TeamNotificationDto> eventData)
+        {
+            string titleKey = (eventData.Action == EntityWriteAction.TeamAssociation) ? "Notification_Team_PersonAssociation_Title" : "Notification_Team_PersonDissociation_Title";
+            string[] bodyParams = new string[] { eventData.Content.Name };
+
+            var receivers = _personManager
+                                .Persons
+                                .Include(p => p.Organization)
+                                .Where(p => eventData.Content.Guids != null && eventData.Content.Guids.Contains(p.FusionAuthUserGuid));
+            await _notifierService.SendUserNotification(eventData.CreatorId, receivers, eventData.EntityId, ((eventData.Action == EntityWriteAction.TeamAssociation) ? "Notification_Team_PersonAssociation_Body" : "Notification_Team_PersonDissociation_Body", bodyParams), (titleKey, null), eventData.Action, EntityType.Team);
         }
     }
 }
