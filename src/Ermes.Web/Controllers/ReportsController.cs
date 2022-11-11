@@ -321,8 +321,7 @@ namespace Ermes.Web.Controllers
                     switch (cat.Type)
                     {
                         case CategoryType.Range:
-                            var localizedValues = ObjectMapper.Map<LocalizedCategoryValuesDto>(cat);
-                            if (!localizedValues.Values.Contains(item.Value))
+                            if (!cat.Translations.SelectMany(c => c.Values).Contains(item.Value))
                                 return new Tuple<string, string>("InvalidCategoryRangeValue", item.Value);
                             break;
                         case CategoryType.Numeric:

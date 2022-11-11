@@ -1,5 +1,6 @@
 Ver.
 --------------------------------
+- Bugfix - Fix check on report categories based on language (#116)
 
 Ver. 4.2.0 - 2022-11-10
 --------------------------------
