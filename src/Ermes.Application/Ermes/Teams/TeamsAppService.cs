@@ -1,40 +1,44 @@
-﻿using Ermes.Attributes;
+﻿using Abp.Application.Services.Dto;
+using Abp.BackgroundJobs;
+using Abp.Json;
+using Abp.Linq.Extensions;
+using Abp.UI;
+using Ermes.Attributes;
+using Ermes.Authorization;
+using Ermes.Dto;
+using Ermes.Dto.Datatable;
+using Ermes.Enums;
+using Ermes.EventHandlers;
+using Ermes.Linq.Extensions;
+using Ermes.Organizations;
 using Ermes.Persons;
+using Ermes.Teams.Dto;
+using Ermes.Users.Dto;
+using Microsoft.EntityFrameworkCore;
 using NSwag.Annotations;
 using System;
 using System.Collections.Generic;
-using System.Linq.Dynamic.Core;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
-using Ermes.Teams.Dto;
-using Abp.UI;
-using Abp.Application.Services.Dto;
-using Ermes.Linq.Extensions;
-using Microsoft.EntityFrameworkCore;
-using Abp.Linq.Extensions;
-using Ermes.Dto.Datatable;
-using Ermes.Users.Dto;
-using Ermes.Dto;
-using Abp.Json;
-using Ermes.Permissions;
-using Ermes.Authorization;
-using Ermes.Organizations;
 
 namespace Ermes.Teams
 {
     [ErmesAuthorize]
-    public class TeamsAppService: ErmesAppServiceBase, ITeamsAppService
+    public class TeamsAppService : ErmesAppServiceBase, ITeamsAppService
     {
         private readonly ErmesAppSession _session;
         private readonly TeamManager _teamManager;
         private readonly PersonManager _personManager;
         private readonly OrganizationManager _organizationManager;
         private readonly ErmesPermissionChecker _permissionChecker;
+        private readonly IBackgroundJobManager _backgroundJobManager;
         public TeamsAppService(
-                    TeamManager teamManager, 
+                    TeamManager teamManager,
                     PersonManager personManager,
                     OrganizationManager organizationManager,
                     ErmesPermissionChecker permissionChecker,
+                    IBackgroundJobManager backgroundJobManager,
                     ErmesAppSession session)
         {
             _session = session;
@@ -42,6 +46,7 @@ namespace Ermes.Teams
             _personManager = personManager;
             _organizationManager = organizationManager;
             _permissionChecker = permissionChecker;
+            _backgroundJobManager = backgroundJobManager;
         }
         [OpenApiOperation("Get Team",
             @"
@@ -143,7 +148,7 @@ namespace Ermes.Teams
             Team team = _teamManager.GetTeamById(input.Id);
             if (team == null)
                 throw new UserFriendlyException(L("InvalidEntityId", input.Id, "Team"));
-            
+
 
             if (input.OrganizationId.HasValue)
             {
@@ -162,11 +167,12 @@ namespace Ermes.Teams
                         throw new UserFriendlyException(L("InvalidOrganizationId", input.OrganizationId.Value));
                 }
             }
-            else {
+            else
+            {
                 if (team.Organization != null)
                 {
                     var organization = await _organizationManager.GetOrganizationByIdAsync(team.Organization.Id);
-                    if(organization == null)
+                    if (organization == null)
                         throw new UserFriendlyException(L("InvalidOrganizationId", team.Organization.Id));
                     if (_session.LoggedUserPerson.OrganizationId != team.Organization.Id && _session.LoggedUserPerson.OrganizationId != team.Organization.ParentId)
                         throw new UserFriendlyException(L("InvalidOrganizationId"));
@@ -237,10 +243,11 @@ namespace Ermes.Teams
         {
             Team team = await CheckTeamInputValidity(input.TeamId);
             // De-associate persons no longer in team (EF should implicitly convert the contains in a SQL IN clause)
-            _personManager.Persons.Where(p => p.TeamId == input.TeamId).Where(p=> !input.MembersGuids.Contains(p.FusionAuthUserGuid)).ToList().ForEach(p => p.Team = null);
+            var deAssociated = _personManager.Persons.Where(p => p.TeamId == input.TeamId).Where(p => !input.MembersGuids.Contains(p.FusionAuthUserGuid)).ToList();
+            deAssociated.ForEach(p => p.Team = null);
             // Get persons that will be members of team
             List<Person> affectedPersons = _personManager.Persons.Where(p => input.MembersGuids.Contains(p.FusionAuthUserGuid)).ToList();
-
+            List<Guid> associated = new List<Guid>();
             // Verify that at least one has mission management permissions
             /*List<int> memberRoles = _permissionManager.PersonRoles.Where(pr => input.MembersIds.Contains(pr.PersonId))
                         .Select(pr => pr.RoleId)
@@ -258,15 +265,40 @@ namespace Ermes.Teams
             {
                 if (p.OrganizationId != team.OrganizationId)
                     throw new UserFriendlyException(L("OrganizationMismatch", "Team", team.Id, "Person", p.Id));
-                if(p.TeamId != input.TeamId) //otherwise skip as already associated
+                if (p.TeamId != input.TeamId)//otherwise skip as already associated (do not send notification to persons that were already associated to this team)
+                {
                     p.Team = team;
+                    associated.Add(p.FusionAuthUserGuid);
+                }
             });
             // Check if it was passed some unexistent user
             input.MembersGuids.RemoveAll(pi => affectedPersons.Select(p => p.FusionAuthUserGuid).Contains(pi));
-            if(input.MembersGuids.Count > 0)
+            if (input.MembersGuids.Count > 0)
             {
                 throw new UserFriendlyException(L("UnexistentEntities", "Person", input.MembersGuids.ToJsonString()));
             }
+
+            TeamNotificationDto tn = new TeamNotificationDto()
+            {
+                Name = team.Name,
+                Guids = associated
+            };
+            NotificationEvent<TeamNotificationDto> notification = new NotificationEvent<TeamNotificationDto>(team.Id,
+                _session.UserId.Value,
+                tn,
+                EntityWriteAction.TeamAssociation);
+            await _backgroundJobManager.EnqueueEventAsync(notification);
+
+            //Send notification to all persons that are no longer part of this team
+            tn.Guids = deAssociated.Select(a => a.FusionAuthUserGuid).ToList();
+
+            notification = new NotificationEvent<TeamNotificationDto>(team.Id,
+                _session.UserId.Value,
+                tn,
+                EntityWriteAction.TeamDissociation);
+
+            await _backgroundJobManager.EnqueueEventAsync(notification);
+
             return true;
         }
 

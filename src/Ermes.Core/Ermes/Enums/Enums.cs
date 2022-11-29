@@ -178,7 +178,8 @@ namespace Ermes.Enums
         PersonActionStatus = 70,
         PersonActionActivity = 80,
         Person = 90,
-        Gamification = 100
+        Gamification = 100,
+        Team = 110
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -217,7 +218,9 @@ namespace Ermes.Enums
         BadgeObtained,
         FirstLogin,
         CompleteWizard,
-        FirstReport
+        FirstReport,
+        TeamAssociation,
+        TeamDissociation
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
