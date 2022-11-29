@@ -3,6 +3,7 @@ using Abp.UI;
 using Ermes.Categories;
 using Ermes.Enums;
 using Ermes.ExternalServices.Csi.Configuration;
+using Ermes.Helpers;
 using Ermes.Operations;
 using Ermes.Reports;
 using Ermes.Resources;
@@ -66,8 +67,9 @@ namespace Ermes.ExternalServices.Csi
 
         public async Task<int> SearchVolontarioAsync(string taxCode, long personId)
         {
-            //CSI service only accepts HTTP GET request with params in the body
-            //there's no possibility to use query-string params
+            //At the beginning, this was a GET request with a body
+            //Due to problems related to CSI infrastruction in production env,
+            //the request has been transformed into a POST
 
             var builder = new UriBuilder(CsiClient.BaseAddress + "/SearchVolontario");
             string requestBody = JsonConvert.SerializeObject(new Registration()
@@ -78,7 +80,7 @@ namespace Ermes.ExternalServices.Csi
 
             var request = new HttpRequestMessage
             {
-                Method = HttpMethod.Get,
+                Method = HttpMethod.Post,
                 RequestUri = new Uri(builder.ToString()),
                 Content = new StringContent(requestBody, Encoding.UTF8, HEADER_APPLICATION_JSON)
             };
@@ -179,9 +181,18 @@ namespace Ermes.ExternalServices.Csi
                 {
                     string mediaPath = ResourceManager.Reports.GetMediaPath(report.Id, fileName);
                     ReportAttachment ra = new ReportAttachment(fileName, mediaPath);
-                    localBody.allegatiSegnalazione.Add(ra);
                     var file = await _azureReportStorageManager.GetFile(ResourceManager.Reports.GetRelativeMediaPath(report.Id, fileName));
-                    body.allegatiSegnalazione.Add(new ReportAttachment(fileName, mediaPath, file));
+                    var mediaType = ErmesCommon.GetMediaTypeFromFilename(fileName);
+                    if(mediaType == MediaType.Image && localBody.allegatiSegnalazione.Count == 0)
+                    {
+                        localBody.allegatiSegnalazione.Add(ra);
+                        body.allegatiSegnalazione.Add(new ReportAttachment(fileName, mediaPath, file));
+                    }
+                    else
+                    {
+                        localBody.allegatiComunicazione.Add(ra);
+                        body.allegatiComunicazione.Add(new ReportAttachment(fileName, mediaPath, file));
+                    }                    
                 }
             }
 

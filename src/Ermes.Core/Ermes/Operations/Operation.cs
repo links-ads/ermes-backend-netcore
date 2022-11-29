@@ -151,7 +151,15 @@ namespace Ermes.Operations
         public double longitudine { get; set; }
         public string statoSegnalazioneLabel { get; set; }
         public string[] fenomenoLabelList { get; set; }
+
+        /// <summary>
+        /// This field must contain only one image
+        /// </summary>
         public List<ReportAttachment> allegatiSegnalazione { get; set; } = new List<ReportAttachment>();
+
+        /// <summary>
+        /// This field contains video and audio file, and the additional images that are absent in 'allegatiSegnalazione' field
+        /// </summary>
         public List<ReportAttachment> allegatiComunicazione { get; set; } = new List<ReportAttachment>();
         public List<ReportPeople> peoples { get; set; } = new List<ReportPeople>();
 
