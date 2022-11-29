@@ -1,5 +1,7 @@
 Ver.
 --------------------------------
+- Feature - SearchVolontario as POST, allegatiComunicazione management update (#120)
+
 
 Ver. 4.2.0 - 2022-11-10
 --------------------------------
