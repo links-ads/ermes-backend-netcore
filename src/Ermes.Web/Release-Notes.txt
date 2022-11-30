@@ -1,5 +1,9 @@
 Ver.
 --------------------------------
+
+
+Ver. 4.3.0 - 2022-11-29
+--------------------------------
 - Feature - New notification for team association and dissociation (#115)
 - Bugfix - Fix check on report categories based on language (#116)
 - Feature - SearchVolontario as POST, allegatiComunicazione management update (#120)
