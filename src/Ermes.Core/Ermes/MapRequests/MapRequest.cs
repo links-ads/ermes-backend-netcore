@@ -72,7 +72,7 @@ namespace Ermes.MapRequests
         {
             get
             {
-                return Frequency > 0 ? (int)(Duration.UpperBound - Duration.LowerBound).TotalDays / Frequency : 0;
+                return Frequency > 0 ? (int)(Duration.UpperBound - Duration.LowerBound).TotalDays / Frequency : 1;
             }
         }
     }
