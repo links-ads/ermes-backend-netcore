@@ -13,7 +13,7 @@ namespace Ermes.Notifiers
         }
         public async Task<List<string>> SendMessage(FullNotificationData input)
         {
-            return await _chatbotManager.SendMessageAsync(input.Body, input.BodyParams, input.Receivers, input.EntityId, input.EntityType.ToString().ToLower(), input.Title, input.TitleParams);
+            return await _chatbotManager.SendMessageAsync(input.Body, input.BodyParams, input.Receivers, input.EntityId, input.EntityType.ToString(), input.Title, input.TitleParams);
         }
     }
 }
