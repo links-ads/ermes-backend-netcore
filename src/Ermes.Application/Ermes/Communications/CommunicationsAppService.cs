@@ -139,7 +139,9 @@ namespace Ermes.Communications
             else
                 throw new UserFriendlyException(L("InvalidAOI"));
 
-            newCommunication.Id = await _communicationManager.CreateOrUpdateCommunicationAsync(newCommunication);
+            //TODO: add check on receiverIds, the creator must have visibility on them
+
+            newCommunication.Id = await _communicationManager.CreateOrUpdateCommunicationAsync(newCommunication, featureDto.Properties.OrganizationReceiverIds);
 
             await CurrentUnitOfWork.SaveChangesAsync();
             

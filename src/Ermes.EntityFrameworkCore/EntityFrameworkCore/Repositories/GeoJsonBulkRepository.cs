@@ -22,6 +22,7 @@ using Abp;
 using Ermes.Activations;
 using Ermes.MapRequests;
 using static Ermes.Authorization.AppPermissions;
+using Ermes.Organizations;
 
 namespace Ermes.GeoJson
 {
@@ -161,7 +162,8 @@ namespace Ermes.GeoJson
                         null as ""reportContentTypeFilter"",
                         null as ""reportIsPublicFilter"",
                         null as ""communicationRestrictionFilter"",
-                        0 as ""teamFilter""
+                        0 as ""teamFilter"",
+                        null as ""receivers""
                     from public.missions m
                     left join public.organizations o on o.""Id"" = m.""OrganizationId""
                     join public.persons p on p.""Id"" = m.""CreatorUserId""
@@ -192,7 +194,12 @@ namespace Ermes.GeoJson
                         null as ""reportContentTypeFilter"",
                         null as ""reportIsPublicFilter"",
                         c.""Restriction"" as ""communicationRestrictionFilter"",
-                        0 as ""teamFilter""
+                        0 as ""teamFilter"",
+                        (
+    	                    select array_agg(cr.""OrganizationId"")
+    	                    from public.communication_receivers cr 
+    	                    where cr.""CommunicationId"" = c.""Id"" 
+                        ) as ""receivers""
                     from public.communications c
                     join public.persons p on p.""Id"" = c.""CreatorUserId""
                     left join public.organizations o on o.""Id"" = p.""OrganizationId""
@@ -223,7 +230,8 @@ namespace Ermes.GeoJson
                         r.""ContentType"" as ""reportContentTypeFilter"",
                         r.""IsPublic""::text as ""reportIsPublicFilter"",
                         null as ""communicationRestrictionFilter"",
-                        0 as ""teamFilter""
+                        0 as ""teamFilter"",
+                        null as ""receivers""
                     from public.reports r 
                     join public.persons p on p.""Id"" = r.""CreatorUserId""
                     left join public.organizations o on o.""Id"" = p.""OrganizationId""
@@ -254,7 +262,8 @@ namespace Ermes.GeoJson
                         null as ""reportContentTypeFilter"",
                         null as ""reportIsPublicFilter"",
                         null as ""communicationRestrictionFilter"",
-                        0 as ""teamFilter""
+                        0 as ""teamFilter"",
+                        null as ""receivers""
                     from public.reportrequests r2 
                     join public.persons p on p.""Id"" = r2.""CreatorUserId""
                     left join public.organizations o on o.""Id"" = p.""OrganizationId""
@@ -285,7 +294,8 @@ namespace Ermes.GeoJson
                         null as ""reportContentTypeFilter"",
                         null as ""reportIsPublicFilter"",
                         null as ""communicationRestrictionFilter"",
-                        0 as ""teamFilter""
+                        0 as ""teamFilter"",
+                        null as ""receivers""
                     from public.map_requests mr
                     join public.persons p on p.""Id"" = mr.""CreatorUserId""
                     left join public.organizations o on o.""Id"" = p.""OrganizationId""
@@ -316,7 +326,8 @@ namespace Ermes.GeoJson
                         null as ""reportContentTypeFilter"",
                         null as ""reportIsPublicFilter"",
                         null as ""communicationRestrictionFilter"",
-                        t.""Id"" as ""TeamId""
+                        t.""Id"" as ""TeamId"",
+                        null as ""receivers""
                         FROM (
 	                        SELECT pa2.""PersonId"", MAX(pa2.""Timestamp"") as ""MaxTime""
                             FROM person_actions pa2
@@ -370,9 +381,10 @@ namespace Ermes.GeoJson
                         and (((tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations]) or tmp.""organizationId"" is null) and tmp.""type"" in ('Mission', 'MapRequest')) or 
                         ((tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations]) or tmp.""reportIsPublicFilter"" = 'true') and tmp.""type"" = 'Report') or
                         ((tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations])) and tmp.""type"" = 'Person') or
-                        (tmp.""type"" = 'Communication' and tmp.""communicationRestrictionFilter"" = any(array[@restrictionTypes]) and (tmp.""communicationRestrictionFilter"" != 'Organization' or tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations])";
-                    
-                    
+                        (tmp.""type"" = 'Communication' and tmp.""communicationRestrictionFilter"" = any(array[@restrictionTypes]) and (tmp.""communicationRestrictionFilter"" != 'Organization' or array[@organizations] && tmp.""receivers"" ";
+                        
+                    //(tmp.""type"" = 'Communication' and tmp.""communicationRestrictionFilter"" = any(array[@restrictionTypes]) and (tmp.""communicationRestrictionFilter"" != 'Organization' or tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations])";
+
                     var p = new NpgsqlParameter("@organizations", NpgsqlDbType.Array | NpgsqlDbType.Integer)
                     {
                         Value = organizationIdList
