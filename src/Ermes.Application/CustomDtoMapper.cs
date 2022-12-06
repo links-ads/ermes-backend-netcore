@@ -160,13 +160,14 @@ namespace Ermes
             configuration.CreateMap<Communication, CommunicationDto>()
                             .ForMember(dto => dto.Centroid, options => options.MapFrom(b => new PointPosition(b.AreaOfInterest.Centroid.X, b.AreaOfInterest.Centroid.Y)))
                             .ForMember(dto => dto.OrganizationName, options => options.MapFrom(a => a.Creator.OrganizationId.HasValue ? a.Creator.Organization.Name : null))
+                            .ForMember(dto => dto.OrganizationReceiverIds, options => options.MapFrom(a => a.CommunicationReceivers != null ? a.CommunicationReceivers.Select(b => b.OrganizationId).ToList() : null))
                             .AfterMap((src, dest) => dest.Duration.LowerBound = dest.Duration.LowerBound.ToUniversalTime())
                             .AfterMap((src, dest) => dest.Duration.UpperBound = dest.Duration.UpperBound.ToUniversalTime())
                             .ReverseMap()
                             .ForMember(entity => entity.Creator, options => options.Ignore());
             configuration.CreateMap<Communication, CommunicationNotificationDto>()
                             .ForMember(dto => dto.Centroid, options => options.MapFrom(b => new PointPosition(b.AreaOfInterest.Centroid.X, b.AreaOfInterest.Centroid.Y)))
-                            .ForMember(dto => dto.OrganizationId, options => options.MapFrom(b => b.Creator.OrganizationId))
+                            .ForMember(dto => dto.OrganizationReceiverIds, options => options.MapFrom(a => a.CommunicationReceivers != null ? a.CommunicationReceivers.Select(b => b.OrganizationId).ToList() : null))
                             .AfterMap((src, dest) => dest.Duration.LowerBound = dest.Duration.LowerBound.ToUniversalTime())
                             .AfterMap((src, dest) => dest.Duration.UpperBound = dest.Duration.UpperBound.ToUniversalTime());
             configuration.CreateMap<Notification, NotificationDto>()
@@ -258,6 +259,7 @@ namespace Ermes
                 .ForMember(dto => dto.Username, options => options.MapFrom(b => b.Username))
                 .ForMember(dto => dto.Email, options => options.MapFrom(b => b.Email))
                 .ForMember(dto => dto.Points, options => options.MapFrom(b => b.Points));
+
             #region GeoJsons
             configuration.CreateMap<Communication, FeatureDto<GeoJsonItem>>()
                             .ForMember(fd => fd.Geometry, options => options.MapFrom(c => new GeoJsonWriter().Write(c.AreaOfInterest)))

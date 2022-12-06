@@ -81,6 +81,7 @@ namespace Ermes.EntityFrameworkCore
         public virtual DbSet<GamificationAudit> GamificationAudit { get; set; }
         public virtual DbSet<Gamification.Barrier> Barriers { get; set; }
         public virtual DbSet<MapRequestLayer> MapRequestLayers { get; set; }
+        public virtual DbSet<CommunicationReceiver> CommunicationReceivers { get; set; }
 
         public IEntityHistoryHelper EntityHistoryHelper { get; set; }
 
@@ -250,6 +251,15 @@ namespace Ermes.EntityFrameworkCore
                 .WithMany(l => l.MapRequestLayers)
                 .HasPrincipalKey(l => l.DataTypeId)
                 .HasForeignKey(mrl => mrl.LayerDataTypeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CommunicationReceiver>().HasIndex(i => new { i.CommunicationId, i.OrganizationId }).IsUnique();
+            modelBuilder.Entity<CommunicationReceiver>()
+                .HasOne<Communication>(cr => cr.Communication)
+                .WithMany(c => c.CommunicationReceivers)
+                .HasPrincipalKey(c => c.Id)
+                .HasForeignKey(cr => cr.CommunicationId)
+                .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
 
             #region EntityHistory

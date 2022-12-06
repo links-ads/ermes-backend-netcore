@@ -63,9 +63,9 @@ namespace Ermes.EventHandlers
 
             string titleKey = (eventData.Action == EntityWriteAction.Create) ? "Notification_Communication_Create_Title" : "Notification_Communication_Update_Title";
             string[] bodyParams = new string[] { eventData.Content.Message };
-            int? orgId = (await _personManager.GetPersonByIdAsync(eventData.CreatorId)).OrganizationId;
-            if (!orgId.HasValue)
-                return;
+            //int? orgId = (await _personManager.GetPersonByIdAsync(eventData.CreatorId)).OrganizationId;
+            //if (!orgId.HasValue)
+            //    return;
             List<long> personIdList;
             try
             {
@@ -75,10 +75,9 @@ namespace Ermes.EventHandlers
                 //Exclude persons in status = Off; citizens are by default in status = Ready
                 var statusTypes = new List<ActionStatusType>() { ActionStatusType.Active, ActionStatusType.Moving, ActionStatusType.Ready };
 
-                var items = _geoJsonBulkRepository.GetPersonActions(comm.Duration.LowerBound, comm.Duration.UpperBound, new int[] { eventData.Content.OrganizationId.Value }, statusTypes, null, comm.AreaOfInterest, null, "en", comm.Scope, comm.Restriction);
+                var items = _geoJsonBulkRepository.GetPersonActions(comm.Duration.LowerBound, comm.Duration.UpperBound, eventData.Content.OrganizationReceiverIds?.ToArray(), statusTypes, null, comm.AreaOfInterest, null, "en", comm.Scope, comm.Restriction);
                 var actions = JsonConvert.DeserializeObject<GetActionsOutput>(items);
-                if (actions.PersonActions == null)
-                    actions.PersonActions = new List<PersonActionDto>();
+                actions.PersonActions ??= new List<PersonActionDto>();
                 
                 personIdList = actions.PersonActions.Select(a => a.PersonId).ToList();
             }

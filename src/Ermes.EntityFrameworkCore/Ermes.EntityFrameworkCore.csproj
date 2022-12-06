@@ -110,6 +110,10 @@
     <Compile Include="Migrations\20221027101629_Layer_Order_Added.Designer.cs" />
     <Compile Include="Migrations\20221104143922_MapRequest_Layer_ErrorMessages_Added.cs" />
     <Compile Include="Migrations\20221104143922_MapRequest_Layer_ErrorMessages_Added.Designer.cs" />
+    <Compile Include="Migrations\20221206084936_CommunicationReceivers_Table_Added.cs" />
+    <Compile Include="Migrations\20221206084936_CommunicationReceivers_Table_Added.Designer.cs" />
+    <Compile Include="Migrations\20221206112819_CommunicationReceiver_UniqueIndex_Added.cs" />
+    <Compile Include="Migrations\20221206112819_CommunicationReceiver_UniqueIndex_Added.Designer.cs" />
     <Compile Include="Migrations\ErmesDbContextModelSnapshot.cs" />
     <Compile Include="Migrations\Seed\ModelBuilderExtensions.cs" />
   </ItemGroup>

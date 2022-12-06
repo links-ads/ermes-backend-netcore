@@ -1,6 +1,6 @@
 Ver.
 --------------------------------
-
+- Feature - Communication Receivers table added (migration added)(#121)
 
 Ver. 4.3.0 - 2022-11-29
 --------------------------------

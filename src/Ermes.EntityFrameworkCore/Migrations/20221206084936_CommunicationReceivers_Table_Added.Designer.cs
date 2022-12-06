@@ -8,6 +8,7 @@ using Ermes.Operations;
 using Ermes.Reports;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -16,9 +17,10 @@ using NpgsqlTypes;
 namespace Ermes.Migrations
 {
     [DbContext(typeof(ErmesDbContext))]
-    partial class ErmesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221206084936_CommunicationReceivers_Table_Added")]
+    partial class CommunicationReceivers_Table_Added
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -309,10 +311,9 @@ namespace Ermes.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OrganizationId");
+                    b.HasIndex("CommunicationId");
 
-                    b.HasIndex("CommunicationId", "OrganizationId")
-                        .IsUnique();
+                    b.HasIndex("OrganizationId");
 
                     b.ToTable("communication_receivers");
                 });

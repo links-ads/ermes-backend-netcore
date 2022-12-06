@@ -19,9 +19,7 @@ namespace Ermes.Communications
     public class Communication: AuditedEntity
     {
         public const int MaxMessageLength = 1000;
-        public Communication()
-        {
-        }
+        public Communication() { }
 
         [Required]
         [StringLength(MaxMessageLength)]
@@ -55,6 +53,6 @@ namespace Ermes.Communications
         [NotMapped]
         public CommunicationRestrictionType Restriction { get; set; }
 
-
+        public virtual ICollection<CommunicationReceiver> CommunicationReceivers { get; set; }
     }
 }
