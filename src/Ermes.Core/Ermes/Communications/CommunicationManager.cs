@@ -12,7 +12,7 @@ namespace Ermes.Communications
 {
     public class CommunicationManager: DomainService
     {
-        public IQueryable<Communication> Communications { get { return CommunicationRepository.GetAll().Include(a => a.Creator.Organization).Include(a => a.CommunicationReceivers); } }
+        public IQueryable<Communication> Communications { get { return CommunicationRepository.GetAll().Include(a => a.Creator).Include(a => a.Creator.Organization).Include(a => a.CommunicationReceivers); } }
         public IQueryable<CommunicationReceiver> CommunicationReceivers { get { return CommunicationReceiverRepository.GetAll().Include(a => a.Communication).Include(a => a.Organization); } }
         protected IRepository<Communication> CommunicationRepository { get; set; }
         protected IRepository<CommunicationReceiver> CommunicationReceiverRepository { get; set; }

@@ -189,11 +189,10 @@ namespace Ermes.Linq.Extensions
                         .Where(c =>
                             c.ScopeString == CommunicationScopeType.Public.ToString() ||
                             c.RestrictionString == CommunicationRestrictionType.Professional.ToString() || (
-                            c.RestrictionString == CommunicationRestrictionType.Organization.ToString() &&
-                            //Organization visibility
-                            (c.Creator.OrganizationId.HasValue && c.CommunicationReceivers.Select(a => a.OrganizationId).Contains(c.Creator.OrganizationId.Value)) ||
-                            //Organization hierarchy
-                            (c.Creator.Organization.ParentId.HasValue && c.CommunicationReceivers.Select(a => a.OrganizationId).Contains(c.Creator.Organization.ParentId.Value)))
+                                c.RestrictionString == CommunicationRestrictionType.Organization.ToString() && 
+                                //Organization visibility
+                                (c.CommunicationReceivers.Select(a => a.OrganizationId).Any(a => organizationIdList.Contains(a)))
+                            )
                         );
             }
         }
