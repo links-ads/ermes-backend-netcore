@@ -47,6 +47,11 @@ namespace Ermes.Gamification
             return await Levels.ToListAsync();
         }
 
+        public async Task<Level> GetLevelByIdAsync(int levelId)
+        {
+            return await Levels.SingleOrDefaultAsync(l => l.Id == levelId);
+        }
+
         public async Task<List<Medal>> GetMedalsAsync()
         {
             return await Medals.ToListAsync();
@@ -122,17 +127,18 @@ namespace Ermes.Gamification
                 result.AddRange(await assignRewards(person.Id));
 
             var level = await GetLevelByPointsAsync(person.Points);
-            if (level.Id != person.LevelId)
+            if (level.Id != person.LevelId && person.Level.FollowingLevelId.HasValue)
             {
-                bool canChangeLevel = await CheckBarriersAsync(person, level);
+                var followingLevel = person.Level.FollowingLevel;
+                bool canChangeLevel = await CheckBarriersAsync(person, followingLevel);
                 if (canChangeLevel)
                 {
-                    result.Add((action.Points > 0 ? EntityWriteAction.LevelChangeUp : EntityWriteAction.LevelChangeDown, level.Name));
-                    person.LevelId = level.Id;
+                    result.Add((action.Points > 0 ? EntityWriteAction.LevelChangeUp : EntityWriteAction.LevelChangeDown, followingLevel.Name));
+                    person.LevelId = followingLevel.Id;
                     await InsertAudit(person.Id, null, null, person.LevelId);
                 }
                 else
-                    Logger.InfoFormat("User {0} cannot improve his level because he's missing some barriers", person.Email);
+                    Logger.InfoFormat("User {0} cannot upgrade to level {1} because he's missing some barriers", person.Email, followingLevel.Name);
             }
             
             return result;
