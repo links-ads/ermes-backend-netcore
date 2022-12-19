@@ -1,6 +1,6 @@
 Ver.
 --------------------------------
-
+- Feature - Allow user to delete his own profile from client
 
 Ver. 4.3.0 - 2022-11-29
 --------------------------------
