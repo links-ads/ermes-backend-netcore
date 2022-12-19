@@ -1,5 +1,13 @@
 Ver.
 --------------------------------
+
+
+Ver. 4.3.2 - 2022-12-19
+--------------------------------
+- Feature - First responder can call the GetOrganization API, in Backoffice doc (permissions to be re-initialized)
+
+Ver. 4.3.1 - 2022-12-19
+--------------------------------
 - Feature - Communication Receivers table added (migration added)(#121)
 - Feature - Allow user to delete his own profile from client
 

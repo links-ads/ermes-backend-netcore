@@ -54,5 +54,10 @@ namespace Ermes.Authorization
             AppPermissions.Organizations.Organization_CanUpdate,
             AppPermissions.Users.Users_CanEditColleagues
         };
+
+        public static readonly string[] FIRST_RESPONDER_PERMISSION_LIST = new string[]
+        {
+            AppPermissions.Backoffice
+        };
     }
 }
