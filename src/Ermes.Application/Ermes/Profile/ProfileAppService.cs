@@ -331,14 +331,23 @@ namespace Ermes.Profile
         )]
         public virtual async Task<bool> DeleteProfile(IdInput<Guid> input)
         {
-            if (input == null || input.Id == null)
-                throw new UserFriendlyException(L("InvalidGuid", input));
+            Guid refGuid;
 
-            var hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Profiles.Profile_Delete);
-            if (!hasPermission)
-                throw new UserFriendlyException("MissingPermission");
+            //The operation can be performed by:
+            //  - admin
+            //  - the user itself
+            if (input == null || input.Id == null || input.Id == Guid.Empty)
+                refGuid = _session.FusionAuthUserGuid.Value;
+            else
+            {
+                var hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Profiles.Profile_Delete);
+                if (!hasPermission)
+                    throw new UserFriendlyException("MissingPermission");
 
-            var person = await _personManager.GetPersonByFusionAuthUserGuidAsync(input.Id);
+                refGuid = input.Id;
+            }
+                      
+            var person = await _personManager.GetPersonByFusionAuthUserGuidAsync(refGuid);
 
             await _notificationManager.DeleteNotificationsByPersonIdAsync(person.Id);
             await _operationManager.DeleteOperationsByPersonIdAsync(person.Id);
@@ -358,7 +367,7 @@ namespace Ermes.Profile
             }
 
             var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
-            var response = await client.DeleteUserAsync(input.Id);
+            var response = await client.DeleteUserAsync(refGuid);
             if (!response.WasSuccessful())
             {
                 var fa_error = FusionAuth.ManageErrorResponse(response);
