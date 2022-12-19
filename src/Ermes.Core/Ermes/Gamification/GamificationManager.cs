@@ -19,7 +19,7 @@ namespace Ermes.Gamification
         protected IRepository<Reward> RewardRepository { get; set; }
         protected IRepository<GamificationAction> ActionRepository { get; set; }
         protected IRepository<GamificationAudit> AuditRepository { get; set; }
-        public IQueryable<Level> Levels { get { return LevelRepository.GetAll(); } }
+        public IQueryable<Level> Levels { get { return LevelRepository.GetAll().Include(l => l.Barriers); } }
         public IQueryable<Medal> Medals { get { return RewardRepository.GetAll().OfType<Medal>(); } }
         public IQueryable<Badge> Badges { get { return RewardRepository.GetAll().OfType<Badge>(); } }
         public IQueryable<Award> Awards { get { return RewardRepository.GetAll().OfType<Award>(); } }
@@ -72,7 +72,7 @@ namespace Ermes.Gamification
 
         public async Task<Level> GetLevelByPointsAsync(int points)
         {
-            return await Levels.Include(l => l.Barriers).Where(l => l.LowerBound <= points && l.UpperBound >= points).SingleAsync();
+            return await Levels.Where(l => l.LowerBound <= points && l.UpperBound >= points).SingleAsync();
         }
 
         public async Task<GamificationAction> GetActionByCodeAsync(string code)
@@ -126,6 +126,10 @@ namespace Ermes.Gamification
             if(assignRewards != null)
                 result.AddRange(await assignRewards(person.Id));
 
+            //Check if user's level needs to be updated
+            //First check is done based on user's points, 
+            //but the new level to be assigned it's taken from Level static table
+
             var level = await GetLevelByPointsAsync(person.Points);
             if (level.Id != person.LevelId && person.Level.FollowingLevelId.HasValue)
             {
@@ -136,6 +140,7 @@ namespace Ermes.Gamification
                     result.Add((action.Points > 0 ? EntityWriteAction.LevelChangeUp : EntityWriteAction.LevelChangeDown, followingLevel.Name));
                     person.LevelId = followingLevel.Id;
                     await InsertAudit(person.Id, null, null, person.LevelId);
+                    Logger.InfoFormat("User {0} has changed level to {1}", person.Email, followingLevel.Name);
                 }
                 else
                     Logger.InfoFormat("User {0} cannot upgrade to level {1} because he's missing some barriers", person.Email, followingLevel.Name);
