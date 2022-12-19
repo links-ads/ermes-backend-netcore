@@ -1,16 +1,22 @@
 ﻿using Abp.Application.Services.Dto;
+using Abp.BackgroundJobs;
 using Abp.Linq.Extensions;
 using Abp.UI;
+using Ermes.Attributes;
+using Ermes.Authorization;
 using Ermes.Communications.Dto;
 using Ermes.Dto;
 using Ermes.Dto.Datatable;
 using Ermes.Dto.Spatial;
 using Ermes.Enums;
+using Ermes.EventHandlers;
+using Ermes.GeoJson;
 using Ermes.Helpers;
 using Ermes.Linq.Extensions;
+using Ermes.Organizations;
 using Ermes.Persons;
-using Ermes.Notifiers;
 using Microsoft.EntityFrameworkCore;
+using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
 using NpgsqlTypes;
 using NSwag.Annotations;
@@ -18,13 +24,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Ermes.Attributes;
-using Abp.BackgroundJobs;
-using Ermes.EventHandlers;
-using Ermes.GeoJson;
-using NetTopologySuite.Geometries;
-using Ermes.Authorization;
-using Ermes.Organizations;
 
 namespace Ermes.Communications
 {
@@ -144,7 +143,7 @@ namespace Ermes.Communications
             newCommunication.Id = await _communicationManager.CreateOrUpdateCommunicationAsync(newCommunication, featureDto.Properties.OrganizationReceiverIds);
 
             await CurrentUnitOfWork.SaveChangesAsync();
-            
+
             NotificationEvent<CommunicationNotificationDto> notification = new NotificationEvent<CommunicationNotificationDto>(newCommunication.Id,
                 _session.UserId.Value,
                 ObjectMapper.Map<CommunicationNotificationDto>(newCommunication),

@@ -217,6 +217,13 @@ namespace Ermes.Roles
                 await _permissionManager.AssignPermissionToRoleAsync(new ErmesPermission(perm, role.Id));
             }
 
+            permList = AppRoles.FIRST_RESPONDER_PERMISSION_LIST;
+            role = await _permissionManager.GetRoleByNameAsync(AppRoles.FIRST_RESPONDER);
+            foreach (var perm in permList)
+            {
+                await _permissionManager.AssignPermissionToRoleAsync(new ErmesPermission(perm, role.Id));
+            }
+
             await CurrentUnitOfWork.SaveChangesAsync();
 
             return true;
