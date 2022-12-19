@@ -25,7 +25,7 @@ namespace Ermes.Gamification
         public IQueryable<Award> Awards { get { return RewardRepository.GetAll().OfType<Award>(); } }
         public IQueryable<Reward> Rewards { get { return RewardRepository.GetAll(); } }
         public IQueryable<GamificationAction> Actions { get { return ActionRepository.GetAll().Include(c => c.Achievements); } }
-        public IQueryable<GamificationAudit> GamificationAudits { get { return AuditRepository.GetAll(); } }
+        public IQueryable<GamificationAudit> GamificationAudits { get { return AuditRepository.GetAll().Include(a => a.Reward); } }
         private readonly PersonManager PersonManager;
 
         public GamificationManager(
@@ -142,7 +142,6 @@ namespace Ermes.Gamification
         {
             return await GamificationAudits
                             .Where(a => a.PersonId == personId && a.RewardId.HasValue)
-                            .Include(a => a.Reward)
                             .Select(a => a.Reward)
                             .OfType<Medal>()
                             .ToListAsync();
@@ -152,7 +151,6 @@ namespace Ermes.Gamification
         {
             return await GamificationAudits
                             .Where(a => a.PersonId == personId && a.RewardId.HasValue)
-                            .Include(a => a.Reward)
                             .Select(a => a.Reward)
                             .OfType<Badge>()
                             .ToListAsync();
@@ -166,7 +164,11 @@ namespace Ermes.Gamification
         public async Task<bool> CheckBarriersAsync(Person person, Level newLevel)
         {
             var barriers = newLevel.Barriers.Where(b => b.Level.Id == newLevel.Id).Select(b => b.RewardName).ToList();
-            return await GamificationAudits.Where(ga => ga.PersonId == person.Id).AllAsync(ga => barriers.Contains(ga.Reward.Name));
+            var obtainedRewards = await GamificationAudits
+                                        .Where(ga => ga.RewardId.HasValue && ga.PersonId == person.Id)
+                                        .Select(ga => ga.Reward.Name)
+                                        .ToListAsync();
+            return barriers.All(b => obtainedRewards.Contains(b));
         }
 
         public async Task DeleteAuditByPersonIdAsync(long personId)

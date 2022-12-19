@@ -5,6 +5,7 @@ Ver.
 Ver. 4.3.2 - 2022-12-19
 --------------------------------
 - Feature - First responder can call the GetOrganization API, in Backoffice doc (permissions to be re-initialized)
+- Bugfix - Fix Level update barrier conditions (#124)
 
 Ver. 4.3.1 - 2022-12-19
 --------------------------------
