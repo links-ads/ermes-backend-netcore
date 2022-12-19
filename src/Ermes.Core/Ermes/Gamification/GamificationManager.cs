@@ -129,7 +129,7 @@ namespace Ermes.Gamification
             var level = await GetLevelByPointsAsync(person.Points);
             if (level.Id != person.LevelId && person.Level.FollowingLevelId.HasValue)
             {
-                var followingLevel = person.Level.FollowingLevel;
+                var followingLevel = await GetLevelByIdAsync(person.Level.FollowingLevelId.Value);
                 bool canChangeLevel = await CheckBarriersAsync(person, followingLevel);
                 if (canChangeLevel)
                 {
