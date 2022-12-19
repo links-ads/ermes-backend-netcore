@@ -168,7 +168,7 @@ namespace Ermes.Gamification
                                         .Where(ga => ga.RewardId.HasValue && ga.PersonId == person.Id)
                                         .Select(ga => ga.Reward.Name)
                                         .ToListAsync();
-            return barriers.All(b => obtainedRewards.Contains(b));
+            return obtainedRewards.Count > 0 && barriers.All(b => obtainedRewards.Contains(b));
         }
 
         public async Task DeleteAuditByPersonIdAsync(long personId)
