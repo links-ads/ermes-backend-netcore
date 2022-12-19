@@ -15,6 +15,8 @@ namespace Ermes.Migrations
                 table: "communication_receivers",
                 columns: new[] { "CommunicationId", "OrganizationId" },
                 unique: true);
+
+            migrationBuilder.Sql(@"update public.communications set ""Scope"" = 'Public', ""Restriction"" = 'None'");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
