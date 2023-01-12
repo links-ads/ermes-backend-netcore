@@ -9,6 +9,6 @@ namespace Ermes.Logging
 {
     public interface IWebLogAppService : IBackofficeApi
     {
-        GetLatestWebLogsOutput GetLatestWebLogs();
+        GetLatestWebLogsOutput GetLatestWebLogs(GetLatestWebLogsInput input);
     }
 }
