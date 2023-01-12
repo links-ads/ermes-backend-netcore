@@ -25,7 +25,7 @@ namespace Ermes.Logging
             _entityHistoryManager = entityHistoryManager;
         }
 
-        public virtual GetLatestWebLogsOutput GetLatestWebLogs()
+        public virtual GetLatestWebLogsOutput GetLatestWebLogs(GetLatestWebLogsInput input)
         {
             var directory = new DirectoryInfo(_appFolders.WebLogsFolder);
             var lastLogFile = directory.GetFiles("*.txt", SearchOption.AllDirectories)
@@ -37,7 +37,7 @@ namespace Ermes.Logging
                 return new GetLatestWebLogsOutput();
             }
 
-            var lines = FileHelper.ReadLines(lastLogFile.FullName).Reverse().Take(1000).Reverse().ToList();
+            var lines = FileHelper.ReadLines(lastLogFile.FullName).Reverse().Take(input.NumberOfRows).Reverse().ToList();
             var logLineCount = 0;
             var lineCount = 0;
 
@@ -54,7 +54,7 @@ namespace Ermes.Logging
 
                 lineCount++;
 
-                if (logLineCount == 1000)
+                if (logLineCount == input.NumberOfRows)
                 {
                     break;
                 }
