@@ -33,10 +33,11 @@ namespace Ermes.Import
             String ParentShortName { get; }
             String HazardString { get; }
             HazardType Hazard { get; }
+            bool IsActive { get; }
             IEnumerable<(String Translation, String Language)> Items { get; }
         }
         #region Excel
-        const int numberOfHeaderCols = 3;
+        const int numberOfHeaderCols = 4;
         const int numberOfHeaderRows = 1;
         const int excelIndexingStart = 1;
         private class ExcelActivityTranslationRow : IActivityTranslationRow
@@ -90,6 +91,15 @@ namespace Ermes.Import
                 }
             }
 
+            public bool IsActive
+            {
+                get
+                {
+                    string isActivestring = _cells[_rowIndex + numberOfHeaderRows + excelIndexingStart, excelIndexingStart + 3].Text;
+                    return isActivestring == "1";
+                }
+            }
+
             public HazardType Hazard { get { return HazardString.ParseEnum<HazardType>();  } }
         }
         private class ExcelMultilanguageActivityTable : IMultilanguageActivityTable
@@ -99,8 +109,8 @@ namespace Ermes.Import
             public ExcelMultilanguageActivityTable(ExcelRange cells, ErmesLocalizationHelper localizer)
             {
                 _cells = cells;
-                for (length = 3; !String.IsNullOrWhiteSpace(cells[excelIndexingStart, length + excelIndexingStart].Text); length++) ;
-                for (int i = 3; i < length; i++)
+                for (length = 4; !String.IsNullOrWhiteSpace(cells[excelIndexingStart, length + excelIndexingStart].Text); length++) ;
+                for (int i = 4; i < length; i++)
                 {
                     string lcode = cells[excelIndexingStart, excelIndexingStart + i].Text;
                     if (!CultureInfo.GetCultures(CultureTypes.AllCultures).Any(c => c.TwoLetterISOLanguageName == lcode))
@@ -159,7 +169,8 @@ namespace Ermes.Import
                     {
                         ShortName = activity.ShortName,
                         ParentId = parentAct?.Id,
-                        Hazard = activity.Hazard
+                        Hazard = activity.Hazard,
+                        IsActive = activity.IsActive
                     };
                     act.Id = await activityManager.InsertActivityAsync(act);
                     result.ElementsAdded++;
@@ -168,6 +179,7 @@ namespace Ermes.Import
                 {
                     act.ParentId = parentAct?.Id;
                     act.Hazard = activity.Hazard;
+                    act.IsActive = activity.IsActive;
                     result.ElementsUpdated++;
                 }
 

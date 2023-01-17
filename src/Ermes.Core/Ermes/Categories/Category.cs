@@ -81,5 +81,9 @@ namespace Ermes.Categories
 
         [NotMapped]
         public FieldType FieldType { get; set; }
+
+        //If false, the corresponding row must not be displayed on clients
+        //There's the necessity to keep old values for foreign key integrity
+        public bool IsActive { get; set; }
     }
 }

@@ -13,5 +13,6 @@ namespace Ermes.Activities.Dto
         public string ShortName { get; set; }
         public int? ParentId { get; set; }
         public HazardType Hazard { get; set; }
+        public bool IsActive { get; set; }
     }
 }

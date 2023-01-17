@@ -1,6 +1,7 @@
 Ver.
 --------------------------------
 - Feature - Possibility to set the number of log rows to be retrieved with API added (#127)
+- Feature - IsActive property added for Categories and Activities (migration added)(#128)
 
 Ver. 4.3.2 - 2022-12-19
 --------------------------------
