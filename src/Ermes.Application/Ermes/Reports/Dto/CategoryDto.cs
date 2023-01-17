@@ -29,5 +29,6 @@ namespace Ermes.Reports.Dto
         public string[] Values { get; set; }
         public string GroupIcon { get; set; }
         public FieldType FieldType { get; set; }
+        public bool IsActive { get; set; }
     }
 }

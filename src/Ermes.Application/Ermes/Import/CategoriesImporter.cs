@@ -88,6 +88,7 @@ namespace Ermes.Import
                         cat.GroupKey = row.GetString("Group Key");
                         cat.SubGroupKey = row.GetString("SubGroup Key");
                         cat.FieldType = row.GetEnum<FieldType>("Field Type");
+                        cat.IsActive = row.GetBoolean("Is Active");
 
                         await categoryManager.InsertOrUpdateCategoryAsync(cat);
                         context.SaveChanges();
