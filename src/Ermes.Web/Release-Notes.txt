@@ -1,6 +1,7 @@
 Ver.
 --------------------------------
 - Feature - Possibility to set the number of log rows to be retrieved with API added (#127)
+- Feature - Import users procedure now creates Organizations and Teams (#129)
 
 Ver. 4.3.2 - 2022-12-19
 --------------------------------
