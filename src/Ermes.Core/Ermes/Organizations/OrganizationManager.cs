@@ -30,7 +30,7 @@ namespace Ermes.Organizations
 
         public async Task<Organization> GetOrganizationByNameAsync(string name)
         {
-            return await OrganizationRepository.SingleAsync(a => a.Name == name);
+            return await Organizations.SingleOrDefaultAsync(a => a.Name == name);
         }
 
         public async Task<List<Organization>> GetAllAsync()

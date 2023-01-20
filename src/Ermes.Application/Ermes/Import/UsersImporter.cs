@@ -24,6 +24,7 @@ using Ermes.Teams;
 using io.fusionauth.domain;
 using Ermes.Authorization;
 using Ermes.Gamification;
+using static Ermes.Authorization.AppPermissions;
 
 namespace Ermes.Import
 {
@@ -161,32 +162,38 @@ namespace Ermes.Import
                         throw new UserFriendlyException(localizer.L("InvalidRoles"));
                     user.Roles = roles;
 
-                    var organizationId = row.GetInt("OrganizationId");
-                    if (organizationId.HasValue && organizationId.Value > 0)
+                    var organizationName = row.GetString("OrganizationName");
+                    if (organizationName != null && organizationName != string.Empty)
                     {
-                        var org = await organizationManager.GetOrganizationByIdAsync(organizationId.Value);
+                        Organization org = await organizationManager.GetOrganizationByNameAsync(organizationName);
                         if (org == null)
-                            throw new UserFriendlyException(localizer.L("InvalidOrganizationId", organizationId));
-                        else
-                            person.OrganizationId = organizationId;
+                        {
+                            org = new Organization(organizationName);
+                            org.Id = await organizationManager.InsertOrganizationAsync(org);
+                        }
+                        
+                        person.OrganizationId = org.Id;
+
+                        var teamName = row.GetString("TeamName");
+                        if (teamName != null && teamName != string.Empty)
+                        {
+                            var team = await teamManager.GetTeamByNameAndOrganizationIdAsync(teamName, org.Id);
+                            if (team == null)
+                            {
+                                team = new Team(org.Id, teamName);
+                                team.Id = await teamManager.InsertTeamAsync(team);
+                            }
+                            
+                            person.TeamId = team.Id;
+                        }
                     }
                     else
                     {
                         //must be a citizen
                         if (user.Roles.Count(r => r == AppRoles.CITIZEN) == 0)
-                            throw new UserFriendlyException(localizer.L("InvalidOrganizationId", organizationId));
+                            throw new UserFriendlyException(localizer.L("InvalidOrganizationName", organizationName));
                         else
                             person.LevelId = (await gamificationManager.GetDefaultLevel()).Id;
-                    }
-
-                    var teamId = row.GetInt("TeamId");
-                    if (teamId.HasValue && teamId.Value > 0)
-                    {
-                        var team = await teamManager.GetTeamByIdAsync(teamId.Value);
-                        if (team == null)
-                            throw new UserFriendlyException(localizer.L("InvalidTeamId", teamId));
-                        else
-                            person.TeamId = teamId;
                     }
 
                     var email =  row.GetString("Email");
