@@ -13,6 +13,11 @@ namespace Ermes.Teams
     public class Team:AuditedEntity
     {
         private const int MaxTeamNameLength = 255;
+        public Team(int organizationId, string name)
+        {
+            OrganizationId = organizationId;
+            Name = name;
+        }
 
         [ForeignKey("OrganizationId")]
         public virtual Organization Organization { get; set; }

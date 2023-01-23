@@ -1,6 +1,7 @@
 ﻿using Abp.Domain.Repositories;
 using Abp.Domain.Services;
 using Ermes.Persons;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,6 +38,11 @@ namespace Ermes.Teams
         public virtual async Task<int> InsertTeamAsync(Team team)
         {
             return await TeamRepository.InsertAndGetIdAsync(team);
+        }
+
+        public virtual async Task<Team> GetTeamByNameAndOrganizationIdAsync(string teamName, int organizationId)
+        {
+            return await Teams.SingleOrDefaultAsync(t => t.Name == teamName && t.OrganizationId == organizationId);
         }
     }
 }

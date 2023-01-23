@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 using System.Text;
 
 namespace Ermes.Organizations
@@ -17,6 +18,11 @@ namespace Ermes.Organizations
         public const int MaxWebSiteLength = 255;
 
         public Organization(){}
+        public Organization(string name)
+        {
+            Name = name;
+            ShortName = name.Split(' ').Select(a => a.First().ToString().ToUpper()).Aggregate((a,b) => a + b);
+        }
         public Organization(string name, string shortname)
         {
             Name = name;
