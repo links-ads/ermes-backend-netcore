@@ -104,11 +104,11 @@ namespace Ermes.Gamification
         }
 
         
-        public async Task<List<(EntityWriteAction Action, string NewValue)>> UpdatePersonGamificationProfileAsync(long personId, string actionName, Func<long, Task<List<(EntityWriteAction, string newValue)>>> assignRewards)
+        public async Task<List<(EntityWriteAction Action, string NewValue, int EarnedPoints)>> UpdatePersonGamificationProfileAsync(long personId, string actionName, Func<long, Task<List<(EntityWriteAction, string newValue, int earnedPoints)>>> assignRewards)
         {
             var person = await PersonManager.GetPersonByIdAsync(personId);
             var action = await GetActionByNameAsync(actionName);
-            List<(EntityWriteAction, string newValue)> result = new List<(EntityWriteAction, string newValue)>();
+            List<(EntityWriteAction, string newValue, int earnedPoints)> result = new List<(EntityWriteAction, string newValue, int earnedPoints)>();
 
             if (person == null || action == null)
             {
@@ -137,7 +137,7 @@ namespace Ermes.Gamification
                 bool canChangeLevel = await CheckBarriersAsync(person, followingLevel);
                 if (canChangeLevel)
                 {
-                    result.Add((action.Points > 0 ? EntityWriteAction.LevelChangeUp : EntityWriteAction.LevelChangeDown, followingLevel.Name));
+                    result.Add((action.Points > 0 ? EntityWriteAction.LevelChangeUp : EntityWriteAction.LevelChangeDown, followingLevel.Name, action.Points));
                     person.LevelId = followingLevel.Id;
                     await InsertAudit(person.Id, null, null, person.LevelId);
                     Logger.InfoFormat("User {0} has changed level to {1}", person.Email, followingLevel.Name);
