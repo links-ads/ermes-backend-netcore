@@ -10,5 +10,6 @@ namespace Ermes.Gamification.Dto
         public long PersonId { get; set; }
         public string ActionName { get; set; }
         public string NewValue { get; set; }
+        public int EarnedPoints { get; set; }
     }
 }

@@ -95,7 +95,8 @@ namespace Ermes.Bus
             {
                 PersonId = person.Id,
                 ActionName = input.Action.ToString(),
-                NewValue = input.NewRewardName
+                NewValue = input.NewRewardName,
+                EarnedPoints = 10
             },
             input.Action,
             true);

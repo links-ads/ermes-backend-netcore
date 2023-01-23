@@ -136,7 +136,7 @@ namespace Ermes.Gamification
             return result;
         }
 
-        private async Task SendNotification(List<(EntityWriteAction Action, string NewValue)> list)
+        private async Task SendNotification(List<(EntityWriteAction Action, string NewValue, int EarnedPoints)> list)
         {
             foreach (var item in list)
             {
@@ -146,7 +146,8 @@ namespace Ermes.Gamification
                 {
                     PersonId = _session.LoggedUserPerson.Id,
                     ActionName = item.Action.ToString(),
-                    NewValue = item.NewValue
+                    NewValue = item.NewValue,
+                    EarnedPoints = item.EarnedPoints
                 },
                 item.Action,
                 true);
@@ -183,18 +184,17 @@ namespace Ermes.Gamification
                 }
             };
             Person person = await _personManager.GetPersonByIdAsync(_session.LoggedUserPerson.Id);
-
+            GamificationAction action = null;
             try
             {
                 Tip tip = await _tipManager.GetTipByCodeAsync(input.TipCode);
                 int id = await _personManager.CreatePersonTipAsync(_session.LoggedUserPerson.Id, input.TipCode);
-
+                action = await _gamificationManager.GetActionByNameAsync(ErmesConsts.GamificationActionConsts.READ_TIP);
                 if (id > 0)
                 {
-                    async Task<List<(EntityWriteAction, string NewValue)>> AssignRewards(long personId)
+                    async Task<List<(EntityWriteAction, string NewValue, int earnedPoints)>> AssignRewards(long personId)
                     {
-                        List<(EntityWriteAction, string newValue)> result = new List<(EntityWriteAction, string newValue)>();
-                        var action = await _gamificationManager.GetActionByNameAsync(ErmesConsts.GamificationActionConsts.READ_TIP);
+                        List<(EntityWriteAction, string newValue, int earnedPoints)> result = new List<(EntityWriteAction, string newValue, int earnedPoints)>();
                         var person = await _personManager.GetPersonByIdAsync(personId);
                         if (action != null && action.Achievements != null && action.Achievements.Count > 0)
                         {
@@ -207,7 +207,7 @@ namespace Ermes.Gamification
                                     {
                                         await _gamificationManager.InsertAudit(_session.LoggedUserPerson.Id, null, item.Id, null);
                                         person.Points += item.Detail.Points;
-                                        result.Add((EntityWriteAction.MedalObtained, item.Name));
+                                        result.Add((EntityWriteAction.MedalObtained, item.Name, item.Detail.Points));
                                     }
 
                                 }
@@ -223,7 +223,7 @@ namespace Ermes.Gamification
                                     {
                                         await _gamificationManager.InsertAudit(_session.LoggedUserPerson.Id, null, item.Id, null);
                                         person.Points += badge.Detail.Points;
-                                        result.Add((EntityWriteAction.BadgeObtained, badge.Name));
+                                        result.Add((EntityWriteAction.BadgeObtained, badge.Name, item.Detail.Points));
                                     }
                                 }
 
@@ -254,7 +254,7 @@ namespace Ermes.Gamification
             }
 
             if (result.Response.Success)
-                result.Gamification = new GamificationBaseDto(person.Points, person.LevelId, person.Level?.Name);
+                result.Gamification = new GamificationBaseDto(person.Points, person.LevelId, person.Level?.Name, action != null ? action.Points : 0);
 
             return result;
         }
@@ -269,6 +269,7 @@ namespace Ermes.Gamification
                 }
             };
             Person person = await _personManager.GetPersonByIdAsync(_session.LoggedUserPerson.Id);
+            GamificationAction action = null;
             try
             {
                 var ans = await _answerManager.GetAnswerByCodeAsync(input.AnswerCode);
@@ -276,11 +277,10 @@ namespace Ermes.Gamification
                 if (ans.IsTheRightAnswer)
                 {
                     await _personManager.CreatePersonQuizAsync(_session.LoggedUserPerson.Id, ans.QuizCode);
-
-                    async Task<List<(EntityWriteAction, string NewValue)>> AssignRewards(long personId)
+                    action = await _gamificationManager.GetActionByNameAsync(ErmesConsts.GamificationActionConsts.ANSWER_QUIZ);
+                    async Task<List<(EntityWriteAction, string NewValue, int earnedPoints)>> AssignRewards(long personId)
                     {
-                        List<(EntityWriteAction, string newValue)> result = new List<(EntityWriteAction, string newValue)>();
-                        var action = await _gamificationManager.GetActionByNameAsync(ErmesConsts.GamificationActionConsts.ANSWER_QUIZ);
+                        List<(EntityWriteAction, string newValue, int earnedPoints)> result = new List<(EntityWriteAction, string newValue, int earnedPoints)>();
                         var person = await _personManager.GetPersonByIdAsync(personId);
                         if (action != null && action.Achievements != null && action.Achievements.Count > 0)
                         {
@@ -293,7 +293,7 @@ namespace Ermes.Gamification
                                     {
                                         await _gamificationManager.InsertAudit(_session.LoggedUserPerson.Id, null, item.Id, null);
                                         person.Points += item.Detail.Points;
-                                        result.Add((EntityWriteAction.MedalObtained, item.Name));
+                                        result.Add((EntityWriteAction.MedalObtained, item.Name, action.Points));
                                     }
 
                                 }
@@ -309,7 +309,7 @@ namespace Ermes.Gamification
                                     {
                                         await _gamificationManager.InsertAudit(_session.LoggedUserPerson.Id, null, item.Id, null);
                                         person.Points += badge.Detail.Points;
-                                        result.Add((EntityWriteAction.BadgeObtained, badge.Name));
+                                        result.Add((EntityWriteAction.BadgeObtained, badge.Name, action.Points));
                                     }
                                 }
 
@@ -340,7 +340,7 @@ namespace Ermes.Gamification
             }
 
             if (result.Response.Success)
-                result.Gamification = new GamificationBaseDto(person.Points, person.LevelId, person.Level?.Name);
+                result.Gamification = new GamificationBaseDto(person.Points, person.LevelId, person.Level?.Name, action != null ? action.Points:0);
 
             return result;
         }
