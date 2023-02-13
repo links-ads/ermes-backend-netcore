@@ -1,6 +1,7 @@
 Ver.
 --------------------------------
 - Feature - EarnedPoints property added to every gamification notification, to ReportDto and to GamificationBaseDto (sdk to be updated)(#126)
+- Feature - Added Turkish localization (#130)
 
 Ver. 4.4.0 - 2022-01-23
 --------------------------------
