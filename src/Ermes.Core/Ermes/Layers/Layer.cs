@@ -65,5 +65,13 @@ namespace Ermes.Layers
 
         public int Order { get; set; }
 
+        /// <summary>
+        /// Associated layer
+        /// </summary>
+        public virtual Layer Parent { get; set; }
+        public int? ParentDataTypeId { get; set; }
+
+        public virtual ICollection<Layer> AssociatedLayers { get; set; }
+
     }
 }

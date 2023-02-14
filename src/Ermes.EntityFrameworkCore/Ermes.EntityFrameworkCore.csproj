@@ -116,6 +116,8 @@
     <Compile Include="Migrations\20221206112819_CommunicationReceiver_UniqueIndex_Added.Designer.cs" />
     <Compile Include="Migrations\20230116165634_Category_And_Activity_IsActive_Added.cs" />
     <Compile Include="Migrations\20230116165634_Category_And_Activity_IsActive_Added.Designer.cs" />
+    <Compile Include="Migrations\20230214111126_Layer_ParentDataTypeId_Added.cs" />
+    <Compile Include="Migrations\20230214111126_Layer_ParentDataTypeId_Added.Designer.cs" />
     <Compile Include="Migrations\ErmesDbContextModelSnapshot.cs" />
     <Compile Include="Migrations\Seed\ModelBuilderExtensions.cs" />
   </ItemGroup>

@@ -7,5 +7,6 @@ namespace Ermes.Layers.Dto
     public class GetLayersOutput
     {
         public List<LayerGroupDto> LayerGroups { get; set; }
+        public List<LayerDto> AssociatedLayers { get; set; }
     }
 }

@@ -1,6 +1,6 @@
 Ver.
 --------------------------------
-
+- Feature - ParentDataTypeId property added to Layer class (migration added) (#125)
 
 Ver. 4.4.0 - 2022-01-23
 --------------------------------

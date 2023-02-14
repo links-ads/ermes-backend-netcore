@@ -23,9 +23,13 @@ namespace Ermes.Excel.Common
 
         public interface IErmesRow
         {
-            int GetInt(string columnName)
+            int? GetInt(string columnName)
             {
-                return Convert.ToInt32(GetString(columnName) ?? "0");
+                var stringValue = GetString(columnName);
+                if (stringValue != null)
+                    return Convert.ToInt32(stringValue);
+                else
+                    return null;
             }
             string GetString(string columnName);
             string[] GetStringArray(string columnName)

@@ -22,5 +22,6 @@ namespace Ermes.Layers.Dto
         public string UnitOfMeasure { get; set; }
         public List<LayerDetailsDto> Details { get; set; }
         public int Order { get; set; }
+        public int? ParentDataTypeId { get; set; }
     }
 }

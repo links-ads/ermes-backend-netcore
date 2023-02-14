@@ -24,7 +24,11 @@ namespace Ermes.Layers
 
         public async Task<List<Layer>> GetLayerDefinitionAsync(bool? canBeVisualized)
         {
-            return await Layers.Where(l => canBeVisualized.HasValue ? l.CanBeVisualized == canBeVisualized.Value : true).ToListAsync();
+            var query = Layers;
+            if (canBeVisualized.HasValue)
+                query = query.Where(l => l.CanBeVisualized == canBeVisualized.Value);
+            
+            return await query.ToListAsync();
         }
 
         public async Task<Layer> GetLayerByDataTypeIdAsync(int dataTypeId)

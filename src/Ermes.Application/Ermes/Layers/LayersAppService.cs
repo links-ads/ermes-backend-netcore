@@ -154,6 +154,24 @@ namespace Ermes.Layers
                 {
                     throw new UserFriendlyException(string.Format("Exception while joining layer lists: {0}", e.Message));
                 }
+
+                //Associated layers management
+                layerDefinition = await _layerManager.GetLayerDefinitionAsync(false);
+                try
+                {
+                    var joinedLayerList = layerDefinition.Join(
+                            availableLayers.Items.Where(a => a.Details.Where(b => b.Timestamps != null && b.Timestamps.Count > 0).Count() > 0).Select(a => new { DataTypeId = a.DataType_Id, a.Details }).ToList(),
+                            a => a.DataTypeId,
+                            b => b.DataTypeId,
+                            (a, b) => new { Layer = a, b.Details }
+                        )
+                    .ToList();
+                    result.AssociatedLayers = joinedLayerList.Select(a => ObjectMapper.Map<LayerDto>(a.Layer)).ToList();
+                }
+                catch (Exception e)
+                {
+                    throw new UserFriendlyException(string.Format("Exception while joining layer lists for associated layers: {0}", e.Message));
+                }
             }
             catch (Exception e)
             {

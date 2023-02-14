@@ -168,6 +168,14 @@ namespace Ermes.EntityFrameworkCore
             modelBuilder.Entity<MapRequest>().HasIndex(t => t.Code).IsUnique(true);
 
             modelBuilder.Entity<Layer>().HasIndex(i => i.DataTypeId).IsUnique();
+            modelBuilder.Entity<Layer>()
+                .HasOne<Layer>(l => l.Parent)
+                .WithMany(l => l.AssociatedLayers)
+                .HasPrincipalKey(l => l.DataTypeId)
+                .HasForeignKey(l => l.ParentDataTypeId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<LayerTranslation>().HasIndex(i => new { i.CoreId, i.Language }).IsUnique();
 
             modelBuilder.Entity<PersonTip>()
