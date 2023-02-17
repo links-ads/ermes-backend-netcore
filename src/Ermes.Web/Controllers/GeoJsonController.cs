@@ -85,6 +85,18 @@ namespace Ermes.Web.Controllers
         [Route("api/services/app/GeoJson/DownloadFeatureCollection")]
         [HttpGet]
         [SwaggerResponse(typeof(FileDto))]
+        [OpenApiOperation("Download geojson collection",
+            @"
+                The API accepts the same input object as the GetFeatureCollection API, use it to filter the result.
+                The response contains a FileDto object with the following properties:
+                    - fileName
+                    - fileType
+                    - fileToken
+                To download the file, it's necessary to do, from the client:
+                    location.href = {{base_url}}/File/DownloadTempFile?fileType={fileType}&fileToken={fileToken}&fileName={fileName}'
+                N.B.: the token can only be used once, after which the file is deleted from the server
+            "
+        )]
         public virtual async Task<FileDto> DownloadFeatureCollection(GetGeoJsonCollectionInput input)
         {
             var result = GetFeatureCollectionInternal(input);
