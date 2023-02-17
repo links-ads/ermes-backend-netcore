@@ -83,6 +83,7 @@
     "InvalidCategoryRangeValue": "Invalid Category Range Value: {0}",
     "InvalidCategoryNumericValue": "Invalid Category Numeric Value: {0}",
     "DoNotTakePartToGamification": "You do not take part to gamification",
-    "InvalidVolterTaxCode": "Invalid tax code"
+    "InvalidVolterTaxCode": "Invalid tax code",
+    "RequestedFileDoesNotExists": "Requested file does not exists"
   }
 }

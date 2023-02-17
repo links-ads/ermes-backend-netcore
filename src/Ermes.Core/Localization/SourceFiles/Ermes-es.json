@@ -84,6 +84,7 @@
     "InvalidCategoryNumericValue": "Valor numérico de categoría no válido: {0}",
     "DoNotTakePartToGamification": "You do not take part to gamification",
     "InvalidEmail": "Invalid email address",
-    "InvalidVolterTaxCode": "Invalid tax code"
+    "InvalidVolterTaxCode": "Invalid tax code",
+    "RequestedFileDoesNotExists": "Requested file does not exists"
   }
 }
