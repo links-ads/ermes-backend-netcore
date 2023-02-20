@@ -47,7 +47,7 @@ namespace Ermes.Import
 
                     foreach (IErmesRow row in sheet.Rows)
                     {
-                        Layer layer = await layerManager.GetLayerByDataTypeIdAsync(row.GetInt("DataTypeId"));
+                        Layer layer = await layerManager.GetLayerByDataTypeIdAsync(row.GetInt("DataTypeId").Value);
 
                         if (layer != null)
                             result.ElementsUpdated++;
@@ -57,7 +57,7 @@ namespace Ermes.Import
                             result.ElementsAdded++;
                         }
 
-                        layer.DataTypeId = row.GetInt("DataTypeId");
+                        layer.DataTypeId = row.GetInt("DataTypeId").Value;
                         layer.GroupKey = row.GetString("Group Key");
                         layer.SubGroupKey = row.GetString("SubGroup Key");
                         layer.PartnerName = row.GetString("Partner Name");
@@ -66,7 +66,8 @@ namespace Ermes.Import
                         layer.CanBeVisualized = row.GetBoolean("Can be visualized");
                         layer.Frequency = row.GetEnum<FrequencyType>("Update Frequency");
                         layer.UnitOfMeasure = row.GetString("Unit of measure");
-                        layer.Order = row.GetInt("Order");
+                        layer.Order = row.GetInt("Order").Value;
+                        layer.ParentDataTypeId = row.GetInt("Parent DataTypeId");
                         await layerManager.InsertOrUpdateLayerAsync(layer);
                         context.SaveChanges();
                     }
@@ -78,10 +79,10 @@ namespace Ermes.Import
 
                     foreach (IErmesRow row in sheet.Rows)
                     {
-                        Layer parent = await layerManager.GetLayerByDataTypeIdAsync(row.GetInt("DataTypeId"));
+                        Layer parent = await layerManager.GetLayerByDataTypeIdAsync(row.GetInt("DataTypeId").Value);
 
                         if (parent == null)
-                            throw new UserFriendlyException(localizer.L("UnexistentEntities", "Layer", row.GetInt("DataTypeId")));
+                            throw new UserFriendlyException(localizer.L("UnexistentEntities", "Layer", row.GetInt("DataTypeId").Value));
 
                         LayerTranslation trans = await layerManager.GetLayerTranslationByCoreIdLanguageAsync(parent.Id, sheet.Language.ToLower());
 

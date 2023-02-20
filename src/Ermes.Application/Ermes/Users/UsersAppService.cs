@@ -106,7 +106,7 @@ namespace Ermes.Users
                         ProfileDto profile = await GetProfileInternal(person, item, _personManager, _missionManager, _gamificationManager, _session, _jobManager);
                         list.Add(profile);
                     }
-                    result.Items = list;
+                    result.Items = list.OrderBy(a => a.User?.DisplayName).ToList();
                 }
             }
             else

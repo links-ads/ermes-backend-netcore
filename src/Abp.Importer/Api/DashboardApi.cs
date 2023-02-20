@@ -104,42 +104,46 @@ namespace Abp.Importer.Api
         /// <returns>ApiResponse of List&lt;GeoserverResourceSchema&gt;</returns>
         ApiResponse<List<GeoserverResourceSchema>> GetResourcesResourcesGetWithHttpInfo(List<string> datatypeIds = default(List<string>), string resourceId = default(string), bool? includeDeleted = default(bool?));
         /// <summary>
-        /// Get Time Series
+        /// Get Timeseries
         /// </summary>
         /// <remarks>
-        /// Retrieves the time series of the requested attribute for layers denoted by the specified datatype_id, at the \&quot;point\&quot; position  :param datatype_id: datatype_id of the layers to retrieve the attribute time series from :type datatype_id: str :param point: point string in the form \&quot;point-x,point-y\&quot; :type point: str :param attribute: name of the column containing the requested attribute :type attribute: str :param start: start date in the form &#39;YYYY-MM-DD HH:MM:SS&#39; filter resources with start_date &gt;&#x3D; start, defaults to Query(None) :type start: Optional[datetime], optional :param end: end date in the form &#39;YYYY-MM-DD HH:MM:SS&#39; filter resources with end_date &lt;&#x3D; end, defaults to Query(None) :type end: Optional[datetime], optional :param geom_col: name of the db table column containing the geometry :type geom_col: str :param date_start_col: name of the db table column containing the activation start date :type date_start_col: str :param date_end_col: name of the db table column containing the activation end date :type date_end_col: str :param creation_date_col: name of the column to use when choosing between multiple table rows with the same start_date.                           Pick always the row with the most recent creation_date_col :type creation_date_col: str :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: time series of the attribute values at \&quot;point\&quot; location :rtype: json  Example: I have many GeoJSON files that form a time series saved on the PostGIS db, each containing polygons with certain values over a specified area. I want to get the series of the \&quot;temperature\&quot; value of the point 15.18,41.68 from date 2020-02-04 00:00:00 to date 2020-02-11 23:59:59. Supposing that the GeoJSON files have their geometries saved in the \&quot;geometry\&quot; column, their start reference date saved in the \&quot;date_start\&quot; column and their end reference date in the \&quot;date_end\&quot; column, specifying all these parameters returns me a dataframe with all the values of the \&quot;temperature\&quot; variable contained in the GeoJSON files for the requested time period, at the specified point location. The \&quot;creation_date_col\&quot; is used when multiple files span the same time (to be more precise, have the same \&quot;date_start\&quot;), only the most recent is returned.
+        /// Retrieves the time series of the requested attribute for layers denoted by the specified datatype_id, at the \&quot;point\&quot; position  :param datatype_id: datatype_id of the layers to retrieve the attribute time series from :type datatype_id: str  :param request_code: request code of the layers to retrieve the attribute time series from :type request_code: str  :param point: point string in the form \&quot;point-x,point-y\&quot; :type point: str  :param start: start date in the form &#39;YYYY-MM-DD HH:MM:SS&#39; filter resources with start_date &gt;&#x3D; start, defaults to Query(None) :type start: Optional[datetime], optional  :param end: end date in the form &#39;YYYY-MM-DD HH:MM:SS&#39; filter resources with end_date &lt;&#x3D; end, defaults to Query(None) :type end: Optional[datetime], optional  :param attribute: name of the column containing the requested attribute :type attribute: Optional[str]  :param geom_col: name of the db table column containing the geometry :type geom_col: Optional[str]  :param date_start_col: name of the db table column containing the activation start date :type date_start_col: Optional[str]  :param date_end_col: name of the db table column containing the activation end date :type date_end_col: Optional[str]  :param creation_date_col: name of the column to use when choosing between multiple table rows with the same start_date.                           Pick always the row with the most recent creation_date_col :type creation_date_col: Optional[str]  :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional  :return: time series of the attribute values at \&quot;point\&quot; location :rtype: json  Example: I have many GeoJSON files that form a time series saved on the PostGIS db, each containing polygons with certain values over a specified area. I want to get the series of the \&quot;temperature\&quot; value of the point 15.18,41.68 from date 2020-02-04 00:00:00 to date 2020-02-11 23:59:59. Supposing that the GeoJSON files have their geometries saved in the \&quot;geometry\&quot; column, their start reference date saved in the \&quot;date_start\&quot; column and their end reference date in the \&quot;date_end\&quot; column, specifying all these parameters returns me a dataframe with all the values of the \&quot;temperature\&quot; variable contained in the GeoJSON files for the requested time period, at the specified point location. The \&quot;creation_date_col\&quot; is used when multiple files span the same time (to be more precise, have the same \&quot;date_start\&quot;), only the most recent is returned.
         /// </remarks>
         /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="datatypeId"></param>
         /// <param name="point"></param>
-        /// <param name="attribute"></param>
+        /// <param name="requestCode"> (optional)</param>
+        /// <param name="layerName"> (optional)</param>
         /// <param name="start"> (optional)</param>
         /// <param name="end"> (optional)</param>
+        /// <param name="attribute"> (optional)</param>
         /// <param name="geomCol"> (optional, default to &quot;geometry&quot;)</param>
         /// <param name="dateStartCol"> (optional, default to &quot;date_start&quot;)</param>
         /// <param name="dateEndCol"> (optional, default to &quot;date_end&quot;)</param>
         /// <param name="creationDateCol"> (optional, default to &quot;computation_time&quot;)</param>
         /// <returns>Object</returns>
-        Object GetTimeSeriesTimeSeriesGet(string datatypeId, string point, string attribute, DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string geomCol = default(string), string dateStartCol = default(string), string dateEndCol = default(string), string creationDateCol = default(string));
+        Object GetTimeseriesTimeseriesGet(string datatypeId, string point, string requestCode = default(string), string layerName = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string attribute = default(string), string geomCol = default(string), string dateStartCol = default(string), string dateEndCol = default(string), string creationDateCol = default(string));
 
         /// <summary>
-        /// Get Time Series
+        /// Get Timeseries
         /// </summary>
         /// <remarks>
-        /// Retrieves the time series of the requested attribute for layers denoted by the specified datatype_id, at the \&quot;point\&quot; position  :param datatype_id: datatype_id of the layers to retrieve the attribute time series from :type datatype_id: str :param point: point string in the form \&quot;point-x,point-y\&quot; :type point: str :param attribute: name of the column containing the requested attribute :type attribute: str :param start: start date in the form &#39;YYYY-MM-DD HH:MM:SS&#39; filter resources with start_date &gt;&#x3D; start, defaults to Query(None) :type start: Optional[datetime], optional :param end: end date in the form &#39;YYYY-MM-DD HH:MM:SS&#39; filter resources with end_date &lt;&#x3D; end, defaults to Query(None) :type end: Optional[datetime], optional :param geom_col: name of the db table column containing the geometry :type geom_col: str :param date_start_col: name of the db table column containing the activation start date :type date_start_col: str :param date_end_col: name of the db table column containing the activation end date :type date_end_col: str :param creation_date_col: name of the column to use when choosing between multiple table rows with the same start_date.                           Pick always the row with the most recent creation_date_col :type creation_date_col: str :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: time series of the attribute values at \&quot;point\&quot; location :rtype: json  Example: I have many GeoJSON files that form a time series saved on the PostGIS db, each containing polygons with certain values over a specified area. I want to get the series of the \&quot;temperature\&quot; value of the point 15.18,41.68 from date 2020-02-04 00:00:00 to date 2020-02-11 23:59:59. Supposing that the GeoJSON files have their geometries saved in the \&quot;geometry\&quot; column, their start reference date saved in the \&quot;date_start\&quot; column and their end reference date in the \&quot;date_end\&quot; column, specifying all these parameters returns me a dataframe with all the values of the \&quot;temperature\&quot; variable contained in the GeoJSON files for the requested time period, at the specified point location. The \&quot;creation_date_col\&quot; is used when multiple files span the same time (to be more precise, have the same \&quot;date_start\&quot;), only the most recent is returned.
+        /// Retrieves the time series of the requested attribute for layers denoted by the specified datatype_id, at the \&quot;point\&quot; position  :param datatype_id: datatype_id of the layers to retrieve the attribute time series from :type datatype_id: str  :param request_code: request code of the layers to retrieve the attribute time series from :type request_code: str  :param point: point string in the form \&quot;point-x,point-y\&quot; :type point: str  :param start: start date in the form &#39;YYYY-MM-DD HH:MM:SS&#39; filter resources with start_date &gt;&#x3D; start, defaults to Query(None) :type start: Optional[datetime], optional  :param end: end date in the form &#39;YYYY-MM-DD HH:MM:SS&#39; filter resources with end_date &lt;&#x3D; end, defaults to Query(None) :type end: Optional[datetime], optional  :param attribute: name of the column containing the requested attribute :type attribute: Optional[str]  :param geom_col: name of the db table column containing the geometry :type geom_col: Optional[str]  :param date_start_col: name of the db table column containing the activation start date :type date_start_col: Optional[str]  :param date_end_col: name of the db table column containing the activation end date :type date_end_col: Optional[str]  :param creation_date_col: name of the column to use when choosing between multiple table rows with the same start_date.                           Pick always the row with the most recent creation_date_col :type creation_date_col: Optional[str]  :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional  :return: time series of the attribute values at \&quot;point\&quot; location :rtype: json  Example: I have many GeoJSON files that form a time series saved on the PostGIS db, each containing polygons with certain values over a specified area. I want to get the series of the \&quot;temperature\&quot; value of the point 15.18,41.68 from date 2020-02-04 00:00:00 to date 2020-02-11 23:59:59. Supposing that the GeoJSON files have their geometries saved in the \&quot;geometry\&quot; column, their start reference date saved in the \&quot;date_start\&quot; column and their end reference date in the \&quot;date_end\&quot; column, specifying all these parameters returns me a dataframe with all the values of the \&quot;temperature\&quot; variable contained in the GeoJSON files for the requested time period, at the specified point location. The \&quot;creation_date_col\&quot; is used when multiple files span the same time (to be more precise, have the same \&quot;date_start\&quot;), only the most recent is returned.
         /// </remarks>
         /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="datatypeId"></param>
         /// <param name="point"></param>
-        /// <param name="attribute"></param>
+        /// <param name="requestCode"> (optional)</param>
+        /// <param name="layerName"> (optional)</param>
         /// <param name="start"> (optional)</param>
         /// <param name="end"> (optional)</param>
+        /// <param name="attribute"> (optional)</param>
         /// <param name="geomCol"> (optional, default to &quot;geometry&quot;)</param>
         /// <param name="dateStartCol"> (optional, default to &quot;date_start&quot;)</param>
         /// <param name="dateEndCol"> (optional, default to &quot;date_end&quot;)</param>
         /// <param name="creationDateCol"> (optional, default to &quot;computation_time&quot;)</param>
         /// <returns>ApiResponse of Object</returns>
-        ApiResponse<Object> GetTimeSeriesTimeSeriesGetWithHttpInfo(string datatypeId, string point, string attribute, DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string geomCol = default(string), string dateStartCol = default(string), string dateEndCol = default(string), string creationDateCol = default(string));
+        ApiResponse<Object> GetTimeseriesTimeseriesGetWithHttpInfo(string datatypeId, string point, string requestCode = default(string), string layerName = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string attribute = default(string), string geomCol = default(string), string dateStartCol = default(string), string dateEndCol = default(string), string creationDateCol = default(string));
         #endregion Synchronous Operations
     }
 
@@ -233,44 +237,48 @@ namespace Abp.Importer.Api
         /// <returns>Task of ApiResponse (List&lt;GeoserverResourceSchema&gt;)</returns>
         System.Threading.Tasks.Task<ApiResponse<List<GeoserverResourceSchema>>> GetResourcesResourcesGetWithHttpInfoAsync(List<string> datatypeIds = default(List<string>), string resourceId = default(string), bool? includeDeleted = default(bool?), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
         /// <summary>
-        /// Get Time Series
+        /// Get Timeseries
         /// </summary>
         /// <remarks>
-        /// Retrieves the time series of the requested attribute for layers denoted by the specified datatype_id, at the \&quot;point\&quot; position  :param datatype_id: datatype_id of the layers to retrieve the attribute time series from :type datatype_id: str :param point: point string in the form \&quot;point-x,point-y\&quot; :type point: str :param attribute: name of the column containing the requested attribute :type attribute: str :param start: start date in the form &#39;YYYY-MM-DD HH:MM:SS&#39; filter resources with start_date &gt;&#x3D; start, defaults to Query(None) :type start: Optional[datetime], optional :param end: end date in the form &#39;YYYY-MM-DD HH:MM:SS&#39; filter resources with end_date &lt;&#x3D; end, defaults to Query(None) :type end: Optional[datetime], optional :param geom_col: name of the db table column containing the geometry :type geom_col: str :param date_start_col: name of the db table column containing the activation start date :type date_start_col: str :param date_end_col: name of the db table column containing the activation end date :type date_end_col: str :param creation_date_col: name of the column to use when choosing between multiple table rows with the same start_date.                           Pick always the row with the most recent creation_date_col :type creation_date_col: str :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: time series of the attribute values at \&quot;point\&quot; location :rtype: json  Example: I have many GeoJSON files that form a time series saved on the PostGIS db, each containing polygons with certain values over a specified area. I want to get the series of the \&quot;temperature\&quot; value of the point 15.18,41.68 from date 2020-02-04 00:00:00 to date 2020-02-11 23:59:59. Supposing that the GeoJSON files have their geometries saved in the \&quot;geometry\&quot; column, their start reference date saved in the \&quot;date_start\&quot; column and their end reference date in the \&quot;date_end\&quot; column, specifying all these parameters returns me a dataframe with all the values of the \&quot;temperature\&quot; variable contained in the GeoJSON files for the requested time period, at the specified point location. The \&quot;creation_date_col\&quot; is used when multiple files span the same time (to be more precise, have the same \&quot;date_start\&quot;), only the most recent is returned.
+        /// Retrieves the time series of the requested attribute for layers denoted by the specified datatype_id, at the \&quot;point\&quot; position  :param datatype_id: datatype_id of the layers to retrieve the attribute time series from :type datatype_id: str  :param request_code: request code of the layers to retrieve the attribute time series from :type request_code: str  :param point: point string in the form \&quot;point-x,point-y\&quot; :type point: str  :param start: start date in the form &#39;YYYY-MM-DD HH:MM:SS&#39; filter resources with start_date &gt;&#x3D; start, defaults to Query(None) :type start: Optional[datetime], optional  :param end: end date in the form &#39;YYYY-MM-DD HH:MM:SS&#39; filter resources with end_date &lt;&#x3D; end, defaults to Query(None) :type end: Optional[datetime], optional  :param attribute: name of the column containing the requested attribute :type attribute: Optional[str]  :param geom_col: name of the db table column containing the geometry :type geom_col: Optional[str]  :param date_start_col: name of the db table column containing the activation start date :type date_start_col: Optional[str]  :param date_end_col: name of the db table column containing the activation end date :type date_end_col: Optional[str]  :param creation_date_col: name of the column to use when choosing between multiple table rows with the same start_date.                           Pick always the row with the most recent creation_date_col :type creation_date_col: Optional[str]  :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional  :return: time series of the attribute values at \&quot;point\&quot; location :rtype: json  Example: I have many GeoJSON files that form a time series saved on the PostGIS db, each containing polygons with certain values over a specified area. I want to get the series of the \&quot;temperature\&quot; value of the point 15.18,41.68 from date 2020-02-04 00:00:00 to date 2020-02-11 23:59:59. Supposing that the GeoJSON files have their geometries saved in the \&quot;geometry\&quot; column, their start reference date saved in the \&quot;date_start\&quot; column and their end reference date in the \&quot;date_end\&quot; column, specifying all these parameters returns me a dataframe with all the values of the \&quot;temperature\&quot; variable contained in the GeoJSON files for the requested time period, at the specified point location. The \&quot;creation_date_col\&quot; is used when multiple files span the same time (to be more precise, have the same \&quot;date_start\&quot;), only the most recent is returned.
         /// </remarks>
         /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="datatypeId"></param>
         /// <param name="point"></param>
-        /// <param name="attribute"></param>
+        /// <param name="requestCode"> (optional)</param>
+        /// <param name="layerName"> (optional)</param>
         /// <param name="start"> (optional)</param>
         /// <param name="end"> (optional)</param>
+        /// <param name="attribute"> (optional)</param>
         /// <param name="geomCol"> (optional, default to &quot;geometry&quot;)</param>
         /// <param name="dateStartCol"> (optional, default to &quot;date_start&quot;)</param>
         /// <param name="dateEndCol"> (optional, default to &quot;date_end&quot;)</param>
         /// <param name="creationDateCol"> (optional, default to &quot;computation_time&quot;)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of Object</returns>
-        System.Threading.Tasks.Task<Object> GetTimeSeriesTimeSeriesGetAsync(string datatypeId, string point, string attribute, DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string geomCol = default(string), string dateStartCol = default(string), string dateEndCol = default(string), string creationDateCol = default(string), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Object> GetTimeseriesTimeseriesGetAsync(string datatypeId, string point, string requestCode = default(string), string layerName = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string attribute = default(string), string geomCol = default(string), string dateStartCol = default(string), string dateEndCol = default(string), string creationDateCol = default(string), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <summary>
-        /// Get Time Series
+        /// Get Timeseries
         /// </summary>
         /// <remarks>
-        /// Retrieves the time series of the requested attribute for layers denoted by the specified datatype_id, at the \&quot;point\&quot; position  :param datatype_id: datatype_id of the layers to retrieve the attribute time series from :type datatype_id: str :param point: point string in the form \&quot;point-x,point-y\&quot; :type point: str :param attribute: name of the column containing the requested attribute :type attribute: str :param start: start date in the form &#39;YYYY-MM-DD HH:MM:SS&#39; filter resources with start_date &gt;&#x3D; start, defaults to Query(None) :type start: Optional[datetime], optional :param end: end date in the form &#39;YYYY-MM-DD HH:MM:SS&#39; filter resources with end_date &lt;&#x3D; end, defaults to Query(None) :type end: Optional[datetime], optional :param geom_col: name of the db table column containing the geometry :type geom_col: str :param date_start_col: name of the db table column containing the activation start date :type date_start_col: str :param date_end_col: name of the db table column containing the activation end date :type date_end_col: str :param creation_date_col: name of the column to use when choosing between multiple table rows with the same start_date.                           Pick always the row with the most recent creation_date_col :type creation_date_col: str :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: time series of the attribute values at \&quot;point\&quot; location :rtype: json  Example: I have many GeoJSON files that form a time series saved on the PostGIS db, each containing polygons with certain values over a specified area. I want to get the series of the \&quot;temperature\&quot; value of the point 15.18,41.68 from date 2020-02-04 00:00:00 to date 2020-02-11 23:59:59. Supposing that the GeoJSON files have their geometries saved in the \&quot;geometry\&quot; column, their start reference date saved in the \&quot;date_start\&quot; column and their end reference date in the \&quot;date_end\&quot; column, specifying all these parameters returns me a dataframe with all the values of the \&quot;temperature\&quot; variable contained in the GeoJSON files for the requested time period, at the specified point location. The \&quot;creation_date_col\&quot; is used when multiple files span the same time (to be more precise, have the same \&quot;date_start\&quot;), only the most recent is returned.
+        /// Retrieves the time series of the requested attribute for layers denoted by the specified datatype_id, at the \&quot;point\&quot; position  :param datatype_id: datatype_id of the layers to retrieve the attribute time series from :type datatype_id: str  :param request_code: request code of the layers to retrieve the attribute time series from :type request_code: str  :param point: point string in the form \&quot;point-x,point-y\&quot; :type point: str  :param start: start date in the form &#39;YYYY-MM-DD HH:MM:SS&#39; filter resources with start_date &gt;&#x3D; start, defaults to Query(None) :type start: Optional[datetime], optional  :param end: end date in the form &#39;YYYY-MM-DD HH:MM:SS&#39; filter resources with end_date &lt;&#x3D; end, defaults to Query(None) :type end: Optional[datetime], optional  :param attribute: name of the column containing the requested attribute :type attribute: Optional[str]  :param geom_col: name of the db table column containing the geometry :type geom_col: Optional[str]  :param date_start_col: name of the db table column containing the activation start date :type date_start_col: Optional[str]  :param date_end_col: name of the db table column containing the activation end date :type date_end_col: Optional[str]  :param creation_date_col: name of the column to use when choosing between multiple table rows with the same start_date.                           Pick always the row with the most recent creation_date_col :type creation_date_col: Optional[str]  :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional  :return: time series of the attribute values at \&quot;point\&quot; location :rtype: json  Example: I have many GeoJSON files that form a time series saved on the PostGIS db, each containing polygons with certain values over a specified area. I want to get the series of the \&quot;temperature\&quot; value of the point 15.18,41.68 from date 2020-02-04 00:00:00 to date 2020-02-11 23:59:59. Supposing that the GeoJSON files have their geometries saved in the \&quot;geometry\&quot; column, their start reference date saved in the \&quot;date_start\&quot; column and their end reference date in the \&quot;date_end\&quot; column, specifying all these parameters returns me a dataframe with all the values of the \&quot;temperature\&quot; variable contained in the GeoJSON files for the requested time period, at the specified point location. The \&quot;creation_date_col\&quot; is used when multiple files span the same time (to be more precise, have the same \&quot;date_start\&quot;), only the most recent is returned.
         /// </remarks>
         /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="datatypeId"></param>
         /// <param name="point"></param>
-        /// <param name="attribute"></param>
+        /// <param name="requestCode"> (optional)</param>
+        /// <param name="layerName"> (optional)</param>
         /// <param name="start"> (optional)</param>
         /// <param name="end"> (optional)</param>
+        /// <param name="attribute"> (optional)</param>
         /// <param name="geomCol"> (optional, default to &quot;geometry&quot;)</param>
         /// <param name="dateStartCol"> (optional, default to &quot;date_start&quot;)</param>
         /// <param name="dateEndCol"> (optional, default to &quot;date_end&quot;)</param>
         /// <param name="creationDateCol"> (optional, default to &quot;computation_time&quot;)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of ApiResponse (Object)</returns>
-        System.Threading.Tasks.Task<ApiResponse<Object>> GetTimeSeriesTimeSeriesGetWithHttpInfoAsync(string datatypeId, string point, string attribute, DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string geomCol = default(string), string dateStartCol = default(string), string dateEndCol = default(string), string creationDateCol = default(string), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<ApiResponse<Object>> GetTimeseriesTimeseriesGetWithHttpInfoAsync(string datatypeId, string point, string requestCode = default(string), string layerName = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string attribute = default(string), string geomCol = default(string), string dateStartCol = default(string), string dateEndCol = default(string), string creationDateCol = default(string), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
         #endregion Asynchronous Operations
     }
 
@@ -890,57 +898,55 @@ namespace Abp.Importer.Api
         }
 
         /// <summary>
-        /// Get Time Series Retrieves the time series of the requested attribute for layers denoted by the specified datatype_id, at the \&quot;point\&quot; position  :param datatype_id: datatype_id of the layers to retrieve the attribute time series from :type datatype_id: str :param point: point string in the form \&quot;point-x,point-y\&quot; :type point: str :param attribute: name of the column containing the requested attribute :type attribute: str :param start: start date in the form &#39;YYYY-MM-DD HH:MM:SS&#39; filter resources with start_date &gt;&#x3D; start, defaults to Query(None) :type start: Optional[datetime], optional :param end: end date in the form &#39;YYYY-MM-DD HH:MM:SS&#39; filter resources with end_date &lt;&#x3D; end, defaults to Query(None) :type end: Optional[datetime], optional :param geom_col: name of the db table column containing the geometry :type geom_col: str :param date_start_col: name of the db table column containing the activation start date :type date_start_col: str :param date_end_col: name of the db table column containing the activation end date :type date_end_col: str :param creation_date_col: name of the column to use when choosing between multiple table rows with the same start_date.                           Pick always the row with the most recent creation_date_col :type creation_date_col: str :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: time series of the attribute values at \&quot;point\&quot; location :rtype: json  Example: I have many GeoJSON files that form a time series saved on the PostGIS db, each containing polygons with certain values over a specified area. I want to get the series of the \&quot;temperature\&quot; value of the point 15.18,41.68 from date 2020-02-04 00:00:00 to date 2020-02-11 23:59:59. Supposing that the GeoJSON files have their geometries saved in the \&quot;geometry\&quot; column, their start reference date saved in the \&quot;date_start\&quot; column and their end reference date in the \&quot;date_end\&quot; column, specifying all these parameters returns me a dataframe with all the values of the \&quot;temperature\&quot; variable contained in the GeoJSON files for the requested time period, at the specified point location. The \&quot;creation_date_col\&quot; is used when multiple files span the same time (to be more precise, have the same \&quot;date_start\&quot;), only the most recent is returned.
+        /// Get Timeseries Retrieves the time series of the requested attribute for layers denoted by the specified datatype_id, at the \&quot;point\&quot; position  :param datatype_id: datatype_id of the layers to retrieve the attribute time series from :type datatype_id: str  :param request_code: request code of the layers to retrieve the attribute time series from :type request_code: str  :param point: point string in the form \&quot;point-x,point-y\&quot; :type point: str  :param start: start date in the form &#39;YYYY-MM-DD HH:MM:SS&#39; filter resources with start_date &gt;&#x3D; start, defaults to Query(None) :type start: Optional[datetime], optional  :param end: end date in the form &#39;YYYY-MM-DD HH:MM:SS&#39; filter resources with end_date &lt;&#x3D; end, defaults to Query(None) :type end: Optional[datetime], optional  :param attribute: name of the column containing the requested attribute :type attribute: Optional[str]  :param geom_col: name of the db table column containing the geometry :type geom_col: Optional[str]  :param date_start_col: name of the db table column containing the activation start date :type date_start_col: Optional[str]  :param date_end_col: name of the db table column containing the activation end date :type date_end_col: Optional[str]  :param creation_date_col: name of the column to use when choosing between multiple table rows with the same start_date.                           Pick always the row with the most recent creation_date_col :type creation_date_col: Optional[str]  :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional  :return: time series of the attribute values at \&quot;point\&quot; location :rtype: json  Example: I have many GeoJSON files that form a time series saved on the PostGIS db, each containing polygons with certain values over a specified area. I want to get the series of the \&quot;temperature\&quot; value of the point 15.18,41.68 from date 2020-02-04 00:00:00 to date 2020-02-11 23:59:59. Supposing that the GeoJSON files have their geometries saved in the \&quot;geometry\&quot; column, their start reference date saved in the \&quot;date_start\&quot; column and their end reference date in the \&quot;date_end\&quot; column, specifying all these parameters returns me a dataframe with all the values of the \&quot;temperature\&quot; variable contained in the GeoJSON files for the requested time period, at the specified point location. The \&quot;creation_date_col\&quot; is used when multiple files span the same time (to be more precise, have the same \&quot;date_start\&quot;), only the most recent is returned.
         /// </summary>
         /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="datatypeId"></param>
         /// <param name="point"></param>
-        /// <param name="attribute"></param>
+        /// <param name="requestCode"> (optional)</param>
+        /// <param name="layerName"> (optional)</param>
         /// <param name="start"> (optional)</param>
         /// <param name="end"> (optional)</param>
+        /// <param name="attribute"> (optional)</param>
         /// <param name="geomCol"> (optional, default to &quot;geometry&quot;)</param>
         /// <param name="dateStartCol"> (optional, default to &quot;date_start&quot;)</param>
         /// <param name="dateEndCol"> (optional, default to &quot;date_end&quot;)</param>
         /// <param name="creationDateCol"> (optional, default to &quot;computation_time&quot;)</param>
         /// <returns>Object</returns>
-        public Object GetTimeSeriesTimeSeriesGet(string datatypeId, string point, string attribute, DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string geomCol = default(string), string dateStartCol = default(string), string dateEndCol = default(string), string creationDateCol = default(string))
+        public Object GetTimeseriesTimeseriesGet(string datatypeId, string point, string requestCode = default(string), string layerName = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string attribute = default(string), string geomCol = default(string), string dateStartCol = default(string), string dateEndCol = default(string), string creationDateCol = default(string))
         {
-            Abp.Importer.Client.ApiResponse<Object> localVarResponse = GetTimeSeriesTimeSeriesGetWithHttpInfo(datatypeId, point, attribute, start, end, geomCol, dateStartCol, dateEndCol, creationDateCol);
+            Abp.Importer.Client.ApiResponse<Object> localVarResponse = GetTimeseriesTimeseriesGetWithHttpInfo(datatypeId, point, requestCode, layerName, start, end, attribute, geomCol, dateStartCol, dateEndCol, creationDateCol);
             return localVarResponse.Data;
         }
 
         /// <summary>
-        /// Get Time Series Retrieves the time series of the requested attribute for layers denoted by the specified datatype_id, at the \&quot;point\&quot; position  :param datatype_id: datatype_id of the layers to retrieve the attribute time series from :type datatype_id: str :param point: point string in the form \&quot;point-x,point-y\&quot; :type point: str :param attribute: name of the column containing the requested attribute :type attribute: str :param start: start date in the form &#39;YYYY-MM-DD HH:MM:SS&#39; filter resources with start_date &gt;&#x3D; start, defaults to Query(None) :type start: Optional[datetime], optional :param end: end date in the form &#39;YYYY-MM-DD HH:MM:SS&#39; filter resources with end_date &lt;&#x3D; end, defaults to Query(None) :type end: Optional[datetime], optional :param geom_col: name of the db table column containing the geometry :type geom_col: str :param date_start_col: name of the db table column containing the activation start date :type date_start_col: str :param date_end_col: name of the db table column containing the activation end date :type date_end_col: str :param creation_date_col: name of the column to use when choosing between multiple table rows with the same start_date.                           Pick always the row with the most recent creation_date_col :type creation_date_col: str :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: time series of the attribute values at \&quot;point\&quot; location :rtype: json  Example: I have many GeoJSON files that form a time series saved on the PostGIS db, each containing polygons with certain values over a specified area. I want to get the series of the \&quot;temperature\&quot; value of the point 15.18,41.68 from date 2020-02-04 00:00:00 to date 2020-02-11 23:59:59. Supposing that the GeoJSON files have their geometries saved in the \&quot;geometry\&quot; column, their start reference date saved in the \&quot;date_start\&quot; column and their end reference date in the \&quot;date_end\&quot; column, specifying all these parameters returns me a dataframe with all the values of the \&quot;temperature\&quot; variable contained in the GeoJSON files for the requested time period, at the specified point location. The \&quot;creation_date_col\&quot; is used when multiple files span the same time (to be more precise, have the same \&quot;date_start\&quot;), only the most recent is returned.
+        /// Get Timeseries Retrieves the time series of the requested attribute for layers denoted by the specified datatype_id, at the \&quot;point\&quot; position  :param datatype_id: datatype_id of the layers to retrieve the attribute time series from :type datatype_id: str  :param request_code: request code of the layers to retrieve the attribute time series from :type request_code: str  :param point: point string in the form \&quot;point-x,point-y\&quot; :type point: str  :param start: start date in the form &#39;YYYY-MM-DD HH:MM:SS&#39; filter resources with start_date &gt;&#x3D; start, defaults to Query(None) :type start: Optional[datetime], optional  :param end: end date in the form &#39;YYYY-MM-DD HH:MM:SS&#39; filter resources with end_date &lt;&#x3D; end, defaults to Query(None) :type end: Optional[datetime], optional  :param attribute: name of the column containing the requested attribute :type attribute: Optional[str]  :param geom_col: name of the db table column containing the geometry :type geom_col: Optional[str]  :param date_start_col: name of the db table column containing the activation start date :type date_start_col: Optional[str]  :param date_end_col: name of the db table column containing the activation end date :type date_end_col: Optional[str]  :param creation_date_col: name of the column to use when choosing between multiple table rows with the same start_date.                           Pick always the row with the most recent creation_date_col :type creation_date_col: Optional[str]  :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional  :return: time series of the attribute values at \&quot;point\&quot; location :rtype: json  Example: I have many GeoJSON files that form a time series saved on the PostGIS db, each containing polygons with certain values over a specified area. I want to get the series of the \&quot;temperature\&quot; value of the point 15.18,41.68 from date 2020-02-04 00:00:00 to date 2020-02-11 23:59:59. Supposing that the GeoJSON files have their geometries saved in the \&quot;geometry\&quot; column, their start reference date saved in the \&quot;date_start\&quot; column and their end reference date in the \&quot;date_end\&quot; column, specifying all these parameters returns me a dataframe with all the values of the \&quot;temperature\&quot; variable contained in the GeoJSON files for the requested time period, at the specified point location. The \&quot;creation_date_col\&quot; is used when multiple files span the same time (to be more precise, have the same \&quot;date_start\&quot;), only the most recent is returned.
         /// </summary>
         /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="datatypeId"></param>
         /// <param name="point"></param>
-        /// <param name="attribute"></param>
+        /// <param name="requestCode"> (optional)</param>
+        /// <param name="layerName"> (optional)</param>
         /// <param name="start"> (optional)</param>
         /// <param name="end"> (optional)</param>
+        /// <param name="attribute"> (optional)</param>
         /// <param name="geomCol"> (optional, default to &quot;geometry&quot;)</param>
         /// <param name="dateStartCol"> (optional, default to &quot;date_start&quot;)</param>
         /// <param name="dateEndCol"> (optional, default to &quot;date_end&quot;)</param>
         /// <param name="creationDateCol"> (optional, default to &quot;computation_time&quot;)</param>
         /// <returns>ApiResponse of Object</returns>
-        public Abp.Importer.Client.ApiResponse<Object> GetTimeSeriesTimeSeriesGetWithHttpInfo(string datatypeId, string point, string attribute, DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string geomCol = default(string), string dateStartCol = default(string), string dateEndCol = default(string), string creationDateCol = default(string))
+        public Abp.Importer.Client.ApiResponse<Object> GetTimeseriesTimeseriesGetWithHttpInfo(string datatypeId, string point, string requestCode = default(string), string layerName = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string attribute = default(string), string geomCol = default(string), string dateStartCol = default(string), string dateEndCol = default(string), string creationDateCol = default(string))
         {
             // verify the required parameter 'datatypeId' is set
             if (datatypeId == null)
             {
-                throw new Abp.Importer.Client.ApiException(400, "Missing required parameter 'datatypeId' when calling DashboardApi->GetTimeSeriesTimeSeriesGet");
+                throw new Abp.Importer.Client.ApiException(400, "Missing required parameter 'datatypeId' when calling DashboardApi->GetTimeseriesTimeseriesGet");
             }
 
             // verify the required parameter 'point' is set
             if (point == null)
             {
-                throw new Abp.Importer.Client.ApiException(400, "Missing required parameter 'point' when calling DashboardApi->GetTimeSeriesTimeSeriesGet");
-            }
-
-            // verify the required parameter 'attribute' is set
-            if (attribute == null)
-            {
-                throw new Abp.Importer.Client.ApiException(400, "Missing required parameter 'attribute' when calling DashboardApi->GetTimeSeriesTimeSeriesGet");
+                throw new Abp.Importer.Client.ApiException(400, "Missing required parameter 'point' when calling DashboardApi->GetTimeseriesTimeseriesGet");
             }
 
             Abp.Importer.Client.RequestOptions localVarRequestOptions = new Abp.Importer.Client.RequestOptions();
@@ -966,8 +972,15 @@ namespace Abp.Importer.Api
             }
 
             localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("", "datatype_id", datatypeId));
+            if (requestCode != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("", "request_code", requestCode));
+            }
+            if (layerName != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("", "layer_name", layerName));
+            }
             localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("", "point", point));
-            localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("", "attribute", attribute));
             if (start != null)
             {
                 localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("", "start", start));
@@ -975,6 +988,10 @@ namespace Abp.Importer.Api
             if (end != null)
             {
                 localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("", "end", end));
+            }
+            if (attribute != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("", "attribute", attribute));
             }
             if (geomCol != null)
             {
@@ -1000,10 +1017,10 @@ namespace Abp.Importer.Api
             }
 
             // make the HTTP request
-            var localVarResponse = this.Client.Get<Object>("/time_series", localVarRequestOptions, this.Configuration);
+            var localVarResponse = this.Client.Get<Object>("/timeseries", localVarRequestOptions, this.Configuration);
             if (this.ExceptionFactory != null)
             {
-                Exception _exception = this.ExceptionFactory("GetTimeSeriesTimeSeriesGet", localVarResponse);
+                Exception _exception = this.ExceptionFactory("GetTimeseriesTimeseriesGet", localVarResponse);
                 if (_exception != null)
                 {
                     throw _exception;
@@ -1014,59 +1031,57 @@ namespace Abp.Importer.Api
         }
 
         /// <summary>
-        /// Get Time Series Retrieves the time series of the requested attribute for layers denoted by the specified datatype_id, at the \&quot;point\&quot; position  :param datatype_id: datatype_id of the layers to retrieve the attribute time series from :type datatype_id: str :param point: point string in the form \&quot;point-x,point-y\&quot; :type point: str :param attribute: name of the column containing the requested attribute :type attribute: str :param start: start date in the form &#39;YYYY-MM-DD HH:MM:SS&#39; filter resources with start_date &gt;&#x3D; start, defaults to Query(None) :type start: Optional[datetime], optional :param end: end date in the form &#39;YYYY-MM-DD HH:MM:SS&#39; filter resources with end_date &lt;&#x3D; end, defaults to Query(None) :type end: Optional[datetime], optional :param geom_col: name of the db table column containing the geometry :type geom_col: str :param date_start_col: name of the db table column containing the activation start date :type date_start_col: str :param date_end_col: name of the db table column containing the activation end date :type date_end_col: str :param creation_date_col: name of the column to use when choosing between multiple table rows with the same start_date.                           Pick always the row with the most recent creation_date_col :type creation_date_col: str :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: time series of the attribute values at \&quot;point\&quot; location :rtype: json  Example: I have many GeoJSON files that form a time series saved on the PostGIS db, each containing polygons with certain values over a specified area. I want to get the series of the \&quot;temperature\&quot; value of the point 15.18,41.68 from date 2020-02-04 00:00:00 to date 2020-02-11 23:59:59. Supposing that the GeoJSON files have their geometries saved in the \&quot;geometry\&quot; column, their start reference date saved in the \&quot;date_start\&quot; column and their end reference date in the \&quot;date_end\&quot; column, specifying all these parameters returns me a dataframe with all the values of the \&quot;temperature\&quot; variable contained in the GeoJSON files for the requested time period, at the specified point location. The \&quot;creation_date_col\&quot; is used when multiple files span the same time (to be more precise, have the same \&quot;date_start\&quot;), only the most recent is returned.
+        /// Get Timeseries Retrieves the time series of the requested attribute for layers denoted by the specified datatype_id, at the \&quot;point\&quot; position  :param datatype_id: datatype_id of the layers to retrieve the attribute time series from :type datatype_id: str  :param request_code: request code of the layers to retrieve the attribute time series from :type request_code: str  :param point: point string in the form \&quot;point-x,point-y\&quot; :type point: str  :param start: start date in the form &#39;YYYY-MM-DD HH:MM:SS&#39; filter resources with start_date &gt;&#x3D; start, defaults to Query(None) :type start: Optional[datetime], optional  :param end: end date in the form &#39;YYYY-MM-DD HH:MM:SS&#39; filter resources with end_date &lt;&#x3D; end, defaults to Query(None) :type end: Optional[datetime], optional  :param attribute: name of the column containing the requested attribute :type attribute: Optional[str]  :param geom_col: name of the db table column containing the geometry :type geom_col: Optional[str]  :param date_start_col: name of the db table column containing the activation start date :type date_start_col: Optional[str]  :param date_end_col: name of the db table column containing the activation end date :type date_end_col: Optional[str]  :param creation_date_col: name of the column to use when choosing between multiple table rows with the same start_date.                           Pick always the row with the most recent creation_date_col :type creation_date_col: Optional[str]  :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional  :return: time series of the attribute values at \&quot;point\&quot; location :rtype: json  Example: I have many GeoJSON files that form a time series saved on the PostGIS db, each containing polygons with certain values over a specified area. I want to get the series of the \&quot;temperature\&quot; value of the point 15.18,41.68 from date 2020-02-04 00:00:00 to date 2020-02-11 23:59:59. Supposing that the GeoJSON files have their geometries saved in the \&quot;geometry\&quot; column, their start reference date saved in the \&quot;date_start\&quot; column and their end reference date in the \&quot;date_end\&quot; column, specifying all these parameters returns me a dataframe with all the values of the \&quot;temperature\&quot; variable contained in the GeoJSON files for the requested time period, at the specified point location. The \&quot;creation_date_col\&quot; is used when multiple files span the same time (to be more precise, have the same \&quot;date_start\&quot;), only the most recent is returned.
         /// </summary>
         /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="datatypeId"></param>
         /// <param name="point"></param>
-        /// <param name="attribute"></param>
+        /// <param name="requestCode"> (optional)</param>
+        /// <param name="layerName"> (optional)</param>
         /// <param name="start"> (optional)</param>
         /// <param name="end"> (optional)</param>
+        /// <param name="attribute"> (optional)</param>
         /// <param name="geomCol"> (optional, default to &quot;geometry&quot;)</param>
         /// <param name="dateStartCol"> (optional, default to &quot;date_start&quot;)</param>
         /// <param name="dateEndCol"> (optional, default to &quot;date_end&quot;)</param>
         /// <param name="creationDateCol"> (optional, default to &quot;computation_time&quot;)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of Object</returns>
-        public async System.Threading.Tasks.Task<Object> GetTimeSeriesTimeSeriesGetAsync(string datatypeId, string point, string attribute, DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string geomCol = default(string), string dateStartCol = default(string), string dateEndCol = default(string), string creationDateCol = default(string), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public async System.Threading.Tasks.Task<Object> GetTimeseriesTimeseriesGetAsync(string datatypeId, string point, string requestCode = default(string), string layerName = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string attribute = default(string), string geomCol = default(string), string dateStartCol = default(string), string dateEndCol = default(string), string creationDateCol = default(string), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
-            Abp.Importer.Client.ApiResponse<Object> localVarResponse = await GetTimeSeriesTimeSeriesGetWithHttpInfoAsync(datatypeId, point, attribute, start, end, geomCol, dateStartCol, dateEndCol, creationDateCol, cancellationToken).ConfigureAwait(false);
+            Abp.Importer.Client.ApiResponse<Object> localVarResponse = await GetTimeseriesTimeseriesGetWithHttpInfoAsync(datatypeId, point, requestCode, layerName, start, end, attribute, geomCol, dateStartCol, dateEndCol, creationDateCol, cancellationToken).ConfigureAwait(false);
             return localVarResponse.Data;
         }
 
         /// <summary>
-        /// Get Time Series Retrieves the time series of the requested attribute for layers denoted by the specified datatype_id, at the \&quot;point\&quot; position  :param datatype_id: datatype_id of the layers to retrieve the attribute time series from :type datatype_id: str :param point: point string in the form \&quot;point-x,point-y\&quot; :type point: str :param attribute: name of the column containing the requested attribute :type attribute: str :param start: start date in the form &#39;YYYY-MM-DD HH:MM:SS&#39; filter resources with start_date &gt;&#x3D; start, defaults to Query(None) :type start: Optional[datetime], optional :param end: end date in the form &#39;YYYY-MM-DD HH:MM:SS&#39; filter resources with end_date &lt;&#x3D; end, defaults to Query(None) :type end: Optional[datetime], optional :param geom_col: name of the db table column containing the geometry :type geom_col: str :param date_start_col: name of the db table column containing the activation start date :type date_start_col: str :param date_end_col: name of the db table column containing the activation end date :type date_end_col: str :param creation_date_col: name of the column to use when choosing between multiple table rows with the same start_date.                           Pick always the row with the most recent creation_date_col :type creation_date_col: str :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional :return: time series of the attribute values at \&quot;point\&quot; location :rtype: json  Example: I have many GeoJSON files that form a time series saved on the PostGIS db, each containing polygons with certain values over a specified area. I want to get the series of the \&quot;temperature\&quot; value of the point 15.18,41.68 from date 2020-02-04 00:00:00 to date 2020-02-11 23:59:59. Supposing that the GeoJSON files have their geometries saved in the \&quot;geometry\&quot; column, their start reference date saved in the \&quot;date_start\&quot; column and their end reference date in the \&quot;date_end\&quot; column, specifying all these parameters returns me a dataframe with all the values of the \&quot;temperature\&quot; variable contained in the GeoJSON files for the requested time period, at the specified point location. The \&quot;creation_date_col\&quot; is used when multiple files span the same time (to be more precise, have the same \&quot;date_start\&quot;), only the most recent is returned.
+        /// Get Timeseries Retrieves the time series of the requested attribute for layers denoted by the specified datatype_id, at the \&quot;point\&quot; position  :param datatype_id: datatype_id of the layers to retrieve the attribute time series from :type datatype_id: str  :param request_code: request code of the layers to retrieve the attribute time series from :type request_code: str  :param point: point string in the form \&quot;point-x,point-y\&quot; :type point: str  :param start: start date in the form &#39;YYYY-MM-DD HH:MM:SS&#39; filter resources with start_date &gt;&#x3D; start, defaults to Query(None) :type start: Optional[datetime], optional  :param end: end date in the form &#39;YYYY-MM-DD HH:MM:SS&#39; filter resources with end_date &lt;&#x3D; end, defaults to Query(None) :type end: Optional[datetime], optional  :param attribute: name of the column containing the requested attribute :type attribute: Optional[str]  :param geom_col: name of the db table column containing the geometry :type geom_col: Optional[str]  :param date_start_col: name of the db table column containing the activation start date :type date_start_col: Optional[str]  :param date_end_col: name of the db table column containing the activation end date :type date_end_col: Optional[str]  :param creation_date_col: name of the column to use when choosing between multiple table rows with the same start_date.                           Pick always the row with the most recent creation_date_col :type creation_date_col: Optional[str]  :param db: DB session instance, defaults to Depends(db_webserver) :type db: Session, optional  :return: time series of the attribute values at \&quot;point\&quot; location :rtype: json  Example: I have many GeoJSON files that form a time series saved on the PostGIS db, each containing polygons with certain values over a specified area. I want to get the series of the \&quot;temperature\&quot; value of the point 15.18,41.68 from date 2020-02-04 00:00:00 to date 2020-02-11 23:59:59. Supposing that the GeoJSON files have their geometries saved in the \&quot;geometry\&quot; column, their start reference date saved in the \&quot;date_start\&quot; column and their end reference date in the \&quot;date_end\&quot; column, specifying all these parameters returns me a dataframe with all the values of the \&quot;temperature\&quot; variable contained in the GeoJSON files for the requested time period, at the specified point location. The \&quot;creation_date_col\&quot; is used when multiple files span the same time (to be more precise, have the same \&quot;date_start\&quot;), only the most recent is returned.
         /// </summary>
         /// <exception cref="Abp.Importer.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="datatypeId"></param>
         /// <param name="point"></param>
-        /// <param name="attribute"></param>
+        /// <param name="requestCode"> (optional)</param>
+        /// <param name="layerName"> (optional)</param>
         /// <param name="start"> (optional)</param>
         /// <param name="end"> (optional)</param>
+        /// <param name="attribute"> (optional)</param>
         /// <param name="geomCol"> (optional, default to &quot;geometry&quot;)</param>
         /// <param name="dateStartCol"> (optional, default to &quot;date_start&quot;)</param>
         /// <param name="dateEndCol"> (optional, default to &quot;date_end&quot;)</param>
         /// <param name="creationDateCol"> (optional, default to &quot;computation_time&quot;)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of ApiResponse (Object)</returns>
-        public async System.Threading.Tasks.Task<Abp.Importer.Client.ApiResponse<Object>> GetTimeSeriesTimeSeriesGetWithHttpInfoAsync(string datatypeId, string point, string attribute, DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string geomCol = default(string), string dateStartCol = default(string), string dateEndCol = default(string), string creationDateCol = default(string), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public async System.Threading.Tasks.Task<Abp.Importer.Client.ApiResponse<Object>> GetTimeseriesTimeseriesGetWithHttpInfoAsync(string datatypeId, string point, string requestCode = default(string), string layerName = default(string), DateTime? start = default(DateTime?), DateTime? end = default(DateTime?), string attribute = default(string), string geomCol = default(string), string dateStartCol = default(string), string dateEndCol = default(string), string creationDateCol = default(string), System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             // verify the required parameter 'datatypeId' is set
             if (datatypeId == null)
             {
-                throw new Abp.Importer.Client.ApiException(400, "Missing required parameter 'datatypeId' when calling DashboardApi->GetTimeSeriesTimeSeriesGet");
+                throw new Abp.Importer.Client.ApiException(400, "Missing required parameter 'datatypeId' when calling DashboardApi->GetTimeseriesTimeseriesGet");
             }
 
             // verify the required parameter 'point' is set
             if (point == null)
             {
-                throw new Abp.Importer.Client.ApiException(400, "Missing required parameter 'point' when calling DashboardApi->GetTimeSeriesTimeSeriesGet");
-            }
-
-            // verify the required parameter 'attribute' is set
-            if (attribute == null)
-            {
-                throw new Abp.Importer.Client.ApiException(400, "Missing required parameter 'attribute' when calling DashboardApi->GetTimeSeriesTimeSeriesGet");
+                throw new Abp.Importer.Client.ApiException(400, "Missing required parameter 'point' when calling DashboardApi->GetTimeseriesTimeseriesGet");
             }
 
 
@@ -1093,8 +1108,15 @@ namespace Abp.Importer.Api
             }
 
             localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("", "datatype_id", datatypeId));
+            if (requestCode != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("", "request_code", requestCode));
+            }
+            if (layerName != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("", "layer_name", layerName));
+            }
             localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("", "point", point));
-            localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("", "attribute", attribute));
             if (start != null)
             {
                 localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("", "start", start));
@@ -1102,6 +1124,10 @@ namespace Abp.Importer.Api
             if (end != null)
             {
                 localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("", "end", end));
+            }
+            if (attribute != null)
+            {
+                localVarRequestOptions.QueryParameters.Add(Abp.Importer.Client.ClientUtils.ParameterToMultiMap("", "attribute", attribute));
             }
             if (geomCol != null)
             {
@@ -1127,11 +1153,11 @@ namespace Abp.Importer.Api
             }
 
             // make the HTTP request
-            var localVarResponse = await this.AsynchronousClient.GetAsync<Object>("/time_series", localVarRequestOptions, this.Configuration, cancellationToken).ConfigureAwait(false);
+            var localVarResponse = await this.AsynchronousClient.GetAsync<Object>("/timeseries", localVarRequestOptions, this.Configuration, cancellationToken).ConfigureAwait(false);
 
             if (this.ExceptionFactory != null)
             {
-                Exception _exception = this.ExceptionFactory("GetTimeSeriesTimeSeriesGet", localVarResponse);
+                Exception _exception = this.ExceptionFactory("GetTimeseriesTimeseriesGet", localVarResponse);
                 if (_exception != null)
                 {
                     throw _exception;
