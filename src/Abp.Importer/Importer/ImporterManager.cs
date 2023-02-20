@@ -34,10 +34,10 @@ namespace Abp.Importer
             return await api.GetLayersLayersGetAsync(datatype_ids, bbox, start, end, request_codes, includeMapRequests);
         }
 
-        public async Task<object> GetTimeSeries(string datatype_id, string point, string attribute, DateTime start, DateTime end)
+        public async Task<object> GetTimeSeries(string datatype_id, string point, string request_code = null, string layer_name=null, DateTime? start = null, DateTime? end = null)
         {
             var api = new DashboardApi();
-            return await api.GetTimeSeriesTimeSeriesGetAsync(datatype_id, point, attribute, start, end);
+            return await api.GetTimeseriesTimeseriesGetAsync(datatype_id, point, request_code, layer_name, start, end);
         }
 
         public async Task<object> GetMetadata(string metadata_id)

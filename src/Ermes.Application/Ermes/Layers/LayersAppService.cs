@@ -200,5 +200,36 @@ namespace Ermes.Layers
                 throw new UserFriendlyException(e.Message);
             }
         }
+
+        [OpenApiOperation("Retrieves the time series of the requested attribute for layers denoted by the specified datatype_id, at the \"point\" position",
+            @"
+                Input: use the following properties to filter result list:
+                    - DatatypeId: datatype_id of the layers to retrieve the attribute time series
+                    - Point: point string in the form ""point-x,point-y""
+                    - RequestCode: request code of the layers to retrieve the attribute time series from
+                    - LayerName: the name of the layer
+                    - StartDate: start date, format YYYY-MM-DDTHH:MM:SS.000Z
+                    - EndDate: end date, format YYYY-MM-DDTHH:MM:SS.000Z
+            
+                    
+                Exception: Importer service not available
+            "
+        )]
+        public async Task<GetTimeSeriesOutput> GetTimeSeries(GetTimeSeriesInput input)
+        {
+            var result = new GetTimeSeriesOutput();
+            try
+            {
+                var response = await _importerMananger.GetTimeSeries(input.DatatypeId, input.Point, input.RequestCode, input.LayerName, input.StartDate, input.EndDate);
+                if (response != null)
+                    result.Variables = JsonConvert.DeserializeObject<List<TimeSeriesVariableDto>>(response.ToString());
+            }
+            catch (Exception e)
+            {
+                throw new UserFriendlyException(e.Message);
+            }
+
+            return result;
+        }
     }
 }
