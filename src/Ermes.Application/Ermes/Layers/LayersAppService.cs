@@ -215,7 +215,7 @@ namespace Ermes.Layers
                 Exception: Importer service not available
             "
         )]
-        public async Task<GetTimeSeriesOutput> GetTimeSeries(GetTimeSeriesInput input)
+        public virtual async Task<GetTimeSeriesOutput> GetTimeSeries(GetTimeSeriesInput input)
         {
             var result = new GetTimeSeriesOutput();
             try
