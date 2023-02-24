@@ -220,16 +220,15 @@ namespace Ermes.Web.Controllers
 
             var res = ObjectMapper.Map<ReportDto>(report);
             res.IsEditable = true;
-
+            GamificationAction action = null;
             if (_session.Roles.Contains(AppRoles.CITIZEN))
             {
                 //Gamification section
                 Person p = await _personManager.GetPersonByIdAsync(_session.LoggedUserPerson.Id);
-
-                async Task<List<(EntityWriteAction, string NewValue)>> AssignRewards(long personId)
+                action = await _gamificationManager.GetActionByNameAsync(ErmesConsts.GamificationActionConsts.DO_REPORT);
+                async Task<List<(EntityWriteAction, string NewValue, int EarnedPoints)>> AssignRewards(long personId)
                 {
-                    List<(EntityWriteAction, string newValue)> result = new List<(EntityWriteAction, string newValue)>();
-                    var action = await _gamificationManager.GetActionByNameAsync(ErmesConsts.GamificationActionConsts.DO_REPORT);
+                    List<(EntityWriteAction, string newValue, int earnedPoints)> result = new List<(EntityWriteAction, string newValue, int earnedPoints)>();
                     var person = await _personManager.GetPersonByIdAsync(personId);
 
                     var reports = await _reportManager.GetReportsByPersonAsync(personId);
@@ -238,7 +237,7 @@ namespace Ermes.Web.Controllers
                         var isFirstReportAction = await _gamificationManager.GetActionByNameAsync(ErmesConsts.GamificationActionConsts.FIRST_REPORT);
                         await _gamificationManager.InsertAudit(_session.LoggedUserPerson.Id, isFirstReportAction.Id, null, null);
                         person.Points += isFirstReportAction.Points;
-                        result.Add((EntityWriteAction.FirstReport, isFirstReportAction.Name));
+                        result.Add((EntityWriteAction.FirstReport, isFirstReportAction.Name, isFirstReportAction.Points));
                     }
 
 
@@ -253,7 +252,7 @@ namespace Ermes.Web.Controllers
                                 {
                                     await _gamificationManager.InsertAudit(_session.LoggedUserPerson.Id, null, item.Id, null);
                                     person.Points += item.Detail.Points;
-                                    result.Add((EntityWriteAction.MedalObtained, item.Name));
+                                    result.Add((EntityWriteAction.MedalObtained, item.Name, item.Detail.Points));
                                 }
 
                             }
@@ -274,7 +273,8 @@ namespace Ermes.Web.Controllers
                     {
                         PersonId = _session.LoggedUserPerson.Id,
                         ActionName = item.Action.ToString(),
-                        NewValue = item.NewValue
+                        NewValue = item.NewValue,
+                        EarnedPoints = item.EarnedPoints
                     },
                     item.Action,
                     true);
@@ -284,6 +284,7 @@ namespace Ermes.Web.Controllers
                 res.Points = p.Points;
                 res.LevelId = p.LevelId;
                 res.LevelName = p.Level?.Name;
+                res.EarnedPoints = action != null ? action.Points : 0;
             }
             return res;
         }

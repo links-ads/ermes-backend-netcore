@@ -262,35 +262,35 @@ namespace Ermes.EventHandlers
                     {
                         titleKey = "Notification_Gamification_MedalObtained_Title";
                         bodyKey = "Notification_Gamification_MedalObtained_Body";
-                        bodyParams = new string[] { eventData.Content.NewValue };
+                        bodyParams = new string[] { eventData.Content.NewValue, eventData.Content.EarnedPoints.ToString() };
                         break;
                     }
                 case EntityWriteAction.BadgeObtained:
                     {
                         titleKey = "Notification_Gamification_BadgeObtained_Title";
                         bodyKey = "Notification_Gamification_BadgeObtained_Body";
-                        bodyParams = new string[] { eventData.Content.NewValue };
+                        bodyParams = new string[] { eventData.Content.NewValue, eventData.Content.EarnedPoints.ToString() };
                         break;
                     }
                 case EntityWriteAction.FirstLogin:
                     {
                         titleKey = "Notification_Gamification_FirstLogin_Title";
                         bodyKey = "Notification_Gamification_FirstLogin_Body";
-                        bodyParams = new string[] { eventData.Content.NewValue };
+                        bodyParams = new string[] { eventData.Content.NewValue, eventData.Content.EarnedPoints.ToString() };
                         break;
                     }
                 case EntityWriteAction.CompleteWizard:
                     {
                         titleKey = "Notification_Gamification_CompleteWizard_Title";
                         bodyKey = "Notification_Gamification_CompleteWizard_Body";
-                        bodyParams = new string[] { eventData.Content.NewValue };
+                        bodyParams = new string[] { eventData.Content.NewValue, eventData.Content.EarnedPoints.ToString() };
                         break;
                     }
                 case EntityWriteAction.FirstReport:
                     {
                         titleKey = "Notification_Gamification_FirstReport_Title";
                         bodyKey =  "Notification_Gamification_FirstReport_Body";
-                        bodyParams = new string[] { eventData.Content.NewValue };
+                        bodyParams = new string[] { eventData.Content.NewValue, eventData.Content.EarnedPoints.ToString() };
                         break;
                     }
                 default:
