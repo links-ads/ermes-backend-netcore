@@ -39,5 +39,6 @@ namespace Ermes.Reports.Dto
         public int Points { get; set; }
         public int? LevelId { get; set; }
         public string LevelName { get; set; }
+        public int EarnedPoints { get; set; }
     }
 }

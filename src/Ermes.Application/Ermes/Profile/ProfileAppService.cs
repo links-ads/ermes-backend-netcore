@@ -281,17 +281,19 @@ namespace Ermes.Profile
 
             if (rolesToAssign.Select(r => r.Name).Contains(AppRoles.CITIZEN))
             {
-                var list = new List<(EntityWriteAction Action, string NewValue)>();
+                var list = new List<(EntityWriteAction Action, string NewValue, int EarnedPoints)>();
                 if (oldFirstLoginValue != person.IsFirstLogin && !person.IsFirstLogin) //send notification, the user has completed the tutorial
                 {
-                    list = await _gamificationManager.UpdatePersonGamificationProfileAsync(person.Id, ErmesConsts.GamificationActionConsts.COMPLETE_WIZARD, null);
-                    list.Add((EntityWriteAction.CompleteWizard, ErmesConsts.GamificationActionConsts.COMPLETE_WIZARD));
+                    var action = await _gamificationManager.GetActionByNameAsync(ErmesConsts.GamificationActionConsts.COMPLETE_WIZARD);
+                    list = await _gamificationManager.UpdatePersonGamificationProfileAsync(person.Id, action.Name, null);
+                    list.Add((EntityWriteAction.CompleteWizard, action.Name, action.Points));
                 }
 
                 if (oldIsNewUserValue != person.IsNewUser && !person.IsNewUser)
                 {
-                    list.AddRange(await _gamificationManager.UpdatePersonGamificationProfileAsync(person.Id, ErmesConsts.GamificationActionConsts.FIRST_LOGIN, null));
-                    list.Add((EntityWriteAction.FirstLogin, ErmesConsts.GamificationActionConsts.FIRST_LOGIN));
+                    var action = await _gamificationManager.GetActionByNameAsync(ErmesConsts.GamificationActionConsts.FIRST_LOGIN);
+                    list.AddRange(await _gamificationManager.UpdatePersonGamificationProfileAsync(person.Id, action.Name, null));
+                    list.Add((EntityWriteAction.FirstLogin, action.Name, action.Points));
                 }
 
                 foreach (var item in list)
@@ -302,7 +304,8 @@ namespace Ermes.Profile
                     {
                         PersonId = _session.LoggedUserPerson.Id,
                         ActionName = item.Action.ToString(),
-                        NewValue = item.NewValue
+                        NewValue = item.NewValue,
+                        EarnedPoints = item.EarnedPoints
                     },
                     item.Action,
                     true);

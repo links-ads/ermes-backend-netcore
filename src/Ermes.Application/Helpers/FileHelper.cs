@@ -1,4 +1,9 @@
-﻿using System;
+﻿using Ermes.Dto;
+using Ermes.Dto.Datatable;
+using Ermes.Net.MimeTypes;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using OfficeOpenXml;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -26,6 +31,14 @@ namespace Ermes.Helpers
             extension = !string.IsNullOrWhiteSpace(extension) ? extension.ToLowerInvariant() : string.Empty;
 
             return extension;
+        }
+
+        public static FileDto CreateFile(string fileName, string mimeTypeName, string tempFileDownloadFolder, string content)
+        {
+            var file = new FileDto(fileName, mimeTypeName);
+            var filePath = Path.Combine(tempFileDownloadFolder, file.FileToken);
+            File.WriteAllText(filePath, content);
+            return file;
         }
     }
 }
