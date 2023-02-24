@@ -1,9 +1,12 @@
 Ver.
 --------------------------------
+- Feature - ParentDataTypeId property added to Layer class (migration added) + GetTimeSeries of Importer added (sdk to be updated)(#125)
+
+Ver. 4.5.0 - 2022-02-24
+--------------------------------
 - Feature - EarnedPoints property added to every gamification notification, to ReportDto and to GamificationBaseDto (sdk to be updated)(#126)
 - Feature - Added Turkish localization (#130)
 - Feature - Geojson export function added (#131)
-- Feature - ParentDataTypeId property added to Layer class (migration added) + GetTimeSeries of Importer added (sdk to be updated)(#125)
 
 Ver. 4.4.0 - 2022-01-23
 --------------------------------
