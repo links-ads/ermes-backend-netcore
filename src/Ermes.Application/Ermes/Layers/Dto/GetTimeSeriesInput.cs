@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using Abp.Runtime.Validation;
+using Ermes.Helpers;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -6,7 +8,7 @@ using System.Text;
 
 namespace Ermes.Layers.Dto
 {
-    public class GetTimeSeriesInput
+    public class GetTimeSeriesInput: ICustomValidate
     {
         [Required]
         public string DatatypeId { get; set; }
@@ -16,5 +18,14 @@ namespace Ermes.Layers.Dto
         public string LayerName { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
+
+        public void AddValidationErrors(CustomValidationContext context)
+        {
+            var geo = ErmesCommon.GetGeometryFromWKT(Point);
+            if (geo == null || geo.GeometryType != AppConsts.GEOMETRY_POINT)
+            {
+                context.Results.Add(new ValidationResult("Point must be a valid WKT string"));
+            }
+        }
     }
 }

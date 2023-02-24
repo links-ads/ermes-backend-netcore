@@ -167,6 +167,17 @@ namespace Ermes.Layers
                         )
                     .ToList();
                     result.AssociatedLayers = joinedLayerList.Select(a => ObjectMapper.Map<LayerDto>(a.Layer)).ToList();
+
+                    /*
+                     * It is useless to map all the details about the associated layers, since all the needed information
+                     * can be retrieved through GetTimeSeries API.
+                     
+                        result.AssociatedLayers =
+                            joinedLayerList
+                            .Select(a => new { LayerDto = ObjectMapper.Map<LayerDto>(a.Layer), a.Details })
+                            .Select(a => { a.LayerDto.Details = a.Details; return a.LayerDto; })
+                            .ToList();
+                    */
                 }
                 catch (Exception e)
                 {
@@ -205,12 +216,11 @@ namespace Ermes.Layers
             @"
                 Input: use the following properties to filter result list:
                     - DatatypeId: datatype_id of the layers to retrieve the attribute time series
-                    - Point: point string in the form ""point-x,point-y""
+                    - Point: point string in WKT format
                     - RequestCode: request code of the layers to retrieve the attribute time series from
                     - LayerName: the name of the layer
                     - StartDate: start date, format YYYY-MM-DDTHH:MM:SS.000Z
                     - EndDate: end date, format YYYY-MM-DDTHH:MM:SS.000Z
-            
                     
                 Exception: Importer service not available
             "

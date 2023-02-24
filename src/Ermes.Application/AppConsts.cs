@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Text;
 
 namespace Ermes
@@ -49,6 +50,8 @@ namespace Ermes
 
         public const string CSI_OFFLINE = "Offline";
         public const string CSI_ACTIVITY = "Doing activity";
+
+        public const string GEOMETRY_POINT = "Point";
         
 
 

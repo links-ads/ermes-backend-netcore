@@ -8,6 +8,7 @@ using System.Drawing;
 using System.IO;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using NetTopologySuite.Geometries;
 
 namespace Ermes.Helpers
 {
@@ -19,10 +20,23 @@ namespace Ermes.Helpers
             if (WKTReader == null)
                 return new WKTReader()
                 {
-                    DefaultSRID = AppConsts.Srid
+                    DefaultSRID = AppConsts.Srid                    
                 };
             else
                 return WKTReader;
+        }
+
+        public static Geometry GetGeometryFromWKT(string wkt)
+        {
+            var WKTReader = GetWktReader();
+            try
+            {
+                return WKTReader.Read(wkt);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         //https://gist.github.com/ChristianWeyer/eea2cb567932e345cdfa for mapping
