@@ -98,6 +98,7 @@
     "InvalidCategoryNumericValue": "Μη έγκυρη αριθμητική τιμή κατηγορίας: {0}",
     "DoNotTakePartToGamification": "Δεν συμμετέχεις στο gamification",
     "InvalidEmail": "Μη έγκυρη διεύθυνση e-mail",
-    "InvalidVolterTaxCode": "Invalid tax code"
+    "InvalidVolterTaxCode": "Invalid tax code",
+    "RequestedFileDoesNotExists": "Requested file does not exists"
   }
 }

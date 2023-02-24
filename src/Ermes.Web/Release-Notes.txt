@@ -1,6 +1,7 @@
 Ver.
 --------------------------------
 - Feature - Added Turkish localization (#130)
+- Feature - Geojson export function added (#131)
 
 Ver. 4.4.0 - 2022-01-23
 --------------------------------

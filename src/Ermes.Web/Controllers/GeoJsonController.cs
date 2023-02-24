@@ -16,6 +16,10 @@ using Ermes.Organizations;
 using System.Collections.Generic;
 using Ermes.Enums;
 using Ermes.Persons;
+using Ermes.Web.Controllers.Dto;
+using Ermes.Net.MimeTypes;
+using System.IO;
+using Ermes.Dto;
 
 namespace Ermes.Web.Controllers
 {
@@ -28,13 +32,17 @@ namespace Ermes.Web.Controllers
         private readonly OrganizationManager _organizationManager;
         private readonly PersonManager _personManager;
         private readonly ErmesPermissionChecker _permissionChecker;
+        private readonly IAppFolders _appFolders;
+        private const string FILE_NAME = "collection_{0}.json";
+
         public GeoJsonController(
             IGeoJsonBulkRepository geoJsonBulkRepository, 
             ErmesAppSession session, 
             ILanguageManager languageManager, 
             ErmesPermissionChecker permissionChecker, 
             OrganizationManager organizationManager,
-            PersonManager personManager)
+            PersonManager personManager,
+            IAppFolders appFolders)
         {
             _geoJsonBulkRepository = geoJsonBulkRepository;
             _languageManager = languageManager;
@@ -42,6 +50,7 @@ namespace Ermes.Web.Controllers
             _permissionChecker = permissionChecker;
             _organizationManager = organizationManager;
             _personManager = personManager;
+            _appFolders = appFolders;
         }
 
         private class PreserializedJsonResult : JsonResult
@@ -70,8 +79,34 @@ namespace Ermes.Web.Controllers
         [SwaggerResponse(typeof(GetGeoJsonCollectionOutput))]
         public virtual JsonResult GetFeatureCollection(GetGeoJsonCollectionInput input)
         {
+            return new PreserializedJsonResult(GetFeatureCollectionInternal(input));
+        }
+
+        [Route("api/services/app/GeoJson/DownloadFeatureCollection")]
+        [HttpGet]
+        [SwaggerResponse(typeof(FileDto))]
+        [OpenApiOperation("Download geojson collection",
+            @"
+                The API accepts the same input object as the GetFeatureCollection API, use it to filter the result.
+                The response contains a FileDto object with the following properties:
+                    - fileName
+                    - fileType
+                    - fileToken
+                To download the file, it's necessary to do, from the client:
+                    location.href = {{base_url}}/File/DownloadTempFile?fileType={fileType}&fileToken={fileToken}&fileName={fileName}'
+                N.B.: the token can only be used once, after which the file is deleted from the server
+            "
+        )]
+        public virtual async Task<FileDto> DownloadFeatureCollection(GetGeoJsonCollectionInput input)
+        {
+            var result = GetFeatureCollectionInternal(input);
+            return FileHelper.CreateFile(string.Format(FILE_NAME, DateTime.UtcNow.ToShortDateString()), MimeTypeNames.ApplicationGeoJson, _appFolders.TempFileDownloadFolder, result);
+        }
+
+        private string GetFeatureCollectionInternal(GetGeoJsonCollectionInput input)
+        {
             Geometry boundingBox = null;
-            if(input.SouthWestBoundary != null && input.NorthEastBoundary != null)
+            if (input.SouthWestBoundary != null && input.NorthEastBoundary != null)
                 boundingBox = GeometryHelper.GetPolygonFromBoundaries(input.SouthWestBoundary, input.NorthEastBoundary);
             input.EndDate = input.EndDate == DateTime.MinValue ? DateTime.MaxValue : input.EndDate;
             var actIds = input.ActivityIds?.ToArray();
@@ -85,7 +120,7 @@ namespace Ermes.Web.Controllers
 
             //Admin can see everything
             hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Communications.Communication_CanSeeCrossOrganization);
-            List<CommunicationRestrictionType> communicationRestrictionTypes = 
+            List<CommunicationRestrictionType> communicationRestrictionTypes =
                 new List<CommunicationRestrictionType>() { CommunicationRestrictionType.None };
             if (!hasPermission)
             {
@@ -101,7 +136,7 @@ namespace Ermes.Web.Controllers
                         communicationRestrictionTypes.Add(CommunicationRestrictionType.Citizen);
                         input.ReportVisibilityType = VisibilityType.Public;
                     }
-                }   
+                }
             }
             else
             {
@@ -111,18 +146,18 @@ namespace Ermes.Web.Controllers
 
             Person person = _personManager.GetPersonById(_session.LoggedUserPerson.Id);
             string personName = person.Username ?? person.Email;
-            string responseContent = _geoJsonBulkRepository.GetGeoJsonCollection(
-                    input.StartDate, 
-                    input.EndDate, 
-                    boundingBox, 
-                    input.EntityTypes, 
-                    orgIdList, 
-                    input.StatusTypes, 
-                    actIds, 
+            return _geoJsonBulkRepository.GetGeoJsonCollection(
+                    input.StartDate,
+                    input.EndDate,
+                    boundingBox,
+                    input.EntityTypes,
+                    orgIdList,
+                    input.StatusTypes,
+                    actIds,
                     teamIds,
-                    input.HazardTypes, 
-                    input.ReportStatusTypes, 
-                    input.MissionStatusTypes, 
+                    input.HazardTypes,
+                    input.ReportStatusTypes,
+                    input.MissionStatusTypes,
                     input.MapRequestHazardTypes,
                     input.MapRequestLayerTypes,
                     input.MapRequestStatusTypes,
@@ -137,9 +172,9 @@ namespace Ermes.Web.Controllers
 
             // I need to return a JsonResult or in case of exception, Abp produces html instead of json. However, the real
             // JsonResult serializes the object I give him while I have an already serialized one.
-            PreserializedJsonResult result = new PreserializedJsonResult(responseContent);
+            //PreserializedJsonResult result = new PreserializedJsonResult(responseContent);
 
-            return result;
+            //return result;
         }
 
     }
