@@ -215,8 +215,9 @@ namespace Ermes.Layers
         [OpenApiOperation("Retrieves the time series of the requested attribute for layers denoted by the specified datatype_id, at the \"point\" position",
             @"
                 Input: use the following properties to filter result list:
-                    - DatatypeId: datatype_id of the layers to retrieve the attribute time series
-                    - Point: point string in WKT format
+                    - DatatypeId: datatype_id of the layers to retrieve the attribute time series (required)
+                    - Point: point string in WKT format. Example: 'POINT(7 45)' (required)
+                    - Crs: coordinate reference system. Example: 'EPSG:4326' (required)
                     - RequestCode: request code of the layers to retrieve the attribute time series from
                     - LayerName: the name of the layer
                     - StartDate: start date, format YYYY-MM-DDTHH:MM:SS.000Z
@@ -228,9 +229,11 @@ namespace Ermes.Layers
         public virtual async Task<GetTimeSeriesOutput> GetTimeSeries(GetTimeSeriesInput input)
         {
             var result = new GetTimeSeriesOutput();
+            input.StartDate = input.StartDate == null ? DateTime.MinValue : input.StartDate;
+            input.EndDate = input.EndDate == null ? DateTime.MaxValue : input.EndDate;
             try
             {
-                var response = await _importerMananger.GetTimeSeries(input.DatatypeId, input.Point, input.RequestCode, input.LayerName, input.StartDate, input.EndDate);
+                var response = await _importerMananger.GetTimeSeries(input.DatatypeId, input.Point, input.Crs, input.RequestCode, input.LayerName, input.StartDate, input.EndDate);
                 if (response != null)
                     result.Variables = JsonConvert.DeserializeObject<List<TimeSeriesVariableDto>>(response.ToString());
             }

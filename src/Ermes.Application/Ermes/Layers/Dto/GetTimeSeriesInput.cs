@@ -13,7 +13,9 @@ namespace Ermes.Layers.Dto
         [Required]
         public string DatatypeId { get; set; }
         [Required]
-        public string Point { get; set; } 
+        public string Point { get; set; }
+        [Required]
+        public string Crs { get; set; }
         public string RequestCode { get; set; }
         public string LayerName { get; set; }
         public DateTime? StartDate { get; set; }
