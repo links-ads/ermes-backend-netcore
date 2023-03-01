@@ -111,9 +111,9 @@ namespace Ermes.Actions
             if (actions.PersonActions != null)
                 data = actions
                         .PersonActions
+                        .OrderByDescending(a => a.Timestamp)
                         .Skip(input.SkipCount)
                         .Take(input.MaxResultCount)
-                        .OrderByDescending(a => a.Timestamp)
                         .ToList();
             else
                 actions.PersonActions = new List<PersonActionDto>();
