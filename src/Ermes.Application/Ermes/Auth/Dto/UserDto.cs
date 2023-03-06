@@ -23,5 +23,6 @@ namespace Ermes.Auth.Dto
         public string Password { get; set; }
         public List<string> Roles { get; set; }
         public string Timezone { get; set; }
+        public bool  Verified { get; set; }
     }
 }

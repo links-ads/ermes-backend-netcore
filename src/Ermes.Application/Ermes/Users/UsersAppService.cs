@@ -4,6 +4,7 @@ using Abp.UI;
 using Ermes.Attributes;
 using Ermes.Auth.Dto;
 using Ermes.Authorization;
+using Ermes.Dto;
 using Ermes.Dto.Datatable;
 using Ermes.Gamification;
 using Ermes.Helpers;
@@ -118,11 +119,59 @@ namespace Ermes.Users
             return result;
         }
 
+        private async Task<PagedResultDto<ProfileDto>> InternalGetUncompletedProfiles(GetUncompletedUsersInput input)
+        {
+            PagedResultDto<ProfileDto> result = new PagedResultDto<ProfileDto>();
+            var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
+            if (input.Search == null || input.Search.Value == null)
+                input.Search = new DTSearch() { Regex = false, Value = "" };
+            var response = await client.SearchUsersByQueryAsync(new SearchRequest()
+            {
+                search = new UserSearchCriteria()
+                {
+                    numberOfResults = input.MaxResultCount,
+                    sortFields = input.Order.Select(a => new SortField() { name = a.Column, order = FusionAuth.GetFusionAuthSortParam(a.Dir.ToString()) }).ToList(),
+                    startRow = input.SkipCount,
+                    queryString = input.Search.Value
+                }
+            });
+            if (response.WasSuccessful())
+            {
+                result.TotalCount = response.successResponse.total.HasValue ? (int)response.successResponse.total : 0;
+                if (result.TotalCount > 0)
+                {
+                    var list = new List<ProfileDto>();
+                    foreach (var item in response.successResponse.users)
+                    {
+                        var person = await _personManager.GetPersonByFusionAuthUserGuidAsync(item.id.Value, item.email, item.username);
+                        ProfileDto profile = await GetProfileInternal(person, item, _personManager, _missionManager, _gamificationManager, _session, _jobManager);
+                        if(!item.verified.HasValue || !item.verified.Value)
+                            list.Add(profile);
+                        else if(!profile.User.Roles.Any(a => a == AppRoles.CITIZEN) && !person.OrganizationId.HasValue)
+                            list.Add(profile);
+                    }
+                    result.Items = list.OrderBy(a => a.User?.DisplayName).ToList();
+                }
+            }
+            else
+            {
+                var fa_error = FusionAuth.ManageErrorResponse(response);
+                throw new UserFriendlyException(fa_error.ErrorCode, fa_error.HasTranslation ? L(fa_error.Message) : fa_error.Message);
+
+            }
+            return result;
+        }
         #endregion
 
         public virtual async Task<DTResult<ProfileDto>> GetUsers(GetUsersInput input)
         {
             PagedResultDto<ProfileDto> result = await InternalGetProfiles(input);
+            return new DTResult<ProfileDto>(input.Draw, result.TotalCount, result.Items.Count, result.Items.ToList());
+        }
+
+        public virtual async Task<DTResult<ProfileDto>> GetUncompletedUsers(GetUncompletedUsersInput input)
+        {
+            PagedResultDto<ProfileDto> result = await InternalGetUncompletedProfiles(input);
             return new DTResult<ProfileDto>(input.Draw, result.TotalCount, result.Items.Count, result.Items.ToList());
         }
 
@@ -156,6 +205,8 @@ namespace Ermes.Users
                 Profile = await GetProfileInternal(person, currentUser, _personManager, _missionManager, _gamificationManager, _session, _jobManager)
             };
         }
+
+
 
         //[OpenApiOperation("Create User",
         //    @"
