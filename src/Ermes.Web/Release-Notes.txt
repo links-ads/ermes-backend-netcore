@@ -1,6 +1,8 @@
 Ver.
 --------------------------------
 - Bugfix - Fix GetAction sorting (#133)
+- Feature - UncompletedUsers api added (#132)
+
 
 Ver. 4.6.0 - 2022-02-27
 --------------------------------
