@@ -1,4 +1,5 @@
 ﻿using Abp.Application.Services.Dto;
+using Abp.Authorization;
 using Abp.BackgroundJobs;
 using Abp.UI;
 using Ermes.Attributes;
@@ -147,7 +148,7 @@ namespace Ermes.Users
                         ProfileDto profile = await GetProfileInternal(person, item, _personManager, _missionManager, _gamificationManager, _session, _jobManager);
                         if(!item.verified.HasValue || !item.verified.Value)
                             list.Add(profile);
-                        else if(!profile.User.Roles.Any(a => a == AppRoles.CITIZEN) && !person.OrganizationId.HasValue)
+                        else if(!profile.User.Roles.Any(a => a == AppRoles.CITIZEN || a == AppRoles.ADMINISTRATOR) && !person.OrganizationId.HasValue)
                             list.Add(profile);
                     }
                     result.Items = list.OrderBy(a => a.User?.DisplayName).ToList();
@@ -169,6 +170,7 @@ namespace Ermes.Users
             return new DTResult<ProfileDto>(input.Draw, result.TotalCount, result.Items.Count, result.Items.ToList());
         }
 
+        [ErmesAuthorize(AppPermissions.Users.Users_CanSeeUncompletedUsers)]
         public virtual async Task<DTResult<ProfileDto>> GetUncompletedUsers(GetUncompletedUsersInput input)
         {
             PagedResultDto<ProfileDto> result = await InternalGetUncompletedProfiles(input);

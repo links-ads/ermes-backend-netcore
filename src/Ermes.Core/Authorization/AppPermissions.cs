@@ -82,6 +82,7 @@ namespace Ermes.Authorization
         {
             public const string Users_CanCreateCitizenOrPersonCrossOrganization = "Users.CanCreateCitizenOrPersonCrossOrganization";
             public const string Users_CanEditColleagues = "Users.CanEditColleagues";
+            public const string Users_CanSeeUncompletedUsers = "Users.Users_CanSeeUncompletedUsers";
         }
     }
 }
