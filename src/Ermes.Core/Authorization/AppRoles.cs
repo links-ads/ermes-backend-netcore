@@ -31,6 +31,7 @@ namespace Ermes.Authorization
             AppPermissions.Teams.Team_CanViewAll,
             AppPermissions.Teams.Team_CanCreateTeamCrossOrganization,
             AppPermissions.Users.Users_CanCreateCitizenOrPersonCrossOrganization,
+            AppPermissions.Users.Users_CanSeeUncompletedUsers,
             AppPermissions.Missions.Mission_CanSeeCrossOrganization,
             AppPermissions.Reports.Report_CanSeeCrossOrganization,
             AppPermissions.Actions.Action_CanSeeCrossOrganization,

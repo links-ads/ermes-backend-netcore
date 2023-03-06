@@ -1,6 +1,6 @@
 Ver.
 --------------------------------
-- Feature - UncompletedUsers api added (#132)
+- Feature - UncompletedUsers api added (initialize permissions) (#132)
 
 
 Ver. 4.6.0 - 2022-02-27
