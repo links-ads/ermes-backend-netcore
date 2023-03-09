@@ -130,16 +130,15 @@ namespace Ermes.Users
             {
                 search = new UserSearchCriteria()
                 {
-                    numberOfResults = input.MaxResultCount,
+                    numberOfResults = 10000,
                     sortFields = input.Order.Select(a => new SortField() { name = a.Column, order = FusionAuth.GetFusionAuthSortParam(a.Dir.ToString()) }).ToList(),
-                    startRow = input.SkipCount,
+                    startRow = 0,
                     queryString = input.Search.Value
                 }
             });
             if (response.WasSuccessful())
             {
-                result.TotalCount = response.successResponse.total.HasValue ? (int)response.successResponse.total : 0;
-                if (result.TotalCount > 0)
+                if (response.successResponse.total > 0)
                 {
                     var list = new List<ProfileDto>();
                     foreach (var item in response.successResponse.users)
@@ -151,7 +150,12 @@ namespace Ermes.Users
                         else if(!profile.User.Roles.Any(a => a == AppRoles.CITIZEN || a == AppRoles.ADMINISTRATOR) && !person.OrganizationId.HasValue)
                             list.Add(profile);
                     }
-                    result.Items = list.OrderBy(a => a.User?.DisplayName).ToList();
+                    result.TotalCount = list.Count;
+                    result.Items = list
+                            .Skip(input.SkipCount)
+                            .Take(input.MaxResultCount)
+                            .OrderBy(a => a.User?.DisplayName)
+                            .ToList();
                 }
             }
             else
