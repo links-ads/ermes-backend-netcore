@@ -1,5 +1,6 @@
 Ver.
 --------------------------------
+- Bugfix - Fix GetAction sorting (#133)
 - Feature - UncompletedUsers api added (initialize permissions) (#132)
 
 
