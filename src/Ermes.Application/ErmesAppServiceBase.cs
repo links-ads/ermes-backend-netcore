@@ -269,14 +269,18 @@ namespace Ermes
                 //Communications are not sent to persons in Off status
                 if (rta.Name == AppRoles.CITIZEN)
                 {
-                    await _personManager.InsertPersonActionStatusAsync(new PersonActionStatus()
+                    var lastAction = await _personManager.GetLastPersonActionAsync(personId);
+                    if (lastAction == null)
                     {
-                        CurrentStatus = ActionStatusType.Ready,
-                        PersonId = personId,
-                        Timestamp = DateTime.UtcNow,
-                        Status = ActionStatusType.Ready,
-                        CreatorUserId = personId
-                    });
+                        await _personManager.InsertPersonActionStatusAsync(new PersonActionStatus()
+                        {
+                            CurrentStatus = ActionStatusType.Ready,
+                            PersonId = personId,
+                            Timestamp = DateTime.UtcNow,
+                            Status = ActionStatusType.Ready,
+                            CreatorUserId = personId
+                        });
+                    }
                 }
             }
 
