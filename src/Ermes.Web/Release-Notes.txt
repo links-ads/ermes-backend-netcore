@@ -1,5 +1,9 @@
 Ver.
 --------------------------------
+- Bugfix - Fix UpdateProfile API for citizens (#135)
+
+Ver. 4.7.0 - 2022-03-10
+--------------------------------
 - Bugfix - Fix GetAction sorting (#133)
 - Feature - UncompletedUsers api added (initialize permissions) (#132)
 
