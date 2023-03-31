@@ -13,5 +13,6 @@ namespace Ermes.Layers
         Task<GetLayersOutput> GetLayerDefinition();
         Task<object> GetMetadata(GetMetadataInput input);
         Task<GetTimeSeriesOutput> GetTimeSeries(GetTimeSeriesInput input);
+        Task<GetFilenameOutput> GetFilename(GetFilenameInput input);
     }
 }

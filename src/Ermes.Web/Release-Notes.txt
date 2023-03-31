@@ -1,24 +1,28 @@
 Ver.
 --------------------------------
+- Feature - Added API for downloading file from Importer (#136)
+
+Ver. 4.7.1 - 2022-03-21
+--------------------------------
 - Bugfix - Fix UpdateProfile API for citizens (#135)
 
-Ver. 4.7.0 - 2022-03-10
+Ver. 4.7.0 - 2023-03-10
 --------------------------------
 - Bugfix - Fix GetAction sorting (#133)
 - Feature - UncompletedUsers api added (initialize permissions) (#132)
 
 
-Ver. 4.6.0 - 2022-02-27
+Ver. 4.6.0 - 2023-02-27
 --------------------------------
 - Feature - ParentDataTypeId property added to Layer class (migration added) + GetTimeSeries of Importer added (sdk to be updated)(#125)
 
-Ver. 4.5.0 - 2022-02-24
+Ver. 4.5.0 - 2023-02-24
 --------------------------------
 - Feature - EarnedPoints property added to every gamification notification, to ReportDto and to GamificationBaseDto (sdk to be updated)(#126)
 - Feature - Added Turkish localization (#130)
 - Feature - Geojson export function added (#131)
 
-Ver. 4.4.0 - 2022-01-23
+Ver. 4.4.0 - 2023-01-23
 --------------------------------
 - Feature - Possibility to set the number of log rows to be retrieved with API added (#127)
 - Feature - IsActive property added for Categories and Activities (migration added)(#128)
