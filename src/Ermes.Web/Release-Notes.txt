@@ -1,6 +1,6 @@
 Ver.
 --------------------------------
-
+- Feature - Added API for downloading file from Importer (#136)
 
 Ver. 4.7.1 - 2022-03-21
 --------------------------------

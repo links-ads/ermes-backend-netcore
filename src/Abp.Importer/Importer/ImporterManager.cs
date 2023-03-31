@@ -55,5 +55,11 @@ namespace Abp.Importer
                 result = deletedLayers.Select(a => a.RequestCode).Distinct().ToList();
             return result;
         }
+
+        public async Task<object> GetFilename(string layerName, string resourceId)
+        {
+            var api = new DownloadApi();
+            return await api.GetResourcePathResourcePathGetAsync(layerName, resourceId);
+        }
     }
 }

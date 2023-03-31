@@ -11,5 +11,6 @@ namespace Abp.Importer
         Task<object> GetTimeSeries(string datatype_id, string point, string crs, string request_code = null, string layer_name = null, DateTime? start = null, DateTime? end = null);
         Task<object> GetMetadata(string metadata_id);
         Task<List<string>> DeleteMapRequests(List<string> mapRequestCodes);
+        Task<object> GetFilename(string layerName, string resourceId);
     }
 }

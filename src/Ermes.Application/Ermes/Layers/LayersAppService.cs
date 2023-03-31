@@ -1,7 +1,6 @@
 ﻿using Abp.Importer;
 using Abp.UI;
 using Ermes.Attributes;
-using Ermes.Authorization;
 using Ermes.Layers.Dto;
 using Newtonsoft.Json;
 using NSwag.Annotations;
@@ -72,7 +71,7 @@ namespace Ermes.Layers
                 //1) Get available list of layers from Importer Module
                 //2) Join this list with layer definition
                 //3) Group the result by GroupKey and SubGroupKey
-                
+
                 var res = await _importerMananger.GetLayers(input.DataTypeIds, input.Bbox, input.Start.Value, input.End.Value, input.MapRequestCodes, input.IncludeMapRequests);
 
                 #region Example
@@ -206,7 +205,7 @@ namespace Ermes.Layers
             {
                 return await _importerMananger.GetMetadata(input.MetadataId);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw new UserFriendlyException(e.Message);
             }
@@ -242,6 +241,34 @@ namespace Ermes.Layers
                 throw new UserFriendlyException(e.Message);
             }
 
+            return result;
+        }
+
+
+        [OpenApiOperation("Gets the resource file given the layer name or the resource id",
+            @"
+                Input:
+                    - LayerName: id of the resource
+                    - ResourceId: name of the layer
+                Output: filename of the file to be downloaded.
+                        To download the file, it's necessary to do, from the client:
+                            location.href = {{base_url}}/download?filename={fileName}', where {{base_url}} refers to Importer module
+                Exception: Importer service not available
+            "
+        )]
+        public virtual async Task<GetFilenameOutput> GetFilename(GetFilenameInput input)
+        {
+            GetFilenameOutput result = new GetFilenameOutput();
+            try
+            {
+                var response = await _importerMananger.GetFilename(input.LayerName, input.ResourceId);
+                if (response != null)
+                    result = JsonConvert.DeserializeObject<GetFilenameOutput>(response.ToString());
+            }
+            catch (Exception e)
+            {
+                throw new UserFriendlyException(e.Message);
+            }
             return result;
         }
     }
