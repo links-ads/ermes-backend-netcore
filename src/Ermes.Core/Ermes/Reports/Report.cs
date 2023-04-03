@@ -82,6 +82,8 @@ namespace Ermes.Reports
         }
         [NotMapped]
         public ReportContentType Content { get; set; }
+
+        public virtual ICollection<ReportValidation> Validations { get; set; }
     }
 
     public class ReportExtensionData

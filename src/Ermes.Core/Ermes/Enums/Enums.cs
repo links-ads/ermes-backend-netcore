@@ -220,7 +220,8 @@ namespace Ermes.Enums
         CompleteWizard,
         FirstReport,
         TeamAssociation,
-        TeamDissociation
+        TeamDissociation,
+        ValidateReport
     }
 
     [JsonConverter(typeof(StringEnumConverter))]

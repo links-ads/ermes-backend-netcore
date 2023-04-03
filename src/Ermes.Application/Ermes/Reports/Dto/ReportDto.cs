@@ -40,5 +40,9 @@ namespace Ermes.Reports.Dto
         public int? LevelId { get; set; }
         public string LevelName { get; set; }
         public int EarnedPoints { get; set; }
+        public bool CanBeValidated { get; set; }
+        public int Upvotes { get; set; }
+        public int Downvotes { get; set; }
+        public List<ReportValidationDto> Validations { get; set; }
     }
 }

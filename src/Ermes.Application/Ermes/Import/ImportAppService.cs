@@ -1,46 +1,39 @@
-﻿using Abp.ObjectMapping;
+﻿using Abp.Azure;
+using Abp.BackgroundJobs;
+using Abp.IO.Extensions;
 using Abp.UI;
+using Ermes.Activities;
+using Ermes.Answers;
 using Ermes.Attributes;
 using Ermes.Authorization;
-using Ermes.Roles.Dto;
-using Ermes.Roles;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Ermes.Permissions;
-using Ermes.Import.Dto;
-using Microsoft.AspNetCore.Http;
-using Ermes.Interfaces;
-using Ermes.Net.MimeTypes;
-using System.Linq;
-using Ermes.Helpers;
-using System.IO;
-using Abp.IO.Extensions;
-using Ermes.Activities;
-using OfficeOpenXml;
-using Ermes.Localization;
-using Abp.Azure;
-using Ermes.Resources;
-using NSwag.Annotations;
-using Abp.BackgroundJobs;
-using Ermes.Enums;
-using Ermes.Jobs;
-using Abp.Domain.Uow;
 using Ermes.Categories;
-using Ermes.Reports.Dto;
-using static Ermes.Resources.ResourceManager;
+using Ermes.Enums;
+using Ermes.Gamification;
+using Ermes.Helpers;
+using Ermes.Import.Dto;
+using Ermes.Interfaces;
+using Ermes.Jobs;
+using Ermes.Layers;
+using Ermes.Localization;
+using Ermes.Net.MimeTypes;
 using Ermes.Organizations;
 using Ermes.Persons;
+using Ermes.Quizzes;
+using Ermes.Resources;
+using Ermes.Roles;
 using Ermes.Teams;
-using Microsoft.Extensions.Options;
+using Ermes.Tips;
 using FusionAuthNetCore;
 using io.fusionauth.domain;
-using Ermes.Tips;
-using Ermes.Quizzes;
-using Ermes.Answers;
-using Ermes.Layers;
-using Ermes.Gamification;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
+using NSwag.Annotations;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using static Ermes.Resources.ResourceManager;
 
 namespace Ermes.Import
 {
@@ -195,7 +188,7 @@ namespace Ermes.Import
             return await LoadFileAndImport((filename, contentType) =>
             {
                 return ActivitiesImporter.ImportActivitiesAsync(filename, contentType, _activityManager, _localizer);
-            }, new ImportActivitiesResourceContainer(), AcceptedActivitySourceMimeTypes);            
+            }, new ImportActivitiesResourceContainer(), AcceptedActivitySourceMimeTypes);
         }
         #endregion
 
@@ -288,7 +281,7 @@ s            "
             {
                 //create data structure
                 var result = await UsersImporter.ImportUsersAsync(filename, contentType, _personManager, _organizationManager, _teamManager, _localizer, _gamificationManager);
-                
+
                 //add person on project DB
                 foreach (var tuple in result.Accounts)
                 {
@@ -388,6 +381,24 @@ s            "
             }, new ImportAnswersResourceContainer(), AcceptedGamificationSourceMimeTypes);
         }
 
+        #endregion
+
+        #region GamificationActions
+        [OpenApiOperation("Import Gamification actions",
+   @"
+                Import (creating or updating) a list of gam. actions and relative translations.
+                Input: attach as form-data an excel (.xls or .xlsx) file with the correct format
+                Output: An import result dto, containing a summary of insertions and updates
+            "
+)]
+        [ErmesAuthorize(AppPermissions.Imports.Import_Gamification)]
+        public virtual async Task<ImportResultDto> ImportGamificationActions(IFormFile file)
+        {
+            return await LoadFileAndImport((filename, contentType) =>
+            {
+                return GamificationActionsImporter.ImportActionsAsync(filename, contentType, _gamificationManager, _localizer, CurrentUnitOfWork);
+            }, new ImportGamificationActionsResourceContainer(), AcceptedGamificationSourceMimeTypes);
+        }
         #endregion
 
     }

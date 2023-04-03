@@ -137,6 +137,8 @@ namespace Ermes
                             .ForMember(entity => entity.Tags, options => options.Ignore())
                             .ForMember(entity => entity.AdultInfo, options => options.Ignore())
                             .ForMember(entity => entity.Creator, options => options.Ignore());
+            configuration.CreateMap<ReportValidation, ReportValidationDto>()
+                            .ReverseMap();
             configuration.CreateMap<Report, ReportNotificationDto>()
                             .ForMember(dto => dto.Location, options => options.MapFrom(a => new PointPosition(a.Location.X, a.Location.Y)))
                             .ForMember(dto => dto.Timestamp, options => options.MapFrom(a => a.Timestamp.ToUniversalTime()))

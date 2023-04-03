@@ -3,6 +3,7 @@ using Ermes.Gamification;
 using Ermes.Operations;
 using Ermes.Organizations;
 using Ermes.Persons.Cache;
+using Ermes.Reports;
 using Ermes.Teams;
 using System;
 using System.Collections.Generic;
@@ -72,5 +73,7 @@ namespace Ermes.Persons
 
         [StringLength(MaxEmailLength)]
         public string Email { get; set; }
+
+        public virtual ICollection<ReportValidation> ReportValidations { get; set; }
     }
 }

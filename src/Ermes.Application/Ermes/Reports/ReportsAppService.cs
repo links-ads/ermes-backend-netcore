@@ -1,32 +1,33 @@
 ﻿using Abp.Application.Services.Dto;
+using Abp.BackgroundJobs;
+using Abp.Domain.Uow;
 using Abp.Linq.Extensions;
 using Abp.UI;
 using Ermes.Attributes;
+using Ermes.Authorization;
 using Ermes.Categories;
+using Ermes.Dto;
 using Ermes.Dto.Datatable;
 using Ermes.Dto.Spatial;
+using Ermes.Enums;
+using Ermes.EventHandlers;
+using Ermes.Gamification;
+using Ermes.Gamification.Dto;
+using Ermes.GeoJson;
 using Ermes.Helpers;
 using Ermes.Linq.Extensions;
+using Ermes.Persons;
 using Ermes.ReportRequests;
 using Ermes.Reports.Dto;
+using Microsoft.EntityFrameworkCore;
+using NetTopologySuite.Geometries;
+using NetTopologySuite.IO;
 using NpgsqlTypes;
+using NSwag.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Ermes.Dto;
-using NetTopologySuite.IO;
-using Microsoft.EntityFrameworkCore;
-using NSwag.Annotations;
-using Ermes.Enums;
-using Ermes.EventHandlers;
-using Abp.BackgroundJobs;
-using Abp.Domain.Uow;
-using NetTopologySuite.Geometries;
-using Ermes.GeoJson;
-using Ermes.Authorization;
-using Ermes.Gamification.Dto;
-using Ermes.Gamification;
 
 namespace Ermes.Reports
 {
@@ -36,6 +37,7 @@ namespace Ermes.Reports
         private readonly CategoryManager _categoryManager;
         private readonly ReportManager _reportManager;
         private readonly GamificationManager _gamificationManager;
+        private readonly PersonManager _personManager;
         private readonly ReportRequestManager _reportRequestManager;
         private readonly ErmesAppSession _session;
         private readonly ErmesPermissionChecker _permissionChecker;
@@ -43,9 +45,10 @@ namespace Ermes.Reports
         private readonly IBackgroundJobManager _backgroundJobManager;
 
         public ReportsAppService(
-            CategoryManager categoryManager, 
+            CategoryManager categoryManager,
             ReportManager reportManager,
             GamificationManager gamificationManager,
+            PersonManager personManager,
             ReportRequestManager reportRequestManager,
             IGeoJsonBulkRepository geoJsonBulkRepository,
             ErmesAppSession session,
@@ -56,6 +59,7 @@ namespace Ermes.Reports
             _categoryManager = categoryManager;
             _reportManager = reportManager;
             _gamificationManager = gamificationManager;
+            _personManager = personManager;
             _session = session;
             _reportRequestManager = reportRequestManager;
             _backgroundJobManager = backgroundJobManager;
@@ -79,18 +83,18 @@ namespace Ermes.Reports
             IQueryable<Report> query;
             input.StartDate = input.StartDate.HasValue ? input.StartDate : DateTime.MinValue;
             input.EndDate = input.EndDate.HasValue ? input.EndDate : DateTime.MaxValue;
-            
+
             if (input.NorthEastBoundary != null && input.SouthWestBoundary != null)
             {
                 Geometry boundingBox = GeometryHelper.GetPolygonFromBoundaries(input.SouthWestBoundary, input.NorthEastBoundary);
                 query = _geoJsonBulkRepository.GetReports(input.StartDate.Value, input.EndDate.Value, boundingBox);
-                query = query.Include(a => a.Creator).Include(a => a.Creator.Organization);
+                query = query.Include(a => a.Creator).Include(a => a.Creator.Organization).Include(a => a.Validations);
             }
             else
                 query = _reportManager.Reports.Where(a => new NpgsqlRange<DateTime>(input.StartDate.Value, input.EndDate.Value).Contains(a.Timestamp));
 
             if (input.ReportRequestId > 0)
-            {               
+            {
                 //TODO: to be implemented (commented after bbox filtering)
                 //var reportRequest = await _reportRequestManager.GetReportRequestByIdAsync(input.ReportRequestId);
                 //if (reportRequest == null)
@@ -149,7 +153,14 @@ namespace Ermes.Reports
             var items = await query.ToListAsync();
             var tmp = ObjectMapper.Map<List<ReportDto>>(items);
             result.Items = tmp
-                            .Select(r => { r.IsEditable = person.Id == r.CreatorId; return r; })
+                            .Select(r => 
+                            { 
+                                r.IsEditable = person.Id == r.CreatorId; 
+                                r.CanBeValidated = person.Id != r.CreatorId;
+                                r.Upvotes = r.Validations.Count(b => b.IsValid);
+                                r.Downvotes = r.Validations.Count(b => !b.IsValid);
+                                return r; 
+                            })
                             .ToList();
             return result;
         }
@@ -192,7 +203,7 @@ namespace Ermes.Reports
             result.Items = ObjectMapper.Map<List<ReportRequestDto>>(items);
 
             return result;
-        }        
+        }
 
         private async Task<int> CreateReportRequestAsync(FeatureDto<ReportRequestDto> featureDto)
         {
@@ -218,7 +229,7 @@ namespace Ermes.Reports
                 ObjectMapper.Map<ReportRequestNotificationDto>(newReportrequest),
                 EntityWriteAction.Create);
             await _backgroundJobManager.EnqueueEventAsync(notification);
-           
+
             return newReportrequest.Id;
         }
 
@@ -373,7 +384,7 @@ namespace Ermes.Reports
             var report = await _reportManager.GetReportByIdAsync(input.Id);
             if (report == null)
                 throw new UserFriendlyException(L("InvalidReportId", input.Id));
-            
+
             //report can be created by citizens
             //they won't have an organizationId associated
             var hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Reports.Report_CanSeeCrossOrganization);
@@ -382,23 +393,24 @@ namespace Ermes.Reports
                 //Father Org can see child contents
                 //false the contrary
                 if (
-                    report.Creator.OrganizationId.HasValue && 
+                    report.Creator.OrganizationId.HasValue &&
                     (
                         report.Creator.OrganizationId.Value != _session.LoggedUserPerson.OrganizationId &&
                         (
                             !report.Creator.Organization.ParentId.HasValue ||
                             (
-                                report.Creator.Organization.ParentId.HasValue && 
+                                report.Creator.Organization.ParentId.HasValue &&
                                 report.Creator.Organization.ParentId.Value != _session.LoggedUserPerson.OrganizationId
                             )
                         )
                     )
                 )
-                throw new UserFriendlyException(L("EntityOutsideOrganization"));
+                    throw new UserFriendlyException(L("EntityOutsideOrganization"));
             }
 
             var properties = ObjectMapper.Map<ReportDto>(report);
             properties.IsEditable = (report.CreatorUserId == _session.UserId);
+            properties.CanBeValidated = (report.CreatorUserId != _session.UserId);
             var writer = new GeoJsonWriter();
             return new GetEntityByIdOutput<ReportDto>()
             {
@@ -423,7 +435,7 @@ namespace Ermes.Reports
         public virtual async Task<bool> UpdateReportStatus(UpdateReportStatusInput input)
         {
             Report report = await _reportManager.GetReportByIdAsync(input.ReportId);
-            if(report == null)
+            if (report == null)
                 throw new UserFriendlyException(L("InvalidReportId", input.ReportId));
             if (report.Creator.OrganizationId != _session.LoggedUserPerson.OrganizationId)
                 throw new UserFriendlyException(L("EntityOutsideOrganization"));
@@ -510,6 +522,72 @@ namespace Ermes.Reports
             await _backgroundJobManager.EnqueueEventAsync(notification);
 
             return true;
+        }
+
+        [OpenApiOperation("Validate report",
+            @"
+                Input: 
+                    - ReportId: the id of the report to be validated
+                    - IsValid: true to upvote the report, false otherwise
+                    - RejectionNote: rejection note inserted by user, if IsValid == false
+                Output: true if the operation has been excuted successfully, false otherwise
+                N.B: 
+                    1) a person cannot validate his own reports;
+                    2) a person can validate a report only once
+                Exception: invalid report id 
+            "
+        )]
+        public virtual async Task<GamificationResponse> ValidateReport(ValidateReportInput input)
+        {
+            var result = new GamificationResponse();
+            var report = await _reportManager.GetReportByIdAsync(input.ReportId) ?? throw new UserFriendlyException(L("InvalidReportId", input.ReportId));
+
+            if (report.CreatorUserId == AbpSession.UserId.Value)
+                throw new UserFriendlyException(L("InvalidReportVerifierOwner"));
+
+            if (await _reportManager.HasAlreadyValidatedReportAsync(AbpSession.UserId.Value, report.Id))
+                throw new UserFriendlyException(L("InvalidReportVerifierDuplicate"));
+
+            ReportValidation rp = new ReportValidation()
+            {
+                ReportId = report.Id,
+                PersonId = AbpSession.UserId.Value,
+                IsValid = input.IsValid,
+                RejectionNote = input.IsValid ? null : input.RejectionNote
+            };
+
+            await _reportManager.InsertReportValidationAsync(rp);
+
+            if (_session.Roles.Contains(AppRoles.CITIZEN))
+            {
+                Person person = await _personManager.GetPersonByIdAsync(_session.LoggedUserPerson.Id);
+                var action = await _gamificationManager.GetActionByNameAsync(ErmesConsts.GamificationActionConsts.VALIDATE_REPORT);
+                //The list contains the information about the notification to be sent
+                var list = await _gamificationManager.UpdatePersonGamificationProfileAsync(_session.LoggedUserPerson.Id, action.Name, null);
+
+                foreach (var item in list)
+                {
+                    NotificationEvent<GamificationNotificationDto> gamNotification = new NotificationEvent<GamificationNotificationDto>(0,
+                    _session.LoggedUserPerson.Id,
+                    new GamificationNotificationDto()
+                    {
+                        PersonId = _session.LoggedUserPerson.Id,
+                        ActionName = item.Action.ToString(),
+                        NewValue = item.NewValue,
+                        EarnedPoints = item.EarnedPoints
+                    },
+                    item.Action,
+                    true);
+                    await _backgroundJobManager.EnqueueEventAsync(gamNotification);
+                }
+                result.Gamification = new GamificationBaseDto(person.Points, person.LevelId, person.Level?.Name, action != null ? action.Points : 0);
+            }
+            result.Response = new ResponseBaseDto()
+            {
+                Success = true
+            };
+
+            return result;
         }
     }
 }

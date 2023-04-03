@@ -102,6 +102,8 @@
     "InvalidCategoryNumericValue": "Geçersiz Kategori Sayısal Değeri: {0}",
     "DoNotTakePartToGamification": "Oyunlaştırmaya katılmazsınız",
     "InvalidEmail": "Geçersiz e-posta adresi",
-    "InvalidVolterTaxCode": "Geçersiz vergi kodu"
+    "InvalidVolterTaxCode": "Geçersiz vergi kodu",
+    "InvalidReportVerifierOwner": "A user cannot validate his own report",
+    "InvalidReportVerifierDuplicate": "This report has already been validated by this user"
   }
 }
