@@ -79,8 +79,9 @@ namespace Ermes.Dashboard
             if (start > end)
                 throw new UserFriendlyException(L("TimeWindowLimitError"));
             var timestap = end.Subtract(start);
-            if (timestap.TotalDays > 30)
-                throw new UserFriendlyException(L("TimeWindowSizeError"));
+            //TODO: could be restored, but check needs to be implemented client-side
+            //if (timestap.TotalDays > 30)
+            //    throw new UserFriendlyException(L("TimeWindowSizeError"));
 
             //Reports////////////
             IQueryable<Report> queryReport;
