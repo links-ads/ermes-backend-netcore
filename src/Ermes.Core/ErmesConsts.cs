@@ -50,6 +50,7 @@
             public const string FIRST_REPORT = "FirstReport";
             public const string FIRST_LOGIN = "FirstLogin";
             public const string COMPLETE_WIZARD = "CompleteWizard";
+            public const string VALIDATE_REPORT = "ValidateReport";
         }
     }
 }

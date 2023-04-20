@@ -1,5 +1,6 @@
 ﻿using Ermes.Dto;
 using Ermes.Dto.Datatable;
+using Ermes.Gamification.Dto;
 using Ermes.Reports.Dto;
 using System;
 using System.Collections.Generic;
@@ -19,5 +20,6 @@ namespace Ermes.Reports
         Task<int> CreateOrUpdateReportRequest(CreateOrUpdateReportRequestInput input);
         Task<GetEntityByIdOutput<ReportRequestDto>> GetReportRequestById(GetEntityByIdInput<int> input);
         Task<bool> DeleteReportRequest(IdInput<int> input);
+        Task<GamificationResponse> ValidateReport(ValidateReportInput input);
     }
 }

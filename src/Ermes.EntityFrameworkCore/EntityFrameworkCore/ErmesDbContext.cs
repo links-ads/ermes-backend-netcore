@@ -51,6 +51,7 @@ namespace Ermes.EntityFrameworkCore
         public virtual DbSet<Category> Categories { get; set; }
         public virtual DbSet<CategoryTranslation> CategoryTranslations { get; set; }
         public virtual DbSet<Report> Reports { get; set; }
+        public virtual DbSet<ReportValidation> ReportValidations { get; set; }
         public virtual DbSet<ReportRequest> ReportRequests { get; set; }
         public virtual DbSet<Communication> Communications { get; set; }
         public virtual DbSet<Notification> Notifications { get; set; }
@@ -267,6 +268,22 @@ namespace Ermes.EntityFrameworkCore
                 .WithMany(c => c.CommunicationReceivers)
                 .HasPrincipalKey(c => c.Id)
                 .HasForeignKey(cr => cr.CommunicationId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ReportValidation>().HasIndex(i => new { i.PersonId, i.ReportId }).IsUnique();
+            modelBuilder.Entity<ReportValidation>()
+                .HasOne<Person>(rv => rv.Person)
+                .WithMany(p => p.ReportValidations)
+                .HasPrincipalKey(p => p.Id)
+                .HasForeignKey(rv => rv.PersonId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<ReportValidation>()
+                .HasOne<Report>(rv => rv.Report)
+                .WithMany(r => r.Validations)
+                .HasPrincipalKey(r => r.Id)
+                .HasForeignKey(rv => rv.ReportId)
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
 

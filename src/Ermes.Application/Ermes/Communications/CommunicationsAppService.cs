@@ -284,7 +284,7 @@ namespace Ermes.Communications
         [OpenApiOperation("Delete a Communication",
             @"
                 Input: the id of the communication to be deleted
-                Output: true if the operation has been excuted successfully, false otherwise
+                Output: true if the operation has been successfully executed, false otherwise
                 Exception: invalid communication Id 
             "
         )]

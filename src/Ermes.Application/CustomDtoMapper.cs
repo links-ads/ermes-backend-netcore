@@ -129,6 +129,8 @@ namespace Ermes
                             .ForMember(dto => dto.OrganizationName, options => options.MapFrom(a => a.Creator.OrganizationId.HasValue ? a.Creator.Organization.Name : null))
                             .ForMember(dto => dto.Username, options => options.MapFrom(a => a.CreatorUserId.HasValue ? a.Creator.Username : null))
                             .ForMember(dto => dto.Email, options => options.MapFrom(a => a.CreatorUserId.HasValue ? a.Creator.Email : null))
+                            .ForMember(dto => dto.Upvotes, options => options.MapFrom(a => a.Validations != null && a.Validations.Count > 0 ? a.Validations.Count(a => a.IsValid) : 0))
+                            .ForMember(dto => dto.Downvotes, options => options.MapFrom(a => a.Validations != null && a.Validations.Count > 0 ? a.Validations.Count(a => !a.IsValid) : 0))
                             .ForMember(dto => dto.MediaURIs, options => options.MapFrom(a => a.MediaURIs.Select(s => MediaURIMapper(s, a.Id)).OrderByDescending(a => a.MediaType == MediaType.Image).ToList()))
                             .ReverseMap()
                             .ForMember(entity => entity.Location, options => options.MapFrom(a => new Point(a.Location.Longitude, a.Location.Latitude)))
@@ -137,6 +139,9 @@ namespace Ermes
                             .ForMember(entity => entity.Tags, options => options.Ignore())
                             .ForMember(entity => entity.AdultInfo, options => options.Ignore())
                             .ForMember(entity => entity.Creator, options => options.Ignore());
+            configuration.CreateMap<ReportValidation, ReportValidationDto>()
+                            .ForMember(dto => dto.ValidatorDisplayName, options => options.MapFrom(a => a.Person.Username != null && a.Person.Username != string.Empty ? a.Person.Username : a.Person.Email))
+                            .ReverseMap();
             configuration.CreateMap<Report, ReportNotificationDto>()
                             .ForMember(dto => dto.Location, options => options.MapFrom(a => new PointPosition(a.Location.X, a.Location.Y)))
                             .ForMember(dto => dto.Timestamp, options => options.MapFrom(a => a.Timestamp.ToUniversalTime()))

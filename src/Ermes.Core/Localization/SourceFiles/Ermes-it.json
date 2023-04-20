@@ -99,6 +99,8 @@
     "DoNotTakePartToGamification": "Non prendi parte alla gamification",
     "InvalidEmail": "Indirizzo email non valido",
     "InvalidVolterTaxCode": "Codice fiscale non valido",
-    "RequestedFileDoesNotExists": "Requested file does not exists"
+    "RequestedFileDoesNotExists": "Il file richiesto non esiste",
+    "InvalidReportVerifierOwner": "Un utente non può validare le proprie segnalazioni",
+    "InvalidReportVerifierDuplicate": "Questa segnalazione è già stata validata da questo utente"
   }
 }
