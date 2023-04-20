@@ -506,7 +506,7 @@ namespace Ermes.Reports
         [OpenApiOperation("Delete a ReportRequest",
             @"
                 Input: the id of the report request to be deleted
-                Output: true if the operation has been excuted successfully, false otherwise
+                Output: true if the operation has been successfully executed, false otherwise
                 Exception: invalid report request Id 
             "
         )]
@@ -530,7 +530,7 @@ namespace Ermes.Reports
                     - ReportId: the id of the report to be validated
                     - IsValid: true to upvote the report, false otherwise
                     - RejectionNote: rejection note inserted by user, if IsValid == false
-                Output: true if the operation has been excuted successfully, false otherwise
+                Output: true if the operation has been successfully executed, false otherwise
                 N.B: 
                     1) a person cannot validate his own reports;
                     2) a person can validate a report only once

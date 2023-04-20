@@ -10,6 +10,7 @@ namespace Ermes.Reports.Dto
     {
         public int ReportId { get; set; }
         public int PersonId { get; set; }
+        public string ValidatorDisplayName { get; set; }
         public bool IsValid { get; set; }
         public string RejectionNote { get; set; }
     }

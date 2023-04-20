@@ -356,7 +356,7 @@ namespace Ermes.Missions
         [OpenApiOperation("Update the Status of a Mission",
             @"
                 Input: the id of the mission to be updated, and the new status
-                Output: true if the operation has been excuted successfully
+                Output: true if the operation has been successfully executed
                 Exception: invalid new status. 
                 This operation will trigger notifications
             "
@@ -395,7 +395,7 @@ namespace Ermes.Missions
         [OpenApiOperation("Delete a Mission",
             @"
                 Input: the id of the mission to be deleted
-                Output: true if the operation has been excuted successfully, false otherwise
+                Output: true if the operation has been successfully executed, false otherwise
                 Exception: invalid mission Id 
             "
         )]

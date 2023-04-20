@@ -386,7 +386,7 @@ namespace Ermes.Profile
                 Update Registration Token associated to the current logged user.
                 This token will be used by push notification service
                 Input: UpdateRegistrationTokenInput object with the token
-                Output: true if the operation has been excuted successfully
+                Output: true if the operation has been successfully executed
             "
         )]
         public virtual async Task<bool> UpdateRegistrationToken(UpdateRegistrationTokenInput input)
@@ -443,7 +443,7 @@ namespace Ermes.Profile
         //        [Deprecated]
         //        Update Person Preferred Languages
         //        Input: UpdatePreferredLanguagesInput Dto object with the full list of preferred languages in Iso2Code format
-        //        Output: true if the operation has been excuted successfully
+        //        Output: true if the operation has been successfully executed
         //    "
         //)]
         //public virtual async Task<bool> UpdatePreferredLanguages(UpdatePreferredLanguagesInput input)
