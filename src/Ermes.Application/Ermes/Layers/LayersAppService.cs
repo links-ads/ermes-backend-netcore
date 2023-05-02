@@ -248,8 +248,8 @@ namespace Ermes.Layers
         [OpenApiOperation("Gets the resource file given the layer name or the resource id",
             @"
                 Input:
-                    - LayerName: id of the resource
-                    - ResourceId: name of the layer
+                    - LayerName: name of the layer
+                    - ResourceId: id of the resource
                 Output: filename of the file to be downloaded.
                         To download the file, it's necessary to do, from the client:
                             location.href = {{base_url}}/download?filename={fileName}', where {{base_url}} refers to Importer module
