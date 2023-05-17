@@ -1,6 +1,7 @@
 Ver.
 --------------------------------
 - Feature - ReportValidation added (migration added)(gamification actions to be imported)(#137)
+- Feature - ReportRequest removed (migration added)(#138)
 
 Ver. 4.7.1 - 2023-03-21
 --------------------------------

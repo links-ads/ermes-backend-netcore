@@ -6,13 +6,11 @@ using Ermes.MapRequests;
 using Ermes.Missions;
 using Ermes.Organizations;
 using Ermes.Persons;
-using Ermes.ReportRequests;
 using Ermes.Reports;
 using Ermes.Teams;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Ermes.Linq.Extensions
 {
@@ -22,11 +20,11 @@ namespace Ermes.Linq.Extensions
         {
             //TBD
             return query
-                    .Where(a =>a.StartDate >= startDate && a.EndDate <= endDate);
+                    .Where(a => a.StartDate >= startDate && a.EndDate <= endDate);
         }
 
         #region Data Ownership
-        public static IQueryable<T> DataOwnership<T>(this IQueryable<T> query, List<int> organizationIdList, IPersonBase person =null, VisibilityType visibility = VisibilityType.Private)
+        public static IQueryable<T> DataOwnership<T>(this IQueryable<T> query, List<int> organizationIdList, IPersonBase person = null, VisibilityType visibility = VisibilityType.Private)
         {
 
             if (organizationIdList == null || organizationIdList.Count == 0)
@@ -45,8 +43,6 @@ namespace Ermes.Linq.Extensions
                 return new MissionDataOwnershipResolver().Resolve(query as IQueryable<Mission>, organizationIdList, person, visibility) as IQueryable<T>;
             else if (typeof(T) == typeof(Report))
                 return new ReportDataOwnershipResolver().Resolve(query as IQueryable<Report>, organizationIdList, person, visibility) as IQueryable<T>;
-            else if (typeof(T) == typeof(ReportRequest))
-                return new ReportRequestDataOwnershipResolver().Resolve(query as IQueryable<ReportRequest>, organizationIdList, person, visibility) as IQueryable<T>;
             else if (typeof(T) == typeof(Organization))
                 return new OrganizationDataOwnershipResolver().Resolve(query as IQueryable<Organization>, organizationIdList, person, visibility) as IQueryable<T>;
             else if (typeof(T) == typeof(PersonAction))
@@ -75,7 +71,7 @@ namespace Ermes.Linq.Extensions
         {
             public IQueryable<Person> Resolve(IQueryable<Person> query, List<int> organizationIdList, IPersonBase person, VisibilityType visibility)
             {
-                if(organizationIdList != null)
+                if (organizationIdList != null)
                     query = query
                             .Where(p => p.OrganizationId.HasValue && organizationIdList.Contains(p.OrganizationId.Value));
 
@@ -88,8 +84,8 @@ namespace Ermes.Linq.Extensions
             public IQueryable<Mission> Resolve(IQueryable<Mission> query, List<int> organizationIdList, IPersonBase person, VisibilityType visibility)
             {
                 return organizationIdList == null
-                            ? query                     
-                            : 
+                            ? query
+                            :
                             query
                             .Where(m => organizationIdList.Contains(m.OrganizationId) || (m.Organization.ParentId.HasValue && organizationIdList.Contains(m.Organization.ParentId.Value)));
             }
@@ -138,28 +134,11 @@ namespace Ermes.Linq.Extensions
             }
         }
 
-        private class ReportRequestDataOwnershipResolver : IDataOwnershipResolver<ReportRequest>
-        {
-            public IQueryable<ReportRequest> Resolve(IQueryable<ReportRequest> query, List<int> organizationIdList, IPersonBase person, VisibilityType visibility)
-            {
-                return organizationIdList == null
-                    ? query
-                            .Where(r => !r.Creator.OrganizationId.HasValue)
-                    : query
-                    .Where(r =>
-                                //Organization visibility
-                                (r.Creator.OrganizationId.HasValue && organizationIdList.Contains(r.Creator.OrganizationId.Value)) ||
-                                //User contents
-                                !r.Creator.OrganizationId.HasValue
-                            );
-            }
-        }
-
         private class OrganizationDataOwnershipResolver : IDataOwnershipResolver<Organization>
         {
             public IQueryable<Organization> Resolve(IQueryable<Organization> query, List<int> organizationIdList, IPersonBase person, VisibilityType visibility)
             {
-                if(organizationIdList != null)
+                if (organizationIdList != null)
                     query = query
                             .Where(o => organizationIdList.Contains(o.Id) || (o.ParentId.HasValue && organizationIdList.Contains(o.ParentId.Value)));
 
@@ -170,7 +149,7 @@ namespace Ermes.Linq.Extensions
 
         private class PersonActionDataOwnershipResolver : IDataOwnershipResolver<PersonAction>
         {
-            public IQueryable<PersonAction> Resolve(IQueryable<PersonAction> query, List<int> organizationIdList, IPersonBase person,  VisibilityType visibility)
+            public IQueryable<PersonAction> Resolve(IQueryable<PersonAction> query, List<int> organizationIdList, IPersonBase person, VisibilityType visibility)
             {
                 return query
                     .Where(pa => pa.Person.OrganizationId.HasValue && organizationIdList.Contains(pa.Person.OrganizationId.Value))
@@ -189,7 +168,7 @@ namespace Ermes.Linq.Extensions
                         .Where(c =>
                             c.ScopeString == CommunicationScopeType.Public.ToString() ||
                             c.RestrictionString == CommunicationRestrictionType.Professional.ToString() || (
-                                c.RestrictionString == CommunicationRestrictionType.Organization.ToString() && 
+                                c.RestrictionString == CommunicationRestrictionType.Organization.ToString() &&
                                 //Organization visibility
                                 (c.CommunicationReceivers.Select(a => a.OrganizationId).Any(a => organizationIdList.Contains(a)))
                             )
@@ -201,9 +180,9 @@ namespace Ermes.Linq.Extensions
         {
             public IQueryable<Team> Resolve(IQueryable<Team> query, List<int> organizationIdList, IPersonBase person, VisibilityType visibility)
             {
-                if(organizationIdList != null)
-                query =  query
-                        .Where(t => organizationIdList.Contains(t.OrganizationId) || (t.Organization.ParentId.HasValue && organizationIdList.Contains(t.Organization.ParentId.Value)));
+                if (organizationIdList != null)
+                    query = query
+                            .Where(t => organizationIdList.Contains(t.OrganizationId) || (t.Organization.ParentId.HasValue && organizationIdList.Contains(t.Organization.ParentId.Value)));
 
                 return query;
             }

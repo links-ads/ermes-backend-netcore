@@ -19,7 +19,6 @@ using Ermes.Permissions;
 using Ermes.Persons;
 using Ermes.Preferences;
 using Ermes.Quizzes;
-using Ermes.ReportRequests;
 using Ermes.Reports;
 using Ermes.Roles;
 using Ermes.Teams;
@@ -52,7 +51,6 @@ namespace Ermes.EntityFrameworkCore
         public virtual DbSet<CategoryTranslation> CategoryTranslations { get; set; }
         public virtual DbSet<Report> Reports { get; set; }
         public virtual DbSet<ReportValidation> ReportValidations { get; set; }
-        public virtual DbSet<ReportRequest> ReportRequests { get; set; }
         public virtual DbSet<Communication> Communications { get; set; }
         public virtual DbSet<Notification> Notifications { get; set; }
         public virtual DbSet<Preference> Preferences { get; set; }
@@ -65,7 +63,7 @@ namespace Ermes.EntityFrameworkCore
         public virtual DbSet<TipTranslation> TipTranslations { get; set; }
         public virtual DbSet<Quiz> Quizzes { get; set; }
         public virtual DbSet<PersonQuiz> PersonQuizzes { get; set; }
-        public virtual DbSet<QuizTranslation> QuizTranslations { get; set; }        
+        public virtual DbSet<QuizTranslation> QuizTranslations { get; set; }
         public virtual DbSet<Answer> Answers { get; set; }
         public virtual DbSet<AnswerTranslation> AnswerTranslations { get; set; }
         public virtual DbSet<MapRequest> MapRequests { get; set; }

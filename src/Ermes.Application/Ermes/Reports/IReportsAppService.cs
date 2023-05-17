@@ -15,11 +15,6 @@ namespace Ermes.Reports
         Task<DTResult<ReportDto>> GetReports(GetReportsInput input);
         Task<GetEntityByIdOutput<ReportDto>> GetReportById(GetEntityByIdInput<int> input);
         Task<bool> UpdateReportStatus(UpdateReportStatusInput input);
-
-        Task<DTResult<ReportRequestDto>> GetReportRequests(GetReportRequestsInput input);
-        Task<int> CreateOrUpdateReportRequest(CreateOrUpdateReportRequestInput input);
-        Task<GetEntityByIdOutput<ReportRequestDto>> GetReportRequestById(GetEntityByIdInput<int> input);
-        Task<bool> DeleteReportRequest(IdInput<int> input);
         Task<GamificationResponse> ValidateReport(ValidateReportInput input);
     }
 }

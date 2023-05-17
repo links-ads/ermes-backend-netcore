@@ -120,6 +120,8 @@
     <Compile Include="Migrations\20230214111126_Layer_ParentDataTypeId_Added.Designer.cs" />
     <Compile Include="Migrations\20230403125020_Report_Validations_Added.cs" />
     <Compile Include="Migrations\20230403125020_Report_Validations_Added.Designer.cs" />
+    <Compile Include="Migrations\20230517083906_ReportRequest_Table_Delete.cs" />
+    <Compile Include="Migrations\20230517083906_ReportRequest_Table_Delete.Designer.cs" />
     <Compile Include="Migrations\ErmesDbContextModelSnapshot.cs" />
     <Compile Include="Migrations\Seed\ModelBuilderExtensions.cs" />
   </ItemGroup>
