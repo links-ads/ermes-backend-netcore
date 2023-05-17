@@ -16,6 +16,7 @@ namespace Ermes.Reports.Dto
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         //kept for retro-compatibility in the SDKs
+        [Obsolete]
         public int ReportRequestId { get; set; }
         public bool FilterByCreator { get; set; }
         public PointPosition NorthEastBoundary { get; set; }

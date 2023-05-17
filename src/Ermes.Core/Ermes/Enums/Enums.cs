@@ -171,6 +171,7 @@ namespace Ermes.Enums
         Communication = 0,
         MapRequest = 5,
         Mission = 10,
+        [Obsolete]
         ReportRequest = 20,
         Other = 30,
         Report = 40,
