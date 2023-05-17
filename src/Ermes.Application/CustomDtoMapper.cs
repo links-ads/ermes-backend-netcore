@@ -1,13 +1,29 @@
 ﻿using Abp.AutoMapper;
-using Abp.Json;
+using Abp.SocialMedia.Dto;
+using Abp.SocialMedia.Model;
 using AutoMapper;
 using Ermes.Actions.Dto;
+using Ermes.Activations;
 using Ermes.Activities;
 using Ermes.Activities.Dto;
+using Ermes.Answers;
 using Ermes.Auth.Dto;
+using Ermes.Categories;
 using Ermes.Communications;
 using Ermes.Communications.Dto;
+using Ermes.Dashboard.Dto;
 using Ermes.Dto.Spatial;
+using Ermes.EntityHistory;
+using Ermes.Enums;
+using Ermes.Gamification;
+using Ermes.Gamification.Dto;
+using Ermes.GeoJson.Dto;
+using Ermes.Helpers;
+using Ermes.Import.Dto;
+using Ermes.Layers;
+using Ermes.Layers.Dto;
+using Ermes.Logging.Dto;
+using Ermes.MapRequests.Dto;
 using Ermes.Missions;
 using Ermes.Missions.Dto;
 using Ermes.Notifications;
@@ -16,50 +32,24 @@ using Ermes.Organizations;
 using Ermes.Organizations.Dto;
 using Ermes.Permissions;
 using Ermes.Persons;
-using Ermes.Persons.Dto;
+using Ermes.Preferences;
 using Ermes.Profile.Dto;
-using Ermes.ReportRequests;
+using Ermes.Quizzes;
 using Ermes.Reports;
 using Ermes.Reports.Dto;
 using Ermes.Resources;
 using Ermes.Roles;
 using Ermes.Roles.Dto;
-using Ermes.Preferences;
+using Ermes.Social.Dto;
 using Ermes.Teams;
 using Ermes.Teams.Dto;
+using Ermes.Tips;
 using Ermes.Users.Dto;
 using io.fusionauth.domain;
-using Microsoft.Extensions.Options;
-using NetTopologySuite.Algorithm;
 using NetTopologySuite.Geometries;
-using Newtonsoft.Json;
-using NpgsqlTypes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Abp.EntityHistory;
-using Ermes.Logging.Dto;
-using Ermes.EntityHistory;
-using Ermes.GeoJson.Dto;
 using NetTopologySuite.IO;
-using Ermes.Enums;
-using Ermes.Social.Dto;
-using Ermes.Categories;
-using Ermes.Helpers;
-using Abp.SocialMedia.Model;
-using Abp.SocialMedia.Dto;
-using io.fusionauth.domain.api;
-using Ermes.Import.Dto;
-using Ermes.Activations;
-using Ermes.Dashboard.Dto;
-using Ermes.Tips;
-using Ermes.Gamification.Dto;
-using Ermes.Quizzes;
-using Ermes.Answers;
-using Ermes.MapRequests.Dto;
-using Ermes.Layers;
-using Ermes.Layers.Dto;
-using Ermes.Gamification;
+using System;
+using System.Linq;
 
 namespace Ermes
 {
@@ -103,7 +93,7 @@ namespace Ermes
                             .ReverseMap()
                             .ForMember(entity => entity.CreatorPerson, options => options.Ignore())
                             .ForMember(entity => entity.Organization, options => options.Ignore());
-                            //.ForMember(entity => entity.OrganizationId, options => options.Ignore());
+            //.ForMember(entity => entity.OrganizationId, options => options.Ignore());
             configuration.CreateMap<Mission, MissionNotificationDto>()
                             .ForMember(dto => dto.Centroid, options => options.MapFrom(b => new PointPosition(b.AreaOfInterest.Centroid.X, b.AreaOfInterest.Centroid.Y)))
                             .ForMember(dto => dto.Status, options => options.MapFrom(b => b.CurrentStatus))
@@ -150,18 +140,6 @@ namespace Ermes
                             .ForMember(dto => dto.Username, options => options.MapFrom(a => a.CreatorUserId.HasValue ? a.Creator.Username : null))
                             .ForMember(dto => dto.Email, options => options.MapFrom(a => a.CreatorUserId.HasValue ? a.Creator.Email : null))
                             .AfterMap((src, dest) => dest.MediaURIs = dest.MediaURIs.Select(a => ResourceManager.Reports.GetMediaPath(dest.Id, a)).ToList());
-            configuration.CreateMap<ReportRequest, ReportRequestDto>()
-                            .ForMember(dto => dto.OrganizationId, options => options.MapFrom(b => b.Creator.OrganizationId))
-                            .ForMember(dto => dto.Centroid, options => options.MapFrom(b => new PointPosition(b.AreaOfInterest.Centroid.X, b.AreaOfInterest.Centroid.Y)))
-                            .AfterMap((src, dest) => dest.Duration.LowerBound = dest.Duration.LowerBound.ToUniversalTime())
-                            .AfterMap((src, dest) => dest.Duration.UpperBound = dest.Duration.UpperBound.ToUniversalTime())
-                            .ReverseMap()
-                            .ForMember(entity => entity.Creator, options => options.Ignore());
-            configuration.CreateMap<ReportRequest, ReportRequestNotificationDto>()
-                            .ForMember(dto => dto.OrganizationId, options => options.MapFrom(b => b.Creator.OrganizationId))
-                            .ForMember(dto => dto.Centroid, options => options.MapFrom(b => new PointPosition(b.AreaOfInterest.Centroid.X, b.AreaOfInterest.Centroid.Y)))
-                            .AfterMap((src, dest) => dest.Duration.LowerBound = dest.Duration.LowerBound.ToUniversalTime())
-                            .AfterMap((src, dest) => dest.Duration.UpperBound = dest.Duration.UpperBound.ToUniversalTime());
             configuration.CreateMap<Communication, CommunicationDto>()
                             .ForMember(dto => dto.Centroid, options => options.MapFrom(b => new PointPosition(b.AreaOfInterest.Centroid.X, b.AreaOfInterest.Centroid.Y)))
                             .ForMember(dto => dto.OrganizationName, options => options.MapFrom(a => a.Creator.OrganizationId.HasValue ? a.Creator.Organization.Name : null))
@@ -288,13 +266,6 @@ namespace Ermes
                            .ForPath(fd => fd.Properties.Type, options => options.MapFrom(c => EntityType.Report))
                            .ForPath(fd => fd.Properties.Details, options => options.MapFrom(c => c.Description))
                            .ForPath(fd => fd.Properties.Status, options => options.MapFrom(c => c.StatusString));
-            configuration.CreateMap<ReportRequest, FeatureDto<GeoJsonItem>>()
-                            .ForMember(fd => fd.Geometry, options => options.MapFrom(c => new GeoJsonWriter().Write(c.AreaOfInterest)))
-                            .ForPath(fd => fd.Properties.Id, options => options.MapFrom(c => c.Id))
-                            .ForPath(fd => fd.Properties.StartDate, options => options.MapFrom(c => c.Duration.LowerBound))
-                            .ForPath(fd => fd.Properties.EndDate, options => options.MapFrom(c => c.Duration.UpperBound))
-                            .ForPath(fd => fd.Properties.Type, options => options.MapFrom(c => EntityType.ReportRequest))
-                            .ForPath(fd => fd.Properties.Details, options => options.MapFrom(c => c.Title));
             configuration.CreateMap<PersonAction, FeatureDto<GeoJsonItem>>()
                            .ForMember(fd => fd.Geometry, options => options.MapFrom(c => new GeoJsonWriter().Write(c.Location)))
                            .ForPath(fd => fd.Properties.Id, options => options.MapFrom(c => c.Id))

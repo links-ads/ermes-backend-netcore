@@ -94,55 +94,6 @@ namespace Ermes.EventHandlers
         }
     }
 
-    public class ReportRequestNotificationEventHandler : IAsyncEventHandler<NotificationEvent<ReportRequestNotificationDto>>, ITransientDependency
-    {
-        private readonly NotifierService _notifierService;
-        private readonly PersonManager _personManager;
-        public ReportRequestNotificationEventHandler(NotifierService notifierService, PersonManager personManager)
-        {
-            _notifierService = notifierService;
-            _personManager = personManager;
-        }
-
-        [UnitOfWork]
-        public virtual async Task HandleEventAsync(NotificationEvent<ReportRequestNotificationDto> eventData)
-        {
-            await _notifierService.SendBusNotification(eventData.CreatorId, eventData.EntityId, eventData.Content, eventData.Action, EntityType.ReportRequest);
-
-            string titleKey = null, bodyKey = null;
-            string[] bodyParams = new string[] { eventData.Content.Title };
-
-            switch(eventData.Action)
-            {
-                case EntityWriteAction.Create:
-                    {
-                        titleKey = "Notification_ReportRequest_Create_Title";
-                        bodyKey = "Notification_ReportRequest_Create_Body";
-                        break;
-                    }
-                case EntityWriteAction.Update:
-                    {
-                        titleKey = "Notification_ReportRequest_Update_Title";
-                        bodyKey = "Notification_ReportRequest_Update_Body";
-                        break;
-                    }
-                case EntityWriteAction.Delete:
-                    {
-                        titleKey = "Notification_ReportRequest_Delete_Title";
-                        bodyKey = "Notification_ReportRequest_Delete_Body";
-                        break;
-                    }
-            }
-
-            int? orgId = (await _personManager.GetPersonByIdAsync(eventData.CreatorId)).OrganizationId;
-            if (!orgId.HasValue)
-                return;
-            var receivers = _personManager.Persons.Where(p => p.OrganizationId == orgId);
-
-            await _notifierService.SendUserNotification(eventData.CreatorId, receivers, eventData.EntityId, (bodyKey, bodyParams), (titleKey, null), eventData.Action, EntityType.ReportRequest);
-        }
-    }
-
     public class MissionNotificationEventHandler : IAsyncEventHandler<NotificationEvent<MissionNotificationDto>>, IAsyncEventHandler<NotificationEvent<MissionNotificationTestDto>>, ITransientDependency
     {
         private readonly NotifierService _notifierService;

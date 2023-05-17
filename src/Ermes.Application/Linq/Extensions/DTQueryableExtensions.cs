@@ -1,21 +1,17 @@
 ﻿using Abp.Linq.Expressions;
 using Ermes.Communications;
-using Ermes.Dto;
 using Ermes.Dto.Datatable;
 using Ermes.MapRequests;
 using Ermes.Missions;
 using Ermes.Notifications;
 using Ermes.Organizations;
 using Ermes.Persons;
-using Ermes.ReportRequests;
 using Ermes.Reports;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Text.RegularExpressions;
 
 namespace Ermes.Linq.Extensions
 {
@@ -56,8 +52,6 @@ namespace Ermes.Linq.Extensions
                 return new MissionLinqFilterResolver().Resolve(query as IQueryable<Mission>, search) as IQueryable<T>;
             if (typeof(T) == typeof(Report))
                 return new ReportLinqFilterResolver().Resolve(query as IQueryable<Report>, search) as IQueryable<T>;
-            if (typeof(T) == typeof(ReportRequest))
-                return new ReportRequestLinqFilterResolver().Resolve(query as IQueryable<ReportRequest>, search) as IQueryable<T>;
             if (typeof(T) == typeof(Organization))
                 return new OrganizationLinqFilterResolver().Resolve(query as IQueryable<Organization>, search) as IQueryable<T>;
             if (typeof(T) == typeof(Communication))
@@ -79,8 +73,6 @@ namespace Ermes.Linq.Extensions
                 return new PersonLinqOrderResolver().Resolve(query as IQueryable<Person>, order) as IQueryable<T>;
             if (typeof(T) == typeof(Report))
                 return new ReportLinqOrderResolver().Resolve(query as IQueryable<Report>, order) as IQueryable<T>;
-            if (typeof(T) == typeof(ReportRequest))
-                return new ReportRequestLinqOrderResolver().Resolve(query as IQueryable<ReportRequest>, order) as IQueryable<T>;
             if (typeof(T) == typeof(Organization))
                 return new OrganizationLinqOrderResolver().Resolve(query as IQueryable<Organization>, order) as IQueryable<T>;
             if (typeof(T) == typeof(Communication))
@@ -114,7 +106,8 @@ namespace Ermes.Linq.Extensions
             public IQueryable<Mission> Resolve(IQueryable<Mission> query, DTSearch search)
             {
                 var predicate = PredicateBuilder.New<Mission>(false);
-                if (search.Regex) {
+                if (search.Regex)
+                {
                     ///TBD
                     //predicate = predicate.Or(p => Regex.Match(p.Title, search.Value).Success);
                     //predicate = predicate.Or(p => Regex.Match(p.Description, search.Value).Success);
@@ -148,24 +141,7 @@ namespace Ermes.Linq.Extensions
             }
         }
 
-        private class ReportRequestLinqFilterResolver : ILinqFilterResolver<ReportRequest>
-        {
-            public IQueryable<ReportRequest> Resolve(IQueryable<ReportRequest> query, DTSearch search)
-            {
-
-                var predicate = PredicateBuilder.New<ReportRequest>(false);
-                if (search.Regex)
-                {
-                    //TBD
-                }
-                else
-                {
-                    predicate = predicate.Or(p => p.Title != null && p.Title.ToLower().Contains(search.Value));
-                }
-
-                return query.Where(predicate);
-            }
-        }
+        
 
         private class OrganizationLinqFilterResolver : ILinqFilterResolver<Organization>
         {
@@ -356,38 +332,6 @@ namespace Ermes.Linq.Extensions
             }
         }
 
-        private class ReportRequestLinqOrderResolver : ILinqOrderResolver<ReportRequest>
-        {
-            public IQueryable<ReportRequest> Resolve(IQueryable<ReportRequest> query, List<DTOrder> order)
-            {
-                bool firstOrderClause = true;
-
-                foreach (var item in order)
-                {
-                    ListSortDirection direction = item.Dir == DTOrderDir.ASC ? ListSortDirection.Ascending : ListSortDirection.Descending;
-                    switch (item.Column.ToLower())
-                    {
-                        case "duration":
-                            query = query.OrderBy(a => a.Duration.LowerBound, direction, firstOrderClause);
-                            firstOrderClause = false;
-                            break;
-                        case "title":
-                            query = query.OrderBy(a => a.Title, direction, firstOrderClause);
-                            firstOrderClause = false;
-                            break;
-                        default:
-                            break;
-                    }
-                }
-
-                // At least one order criteria is needed
-                if (firstOrderClause)
-                    query = query.OrderByDescending(a => a.Title);
-
-                return query;
-            }
-        }
-
         private class OrganizationLinqOrderResolver : ILinqOrderResolver<Organization>
         {
             public IQueryable<Organization> Resolve(IQueryable<Organization> query, List<DTOrder> order)
@@ -436,7 +380,7 @@ namespace Ermes.Linq.Extensions
                     switch (item.Column.ToLower())
                     {
                         case "surname":
-                            query = query.OrderBy(a =>a.Username, direction, firstOrderClause);
+                            query = query.OrderBy(a => a.Username, direction, firstOrderClause);
                             firstOrderClause = false;
                             break;
                         case "fusionauthuserguid":

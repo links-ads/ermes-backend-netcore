@@ -49,10 +49,6 @@ namespace Ermes.GeoJson
             var reports = ObjectMapper.Map<List<FeatureDto<GeoJsonItem>>>(_geoJsonBulkRepository.GetReports(input.StartDate, input.EndDate, boundingBox).ToList());
             retval.Features.AddRange(reports);
 
-            var reportRequests = ObjectMapper.Map<List<FeatureDto<GeoJsonItem>>>(_geoJsonBulkRepository.GetReportRequests(input.StartDate, input.EndDate, boundingBox).ToList());
-            retval.Features.AddRange(reportRequests);
-
-
             List<PersonActionActivity> personActionActivities = _geoJsonBulkRepository
                 .GetPersonActionActivities(input.StartDate, input.EndDate, boundingBox)
                 .Include(p => p.Person)

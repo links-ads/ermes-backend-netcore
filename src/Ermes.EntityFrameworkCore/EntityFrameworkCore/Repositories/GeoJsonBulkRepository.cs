@@ -1,13 +1,12 @@
 ﻿using Abp.EntityFrameworkCore;
+using Ermes.Activations;
 using Ermes.Communications;
+using Ermes.EntityFrameworkCore;
 using Ermes.Enums;
-using Ermes.GeoJson;
+using Ermes.MapRequests;
 using Ermes.Missions;
 using Ermes.Persons;
-using Ermes.ReportRequests;
 using Ermes.Reports;
-using Ermes.EntityFrameworkCore;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
 using Npgsql;
@@ -16,13 +15,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Abp;
-using Ermes.Activations;
-using Ermes.MapRequests;
-using static Ermes.Authorization.AppPermissions;
-using Ermes.Organizations;
 
 namespace Ermes.GeoJson
 {
@@ -53,13 +45,6 @@ namespace Ermes.GeoJson
             return _dbContextProvider.GetDbContext()
                 .Reports
                 .FromSqlInterpolated($"SELECT * FROM reports WHERE ST_INTERSECTS(\"Location\", {boundingBox}) and {startDate} < \"Timestamp\" and {endDate} > \"Timestamp\"");
-        }
-
-        public IQueryable<ReportRequest> GetReportRequests(DateTime startDate, DateTime endDate, Geometry boundingBox)
-        {
-            return _dbContextProvider.GetDbContext()
-                .ReportRequests
-                .FromSqlInterpolated($"SELECT * FROM reportrequests WHERE ST_INTERSECTS(\"AreaOfInterest\", {boundingBox}) and tsrange({startDate},{endDate}) && \"Duration\"");
         }
 
         public IQueryable<MapRequest> GetMapRequests(DateTime startDate, DateTime endDate, Geometry boundingBox)
@@ -235,38 +220,6 @@ namespace Ermes.GeoJson
                     from public.reports r 
                     join public.persons p on p.""Id"" = r.""CreatorUserId""
                     left join public.organizations o on o.""Id"" = p.""OrganizationId""
-                    union 
-                    select 
-                        r2.""Id"" as ""id"", 
-                        r2.""Title"" as ""details"", 
-                        to_char(lower(r2.""Duration""), 'YYYY-MM-DD""T""HH24:MI:SSZ') as ""startDate"", 
-                        to_char(upper(r2.""Duration""), 'YYYY-MM-DD""T""HH24:MI:SSZ') as ""endDate"", 
-                        lower(r2.""Duration"") as ""startDateFilter"", 
-                        upper(r2.""Duration"") as ""endDateFilter"", 
-                        'ReportRequest' as ""type"", 
-                        ST_CENTROID(r2.""AreaOfInterest"") as ""location"", 
-                        null as ""status"",
-                        o.""Id"" as ""organizationId"",
-                        o.""Name"" as ""organizationName"",
-                        o.""ParentId"" as ""organizationParentId"",
-                        null as ""extensionData"",
-                        coalesce(p.""Username"", p.""Email"") as ""creator"",
-                        null as ""statusFilter"",
-                        0 as ""activityFilter"",
-                        null as ""hazardFilter"",
-                        null as ""reportStatusFilter"",
-                        null as ""missionStatusFilter"",
-                        null as ""mapRequestHazardFilter"",
-                        null as ""mapRequestStatusFilter"",
-                        null as ""mapRequestLayerFilter"",
-                        null as ""reportContentTypeFilter"",
-                        null as ""reportIsPublicFilter"",
-                        null as ""communicationRestrictionFilter"",
-                        0 as ""teamFilter"",
-                        null as ""receivers""
-                    from public.reportrequests r2 
-                    join public.persons p on p.""Id"" = r2.""CreatorUserId""
-                    left join public.organizations o on o.""Id"" = p.""OrganizationId""
                     union
                     select 
                         mr.""Id"" as ""id"",
@@ -354,7 +307,7 @@ namespace Ermes.GeoJson
                 command.Parameters.Add(new NpgsqlParameter("@language", Language));
                 command.Parameters.Add(new NpgsqlParameter("@srid", srid));
 
-                if(BoundingBox != null)
+                if (BoundingBox != null)
                 {
                     command.CommandText += @" and ST_INTERSECTS(tmp.""location"", @boundingBox)";
                     var p = new NpgsqlParameter("@boundingBox", NpgsqlDbType.Geography)
@@ -382,7 +335,7 @@ namespace Ermes.GeoJson
                         ((tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations]) or tmp.""reportIsPublicFilter"" = 'true') and tmp.""type"" = 'Report') or
                         ((tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations])) and tmp.""type"" = 'Person') or
                         (tmp.""type"" = 'Communication' and tmp.""communicationRestrictionFilter"" = any(array[@restrictionTypes]) and (tmp.""communicationRestrictionFilter"" != 'Organization' or array[@organizations] && tmp.""receivers"" ";
-                        
+
                     //(tmp.""type"" = 'Communication' and tmp.""communicationRestrictionFilter"" = any(array[@restrictionTypes]) and (tmp.""communicationRestrictionFilter"" != 'Organization' or tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations])";
 
                     var p = new NpgsqlParameter("@organizations", NpgsqlDbType.Array | NpgsqlDbType.Integer)
@@ -391,7 +344,8 @@ namespace Ermes.GeoJson
                     };
 
                     command.Parameters.Add(p);
-                    if (parentId.HasValue) {
+                    if (parentId.HasValue)
+                    {
                         command.CommandText += @" or tmp.""organizationId"" = @organizationParentId)))";
                         var p2 = new NpgsqlParameter("@organizationParentId", NpgsqlDbType.Integer)
                         {
@@ -550,15 +504,15 @@ namespace Ermes.GeoJson
         }
 
         public string GetPersonActions(
-            DateTime startDate, 
-            DateTime endDate, 
-            int[] organizationIdList, 
-            List<ActionStatusType> statusTypes, 
-            int[] activityIds, 
-            int[] teamIds, 
-            Geometry boundingBox, 
+            DateTime startDate,
+            DateTime endDate,
+            int[] organizationIdList,
+            List<ActionStatusType> statusTypes,
+            int[] activityIds,
+            int[] teamIds,
+            Geometry boundingBox,
             string personName,
-            string search = "", 
+            string search = "",
             string language = "it"
         )
         {
@@ -699,14 +653,14 @@ namespace Ermes.GeoJson
 
         //Extended version to retrieve the receivers of a communication
         public string GetPersonActions(
-            DateTime startDate, 
-            DateTime endDate, 
-            int[] organizationIdList, 
-            List<ActionStatusType> statusTypes, 
-            int[] activityIds, 
-            Geometry boundingBox, 
-            string search = "", 
-            string language = "it", 
+            DateTime startDate,
+            DateTime endDate,
+            int[] organizationIdList,
+            List<ActionStatusType> statusTypes,
+            int[] activityIds,
+            Geometry boundingBox,
+            string search = "",
+            string language = "it",
             CommunicationScopeType scopeType = CommunicationScopeType.Restricted,
             CommunicationRestrictionType restrictionType = CommunicationRestrictionType.Organization
         )

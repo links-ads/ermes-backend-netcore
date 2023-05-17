@@ -153,8 +153,6 @@ namespace Ermes.Consumers
                         case EntityType.Mission:
                             HandleMissionMessage(eventData);
                             break;
-                        case EntityType.ReportRequest:
-                            break;
                         case EntityType.Report:
                             break;
                         case EntityType.Person:
