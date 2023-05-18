@@ -12,6 +12,7 @@ namespace Ermes.MapRequests.Dto
     {
         public int Id { get; set; }
         public string Code { get; set; }
+        public string Title { get; set; }
         public RangeDto<DateTime> Duration { get; set; }
         public PointPosition Centroid { get; set; }
         public int Frequency { get; set; }
