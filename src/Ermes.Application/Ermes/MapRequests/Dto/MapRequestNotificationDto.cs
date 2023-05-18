@@ -10,6 +10,7 @@ namespace Ermes.MapRequests.Dto
     public class MapRequestNotificationDto
     {
         public string Code { get; set; }
+        public string Title { get; set; }
         public RangeDto<DateTime> Duration { get; set; }
         public PointPosition Centroid { get; set; }
         public HazardType Hazard { get; set; }

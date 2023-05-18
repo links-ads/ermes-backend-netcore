@@ -1,6 +1,6 @@
 Ver.
 --------------------------------
-
+- Feature - Added Title prop to MapRequest (migration added)(#139)
 
 Ver. 4.8.0 - 2023-05-18
 --------------------------------

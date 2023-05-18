@@ -15,11 +15,15 @@ namespace Ermes.MapRequests
     public class MapRequest: AuditedEntity
     {
         public const int MaxCodeLength = 10;
+        public const int MaxTitleLength = 255;
         public const int MaxErrorMessageLength = 2000;
 
         [Required]
         [StringLength(MaxCodeLength)]
         public string Code { get; set; }
+
+        [StringLength(MaxTitleLength)]
+        public string Title { get; set; }
 
         public NpgsqlRange<DateTime> Duration { get; set; }
         [Required]
