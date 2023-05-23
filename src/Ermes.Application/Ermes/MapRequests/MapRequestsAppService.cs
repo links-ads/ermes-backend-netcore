@@ -3,7 +3,6 @@ using Abp.BackgroundJobs;
 using Abp.Importer;
 using Abp.Linq.Extensions;
 using Abp.UI;
-using AutoMapper;
 using Ermes.Attributes;
 using Ermes.Authorization;
 using Ermes.Dto;
@@ -15,9 +14,7 @@ using Ermes.GeoJson;
 using Ermes.Helpers;
 using Ermes.Linq.Extensions;
 using Ermes.MapRequests.Dto;
-using Ermes.Notifiers.MessageBody;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
 using NpgsqlTypes;
@@ -25,7 +22,6 @@ using NSwag.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Ermes.MapRequests
@@ -57,24 +53,39 @@ namespace Ermes.MapRequests
         }
 
         #region Private
-        private async Task<MapRequest> GetMapRequestAsync(int mapRequestId)
+        private async Task<MapRequest> GetMapRequestAsync(int mapRequestId, bool hasPermission)
         {
             var mapReq = await _mapRequestManager.GetMapRequestByIdAsync(mapRequestId);
-            return CheckMapRequestOwnership(mapReq);
+            return CheckMapRequestOwnership(mapReq, hasPermission);
         }
-        private async Task<MapRequest> GetMapRequestAsync(string  mapRequestCode)
+        private async Task<MapRequest> GetMapRequestAsync(string mapRequestCode, bool hasPermission)
         {
             var mapReq = await _mapRequestManager.GetMapRequestByCodeAsync(mapRequestCode);
-            return CheckMapRequestOwnership(mapReq);
+            return CheckMapRequestOwnership(mapReq, hasPermission);
         }
 
-        private MapRequest CheckMapRequestOwnership(MapRequest mapReq)
+        private MapRequest CheckMapRequestOwnership(MapRequest mr, bool hasPermission)
         {
-            if (mapReq == null)
-                throw new UserFriendlyException(L("InvalidEntityId", "MapRequest", mapReq.Code));
-            if (mapReq.Creator.OrganizationId != _session.LoggedUserPerson.OrganizationId && mapReq.Creator.Organization.ParentId.HasValue && mapReq.Creator.Organization.ParentId.Value != _session.LoggedUserPerson.OrganizationId)
-                throw new UserFriendlyException(L("EntityOutsideOrganization"));
-            return mapReq;
+            if (mr == null)
+                throw new UserFriendlyException(L("InvalidEntityId", "MapRequest", mr.Code));
+            if (!hasPermission)
+            {
+                //Father Org can see child contents
+                //false the contrary
+                if (
+                        mr.Creator.OrganizationId != _session.LoggedUserPerson.OrganizationId &&
+                        (
+                            !mr.Creator.Organization.ParentId.HasValue ||
+                            (
+                                mr.Creator.Organization.ParentId.HasValue &&
+                                mr.Creator.Organization.ParentId.Value != _session.LoggedUserPerson.OrganizationId
+                            )
+                        )
+                    )
+                    throw new UserFriendlyException(L("EntityOutsideOrganization"));
+            }
+
+            return mr;
         }
         private async Task<PagedResultDto<MapRequestDto>> InternalGetMapRequests(GetMapRequestsInput input, bool filterByOrganization = true)
         {
@@ -213,24 +224,9 @@ namespace Ermes.MapRequests
         )]
         public virtual async Task<GetEntityByIdOutput<MapRequestDto>> GetMapRequestById(GetEntityByIdInput<int> input)
         {
-            var mr = await GetMapRequestAsync(input.Id);
             var hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.MapRequests.MapRequest_CanSeeCrossOrganization);
-            if(!hasPermission)
-            {
-                //Father Org can see child contents
-                //false the contrary
-                if (
-                        mr.Creator.OrganizationId != _session.LoggedUserPerson.OrganizationId &&
-                        (
-                            !mr.Creator.Organization.ParentId.HasValue ||
-                            (
-                                mr.Creator.Organization.ParentId.HasValue &&
-                                mr.Creator.Organization.ParentId.Value != _session.LoggedUserPerson.OrganizationId
-                            )
-                        )
-                    )
-                    throw new UserFriendlyException(L("EntityOutsideOrganization"));
-            }
+            var mr = await GetMapRequestAsync(input.Id, hasPermission);
+
             var writer = new GeoJsonWriter();
             var res = new GetEntityByIdOutput<MapRequestDto>()
             {
@@ -256,9 +252,10 @@ namespace Ermes.MapRequests
                 throw new UserFriendlyException("InvalidInput");
 
             var deletedMapRequestCodes = await _importerMananger.DeleteMapRequests(input.MapRequestCodes);
+            var hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.MapRequests.MapRequest_CanSeeCrossOrganization);
             if (input.MapRequestCodes != null && input.MapRequestCodes.Count > 0)
-            { 
-                foreach(var mrCode in input.MapRequestCodes)
+            {
+                foreach (var mrCode in input.MapRequestCodes)
                 {
                     if (mrCode.Contains(AppConsts.Ermes_House_Partner))//Need to update MapRequests created through LINKS' dashboard
                     {
@@ -266,14 +263,14 @@ namespace Ermes.MapRequests
                         if (chunks.Length > 1)
                         {
                             string code = chunks.LastOrDefault();
-                            var mr = await GetMapRequestAsync(code);
+                            var mr = await GetMapRequestAsync(code, hasPermission);
                             await _mapRequestManager.DeleteMapRequestAsync(mr);//MR is not deleted, its status is set to Canceled
                             deletedMapRequestCodes.Add(mrCode);
                         }
                     }
                 }
             }
-            
+
             return new DeleteMapRequestOutput() { DeletedMapRequestCodes = deletedMapRequestCodes.Distinct().ToList() };
         }
 
