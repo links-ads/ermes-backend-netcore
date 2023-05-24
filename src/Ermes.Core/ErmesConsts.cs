@@ -18,6 +18,12 @@
         public const string ShelterProjectName = "SHELTER";
         public const string DefaultYear = "2020";
 
+        public class BusType
+        {
+            public const string KAFKA = "KAFKA";
+            public const string RABBITMQ = "RABBITMQ";
+        }
+
 
         public class NotificationNames
         {

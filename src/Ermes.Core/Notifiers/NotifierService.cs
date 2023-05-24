@@ -81,7 +81,7 @@ namespace Ermes.Notifiers
             {
                 for(int i= 0; i<serializedPayloads.Length; i++)
                 {
-                    await _notifierBase.SendBusNotificationAsync(NotificationNameHelper.GetBusTopicName(entityType, action, _ermesSettings.Value.ErmesProject, entityIdentifier, dataTypeIds != null ? dataTypeIds[i].ToString() : null), serializedPayloads[i]);
+                    await _notifierBase.SendBusNotificationAsync(NotificationNameHelper.GetBusTopicName(entityType, action, _busProducerSettings.Value.Type, entityIdentifier, dataTypeIds != null ? dataTypeIds[i].ToString() : null), serializedPayloads[i]);
                 }
             }
             catch (Exception ex)
