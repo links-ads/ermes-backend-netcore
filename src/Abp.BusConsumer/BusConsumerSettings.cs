@@ -2,6 +2,7 @@
 {
     public class BusConsumerSettings
     {
+        public string Type { get; set; }
         #region KAFKA
         public string ConnectionString { get; set; }
         public string GroupId { get; set; }

@@ -157,13 +157,12 @@ namespace Ermes.Web.Startup
 
             if (bool.Parse(_appConfiguration["Bus:IsEnabled"]))
             {
-                switch (_appConfiguration["App:ErmesProject"])
+                switch (_appConfiguration["Bus:Type"])
                 {
-                    case "FASTER":
+                    case ErmesConsts.BusType.KAFKA:
                         services.AddHostedService<KafkaConsumer>();
                         break;
-                    case "SHELTER":
-                    case "SAFERS":
+                    case ErmesConsts.BusType.RABBITMQ:
                         services.AddHostedService<RabbitMqConsumer>();
                         break;
                     default:

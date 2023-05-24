@@ -16,14 +16,13 @@ namespace Abp.BusProducer
             IocManager.Register<IBusConfigurationProvider, BusConfigurationProvider>();
 
             //setting to be added in app.config file in Ermes.Web project
-            string project = ConfigurationManager.AppSettings["ERMES_PROJECT"];
-            switch (project)
+            string busType = ConfigurationManager.AppSettings["BUS_TYPE"];
+            switch (busType)
             {
-                case "SHELTER":
-                case "SAFERS":
+                case "RABBITMQ":
                     IocManager.Register<IBusProducer, RabbitMqProducer>();
                     break;
-                case "FASTER":
+                case "KAFKA":
                     IocManager.Register<IBusProducer, KafkaProducer>();
                     break;
                 default:
