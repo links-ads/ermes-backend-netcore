@@ -21,6 +21,8 @@ namespace Ermes.Web.Middlewares
         public async Task Invoke(HttpContext context)
         {
             var token = context.Request.Headers["Authorization"].ToString();
+            if(token == null || token == string.Empty)
+                token = context.Request.Cookies["X-Access-Token"];
             if (token != "" && await VerifyToken(token))
             {
                 if (!context.Response.Headers.ContainsKey("Token"))
