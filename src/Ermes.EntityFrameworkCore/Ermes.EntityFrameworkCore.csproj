@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Version>1.0.0.0</Version>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -124,6 +124,8 @@
     <Compile Include="Migrations\20230517083906_ReportRequest_Table_Delete.Designer.cs" />
     <Compile Include="Migrations\20230518081330_MapRequest_Title_Added.cs" />
     <Compile Include="Migrations\20230518081330_MapRequest_Title_Added.Designer.cs" />
+    <Compile Include="Migrations\20230615125603_MapRequest_Types_Added.cs" />
+    <Compile Include="Migrations\20230615125603_MapRequest_Types_Added.Designer.cs" />
     <Compile Include="Migrations\ErmesDbContextModelSnapshot.cs" />
     <Compile Include="Migrations\Seed\ModelBuilderExtensions.cs" />
   </ItemGroup>

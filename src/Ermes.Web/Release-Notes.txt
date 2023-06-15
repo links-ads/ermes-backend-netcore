@@ -1,6 +1,7 @@
 Ver.
 --------------------------------
 - Feature - Bus configuration based on settings and not on project name (app.config and appsettings to be updated)
+- Feature - Map request type management added (migration added)(#143)
 
 Ver. 4.9.1 - 2023-05-23
 --------------------------------

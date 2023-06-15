@@ -52,6 +52,8 @@ namespace Abp.BusConsumer.RabbitMq
 
             //Create the binding if not present
             _channel.QueueBind(q.QueueName, _busConfigurationProvider.GetExchange(), "status.brn.*.links.*");
+            _channel.QueueBind(q.QueueName, _busConfigurationProvider.GetExchange(), "status.propagator.*.links.#");
+            _channel.QueueBind(q.QueueName, _busConfigurationProvider.GetExchange(), "status.pwm.*.links.#");
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -77,7 +79,7 @@ namespace Abp.BusConsumer.RabbitMq
             {
                 //Check on routing key should not be necessary
                 //The queue should be binded to a single routing key
-                if (result.RoutingKey.Contains("status.brn"))
+                if (result.RoutingKey.Contains("status."))
                 {
                     Logger.LogDebug("---------------- RabbitMQ Consumer: new message received");
                     var body = result.Body.ToArray();

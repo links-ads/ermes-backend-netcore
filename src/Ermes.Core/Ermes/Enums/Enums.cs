@@ -307,6 +307,14 @@ namespace Ermes.Enums
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
+    public enum MapRequestType
+    {
+        FireAndBurnedArea,
+        PostEventMonitoring,
+        WildfireSimulation
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum ReportContentType
     {
         Submitted = 0,

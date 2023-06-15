@@ -11,7 +11,7 @@ namespace Ermes.Layers
 {
     public class LayerManager: DomainService
     {
-        public IQueryable<Layer> Layers { get { return LayerRepository.GetAllIncluding(l => l.Translations); } }
+        public IQueryable<Layer> Layers { get { return LayerRepository.GetAllIncluding(l => l.Translations).Where(l => l.IsActive); } }
         protected IRepository<Layer> LayerRepository { get; set; }
         public IQueryable<LayerTranslation> LayersTranslation { get { return LayerTranslationRepository.GetAllIncluding(ct => ct.Core); } }
         protected IRepository<LayerTranslation> LayerTranslationRepository { get; set; }

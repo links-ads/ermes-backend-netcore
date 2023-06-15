@@ -13,8 +13,7 @@ namespace Ermes.MapRequests.Dto
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public List<MapRequestStatusType> Status { get; set; }
-        public List<LayerType> Layers { get; set; }
-        public List<HazardType> Hazards { get; set; }
+        public List<MapRequestType> Types { get; set; }
         public PointPosition NorthEastBoundary { get; set; }
         public PointPosition SouthWestBoundary { get; set; }
     }
