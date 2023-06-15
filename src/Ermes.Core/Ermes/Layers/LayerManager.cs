@@ -32,10 +32,10 @@ namespace Ermes.Layers
             return await query.ToListAsync();
         }
 
-        public async Task<Layer> GetLayerByDataTypeIdAsync(int dataTypeId, bool includeInactive = false)
+        public async Task<Layer> GetLayerByDataTypeIdAsync(int dataTypeId, bool excludeInactive = false)
         {
             var query = AllLayers;
-            if (includeInactive)
+            if (excludeInactive)
                 query.Where(l => l.IsActive);
             return await query.SingleOrDefaultAsync(l => l.DataTypeId == dataTypeId);
         }
