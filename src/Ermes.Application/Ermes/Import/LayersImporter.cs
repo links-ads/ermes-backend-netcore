@@ -45,7 +45,7 @@ namespace Ermes.Import
 
                     foreach (IErmesRow row in sheet.Rows)
                     {
-                        Layer layer = await layerManager.GetLayerByDataTypeIdAsync(row.GetInt("DataTypeId").Value, true);
+                        Layer layer = await layerManager.GetLayerByDataTypeIdAsync(row.GetInt("DataTypeId").Value);
 
                         if (layer != null)
                             result.ElementsUpdated++;
@@ -77,7 +77,7 @@ namespace Ermes.Import
 
                     foreach (IErmesRow row in sheet.Rows)
                     {
-                        Layer parent = await layerManager.GetLayerByDataTypeIdAsync(row.GetInt("DataTypeId").Value, true);
+                        Layer parent = await layerManager.GetLayerByDataTypeIdAsync(row.GetInt("DataTypeId").Value);
 
                         if (parent == null)
                             throw new UserFriendlyException(localizer.L("UnexistentEntities", "Layer", row.GetInt("DataTypeId").Value));
