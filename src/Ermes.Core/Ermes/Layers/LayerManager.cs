@@ -12,6 +12,7 @@ namespace Ermes.Layers
     public class LayerManager: DomainService
     {
         public IQueryable<Layer> Layers { get { return LayerRepository.GetAllIncluding(l => l.Translations).Where(l => l.IsActive); } }
+        public IQueryable<Layer> AllLayers { get { return LayerRepository.GetAllIncluding(l => l.Translations); } }
         protected IRepository<Layer> LayerRepository { get; set; }
         public IQueryable<LayerTranslation> LayersTranslation { get { return LayerTranslationRepository.GetAllIncluding(ct => ct.Core); } }
         protected IRepository<LayerTranslation> LayerTranslationRepository { get; set; }
@@ -31,9 +32,12 @@ namespace Ermes.Layers
             return await query.ToListAsync();
         }
 
-        public async Task<Layer> GetLayerByDataTypeIdAsync(int dataTypeId)
+        public async Task<Layer> GetLayerByDataTypeIdAsync(int dataTypeId, bool includeInactive = false)
         {
-            return await Layers.SingleOrDefaultAsync(l => l.DataTypeId == dataTypeId);
+            var query = AllLayers;
+            if (includeInactive)
+                query.Where(l => l.IsActive);
+            return await query.SingleOrDefaultAsync(l => l.DataTypeId == dataTypeId);
         }
 
         public async Task InsertOrUpdateLayerAsync(Layer layer)
