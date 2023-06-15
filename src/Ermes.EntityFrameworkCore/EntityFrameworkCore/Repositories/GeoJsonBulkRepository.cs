@@ -100,9 +100,8 @@ namespace Ermes.GeoJson
             List<HazardType> hazardTypes,
             List<GeneralStatus> reportStatusTypes,
             List<MissionStatusType> missionStatusTypes,
-            List<HazardType> mapRequestHazardTypes,
-            List<LayerType> mapRequestLayerTypes,
             List<MapRequestStatusType> mapRequestStatusTypes,
+            List<MapRequestType> mapRequestTypes,
             VisibilityType visibilityType,
             List<ReportContentType> reportContentTypes,
             List<CommunicationRestrictionType> communicationRestrictionTypes,
@@ -141,9 +140,8 @@ namespace Ermes.GeoJson
                         null as ""hazardFilter"",
                         null as ""reportStatusFilter"",
                         m.""CurrentStatus"" as ""missionStatusFilter"",
-                        null as ""mapRequestHazardFilter"",
                         null as ""mapRequestStatusFilter"",
-                        null as ""mapRequestLayerFilter"",
+                        null as ""mapRequestTypeFilter"",
                         null as ""reportContentTypeFilter"",
                         null as ""reportIsPublicFilter"",
                         null as ""communicationRestrictionFilter"",
@@ -173,9 +171,8 @@ namespace Ermes.GeoJson
                         null as ""hazardFilter"",
                         null as ""reportStatusFilter"",
                         null as ""missionStatusFilter"",
-                        null as ""mapRequestHazardFilter"",
                         null as ""mapRequestStatusFilter"",
-                        null as ""mapRequestLayerFilter"",
+                        null as ""mapRequestTypeFilter"",
                         null as ""reportContentTypeFilter"",
                         null as ""reportIsPublicFilter"",
                         c.""Restriction"" as ""communicationRestrictionFilter"",
@@ -209,9 +206,8 @@ namespace Ermes.GeoJson
                         r.""Hazard"" as ""hazardFilter"",
                         r.""Status"" as ""reportStatusFilter"",
                         null as ""missionStatusFilter"",
-                        null as ""mapRequestHazardFilter"",
                         null as ""mapRequestStatusFilter"",
-                        null as ""mapRequestLayerFilter"",
+                        null as ""mapRequestTypeFilter"",
                         r.""ContentType"" as ""reportContentTypeFilter"",
                         r.""IsPublic""::text as ""reportIsPublicFilter"",
                         null as ""communicationRestrictionFilter"",
@@ -241,9 +237,8 @@ namespace Ermes.GeoJson
                         null as ""hazardFilter"",
                         null as ""reportStatusFilter"",
                         null as ""missionStatusFilter"",
-                        mr.""Hazard"" as ""mapRequestHazardFilter"",
                         mr.""Status"" as ""mapRequestStatusFilter"",
-                        mr.""Layer"" as ""mapRequestLayerFilter"",
+                        mr.""Type"" as ""mapRequestTypeFilter"",
                         null as ""reportContentTypeFilter"",
                         null as ""reportIsPublicFilter"",
                         null as ""communicationRestrictionFilter"",
@@ -273,9 +268,8 @@ namespace Ermes.GeoJson
                         null as ""hazardFilter"",
                         null as ""reportStatusFilter"",
                         null as ""missionStatusFilter"",
-                        null as ""mapRequestHazardFilter"",
                         null as ""mapRequestStatusFilter"",
-                        null as ""mapRequestLayerFilter"",
+                        null as ""mapRequestTypeFilter"",
                         null as ""reportContentTypeFilter"",
                         null as ""reportIsPublicFilter"",
                         null as ""communicationRestrictionFilter"",
@@ -439,22 +433,12 @@ namespace Ermes.GeoJson
                     command.Parameters.Add(p);
                 }
 
-                if (mapRequestHazardTypes != null && mapRequestHazardTypes.Count > 0)
+                if (mapRequestTypes != null && mapRequestTypes.Count > 0)
                 {
-                    command.CommandText += @" and (tmp.""mapRequestHazardFilter"" is null or tmp.""mapRequestHazardFilter"" = any(array[@mapRequestHazardTypes]))";
-                    var p = new NpgsqlParameter("@mapRequestHazardTypes", NpgsqlDbType.Array | NpgsqlDbType.Text)
+                    command.CommandText += @" and (tmp.""mapRequestTypeFilter"" is null or tmp.""mapRequestTypeFilter"" = any(array[@mapRequestTypes]))";
+                    var p = new NpgsqlParameter("@mapRequestTypes", NpgsqlDbType.Array | NpgsqlDbType.Text)
                     {
-                        Value = mapRequestHazardTypes.Select(a => a.ToString()).ToArray()
-                    };
-                    command.Parameters.Add(p);
-                }
-
-                if (mapRequestLayerTypes != null && mapRequestLayerTypes.Count > 0)
-                {
-                    command.CommandText += @" and (tmp.""mapRequestLayerFilter"" is null or tmp.""mapRequestLayerFilter"" = any(array[@mapRequestLayerTypes]))";
-                    var p = new NpgsqlParameter("@mapRequestLayerTypes", NpgsqlDbType.Array | NpgsqlDbType.Text)
-                    {
-                        Value = mapRequestLayerTypes.Select(a => a.ToString()).ToArray()
+                        Value = mapRequestTypes.Select(a => a.ToString()).ToArray()
                     };
                     command.Parameters.Add(p);
                 }

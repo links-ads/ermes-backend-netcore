@@ -23,11 +23,13 @@ using Ermes.Import.Dto;
 using Ermes.Layers;
 using Ermes.Layers.Dto;
 using Ermes.Logging.Dto;
+using Ermes.MapRequests;
 using Ermes.MapRequests.Dto;
 using Ermes.Missions;
 using Ermes.Missions.Dto;
 using Ermes.Notifications;
 using Ermes.Notifications.Dto;
+using Ermes.Notifiers.MessageBody;
 using Ermes.Organizations;
 using Ermes.Organizations.Dto;
 using Ermes.Permissions;
@@ -242,6 +244,14 @@ namespace Ermes
                 .ForMember(dto => dto.Username, options => options.MapFrom(b => b.Username))
                 .ForMember(dto => dto.Email, options => options.MapFrom(b => b.Email))
                 .ForMember(dto => dto.Points, options => options.MapFrom(b => b.Points));
+
+            configuration.CreateMap<MapRequestBody, MapRequestFireAndBurnedAreaBody>();
+            configuration.CreateMap<MapRequestBody, MapRequestPostEventMonitoringBody>();
+            configuration.CreateMap<MapRequestBody, MapRequestWildFireSimulationBody>();
+            configuration.CreateMap<BoundaryCondition, BoundaryConditionBody>()
+                .ForMember(dto => dto.w_dir, options => options.MapFrom(b => b.WindDirection))
+                .ForMember(dto => dto.w_speed, options => options.MapFrom(b => b.WindSpeed));
+                
 
             #region GeoJsons
             configuration.CreateMap<Communication, FeatureDto<GeoJsonItem>>()

@@ -9,7 +9,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Ermes.Layers
 {
     [Table("layers")]
-    public class Layer: Entity, IMultiLingualEntity<LayerTranslation>
+    public class Layer: Entity, IPassivable, IMultiLingualEntity<LayerTranslation>
     {
         public const int MaxGroupLength = 255;
         public const int MaxPartnerNameLength = 100;
@@ -27,15 +27,6 @@ namespace Ermes.Layers
 
         [StringLength(MaxPartnerNameLength)]
         public string PartnerName { get; set; }
-
-        [Column("Type")]
-        public string TypeString
-        {
-            get { return Type.ToString(); }
-            private set { Type = value.ParseEnum<LayerType>(); }
-        }
-        [NotMapped]
-        public LayerType Type { get; set; }
 
         public bool CanBeVisualized { get; set; }
         [Column("Format")]
@@ -72,6 +63,6 @@ namespace Ermes.Layers
         public int? ParentDataTypeId { get; set; }
 
         public virtual ICollection<Layer> AssociatedLayers { get; set; }
-
+        public bool IsActive { get; set; }
     }
 }

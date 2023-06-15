@@ -19,8 +19,7 @@ namespace Ermes.GeoJson.Dto
         public List<HazardType> HazardTypes { get; set; }
         public List<GeneralStatus> ReportStatusTypes { get; set; }
         public List<MissionStatusType> MissionStatusTypes { get; set; }
-        public List<HazardType> MapRequestHazardTypes { get; set; }
-        public List<LayerType> MapRequestLayerTypes { get; set; }
+        public List<MapRequestType> MapRequestTypes { get; set; }
         public List<MapRequestStatusType> MapRequestStatusTypes { get; set; }
         public List<int> ActivityIds { get; set; }
         public List<int> TeamIds { get; set; }

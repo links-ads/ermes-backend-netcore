@@ -114,16 +114,10 @@ namespace Ermes.MapRequests
             else
                 query = query.Where(a => a.StatusString != MapRequestStatusType.Canceled.ToString());
 
-            if (input.Layers != null && input.Layers.Count > 0)
+            if (input.Types != null && input.Types.Count > 0)
             {
-                var list = input.Layers.Select(a => a.ToString()).ToList();
-                query = query.Where(a => list.Contains(a.LayerString));
-            }
-
-            if (input.Hazards != null && input.Hazards.Count > 0)
-            {
-                var list = input.Hazards.Select(a => a.ToString()).ToList();
-                query = query.Where(a => list.Contains(a.HazardString));
+                var list = input.Types.Select(a => a.ToString()).ToList();
+                query = query.Where(a => list.Contains(a.TypeString));
             }
 
             query = query.DTFilterBy(input);

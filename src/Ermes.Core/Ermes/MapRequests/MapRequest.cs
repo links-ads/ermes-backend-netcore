@@ -14,15 +14,16 @@ namespace Ermes.MapRequests
     [Table("map_requests")]
     public class MapRequest: AuditedEntity
     {
-        public const int MaxCodeLength = 10;
-        public const int MaxTitleLength = 255;
-        public const int MaxErrorMessageLength = 2000;
+        public const int MAX_CODE_LENGTH = 10;
+        public const int MAX_TITLE_LENGTH = 255;
+        public const int MAX_ERROR_MESSAGE_LENGTH = 2000;
+        public const int MAX_DESCRIPTION_LENGTH = 1000;
 
         [Required]
-        [StringLength(MaxCodeLength)]
+        [StringLength(MAX_CODE_LENGTH)]
         public string Code { get; set; }
 
-        [StringLength(MaxTitleLength)]
+        [StringLength(MAX_TITLE_LENGTH)]
         public string Title { get; set; }
 
         public NpgsqlRange<DateTime> Duration { get; set; }
@@ -30,24 +31,6 @@ namespace Ermes.MapRequests
         [Column(TypeName = "geography")]
         public Geometry AreaOfInterest { get; set; }
 
-        [Column("Hazard")]
-        public string HazardString
-        {
-            get { return Hazard.ToString(); }
-            private set { Hazard = value.ParseEnum<HazardType>(); }
-        }
-        [NotMapped]
-        public HazardType Hazard { get; set; }
-
-        [Column("Layer")]
-        public string LayerString
-        {
-            get { return Layer.ToString(); }
-            private set { Layer = value.ParseEnum<LayerType>(); }
-        }
-        [NotMapped]
-        public LayerType Layer { get; set; }
-        public int Frequency { get; set; }
 
         [Column("Status")]
         public string StatusString
@@ -58,18 +41,17 @@ namespace Ermes.MapRequests
         [NotMapped]
         public MapRequestStatusType Status { get; set; }
 
-        [StringLength(MaxErrorMessageLength)]
+        [StringLength(MAX_ERROR_MESSAGE_LENGTH)]
         public string ErrorMessage { get; set; }
 
         [ForeignKey("CreatorUserId")]
         public virtual Person Creator { get; set; }
 
-        /// <summary>
-        /// Number of meters per pixel
-        /// </summary>
-        public int Resolution { get; set; } = 10;
-
         public virtual ICollection<MapRequestLayer> MapRequestLayers { get; set; }
+
+
+        public int Resolution { get; set; } = 10;
+        public int Frequency { get; set; }
 
         [NotMapped]
         public int ExpectedUpdates
@@ -79,5 +61,38 @@ namespace Ermes.MapRequests
                 return Frequency > 0 ? (int)(Duration.UpperBound - Duration.LowerBound).TotalDays / Frequency : 1;
             }
         }
+
+        [Column("Type")]
+        public string TypeString
+        {
+            get { return Type.ToString(); }
+            private set { Type = value.ParseEnum<MapRequestType>(); }
+        }
+        [NotMapped]
+        public MapRequestType Type { get; set; }
+
+        [StringLength(MAX_DESCRIPTION_LENGTH)]
+        public string Description { get; set; }
+        /// <summary>
+        /// Whether to activate spotting or not
+        /// </summary>
+        public bool DoSpotting { get; set; }
+
+        /// <summary>
+        /// Express for each pixel the probability of the fire to reach
+        /// that specific point in the given time step.
+        /// </summary>
+        public decimal ProbabilityRange { get; set; }
+
+        /// <summary>
+        /// Simulation time limit
+        /// </summary>
+        public int TimeLimit { get; set; }
+
+        /// <summary>
+        /// List of boundary conditions
+        /// </summary>
+        [Column(TypeName = "jsonb")]
+        public List<BoundaryCondition> BoundaryConditions { get; set; }
     }
 }
