@@ -27,8 +27,6 @@ namespace Ermes.Notifiers.MessageBody
 
     public class MapRequestWildFireSimulationBody : MapRequestBody
     {
-        public int resolution { get; set; }
-        public int frequency { get; set; }
         public string description { get; set; }
         public bool do_spotting { get; set; }
         public decimal probabilityRange { get; set; }
@@ -41,6 +39,7 @@ namespace Ermes.Notifiers.MessageBody
         public int w_dir { get; set; }
         public int w_speed { get; set; }
         public int moisture { get; set; }
+        public Dictionary<string, string> fireBreak { get; set; }
     }
 
 }

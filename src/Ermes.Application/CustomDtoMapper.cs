@@ -245,9 +245,15 @@ namespace Ermes
                 .ForMember(dto => dto.Email, options => options.MapFrom(b => b.Email))
                 .ForMember(dto => dto.Points, options => options.MapFrom(b => b.Points));
 
-            configuration.CreateMap<MapRequestBody, MapRequestFireAndBurnedAreaBody>();
-            configuration.CreateMap<MapRequestBody, MapRequestPostEventMonitoringBody>();
-            configuration.CreateMap<MapRequestBody, MapRequestWildFireSimulationBody>();
+            configuration.CreateMap<MapRequestBody, MapRequestFireAndBurnedAreaBody>()
+                .ForMember(dto => dto.start, options => options.MapFrom(b => b.start.ToUniversalTime()))
+                .ForMember(dto => dto.end, options => options.MapFrom(b => b.end.ToUniversalTime()));
+            configuration.CreateMap<MapRequestBody, MapRequestPostEventMonitoringBody>()
+                .ForMember(dto => dto.start, options => options.MapFrom(b => b.start.ToUniversalTime()))
+                .ForMember(dto => dto.end, options => options.MapFrom(b => b.end.ToUniversalTime()));
+            configuration.CreateMap<MapRequestBody, MapRequestWildFireSimulationBody>()
+                .ForMember(dto => dto.start, options => options.MapFrom(b => b.start.ToUniversalTime()))
+                .ForMember(dto => dto.end, options => options.MapFrom(b => b.end.ToUniversalTime()));
             configuration.CreateMap<BoundaryCondition, BoundaryConditionBody>()
                 .ForMember(dto => dto.w_dir, options => options.MapFrom(b => b.WindDirection))
                 .ForMember(dto => dto.w_speed, options => options.MapFrom(b => b.WindSpeed));
