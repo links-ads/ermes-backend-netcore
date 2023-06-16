@@ -76,7 +76,6 @@ namespace Ermes.Notifiers
                 }
             }
             string failureMessage = null;
-
             try
             {
                 for(int i= 0; i<serializedPayloads.Length; i++)

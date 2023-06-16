@@ -59,8 +59,6 @@ namespace Ermes.Notifiers
                                 break;
                             case MapRequestType.WildfireSimulation:
                                 var typedBody2 = ObjectMapper.Map<MapRequestWildFireSimulationBody>(body);
-                                typedBody2.frequency = mr.Frequency;
-                                typedBody2.resolution = mr.Resolution;
                                 typedBody2.description = mr.Description;
                                 typedBody2.do_spotting = mr.DoSpotting;
                                 typedBody2.time_limit = mr.TimeLimit;

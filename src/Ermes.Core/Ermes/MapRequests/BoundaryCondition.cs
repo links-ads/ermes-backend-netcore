@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ermes.MapRequests
 {
@@ -22,6 +24,12 @@ namespace Ermes.MapRequests
         /// </summary>
         [Range(0, 100)]
         public int Moisture { get; set; }
+
+        /// <summary>
+        /// Key is one of the value contained in FireBreakType enum
+        /// Value is a LINESTRING
+        /// </summary>
+        public Dictionary<string,string> FireBreak { get; set; }
 
     }
 }

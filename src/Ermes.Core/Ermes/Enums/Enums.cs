@@ -420,4 +420,14 @@ namespace Ermes.Enums
         Citizen,
         Professional
     }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum FireBreakType
+    {
+        Canadair,
+        Helicopter,
+        WaterLine,
+        Vehicle
+
+    }
 }
