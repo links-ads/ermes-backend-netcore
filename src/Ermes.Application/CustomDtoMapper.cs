@@ -6,11 +6,14 @@ using Ermes.Actions.Dto;
 using Ermes.Activations;
 using Ermes.Activities;
 using Ermes.Activities.Dto;
+using Ermes.Alerts;
+using Ermes.Alerts.Dto;
 using Ermes.Answers;
 using Ermes.Auth.Dto;
 using Ermes.Categories;
 using Ermes.Communications;
 using Ermes.Communications.Dto;
+using Ermes.Consumers.RabbitMq;
 using Ermes.Dashboard.Dto;
 using Ermes.Dto.Spatial;
 using Ermes.EntityHistory;
@@ -257,7 +260,17 @@ namespace Ermes
             configuration.CreateMap<BoundaryCondition, BoundaryConditionBody>()
                 .ForMember(dto => dto.w_dir, options => options.MapFrom(b => b.WindDirection))
                 .ForMember(dto => dto.w_speed, options => options.MapFrom(b => b.WindSpeed));
-                
+
+            configuration.CreateMap<Alert, AlertDto>();
+            configuration.CreateMap<Alert, RabbitMqAlert>()
+                .ReverseMap()
+                .ForMember(a => a.Info, options => options.Ignore())
+                .ForMember(a => a.AreaOfInterest, options => options.Ignore());
+            configuration.CreateMap<CapInfo, CapInfoDto>();
+            configuration.CreateMap<CapInfo, RabbitMqAlertInfo>()
+                .ReverseMap();
+            configuration.CreateMap<CapArea, CapAreaDto>();
+            configuration.CreateMap<CapArea, RabbitMqAlertArea>().ReverseMap();
 
             #region GeoJsons
             configuration.CreateMap<Communication, FeatureDto<GeoJsonItem>>()

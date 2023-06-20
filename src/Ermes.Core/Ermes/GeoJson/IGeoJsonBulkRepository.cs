@@ -1,5 +1,6 @@
 ﻿using Abp.Domain.Repositories;
 using Ermes.Activations;
+using Ermes.Alerts;
 using Ermes.Communications;
 using Ermes.Enums;
 using Ermes.MapRequests;
@@ -74,5 +75,6 @@ namespace Ermes.GeoJson
         );
 
         public List<Activation> GetPersonActivations(DateTime StartDate, DateTime EndDate, ActionStatusType statusType);
+        public IQueryable<Alert> GetAlerts(DateTime startDate, DateTime endDate, Geometry boundingBox);
     }
 }

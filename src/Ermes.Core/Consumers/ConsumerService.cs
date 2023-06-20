@@ -1,10 +1,12 @@
 ﻿using Abp.Domain.Uow;
 using Abp.Threading;
+using Ermes.Alerts;
 using Ermes.Consumers.Kafka;
 using Ermes.Consumers.RabbitMq;
 using Ermes.Enums;
 using Ermes.MapRequests;
 using Ermes.Missions;
+using Ermes.Notifications;
 using Ermes.Notifiers;
 using Ermes.Persons;
 using Newtonsoft.Json;
@@ -21,25 +23,32 @@ namespace Ermes.Consumers
         private readonly PersonManager _personManager;
         private readonly NotifierService _notifierService;
         private readonly MapRequestManager _mapRequestManager;
+        private readonly NotificationManager _notificationManager;
+        private readonly AlertManager _alertManager;
+        
 
         public ConsumerService(
             MissionManager missionManager, 
             NotifierService notifierService,
             PersonManager personManager,
-            MapRequestManager mapRequestManager)
+            MapRequestManager mapRequestManager,
+            NotificationManager notificationManager,
+            AlertManager alertManager)
         {
             _missionManager = missionManager;
             _notifierService = notifierService;
             _personManager = personManager;
             _mapRequestManager = mapRequestManager;
+            _notificationManager = notificationManager;
+            _alertManager = alertManager;
         }
 
         public void ConsumeBusNotification(string message, string routingKey)
         {
+            _notificationManager.InsertNotificationReceived(new NotificationReceived(routingKey, message));
             //Consume the message based on routing key prop
             //Kafka bus does not use routingKey, while for RabbitMq it is a mandatory field
             if (routingKey != "")
-                //TODO: to be generalized, only map request status update is managed
                 ConsumeRabbitMqNotification(message, routingKey);
             else
                 ConsumeKafkaNotification(message);
@@ -50,9 +59,19 @@ namespace Ermes.Consumers
         {
             try
             {
-                var eventData = JsonConvert.DeserializeObject<RabbitMqResponse>(message);
-                eventData.request_code = routingKey.Split('.')[^1];
-                HandleMapRequestStatusChange(eventData);
+                if (routingKey.Contains("status"))
+                {
+                    var eventData = JsonConvert.DeserializeObject<RabbitMqResponse>(message);
+                    eventData.request_code = routingKey.Split('.')[^1];
+                    HandleMapRequestStatusChange(eventData);
+                }
+                else if(routingKey.Contains("notification") || routingKey.Contains("alert"))
+                {
+                    var eventData = JsonConvert.DeserializeObject<RabbitMqAlert>(message);
+                    HandleAlertMessage(eventData);
+                }
+                else
+                    Console.WriteLine("No management for messages with routing key: " + routingKey);
             }
             catch (Exception e)
             {
@@ -130,6 +149,48 @@ namespace Ermes.Consumers
                 catch (Exception e)
                 {
                     Logger.ErrorFormat("HandleMapRequestStatusChange exception: {0}", e.Message);
+                }
+
+                unitOfWork.Complete();
+            }
+        }
+
+        [UnitOfWork(IsDisabled = true)]
+        private void HandleAlertMessage(RabbitMqAlert eventData)
+        {
+            using (var unitOfWork = UnitOfWorkManager.Begin(new UnitOfWorkOptions
+            {
+                IsolationLevel = IsolationLevel.ReadCommitted,
+                IsTransactional = true,
+                Timeout = TimeSpan.FromMinutes(30),
+                FilterOverrides =
+                        {
+                            new DataFilterConfiguration(AbpDataFilters.MayHaveTenant,false),
+                            new DataFilterConfiguration(AbpDataFilters.MustHaveTenant, false)
+                        }
+            }))
+            {
+                try
+                {
+                    var alert = ObjectMapper.Map<Alert>(eventData);
+                    alert.AreaOfInterest = eventData.Info.First().Area.First().FullGeometry;
+                    alert.IsARecommendation = true;
+                    alert.Id = _alertManager.InsertAlertAndGetId(alert);
+                    CurrentUnitOfWork.SaveChanges();
+
+                    foreach (var item in eventData.Info)
+                    {
+                        var info = ObjectMapper.Map<CapInfo>(item);
+                        info.AlertId = alert.Id;
+                        _alertManager.InsertCapInfoAndGetId(info);
+                    }
+
+                    
+                    CurrentUnitOfWork.SaveChanges();
+                }
+                catch (Exception e)
+                {
+                    Logger.ErrorFormat("HandleAlertMessage exception: {0}", e.Message);
                 }
 
                 unitOfWork.Complete();

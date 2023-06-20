@@ -1,6 +1,7 @@
 ﻿using Abp.EntityFrameworkCore;
 using Abp.UI;
 using Ermes.Activities;
+using Ermes.Alerts;
 using Ermes.Answers;
 using Ermes.Categories;
 using Ermes.Communications;
@@ -53,6 +54,7 @@ namespace Ermes.EntityFrameworkCore
         public virtual DbSet<ReportValidation> ReportValidations { get; set; }
         public virtual DbSet<Communication> Communications { get; set; }
         public virtual DbSet<Notification> Notifications { get; set; }
+        public virtual DbSet<NotificationReceived> NotificationsReceived { get; set; }
         public virtual DbSet<Preference> Preferences { get; set; }
         public virtual DbSet<Team> Teams { get; set; }
         public virtual DbSet<SplitEntityChange> EntityChange { get; set; }
@@ -81,6 +83,8 @@ namespace Ermes.EntityFrameworkCore
         public virtual DbSet<Gamification.Barrier> Barriers { get; set; }
         public virtual DbSet<MapRequestLayer> MapRequestLayers { get; set; }
         public virtual DbSet<CommunicationReceiver> CommunicationReceivers { get; set; }
+        public virtual DbSet<Alert> Alerts { get; set; }
+        public virtual DbSet<CapInfo> CapInfoList { get; set; }
 
         public IEntityHistoryHelper EntityHistoryHelper { get; set; }
 
@@ -282,6 +286,14 @@ namespace Ermes.EntityFrameworkCore
                 .WithMany(r => r.Validations)
                 .HasPrincipalKey(r => r.Id)
                 .HasForeignKey(rv => rv.ReportId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CapInfo>()
+                .HasOne<Alert>(ci => ci.Alert)
+                .WithMany(a => a.Info)
+                .HasPrincipalKey(a => a.Id)
+                .HasForeignKey(ci => ci.AlertId)
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
 
