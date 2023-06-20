@@ -2,7 +2,6 @@
 using Ermes.Dto;
 using Ermes.Dto.Spatial;
 using Ermes.Enums;
-using Ermes.Organizations.Dto;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;

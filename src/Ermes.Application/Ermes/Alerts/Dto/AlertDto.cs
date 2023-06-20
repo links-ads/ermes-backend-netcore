@@ -1,13 +1,15 @@
-﻿using Ermes.Dto.Spatial;
+﻿using Abp.Application.Services.Dto;
+using Ermes.Dto.Spatial;
 using Ermes.Enums;
 using System;
 using System.Collections.Generic;
 
 namespace Ermes.Alerts.Dto
 {
-    public class AlertDto
+    public class AlertDto: EntityDto
     {
         public string Identifier { get; set; }
+        public string Type { get; } = "Alert";
         public string Sender { get; set; }
         public DateTime Sent { get; set; }
         public CapStatusType Status { get; set; }
