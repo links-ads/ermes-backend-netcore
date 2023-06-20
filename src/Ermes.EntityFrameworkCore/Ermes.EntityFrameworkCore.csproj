@@ -126,6 +126,8 @@
     <Compile Include="Migrations\20230518081330_MapRequest_Title_Added.Designer.cs" />
     <Compile Include="Migrations\20230615125603_MapRequest_Types_Added.cs" />
     <Compile Include="Migrations\20230615125603_MapRequest_Types_Added.Designer.cs" />
+    <Compile Include="Migrations\20230620084652_Alerts_And_NotificationReceived_Added.cs" />
+    <Compile Include="Migrations\20230620084652_Alerts_And_NotificationReceived_Added.Designer.cs" />
     <Compile Include="Migrations\ErmesDbContextModelSnapshot.cs" />
     <Compile Include="Migrations\Seed\ModelBuilderExtensions.cs" />
   </ItemGroup>

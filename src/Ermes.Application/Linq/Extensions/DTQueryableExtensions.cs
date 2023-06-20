@@ -1,4 +1,5 @@
 ﻿using Abp.Linq.Expressions;
+using Ermes.Alerts;
 using Ermes.Communications;
 using Ermes.Dto.Datatable;
 using Ermes.MapRequests;
@@ -60,6 +61,8 @@ namespace Ermes.Linq.Extensions
                 return new NotificationLinqFilterResolver().Resolve(query as IQueryable<Notification>, search) as IQueryable<T>;
             if (typeof(T) == typeof(MapRequest))
                 return new MapRequestLinqFilterResolver().Resolve(query as IQueryable<MapRequest>, search) as IQueryable<T>;
+            if (typeof(T) == typeof(Alert))
+                return new AlertLinqFilterResolver().Resolve(query as IQueryable<Alert>, search) as IQueryable<T>;
 
             return query;
         }
@@ -81,6 +84,8 @@ namespace Ermes.Linq.Extensions
                 return new NotificationLinqOrderResolver().Resolve(query as IQueryable<Notification>, order) as IQueryable<T>;
             if (typeof(T) == typeof(MapRequest))
                 return new MapRequestLinqOrderResolver().Resolve(query as IQueryable<MapRequest>, order) as IQueryable<T>;
+            if (typeof(T) == typeof(Alert))
+                return new AlertLinqOrderResolver().Resolve(query as IQueryable<Alert>, order) as IQueryable<T>;
 
             return query;
         }
@@ -247,6 +252,25 @@ namespace Ermes.Linq.Extensions
 
                 return query.Where(predicate);
 
+            }
+        }
+
+        private class AlertLinqFilterResolver : ILinqFilterResolver<Alert>
+        {
+            public IQueryable<Alert> Resolve(IQueryable<Alert> query, DTSearch search)
+            {
+
+                var predicate = PredicateBuilder.New<Alert>(false);
+                if (search.Regex)
+                {
+                    //TBD
+                }
+                else
+                {
+                    predicate = predicate.Or(p => p.Source != null && p.Source.ToLower().Contains(search.Value));
+                }
+
+                return query.Where(predicate);
             }
         }
 
@@ -505,6 +529,46 @@ namespace Ermes.Linq.Extensions
                 // At least one order criteria is needed
                 if (firstOrderClause)
                     query = query.OrderBy(a => a.Duration.LowerBound);
+
+                return query;
+            }
+        }
+
+        private class AlertLinqOrderResolver : ILinqOrderResolver<Alert>
+        {
+            public IQueryable<Alert> Resolve(IQueryable<Alert> query, List<DTOrder> order)
+            {
+                bool firstOrderClause = true;
+
+                foreach (var item in order)
+                {
+                    ListSortDirection direction = item.Dir == DTOrderDir.ASC ? ListSortDirection.Ascending : ListSortDirection.Descending;
+                    switch (item.Column.ToLower())
+                    {
+                        case "source":
+                            query = query.OrderBy(a => a.Source, direction, firstOrderClause);
+                            firstOrderClause = false;
+                            break;
+                        case "sent":
+                            query = query.OrderBy(a => a.Sent, direction, firstOrderClause);
+                            firstOrderClause = false;
+                            break;
+                        case "code":
+                            query = query.OrderBy(a => a.Code, direction, firstOrderClause);
+                            firstOrderClause = false;
+                            break;
+                        case "sender":
+                            query = query.OrderBy(a => a.Sender, direction, firstOrderClause);
+                            firstOrderClause = false;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                // At least one order criteria is needed
+                if (firstOrderClause)
+                    query = query.OrderBy(a => a.Sent);
 
                 return query;
             }

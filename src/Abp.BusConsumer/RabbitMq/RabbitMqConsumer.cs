@@ -54,6 +54,8 @@ namespace Abp.BusConsumer.RabbitMq
             _channel.QueueBind(q.QueueName, _busConfigurationProvider.GetExchange(), "status.brn.*.links.*");
             _channel.QueueBind(q.QueueName, _busConfigurationProvider.GetExchange(), "status.propagator.*.links.#");
             _channel.QueueBind(q.QueueName, _busConfigurationProvider.GetExchange(), "status.pwm.*.links.#");
+
+            _channel.QueueBind(q.QueueName, _busConfigurationProvider.GetExchange(), "notification.sem.astro");
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -77,17 +79,12 @@ namespace Abp.BusConsumer.RabbitMq
             _consumer = new EventingBasicConsumer(_channel);
             _consumer.Received += (model, result) =>
             {
-                //Check on routing key should not be necessary
-                //The queue should be binded to a single routing key
-                if (result.RoutingKey.Contains("status."))
-                {
-                    Logger.LogDebug("---------------- RabbitMQ Consumer: new message received");
-                    var body = result.Body.ToArray();
-                    var bodyString = Encoding.UTF8.GetString(body);
-                    Logger.LogDebug("RoutingKey: " + result.RoutingKey);
-                    _consumerService.ConsumeBusNotification(bodyString, result.RoutingKey);
-                    
-                }
+                Logger.LogDebug("---------------- RabbitMQ Consumer: new message received");
+                Logger.LogDebug("RoutingKey: " + result.RoutingKey);
+
+                var body = result.Body.ToArray();
+                var bodyString = Encoding.UTF8.GetString(body);
+                _consumerService.ConsumeBusNotification(bodyString, result.RoutingKey);
 
                 _channel.BasicAck(result.DeliveryTag, false);
             };

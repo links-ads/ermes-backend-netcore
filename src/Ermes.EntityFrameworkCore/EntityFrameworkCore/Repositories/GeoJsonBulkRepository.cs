@@ -1,5 +1,6 @@
 ﻿using Abp.EntityFrameworkCore;
 using Ermes.Activations;
+using Ermes.Alerts;
 using Ermes.Communications;
 using Ermes.EntityFrameworkCore;
 using Ermes.Enums;
@@ -288,6 +289,36 @@ namespace Ermes.GeoJson
                     left join public.activity_translations at2 on at2.""CoreId"" = pa.""CurrentActivityId""
                     where (at2.""Language"" = @language or at2.""Language"" is null)
                     and (pa.""Location"" is not null and not ST_Equals(pa.""Location""::geometry, st_geomfromtext('POINT(0 0)', @srid)))
+                    union
+                        select 
+                            a.""Id"" as ""id"", 
+                            c.""Description"" as ""details"", 
+                            to_char(a.""Sent"", 'YYYY-MM-DD""T""HH24:MI:SSZ') as ""startDate"", 
+                            to_char(a.""Sent"", 'YYYY-MM-DD""T""HH24:MI:SSZ') as ""endDate"", 
+                            a.""Sent"" as ""startDateFilter"", 
+                            a.""Sent"" as ""endDateFilter"",
+                            'Alert' as ""type"", 
+                            ST_CENTROID(a.""AreaOfInterest"") as ""location"", 
+                            a.""Status"" as ""status"",
+                            null as ""organizationId"",
+                            null as ""organizationName"",
+                            null as ""organizationParentId"",
+                            null as ""extensionData"",
+                            a.""Sender"" as ""creator"",
+                            null as ""statusFilter"",
+                            0 as ""activityFilter"",
+                            null as ""hazardFilter"",
+                            null as ""reportStatusFilter"",
+                            null as ""missionStatusFilter"",
+                            null as ""mapRequestStatusFilter"",
+                            null as ""mapRequestTypeFilter"",
+                            null as ""reportContentTypeFilter"",
+                            null as ""reportIsPublicFilter"",
+                            null as ""communicationRestrictionFilter"",
+                            0 as ""teamFilter"",
+                            null as ""receivers""
+                        from public.alerts a 
+                        join public.alerts_cap_info c on a.""Id"" = c.""AlertId""
                 ) tmp 
                 where 
                     tsrange(@startDate, @endDate, '[]') &&
@@ -325,7 +356,7 @@ namespace Ermes.GeoJson
                 if (organizationIdList != null)
                 {
                     command.CommandText += @" 
-                        and (((tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations]) or tmp.""organizationId"" is null) and tmp.""type"" in ('Mission', 'MapRequest')) or 
+                        and (((tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations]) or tmp.""organizationId"" is null) and tmp.""type"" in ('Mission', 'MapRequest', 'Alert')) or 
                         ((tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations]) or tmp.""reportIsPublicFilter"" = 'true') and tmp.""type"" = 'Report') or
                         ((tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations])) and tmp.""type"" = 'Person') or
                         (tmp.""type"" = 'Communication' and tmp.""communicationRestrictionFilter"" = any(array[@restrictionTypes]) and (tmp.""communicationRestrictionFilter"" != 'Organization' or array[@organizations] && tmp.""receivers"" ";
@@ -835,6 +866,13 @@ namespace Ermes.GeoJson
 
                 return result;
             }
+        }
+
+        public IQueryable<Alert> GetAlerts(DateTime startDate, DateTime endDate, Geometry boundingBox)
+        {
+            return _dbContextProvider.GetDbContext()
+                .Alerts
+                .FromSqlInterpolated($"SELECT * FROM alerts WHERE ST_INTERSECTS(\"AreaOfInterest\", {boundingBox}) and {startDate} < \"Sent\" and {endDate} > \"Sent\"");
         }
     }
 
