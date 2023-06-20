@@ -1,10 +1,6 @@
-﻿using Castle.MicroKernel.SubSystems.Conversion;
-using Ermes.Enums;
-using Ermes.Helpers;
+﻿using Ermes.Enums;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 
 namespace Ermes.Alerts.Dto
 {
@@ -20,6 +16,8 @@ namespace Ermes.Alerts.Dto
         public string Code { get; set; }
         public string Note { get; set; }
         public string References { get; set; }
+        public string Restriction { get; set; }
+        public string Region { get; set; }
         public bool IsARecommendation { get; set; }
         public List<CapInfoDto> Info { get; set; }
     }
