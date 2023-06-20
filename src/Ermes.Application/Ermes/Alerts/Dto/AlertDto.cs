@@ -1,4 +1,5 @@
-﻿using Ermes.Enums;
+﻿using Ermes.Dto.Spatial;
+using Ermes.Enums;
 using System;
 using System.Collections.Generic;
 
@@ -19,6 +20,7 @@ namespace Ermes.Alerts.Dto
         public string Restriction { get; set; }
         public string Region { get; set; }
         public bool IsARecommendation { get; set; }
+        public PointPosition Centroid { get; set; }
         public List<CapInfoDto> Info { get; set; }
     }
 }

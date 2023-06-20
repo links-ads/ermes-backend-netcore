@@ -1,5 +1,6 @@
 ﻿using Abp.Application.Services.Dto;
 using Abp.Linq.Extensions;
+using Abp.UI;
 using Ermes.Alerts.Dto;
 using Ermes.Dto;
 using Ermes.Dto.Datatable;
@@ -124,6 +125,8 @@ namespace Ermes.Alerts
         public virtual async Task<GetEntityByIdOutput<AlertDto>> GetAlertById(GetEntityByIdInput<int> input)
         {
             var alert = await _alertManager.GetAlertByIdAsync(input.Id);
+            if (alert == null)
+                throw new UserFriendlyException(L("InvalidEntityId", "Alert", input.Id));
 
             var writer = new GeoJsonWriter();
             var res = new GetEntityByIdOutput<AlertDto>()
