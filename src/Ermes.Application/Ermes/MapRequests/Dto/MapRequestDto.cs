@@ -10,6 +10,7 @@ namespace Ermes.MapRequests.Dto
     public class MapRequestDto
     {
         public int Id { get; set; }
+        public string Type { get; } = "MapRequest";
         public string Code { get; set; }
         public string Title { get; set; }
         public RangeDto<DateTime> Duration { get; set; }
