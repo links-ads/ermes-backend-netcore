@@ -30,7 +30,6 @@ namespace Ermes.MapRequests.Dto
         }
         public int Resolution { get; set; } = 10;
         public List<MapRequestLayerDto> MapRequestLayers { get; set; }
-        public string Type { get; set; }
         public List<BoundaryCondition> BoundaryConditions { get; set; }
         public string Description { get; set; }
         public bool DoSpotting { get; set; }
