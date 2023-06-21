@@ -12,6 +12,7 @@ namespace Ermes.Communications.Dto
     public class CommunicationDto : ICustomValidate
     {
         public int Id { get; set; }
+        public string Type { get; } = "Communication";
         [Required]
         public string Message { get; set; }
         public RangeDto<DateTime> Duration { get; set; }

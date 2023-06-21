@@ -10,6 +10,7 @@ namespace Ermes.MapRequests.Dto
     public class MapRequestDto
     {
         public int Id { get; set; }
+        public string Type { get; } = "MapRequest";
         public string Code { get; set; }
         public string Title { get; set; }
         public RangeDto<DateTime> Duration { get; set; }
@@ -29,7 +30,6 @@ namespace Ermes.MapRequests.Dto
         }
         public int Resolution { get; set; } = 10;
         public List<MapRequestLayerDto> MapRequestLayers { get; set; }
-        public string Type { get; set; }
         public List<BoundaryCondition> BoundaryConditions { get; set; }
         public string Description { get; set; }
         public bool DoSpotting { get; set; }
