@@ -56,6 +56,7 @@ namespace Abp.BusConsumer.RabbitMq
             _channel.QueueBind(q.QueueName, _busConfigurationProvider.GetExchange(), "status.pwm.*.links.#");
 
             _channel.QueueBind(q.QueueName, _busConfigurationProvider.GetExchange(), "notification.sem.astro");
+            _channel.QueueBind(q.QueueName, _busConfigurationProvider.GetExchange(), "event.camera.#");
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)

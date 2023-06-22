@@ -34,5 +34,6 @@
     <ProjectReference Include="..\Abp.BusProducer\Abp.BusProducer.csproj" />
     <ProjectReference Include="..\Abp.Chatbot\Abp.Chatbot.csproj" />
     <ProjectReference Include="..\Abp.Firebase\Abp.Firebase.csproj" />
+    <ProjectReference Include="..\Abp.SensorService\Abp.SensorService.csproj" />
   </ItemGroup>
 </Project>

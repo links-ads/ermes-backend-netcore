@@ -1,4 +1,10 @@
-﻿using Abp.Domain.Uow;
+﻿using Abp;
+using Abp.Azure;
+using Abp.Chatbot;
+using Abp.Domain.Uow;
+using Abp.Json;
+using Abp.SensorService;
+using Abp.SensorService.Model;
 using Abp.Threading;
 using Ermes.Alerts;
 using Ermes.Consumers.Kafka;
@@ -9,10 +15,14 @@ using Ermes.Missions;
 using Ermes.Notifications;
 using Ermes.Notifiers;
 using Ermes.Persons;
+using Ermes.Reports;
+using Ermes.Resources;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Security.Policy;
 using System.Transactions;
 
 namespace Ermes.Consumers
@@ -25,7 +35,9 @@ namespace Ermes.Consumers
         private readonly MapRequestManager _mapRequestManager;
         private readonly NotificationManager _notificationManager;
         private readonly AlertManager _alertManager;
-        
+        private readonly IAzureManager _azureManager;
+        private readonly SensorServiceManager _sensorServiceManager;
+
 
         public ConsumerService(
             MissionManager missionManager, 
@@ -33,7 +45,9 @@ namespace Ermes.Consumers
             PersonManager personManager,
             MapRequestManager mapRequestManager,
             NotificationManager notificationManager,
-            AlertManager alertManager)
+            AlertManager alertManager,
+            IAzureManager azureManager,
+            SensorServiceManager sensorServiceManager)
         {
             _missionManager = missionManager;
             _notifierService = notifierService;
@@ -41,6 +55,8 @@ namespace Ermes.Consumers
             _mapRequestManager = mapRequestManager;
             _notificationManager = notificationManager;
             _alertManager = alertManager;
+            _azureManager = azureManager;
+            _sensorServiceManager = sensorServiceManager;
         }
 
         public void ConsumeBusNotification(string message, string routingKey)
@@ -65,10 +81,15 @@ namespace Ermes.Consumers
                     eventData.request_code = routingKey.Split('.')[^1];
                     HandleMapRequestStatusChange(eventData);
                 }
-                else if(routingKey.Contains("notification") || routingKey.Contains("alert"))
+                else if(routingKey.Contains("notification.sem"))
                 {
                     var eventData = JsonConvert.DeserializeObject<RabbitMqAlert>(message);
                     HandleAlertMessage(eventData);
+                }
+                else if (routingKey.Contains("event.camera"))
+                {
+                    var eventData = JsonConvert.DeserializeObject<RabbitMqCameraEvent>(message);
+                    HandleCameraMessage(eventData);
                 }
                 else
                     Console.WriteLine("No management for messages with routing key: " + routingKey);
@@ -191,6 +212,66 @@ namespace Ermes.Consumers
                 catch (Exception e)
                 {
                     Logger.ErrorFormat("HandleAlertMessage exception: {0}", e.Message);
+                }
+
+                unitOfWork.Complete();
+            }
+        }
+
+        [UnitOfWork(IsDisabled = true)]
+        private void HandleCameraMessage(RabbitMqCameraEvent eventData)
+        {
+            using (var unitOfWork = UnitOfWorkManager.Begin(new UnitOfWorkOptions
+            {
+                IsolationLevel = IsolationLevel.ReadCommitted,
+                IsTransactional = true,
+                Timeout = TimeSpan.FromMinutes(30),
+                FilterOverrides =
+                        {
+                            new DataFilterConfiguration(AbpDataFilters.MayHaveTenant,false),
+                            new DataFilterConfiguration(AbpDataFilters.MustHaveTenant, false)
+                        }
+            }))
+            {
+                try
+                {
+                    WebClient client = new WebClient();
+                    byte[] fileBytes = client.DownloadData(eventData.Link);
+                    var _azureCameraStorageManager = _azureManager.GetStorageManager(ResourceManager.GetBasePath(ResourceManager.Cameras.ContainerName));
+                    var _azureCameraThumbnailStorageManager = _azureManager.GetStorageManager(ResourceManager.GetBasePath(ResourceManager.CameraThumbnails.ContainerName));
+
+                    //TODO: to be generalized + implement thumbnails
+                    string fileExtension = "jpg";
+                    string uploadedFileName = string.Concat(Guid.NewGuid().ToString(), ".", fileExtension);
+                    var fileNameWithFolder = ResourceManager.Cameras.GetRelativeMediaPath(eventData.Camera.Name, eventData.Camera.CamDirection, uploadedFileName);
+                    _azureCameraStorageManager.UploadFile(fileNameWithFolder, fileBytes);
+
+                    var stations = AsyncHelper.RunSync(() => _sensorServiceManager.GetStations());
+                    SensorServiceStation station = stations.Where(s => s.Name == eventData.Camera.Name).FirstOrDefault();
+                    SensorServiceSensor sensor;
+                    if (station == null) //create station and sensor if not present
+                    {
+                        station = AsyncHelper.RunSync(() => _sensorServiceManager.CreateStation(eventData.Camera.Name, eventData.Camera.Latitude, eventData.Camera.Longitude, eventData.Camera.Altitude));
+                        sensor = AsyncHelper.RunSync(() => _sensorServiceManager.CreateSensor(station.Id, "camera",  eventData.Camera.CamDirection,"degree"));
+                    }
+                    else
+                    {
+                        station = AsyncHelper.RunSync(() => _sensorServiceManager.GetStationInfo(station.Id));
+                        sensor = station.Sensors.Where(s => s.Description == eventData.Camera.CamDirection).FirstOrDefault();
+                        if(sensor == null)
+                            sensor = AsyncHelper.RunSync(() => _sensorServiceManager.CreateSensor(station.Id, "camera", eventData.Camera.CamDirection, "degree"));
+                    }
+                    object metadata = new
+                    {
+                        detection =  eventData.Detection.ToJsonString(),
+                        class_of_fire = eventData.ClassOfFire.ToJsonString(),
+                        fire_location = eventData.FireLocation.ToJsonString()
+                    };
+                    AsyncHelper.RunSync(() => _sensorServiceManager.CreateMeasure(sensor.Id, DateTime.UtcNow, DateTime.UtcNow, ResourceManager.Cameras.GetMediaPath(eventData.Camera.Name, eventData.Camera.CamDirection, uploadedFileName), metadata));
+                }
+                catch (Exception e)
+                {
+                    Logger.ErrorFormat("HandleCameraEventMessage exception: {0}", e.Message);
                 }
 
                 unitOfWork.Complete();

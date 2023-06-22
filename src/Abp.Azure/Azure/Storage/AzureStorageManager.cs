@@ -32,20 +32,20 @@ namespace Abp.Azure.Storage
         public async Task<Byte[]> GetFile(string blobName)
         {
             MemoryStream memstream = new MemoryStream();
-            var blobClient = await GetBlobClient(blobName);
+            var blobClient = await GetBlobClientAsync(blobName);
             await blobClient.DownloadToAsync(memstream);
             return memstream.ToArray();
         }
 
-        public async Task<bool> UploadFile(string fileName, string uploadFileName, string contentType)
+        public async Task<bool> UploadFileFromLocalAsync(string fileName, string uploadFileName, string contentType)
         {
             byte[] file = File.ReadAllBytes(uploadFileName);
-            return await UploadFile(fileName,file,contentType);
+            return await UploadFileAsync(fileName,file,contentType);
         }
 
-        public async Task<bool> UploadFile(string blobName, byte[] file, string contentType)
+        public async Task<bool> UploadFileAsync(string blobName, byte[] file, string contentType)
         {
-            var blobClient = await GetBlobClient(blobName);
+            var blobClient = await GetBlobClientAsync(blobName);
             using (var stream = new MemoryStream(file, writable: false))
             {
                 await blobClient.UploadAsync(stream);
@@ -54,16 +54,27 @@ namespace Abp.Azure.Storage
             return true;
         }
 
+        public bool UploadFile(string blobName, byte[] file)
+        {
+            var blobClient = GetBlobClient(blobName);
+            using (var stream = new MemoryStream(file, writable: false))
+            {
+                blobClient.Upload(stream);
+            }
+
+            return true;
+        }
+
         public async Task<BlobProperties> GetFileInfo(string blobName)
         {
-            var blobClient = await GetBlobClient(blobName);
+            var blobClient = await GetBlobClientAsync(blobName);
             return await blobClient.GetPropertiesAsync();
         }
 
 
         public async Task<List<BlobItem>> GetFilesInFolder(string prefix, string containerName)
         {
-            var container = await GetBlobContainerClient(connectionString, containerName);
+            var container = await GetBlobContainerClientAsync(connectionString, containerName);
             var list = container.GetBlobs(traits: BlobTraits.None, states: BlobStates.None, prefix: prefix);
             var res = new List<BlobItem>();
             foreach (var item in list)
@@ -76,13 +87,13 @@ namespace Abp.Azure.Storage
 
         public async Task<bool> FileExist(string blobName)
         {
-            var blobClient = await GetBlobClient(blobName);
+            var blobClient = await GetBlobClientAsync(blobName);
             return await blobClient.ExistsAsync();
         }
 
         public async Task<bool> DeleteBlobAsync(string blobName)
         {
-            var blobClient = await GetBlobClient(blobName);
+            var blobClient = await GetBlobClientAsync(blobName);
             var res = await blobClient.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots);
             return res;
         }
@@ -91,21 +102,40 @@ namespace Abp.Azure.Storage
 
         #region Private Members
 
-        private async Task<BlobClient> GetBlobClient(string blobName)
+        private async Task<BlobClient> GetBlobClientAsync(string blobName)
         {
-            var container = await GetBlobContainerClient(connectionString, containerName);
+            var container = await GetBlobContainerClientAsync(connectionString, containerName);
 
             // Get a reference to a blob named "blobName" in a container named "containerName"
             return container.GetBlobClient(blobName);
         }
 
-        private async Task<BlobContainerClient> GetBlobContainerClient(string connectionString, string containerName)
+        private BlobClient GetBlobClient(string blobName)
+        {
+            var container = GetBlobContainerClient(connectionString, containerName);
+
+            // Get a reference to a blob named "blobName" in a container named "containerName"
+            return container.GetBlobClient(blobName);
+        }
+
+        private async Task<BlobContainerClient> GetBlobContainerClientAsync(string connectionString, string containerName)
         {
             // Get a reference to a container named "containerName" and then create it
             if (BlobContainer != null)
                 return BlobContainer;
             BlobContainer = new BlobContainerClient(connectionString, containerName);
             await BlobContainer.CreateIfNotExistsAsync();
+
+            return BlobContainer;
+        }
+
+        private BlobContainerClient GetBlobContainerClient(string connectionString, string containerName)
+        {
+            // Get a reference to a container named "containerName" and then create it
+            if (BlobContainer != null)
+                return BlobContainer;
+            BlobContainer = new BlobContainerClient(connectionString, containerName);
+            BlobContainer.CreateIfNotExists();
 
             return BlobContainer;
         }

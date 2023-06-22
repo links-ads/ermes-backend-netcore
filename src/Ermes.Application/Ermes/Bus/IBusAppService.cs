@@ -15,5 +15,6 @@ namespace Ermes.Bus
         Task TestCsiPresidiService(IdInput<int> input);
         Task<bool> TestVolterTaxCodeService();
         Task TestAlert();
+        Task TestCamera(string imageUrl);
     }
 }
