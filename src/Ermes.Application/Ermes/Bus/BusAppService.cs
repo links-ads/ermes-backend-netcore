@@ -11,6 +11,7 @@ using Ermes.Gamification.Dto;
 using Ermes.Jobs;
 using Ermes.Missions.Dto;
 using Ermes.Persons;
+using Microsoft.Extensions.FileSystemGlobbing.Internal;
 using NSwag.Annotations;
 using System.Threading.Tasks;
 
@@ -15617,77 +15618,51 @@ namespace Ermes.Bus
             ";
             _consumerService.ConsumeBusNotification(message, "notification.sem.astro");
         }
-        /*public async Task TestAlert()
+
+        public async Task TestCamera(string imageUrl)
         {
             string message = @"
+                {
+                    ""timestamp"": ""2023-06-21T13:37:02.507000Z"", 
+                    ""camera"": 
                     {
-                        ""identifier"":""identifier"",
-                        ""sender"":""DSS"",
-                        ""sent"":""2023-03-09T12:37:18+02:00"",
-                        ""status"":""Actual"",
-                        ""msgType"":""Notification"",
-                        ""source"":""DSS"",
-                        ""scope"":""Restricted"",
-                        ""region"":""Catalonia"",
-                        ""areaID"":""2"",
-                        ""restriction"":""Citizen"",
-                        ""organizationIds"":[
-                        ],
-                        ""code"":[
-                        ],
-                        ""info"":[
-                            {
-                                ""language"":""en"",
-                                ""category"":""Met"",
-                                ""event"":""Probability of fire"",
-                                ""expires"":""2023-03-10T12:37:18+02:00"",
-                                ""description"":""Estimated alert level YELLOW.\r\nThe following prescriptions apply:\r\nDo not throw away cigarette butts or matches that are still lit.\r\nDo not light fires in the woods, except in designated areas.\r\nDo not park our cars over grass or dry leaves.\r\nDo not abandon litter in the woods.\r\nDo not burn stubble or agricultural residues near the forest or uncultivated areas.\r\nIn case of a forest fire, we immediately notify the appropriate authorities at 112.\r\nDo not stop to watch the fire along the road or in areas above the fire or downwind.\r\nLet's facilitate the intervention of emergency vehicles.\r\nIf we are in the fire, let's secure an escape route to the already burned area.\r\nDo not stop the vehicle in open areas free of vegetation with lights on, close windows and vents.\r\nAll citizens can defend the territory in the event of fire by promptly reporting the first signs of a possible forest fire to the single emergency number 112.\n We suggest to create a communication to citizens in the reference area: 2"",
-                                ""area"": [
-                                    {
-                                        ""areaDesc"": ""Description of the area"",
-                                        ""geometry"": '{
-                                            ""type"": ""Polygon"",
-                                            ""coordinates"": [
-                                                [
-                                                [
-                                                    -3.7353515625,
-                                                    40.622291783092706
-                                                ],
-                                                [
-                                                    -4.0869140625,
-                                                    40.38002840251183
-                                                ],
-                                                [
-                                                    -3.922119140625,
-                                                    40.18726672309203
-                                                ],
-                                                [
-                                                    -3.482666015625,
-                                                    39.977120098439634
-                                                ],
-                                                [
-                                                    -3.043212890625,
-                                                    40.27952566881291
-                                                ],
-                                                [
-                                                    -3.27392578125,
-                                                    40.58058466412761
-                                                ],
-                                                [
-                                                    -3.7353515625,
-                                                    40.622291783092706
-                                                ]
-                                                ]
-                                            ]        
-                                        }'
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                    ";
-            _consumerService.ConsumeBusNotification(message, "notification.sem.astro");
-        }*/
+                        ""ID"": ""SIS2B_Furiani_244"", 
+                        ""name"": ""Furiani"", 
+                        ""owner"": ""SIS2B"", 
+                        ""cam_direction"": ""244"", 
+                        ""model"": ""reolink RLC-823A"", 
+                        ""type"": ""PTZ"", 
+                        ""latitude"": 42.6612628, 
+                        ""longitude"": 9.4330259, 
+                        ""altitude"": 24
+                    }, 
+                    ""detection"": 
+                    {
+                        ""not_available"": false, 
+                        ""smoke"": false, 
+                        ""fire"": false
+                    }, 
+                    ""class_of_fire"": 
+                    {
+                        ""not_available"": true, 
+                        ""class_1"": false, 
+                        ""class_2"": false, 
+                        ""class_3"": false
+                    }, 
+                    ""fire_location"": 
+                    {
+                        ""not_available"": false, 
+                        ""direction"": null, 
+                        ""distance"": null, 
+                        ""latitude"": null, 
+                        ""longitude"": null
+                    }, 
+                    ""link"": ""https://s3.eu-central-1.amazonaws.com/safers.storage/SIS2BFuriani/213/2023/6/21/2023-06-21_13-55-03.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIDFNU74TC2T3PB7A%2F20230621%2Feu-central-1%2Fs3%2Faws4_request&X-Amz-Date=20230621T135504Z&X-Amz-Expires=259200&X-Amz-SignedHeaders=host&X-Amz-Signature=d09be63c3fdb8a97c1fdec77ebb911249525a8c05e31b667e562f17c180aaf8f""
+                }
+            ";
+            _consumerService.ConsumeBusNotification(message, "event.camera.3.3.33001");
+        }
+        
 
         public async Task TestCsiPresidiService(IdInput<int> input)
         {

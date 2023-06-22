@@ -8,6 +8,7 @@ using Abp.Reflection.Extensions;
 using Ermes.Configuration;
 using Ermes.Localization;
 using System.IO;
+using Abp.SensorService;
 
 namespace Ermes
 {
@@ -15,7 +16,8 @@ namespace Ermes
         typeof(AbpAzureModule),
         typeof(AbpFirebaseModule),
         typeof(AbpChatbotModule),
-        typeof(BusProducerModule)
+        typeof(BusProducerModule),
+        typeof(AbpSensorServiceModule)
     )]
     public class ErmesCoreModule : AbpModule
     {

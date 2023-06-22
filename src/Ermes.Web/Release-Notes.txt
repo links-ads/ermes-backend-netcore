@@ -1,6 +1,6 @@
 Ver.
 --------------------------------
-
+- Feature - SensorService module added and event.camera events management (appsettings updated)(#145)
 
 Ver. 4.11.4 - 2023-06-21
 --------------------------------

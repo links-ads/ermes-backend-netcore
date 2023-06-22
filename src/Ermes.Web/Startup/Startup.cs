@@ -31,6 +31,7 @@ using Abp.AzureCognitiveServices;
 using Abp.SocialMedia;
 using Abp.Importer;
 using Ermes.ExternalServices.Csi.Configuration;
+using Abp.SensorService;
 
 namespace Ermes.Web.Startup
 {
@@ -97,6 +98,9 @@ namespace Ermes.Web.Startup
             );
             services.Configure<AbpImporterSettings>(
                 _appConfiguration.GetSection("Importer")
+            );
+            services.Configure<AbpSensorServiceSettings>(
+                _appConfiguration.GetSection("SensorService")
             );
 
 

@@ -114,7 +114,7 @@ namespace Ermes.Import
             string fileNameWithFolder = resourceContainer.GetRelativeMediaPath(success, fileName);
             try
             {
-                await _azureStorageManager.UploadFile(fileNameWithFolder, pictureBytes, mimeType);
+                await _azureStorageManager.UploadFileAsync(fileNameWithFolder, pictureBytes, mimeType);
             }
             catch (Exception)
             {
