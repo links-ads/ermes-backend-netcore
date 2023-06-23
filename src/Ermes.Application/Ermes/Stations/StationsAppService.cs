@@ -68,7 +68,7 @@ namespace Ermes.Stations
                 Exception: Sensor service module not available
             "
         )]
-        public async Task<DTResult<StationDto>> GetStations(GetStationsInput input)
+        public virtual async Task<DTResult<StationDto>> GetStations(GetStationsInput input)
         {
             PagedResultDto<StationDto> result = await InternalGetStations(input);
             return new DTResult<StationDto>(input.Draw, result.TotalCount, result.Items.Count, result.Items.ToList());
@@ -87,7 +87,7 @@ namespace Ermes.Stations
             "
         )]
 
-        public async Task<GetMeasuresByStationAndSensorOutput> GetMeasuresByStationAndSensor(GetMeasuresByStationAndSensorInput input)
+        public virtual async Task<GetMeasuresByStationAndSensorOutput> GetMeasuresByStationAndSensor(GetMeasuresByStationAndSensorInput input)
         {
             input.StartDate = input.StartDate.HasValue ? input.StartDate : DateTime.MinValue;
             input.EndDate = input.EndDate.HasValue ? input.EndDate : DateTime.MaxValue;
