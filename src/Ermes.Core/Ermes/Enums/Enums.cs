@@ -181,7 +181,8 @@ namespace Ermes.Enums
         Person = 90,
         Gamification = 100,
         Team = 110,
-        Alert = 120
+        Alert = 120,
+        Station = 130
     }
 
     [JsonConverter(typeof(StringEnumConverter))]

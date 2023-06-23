@@ -33,7 +33,9 @@ namespace Ermes.Consumers.RabbitMq
     {
         [JsonProperty(propertyName: "not_available")]
         public bool NotAvailable { get; set; }
+        [JsonProperty(propertyName: "smoke")]
         public bool Smoke { get; set; }
+        [JsonProperty(propertyName: "fire")]
         public bool Fire { get; set; }
     }
 
@@ -53,9 +55,13 @@ namespace Ermes.Consumers.RabbitMq
     {
         [JsonProperty(propertyName: "not_available")]
         public bool NotAvailable { get; set; }
+        [JsonProperty(propertyName: "direction")]
         public decimal? Direction { get; set; }
+        [JsonProperty(propertyName: "distance")]
         public decimal? Distance { get; set; }
+        [JsonProperty(propertyName: "latitude")]
         public decimal? Latitude { get; set; }
+        [JsonProperty(propertyName: "longitude")]
         public decimal? Longitude { get; set; }
     }
 

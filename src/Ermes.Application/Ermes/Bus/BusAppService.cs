@@ -13,6 +13,7 @@ using Ermes.Missions.Dto;
 using Ermes.Persons;
 using Microsoft.Extensions.FileSystemGlobbing.Internal;
 using NSwag.Annotations;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Ermes.Bus
@@ -15626,10 +15627,10 @@ namespace Ermes.Bus
                     ""timestamp"": ""2023-06-21T13:37:02.507000Z"", 
                     ""camera"": 
                     {
-                        ""ID"": ""SIS2B_Furiani_244"", 
-                        ""name"": ""Furiani"", 
+                        ""ID"": ""SIS2B_CSI_San_Michele_Test_244"", 
+                        ""name"": ""El_Perello_Test"", 
                         ""owner"": ""SIS2B"", 
-                        ""cam_direction"": ""244"", 
+                        ""cam_direction"": ""100"", 
                         ""model"": ""reolink RLC-823A"", 
                         ""type"": ""PTZ"", 
                         ""latitude"": 42.6612628, 
@@ -15657,9 +15658,8 @@ namespace Ermes.Bus
                         ""latitude"": null, 
                         ""longitude"": null
                     }, 
-                    ""link"": ""https://s3.eu-central-1.amazonaws.com/safers.storage/SIS2BFuriani/213/2023/6/21/2023-06-21_13-55-03.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIDFNU74TC2T3PB7A%2F20230621%2Feu-central-1%2Fs3%2Faws4_request&X-Amz-Date=20230621T135504Z&X-Amz-Expires=259200&X-Amz-SignedHeaders=host&X-Amz-Signature=d09be63c3fdb8a97c1fdec77ebb911249525a8c05e31b667e562f17c180aaf8f""
-                }
             ";
+            message = message + "\"link\": \""+ imageUrl + "\"}";
             _consumerService.ConsumeBusNotification(message, "event.camera.3.3.33001");
         }
         

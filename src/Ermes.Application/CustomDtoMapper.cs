@@ -1,4 +1,5 @@
 ﻿using Abp.AutoMapper;
+using Abp.SensorService.Model;
 using Abp.SocialMedia.Dto;
 using Abp.SocialMedia.Model;
 using AutoMapper;
@@ -46,12 +47,14 @@ using Ermes.Resources;
 using Ermes.Roles;
 using Ermes.Roles.Dto;
 using Ermes.Social.Dto;
+using Ermes.Stations.Dto;
 using Ermes.Teams;
 using Ermes.Teams.Dto;
 using Ermes.Tips;
 using Ermes.Users.Dto;
 using io.fusionauth.domain;
 using NetTopologySuite.Geometries;
+using NetTopologySuite.GeometriesGraph;
 using NetTopologySuite.IO;
 using System;
 using System.Linq;
@@ -307,6 +310,21 @@ namespace Ermes
             configuration.CreateMap<Activation, ActivationDto>()
                             .ForMember(dto => dto.Y, options => options.MapFrom(c => c.Counter))
                             .ReverseMap();
+
+            configuration.CreateMap<StationDto, SensorServiceStation>()
+                .ReverseMap()
+                .ForMember(dto => dto.Type, options => options.Ignore())
+                .ForMember(dto => dto.StationType, options => options.MapFrom(b => b.ProductCode));
+            configuration.CreateMap<SensorDto, SensorServiceSensor>().ReverseMap();
+
+            configuration.CreateMap<MeasureDto, SensorServiceMeasure>().ReverseMap()
+                .ForMember(dto => dto.Timestamp, options => options.MapFrom(b => b.DateStart));
+
+
+            configuration.CreateMap<SensorServiceStationLocation, PointPosition>()
+                .ForMember(pos => pos.Latitude, options => options.MapFrom(b => b.Coordinates[0]))
+                .ForMember(pos => pos.Longitude, options => options.MapFrom(b => b.Coordinates[1]))
+                .ReverseMap();
             #endregion
 
 

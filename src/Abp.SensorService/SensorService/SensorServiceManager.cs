@@ -1,14 +1,11 @@
 ﻿using Abp.SensorService.Configuration;
 using Abp.SensorService.Model;
-using Abp.UI;
+using Abp.SensorService.Utility;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Abp.SensorService
@@ -35,9 +32,13 @@ namespace Abp.SensorService
             HttpClient = client;
             return;
         }
-        public Task GetMeasuresOfSensor(string stationId, string sensorId)
+        public async Task<SensorServiceSensor> GetMeasuresOfSensor(string stationId, string sensorId, DateTime dateStart, DateTime dateEnd)
         {
-            throw new NotImplementedException();
+            if (HttpClient == null)
+                GetHttpClient();
+            Uri uri = new Uri(HttpClient.BaseAddress + string.Format("query/stations/{0}/sensor/{1}?dateStart={2}&dateEnd={3}", stationId, sensorId, string.Format("{0:yyyy-MM-ddTHH:mm:ss.fffZ}", dateStart), string.Format("{0:yyyy-MM-ddTHH:mm:ss.fffZ}", dateEnd)));
+            var responseValue = await HttpHelper.SendHttpRequestAsync(HttpClient, HttpMethod.Get, uri);
+            return JsonConvert.DeserializeObject<SensorServiceSensor>(responseValue);
         }
 
 
@@ -45,116 +46,47 @@ namespace Abp.SensorService
         {
             if (HttpClient == null)
                 GetHttpClient();
-
             Uri uri = new Uri(HttpClient.BaseAddress + "query/stations");
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, uri);
-            var jsonContent = JsonConvert.SerializeObject(new
-            {
-            });
-            request.Content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-            HttpResponseMessage response = null;
-            try
-            {
-                response = await HttpClient.SendAsync(request);
-            }
-            catch (Exception ex)
-            {
-                throw new UserFriendlyException(ex.Message);
-            }
-
-            var responseValue = string.Empty;
-            if (response != null && response.StatusCode == HttpStatusCode.OK)
-            {
-                Task task = response.Content.ReadAsStreamAsync().ContinueWith(t =>
-                {
-                    var stream = t.Result;
-                    using var reader = new StreamReader(stream);
-                    responseValue = reader.ReadToEnd();
-                });
-
-                task.Wait();
-
-                return JsonConvert.DeserializeObject<List<SensorServiceStation>>(responseValue);
-            }
-            else
-                throw new UserFriendlyException("SensorServiceNotAvailable");
+            var jsonContent = JsonConvert.SerializeObject(new { });
+            var responseValue = await HttpHelper.SendHttpRequestAsync(HttpClient, HttpMethod.Post, uri, jsonContent);
+            return JsonConvert.DeserializeObject<List<SensorServiceStation>>(responseValue);
         }
 
         public async Task<SensorServiceStation> GetStationInfo(string stationId)
         {
             if (HttpClient == null)
                 GetHttpClient();
-
             Uri uri = new Uri(HttpClient.BaseAddress + "query/stations/" + stationId);
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
-            HttpResponseMessage response = null;
-            try
-            {
-                response = await HttpClient.SendAsync(request);
-            }
-            catch (Exception ex)
-            {
-                throw new UserFriendlyException(ex.Message);
-            }
-
-            var responseValue = string.Empty;
-            if (response != null && response.StatusCode == HttpStatusCode.OK)
-            {
-                Task task = response.Content.ReadAsStreamAsync().ContinueWith(t =>
-                {
-                    var stream = t.Result;
-                    using var reader = new StreamReader(stream);
-                    responseValue = reader.ReadToEnd();
-                });
-
-                task.Wait();
-
-                return JsonConvert.DeserializeObject<SensorServiceStation>(responseValue);
-            }
-            else
-                throw new UserFriendlyException("SensorServiceNotAvailable");
+            var responseValue = await HttpHelper.SendHttpRequestAsync(HttpClient, HttpMethod.Get, uri);
+            return JsonConvert.DeserializeObject<SensorServiceStation>(responseValue);
         }
 
-        public async Task<SensorServiceStation> CreateStation(string name, decimal latitude, decimal longitude, decimal altitude, string address = "address")
+        public async Task<SensorServiceStation> GetStationSummary(string stationId, DateTime dateStart, DateTime dateEnd)
+        {
+            if (HttpClient == null)
+                GetHttpClient();
+            Uri uri = new Uri(HttpClient.BaseAddress + string.Format("query/stations/{0}/summary?dateStart={1}&dateEnd={2}", stationId, string.Format("{0:yyyy-MM-ddTHH:mm:ss.fffZ}", dateStart), string.Format("{0:yyyy-MM-ddTHH:mm:ss.fffZ}", dateEnd)));
+            var responseValue = await HttpHelper.SendHttpRequestAsync(HttpClient, HttpMethod.Get, uri);
+            return JsonConvert.DeserializeObject<SensorServiceStation>(responseValue);
+        }
+
+        public async Task<SensorServiceStation> CreateStation(string name, decimal latitude, decimal longitude, decimal altitude, string owner, string brand, string productCode = "", string address = "address")
         {
             if (HttpClient == null)
                 GetHttpClient();
 
             Uri uri = new Uri(HttpClient.BaseAddress + "stations");
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, uri);
             var jsonContent = JsonConvert.SerializeObject(new
             {
                 name,
-                location = new decimal[] {latitude, longitude, altitude},
-                address
+                location = new decimal[] { latitude, longitude, altitude },
+                address,
+                owner,
+                brand,
+                productCode
             });
-            request.Content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-            HttpResponseMessage response = null;
-            try
-            {
-                response = await HttpClient.SendAsync(request);
-            }
-            catch (Exception ex)
-            {
-                throw new UserFriendlyException(ex.Message);
-            }
-
-            var responseValue = string.Empty;
-            if (response != null && response.StatusCode == HttpStatusCode.OK)
-            {
-                Task task = response.Content.ReadAsStreamAsync().ContinueWith(t =>
-                {
-                    var stream = t.Result;
-                    using var reader = new StreamReader(stream);
-                    responseValue = reader.ReadToEnd();
-                });
-
-                task.Wait();
-
-                return JsonConvert.DeserializeObject<SensorServiceStation>(responseValue);
-            }
-            else
-                throw new UserFriendlyException("SensorServiceNotAvailable");
+            var responseValue = await HttpHelper.SendHttpRequestAsync(HttpClient, HttpMethod.Post, uri, jsonContent);
+            return JsonConvert.DeserializeObject<SensorServiceStation>(responseValue);
         }
 
         public async Task<SensorServiceSensor> CreateSensor(string stationId, string type, string description, string unit = "")
@@ -163,40 +95,14 @@ namespace Abp.SensorService
                 GetHttpClient();
 
             Uri uri = new Uri(string.Format("{0}stations/{1}/sensors", HttpClient.BaseAddress, stationId));
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, uri);
             var jsonContent = JsonConvert.SerializeObject(new
             {
                 type,
                 description,
                 unit
             });
-            request.Content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-            HttpResponseMessage response = null;
-            try
-            {
-                response = await HttpClient.SendAsync(request);
-            }
-            catch (Exception ex)
-            {
-                throw new UserFriendlyException(ex.Message);
-            }
-
-            var responseValue = string.Empty;
-            if (response != null && response.StatusCode == HttpStatusCode.OK)
-            {
-                Task task = response.Content.ReadAsStreamAsync().ContinueWith(t =>
-                {
-                    var stream = t.Result;
-                    using var reader = new StreamReader(stream);
-                    responseValue = reader.ReadToEnd();
-                });
-
-                task.Wait();
-
-                return JsonConvert.DeserializeObject<SensorServiceSensor>(responseValue);
-            }
-            else
-                throw new UserFriendlyException("SensorServiceNotAvailable");
+            var responseValue = await HttpHelper.SendHttpRequestAsync(HttpClient, HttpMethod.Post, uri, jsonContent);
+            return JsonConvert.DeserializeObject<SensorServiceSensor>(responseValue);
         }
 
         public async Task<SensorServiceMeasure> CreateMeasure(string sensorId, DateTime dateStart, DateTime dateEnd, string measure, object metadata, string unit = "degree")
@@ -205,7 +111,6 @@ namespace Abp.SensorService
                 GetHttpClient();
 
             Uri uri = new Uri(string.Format("{0}sensors/{1}", HttpClient.BaseAddress, sensorId));
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, uri);
             var jsonContent = JsonConvert.SerializeObject(new
             {
                 dateStart,
@@ -214,33 +119,8 @@ namespace Abp.SensorService
                 unit,
                 metadata
             });
-            request.Content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-            HttpResponseMessage response = null;
-            try
-            {
-                response = await HttpClient.SendAsync(request);
-            }
-            catch (Exception ex)
-            {
-                throw new UserFriendlyException(ex.Message);
-            }
-
-            var responseValue = string.Empty;
-            if (response != null && response.StatusCode == HttpStatusCode.OK)
-            {
-                Task task = response.Content.ReadAsStreamAsync().ContinueWith(t =>
-                {
-                    var stream = t.Result;
-                    using var reader = new StreamReader(stream);
-                    responseValue = reader.ReadToEnd();
-                });
-
-                task.Wait();
-
-                return JsonConvert.DeserializeObject<SensorServiceMeasure>(responseValue);
-            }
-            else
-                throw new UserFriendlyException("SensorServiceNotAvailable");
+            var responseValue = await HttpHelper.SendHttpRequestAsync(HttpClient, HttpMethod.Post, uri, jsonContent);
+            return JsonConvert.DeserializeObject<SensorServiceMeasure>(responseValue);
         }
     }
 }
