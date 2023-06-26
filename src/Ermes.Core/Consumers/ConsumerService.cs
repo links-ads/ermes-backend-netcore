@@ -14,6 +14,7 @@ using Ermes.Notifications;
 using Ermes.Notifiers;
 using Ermes.Persons;
 using Ermes.Resources;
+using Ermes.Stations;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -31,6 +32,7 @@ namespace Ermes.Consumers
         private readonly MapRequestManager _mapRequestManager;
         private readonly NotificationManager _notificationManager;
         private readonly AlertManager _alertManager;
+        private readonly StationManager _stationManager;
         private readonly IAzureManager _azureManager;
         private readonly SensorServiceManager _sensorServiceManager;
 
@@ -42,6 +44,7 @@ namespace Ermes.Consumers
             MapRequestManager mapRequestManager,
             NotificationManager notificationManager,
             AlertManager alertManager,
+            StationManager stationManager,
             IAzureManager azureManager,
             SensorServiceManager sensorServiceManager)
         {
@@ -51,6 +54,7 @@ namespace Ermes.Consumers
             _mapRequestManager = mapRequestManager;
             _notificationManager = notificationManager;
             _alertManager = alertManager;
+            _stationManager = stationManager;
             _azureManager = azureManager;
             _sensorServiceManager = sensorServiceManager;
         }
@@ -256,6 +260,14 @@ namespace Ermes.Consumers
                         station = AsyncHelper.RunSync(() => _sensorServiceManager.GetStationInfo(station.Id));
                         sensor = station.Sensors.Where(s => s.Type == eventData.Camera.CamDirection).FirstOrDefault();
                         sensor ??= AsyncHelper.RunSync(() => _sensorServiceManager.CreateSensor(station.Id, eventData.Camera.CamDirection, eventData.Camera.CamDirection, "degree"));
+                    }
+
+                    //for optimization purposes during GetFeatureCollection, also check and create station locally
+                    Station localStation = _stationManager.GetStationBySensorServiceId(station.Id);
+                    if (localStation == null)
+                    {
+                        localStation = ObjectMapper.Map<Station>(station);
+                        _stationManager.InsertStation(localStation);
                     }
 
                     object metadata = new

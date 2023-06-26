@@ -319,6 +319,35 @@ namespace Ermes.GeoJson
                             null as ""receivers""
                         from public.alerts a 
                         join public.alerts_cap_info c on a.""Id"" = c.""AlertId""
+                    union
+                        select 
+                            s.""Id"" as ""id"", 
+                            s.""SensorServiceId"" as ""details"", 
+                            to_char(to_timestamp(0), 'YYYY-MM-DD""T""HH24:MI:SSZ') as ""startDate"", 
+                            to_char(to_timestamp(10000000000), 'YYYY-MM-DD""T""HH24:MI:SSZ') as ""endDate"", 
+                            null as ""startDateFilter"", 
+                            null as ""endDateFilter"",
+                            'Station' as ""type"", 
+                            ST_CENTROID(s.""Location"") as ""location"", 
+                            null as ""status"",
+                            null as ""organizationId"",
+                            null as ""organizationName"",
+                            null as ""organizationParentId"",
+                            null as ""extensionData"",
+                            s.""Owner"" as ""creator"",
+                            null as ""statusFilter"",
+                            0 as ""activityFilter"",
+                            null as ""hazardFilter"",
+                            null as ""reportStatusFilter"",
+                            null as ""missionStatusFilter"",
+                            null as ""mapRequestStatusFilter"",
+                            null as ""mapRequestTypeFilter"",
+                            null as ""reportContentTypeFilter"",
+                            null as ""reportIsPublicFilter"",
+                            null as ""communicationRestrictionFilter"",
+                            0 as ""teamFilter"",
+                            null as ""receivers""
+                        from public.stations s 
                 ) tmp 
                 where 
                     tsrange(@startDate, @endDate, '[]') &&
@@ -356,7 +385,7 @@ namespace Ermes.GeoJson
                 if (organizationIdList != null)
                 {
                     command.CommandText += @" 
-                        and (((tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations]) or tmp.""organizationId"" is null) and tmp.""type"" in ('Mission', 'MapRequest', 'Alert')) or 
+                        and (((tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations]) or tmp.""organizationId"" is null) and tmp.""type"" in ('Mission', 'MapRequest', 'Alert', 'Station')) or 
                         ((tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations]) or tmp.""reportIsPublicFilter"" = 'true') and tmp.""type"" = 'Report') or
                         ((tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations])) and tmp.""type"" = 'Person') or
                         (tmp.""type"" = 'Communication' and tmp.""communicationRestrictionFilter"" = any(array[@restrictionTypes]) and (tmp.""communicationRestrictionFilter"" != 'Organization' or array[@organizations] && tmp.""receivers"" ";
