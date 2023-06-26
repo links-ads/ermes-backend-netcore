@@ -254,7 +254,7 @@ namespace Ermes.Consumers
                     else
                     {
                         station = AsyncHelper.RunSync(() => _sensorServiceManager.GetStationInfo(station.Id));
-                        sensor = station.Sensors.Where(s => s.Description == eventData.Camera.CamDirection).FirstOrDefault();
+                        sensor = station.Sensors.Where(s => s.Type == eventData.Camera.CamDirection).FirstOrDefault();
                         sensor ??= AsyncHelper.RunSync(() => _sensorServiceManager.CreateSensor(station.Id, eventData.Camera.CamDirection, eventData.Camera.CamDirection, "degree"));
                     }
 
