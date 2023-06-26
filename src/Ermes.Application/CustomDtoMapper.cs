@@ -47,6 +47,7 @@ using Ermes.Resources;
 using Ermes.Roles;
 using Ermes.Roles.Dto;
 using Ermes.Social.Dto;
+using Ermes.Stations;
 using Ermes.Stations.Dto;
 using Ermes.Teams;
 using Ermes.Teams.Dto;
@@ -311,6 +312,12 @@ namespace Ermes
                             .ForMember(dto => dto.Y, options => options.MapFrom(c => c.Counter))
                             .ReverseMap();
 
+            configuration.CreateMap<Station, SensorServiceStation>()
+                .ForMember(a => a.Id, options => options.MapFrom(s => s.SensorServiceId))
+                .ReverseMap()
+                .ForMember(s => s.SensorServiceId, options => options.MapFrom(c => c.Id))
+                .ForMember(s => s.Id, options => options.Ignore())
+                .ForMember(s => s.Location, options => options.MapFrom(a => new Point((double)a.Location.Coordinates[1], (double)a.Location.Coordinates[0])));
             configuration.CreateMap<StationDto, SensorServiceStation>()
                 .ReverseMap()
                 .ForMember(dto => dto.Type, options => options.Ignore())

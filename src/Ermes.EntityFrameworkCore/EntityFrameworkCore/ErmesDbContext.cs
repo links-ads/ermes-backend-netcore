@@ -22,6 +22,7 @@ using Ermes.Preferences;
 using Ermes.Quizzes;
 using Ermes.Reports;
 using Ermes.Roles;
+using Ermes.Stations;
 using Ermes.Teams;
 using Ermes.Tips;
 using Microsoft.EntityFrameworkCore;
@@ -85,6 +86,7 @@ namespace Ermes.EntityFrameworkCore
         public virtual DbSet<CommunicationReceiver> CommunicationReceivers { get; set; }
         public virtual DbSet<Alert> Alerts { get; set; }
         public virtual DbSet<CapInfo> CapInfoList { get; set; }
+        public virtual DbSet<Station> Stations { get; set; }
 
         public IEntityHistoryHelper EntityHistoryHelper { get; set; }
 
@@ -296,6 +298,8 @@ namespace Ermes.EntityFrameworkCore
                 .HasForeignKey(ci => ci.AlertId)
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Station>().HasIndex(i => i.SensorServiceId).IsUnique();
 
             #region EntityHistory
             modelBuilder.Entity<SplitEntityChange>().HasMany(e => e.PropertyChanges).WithOne().HasForeignKey(e => e.EntityChangeId);
