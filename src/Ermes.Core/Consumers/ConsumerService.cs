@@ -249,13 +249,13 @@ namespace Ermes.Consumers
                     if (station == null) //create station and sensor if not present
                     {
                         station = AsyncHelper.RunSync(() => _sensorServiceManager.CreateStation(eventData.Camera.Name, eventData.Camera.Latitude, eventData.Camera.Longitude, eventData.Camera.Altitude, eventData.Camera.Owner, eventData.Camera.Model, eventData.Camera.Type));
-                        sensor = AsyncHelper.RunSync(() => _sensorServiceManager.CreateSensor(station.Id, "camera", eventData.Camera.CamDirection, "degree"));
+                        sensor = AsyncHelper.RunSync(() => _sensorServiceManager.CreateSensor(station.Id, eventData.Camera.CamDirection, eventData.Camera.CamDirection, "degree"));
                     }
                     else
                     {
                         station = AsyncHelper.RunSync(() => _sensorServiceManager.GetStationInfo(station.Id));
-                        sensor = station.Sensors.Where(s => s.Description == eventData.Camera.CamDirection).FirstOrDefault();
-                        sensor ??= AsyncHelper.RunSync(() => _sensorServiceManager.CreateSensor(station.Id, "camera", eventData.Camera.CamDirection, "degree"));
+                        sensor = station.Sensors.Where(s => s.Type == eventData.Camera.CamDirection).FirstOrDefault();
+                        sensor ??= AsyncHelper.RunSync(() => _sensorServiceManager.CreateSensor(station.Id, eventData.Camera.CamDirection, eventData.Camera.CamDirection, "degree"));
                     }
 
                     object metadata = new

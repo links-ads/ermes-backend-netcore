@@ -1,5 +1,9 @@
 Ver.
 --------------------------------
+- Feature - Fix create sensor function, Id prop added to sensorDto (#145)
+
+Ver. 4.12.0 - 2023-06-23
+--------------------------------
 - Feature - SensorService module added, event.camera events management, StationsAppService added (appsettings updated)(#145)
 
 Ver. 4.11.4 - 2023-06-21
