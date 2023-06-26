@@ -89,6 +89,15 @@ namespace Abp.SensorService
             return JsonConvert.DeserializeObject<SensorServiceStation>(responseValue);
         }
 
+
+        /// <summary>
+        /// N.B. : two sensors of the same camera cannot have the same 'type' field
+        /// </summary>
+        /// <param name="stationId"></param>
+        /// <param name="type"></param>
+        /// <param name="description"></param>
+        /// <param name="unit"></param>
+        /// <returns></returns>
         public async Task<SensorServiceSensor> CreateSensor(string stationId, string type, string description, string unit = "")
         {
             if (HttpClient == null)
