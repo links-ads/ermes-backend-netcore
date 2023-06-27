@@ -194,7 +194,9 @@ namespace Ermes.Consumers
                 try
                 {
                     var alert = ObjectMapper.Map<Alert>(eventData);
-                    alert.AreaOfInterest = eventData.Info.First().Area.First().FullGeometry;
+                    alert.FullAreaOfInterest = eventData.Info.First().Area.First().FullGeometry;
+                    alert.AreaOfInterest = alert.FullAreaOfInterest.Envelope;
+                    
                     alert.IsARecommendation = true;
                     alert.Id = _alertManager.InsertAlertAndGetId(alert);
                     CurrentUnitOfWork.SaveChanges();

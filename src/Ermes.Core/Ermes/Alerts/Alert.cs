@@ -62,10 +62,16 @@ namespace Ermes.Alerts
         /// </summary>
         public bool IsARecommendation { get; set; }
 
-
+        /// <summary>
+        /// Buonding box of the original alert's Area of Interest
+        /// </summary>
         [Required]
         [Column(TypeName = "geography")]
         public Geometry AreaOfInterest { get; set; }
+
+        [Column(TypeName = "geography")]
+        public Geometry FullAreaOfInterest { get; set; }
+
         public DateTime CreationTime { get; set; }
 
         public virtual ICollection<CapInfo> Info { get; set; }
