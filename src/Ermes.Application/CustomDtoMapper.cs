@@ -270,7 +270,8 @@ namespace Ermes
             configuration.CreateMap<Alert, RabbitMqAlert>()
                 .ReverseMap()
                 .ForMember(a => a.Info, options => options.Ignore())
-                .ForMember(a => a.AreaOfInterest, options => options.Ignore());
+                .ForMember(a => a.AreaOfInterest, options => options.Ignore())
+                .ForMember(a => a.FullAreaOfInterest, options => options.Ignore());
             configuration.CreateMap<CapInfo, CapInfoDto>();
             configuration.CreateMap<CapInfo, RabbitMqAlertInfo>()
                 .ReverseMap();

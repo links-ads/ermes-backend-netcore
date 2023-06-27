@@ -290,35 +290,35 @@ namespace Ermes.GeoJson
                     where (at2.""Language"" = @language or at2.""Language"" is null)
                     and (pa.""Location"" is not null and not ST_Equals(pa.""Location""::geometry, st_geomfromtext('POINT(0 0)', @srid)))
                     union
-                        select 
-                            a.""Id"" as ""id"", 
-                            c.""Description"" as ""details"", 
-                            to_char(a.""Sent"", 'YYYY-MM-DD""T""HH24:MI:SSZ') as ""startDate"", 
-                            to_char(a.""Sent"", 'YYYY-MM-DD""T""HH24:MI:SSZ') as ""endDate"", 
-                            a.""Sent"" as ""startDateFilter"", 
-                            a.""Sent"" as ""endDateFilter"",
-                            'Alert' as ""type"", 
-                            ST_CENTROID(a.""AreaOfInterest"") as ""location"", 
-                            a.""Status"" as ""status"",
-                            null as ""organizationId"",
-                            null as ""organizationName"",
-                            null as ""organizationParentId"",
-                            null as ""extensionData"",
-                            a.""Sender"" as ""creator"",
-                            null as ""statusFilter"",
-                            0 as ""activityFilter"",
-                            null as ""hazardFilter"",
-                            null as ""reportStatusFilter"",
-                            null as ""missionStatusFilter"",
-                            null as ""mapRequestStatusFilter"",
-                            null as ""mapRequestTypeFilter"",
-                            null as ""reportContentTypeFilter"",
-                            null as ""reportIsPublicFilter"",
-                            null as ""communicationRestrictionFilter"",
-                            0 as ""teamFilter"",
-                            null as ""receivers""
-                        from public.alerts a 
-                        join public.alerts_cap_info c on a.""Id"" = c.""AlertId""
+                    select 
+                        a.""Id"" as ""id"", 
+                        c.""Description"" as ""details"", 
+                        to_char(a.""Sent"", 'YYYY-MM-DD""T""HH24:MI:SSZ') as ""startDate"", 
+                        to_char(a.""Sent"", 'YYYY-MM-DD""T""HH24:MI:SSZ') as ""endDate"", 
+                        a.""Sent"" as ""startDateFilter"", 
+                        a.""Sent"" as ""endDateFilter"",
+                        'Alert' as ""type"", 
+                        ST_CENTROID(a.""AreaOfInterest"") as ""location"", 
+                        a.""Status"" as ""status"",
+                        null as ""organizationId"",
+                        null as ""organizationName"",
+                        null as ""organizationParentId"",
+                        null as ""extensionData"",
+                        a.""Sender"" as ""creator"",
+                        null as ""statusFilter"",
+                        0 as ""activityFilter"",
+                        null as ""hazardFilter"",
+                        null as ""reportStatusFilter"",
+                        null as ""missionStatusFilter"",
+                        null as ""mapRequestStatusFilter"",
+                        null as ""mapRequestTypeFilter"",
+                        null as ""reportContentTypeFilter"",
+                        null as ""reportIsPublicFilter"",
+                        null as ""communicationRestrictionFilter"",
+                        0 as ""teamFilter"",
+                        null as ""receivers""
+                    from public.alerts a 
+                    join public.alerts_cap_info c on a.""Id"" = c.""AlertId""
                     union
                         select 
                             s.""Id"" as ""id"", 

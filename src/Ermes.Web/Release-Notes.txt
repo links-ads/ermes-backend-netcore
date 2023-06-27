@@ -1,6 +1,7 @@
 Ver.
 --------------------------------
 - Bugfix - Report cannot be validated twice by the same person (#146)
+- Feature - Alert's AreaOfInterest performance improvement (migration added)(#147)
 
 Ver. 4.12.2 - 2023-06-26
 --------------------------------
