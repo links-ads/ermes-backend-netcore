@@ -1,5 +1,9 @@
 Ver.
 --------------------------------
+- Bugfix - Report cannot be validated twice by the same person (#146)
+
+Ver. 4.12.2 - 2023-06-26
+--------------------------------
 - Feature - Station entity added (migration added)(#145)
 
 Ver. 4.12.1 - 2023-06-26
