@@ -251,7 +251,7 @@ namespace Ermes.Consumers
                     string thumbnailPath = ResourceManager.CameraThumbnails.GetRelativeMediaPath(eventData.Camera.Name, eventData.Camera.CamDirection, thumbnailName);
                     try
                     {
-                        AsyncHelper.RunSync(() => _azureCameraThumbnailStorageManager.UploadFile(thumbnailPath, ErmesCoreCommon.CreateThumbnailFromImage(fileBytes, ErmesConsts.Thumbnail.SIZE, ErmesConsts.Thumbnail.QUALITY), ErmesConsts.IMAGE_MIME_TYPE));
+                        AsyncHelper.RunSync(() => _azureCameraThumbnailStorageManager.UploadFile(thumbnailPath, ErmesCoreCommon.CreateThumbnailFromImage(fileBytes, ErmesConsts.Thumbnail.SIZE, ErmesConsts.Thumbnail.QUALITY, Logger), ErmesConsts.IMAGE_MIME_TYPE));
                     }
                     catch (Exception e)
                     {

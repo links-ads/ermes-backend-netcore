@@ -452,7 +452,7 @@ namespace Ermes.Web.Controllers
                         string thumbnailPath = ResourceManager.Thumbnails.GetRelativeMediaPath(report.Id, thumbnailName);
                         try
                         {
-                            await _azureThumbnailStorageManager.UploadFile(thumbnailPath, ErmesCommon.GetJpegThumbnail(fileBytes, ErmesConsts.Thumbnail.SIZE, ErmesConsts.Thumbnail.QUALITY), MimeTypeNames.ImageJpeg);
+                            await _azureThumbnailStorageManager.UploadFile(thumbnailPath, ErmesCommon.GetJpegThumbnail(fileBytes, ErmesConsts.Thumbnail.SIZE, ErmesConsts.Thumbnail.QUALITY, Logger), MimeTypeNames.ImageJpeg);
                         }
                         catch (Exception e)
                         {

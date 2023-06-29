@@ -10,6 +10,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using NetTopologySuite.Geometries;
 using Ermes.Core.Helpers;
+using Castle.Core.Logging;
 
 namespace Ermes.Helpers
 {
@@ -147,9 +148,9 @@ namespace Ermes.Helpers
         /// <param name="thumbnailSize"></param>
         /// <param name="imageQuality"></param>
         /// <returns></returns>
-        public static byte[] GetJpegThumbnail(byte[] fileBytes, int thumbnailSize, int imageQuality)
+        public static byte[] GetJpegThumbnail(byte[] fileBytes, int thumbnailSize, int imageQuality, ILogger logger)
         {
-            return ErmesCoreCommon.CreateThumbnailFromImage(fileBytes, thumbnailSize, imageQuality);
+            return ErmesCoreCommon.CreateThumbnailFromImage(fileBytes, thumbnailSize, imageQuality, logger);
         }
     }
 }
