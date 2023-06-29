@@ -1,7 +1,4 @@
-﻿using Ermes.Reports.Dto;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
 
 namespace Ermes.Stations.Dto
 {
