@@ -1,12 +1,12 @@
 ﻿using Abp.Azure;
 using Abp.Domain.Uow;
-using Abp.Events.Bus;
 using Abp.SensorService;
 using Abp.SensorService.Model;
 using Abp.Threading;
 using Ermes.Alerts;
 using Ermes.Consumers.Kafka;
 using Ermes.Consumers.RabbitMq;
+using Ermes.Core.Helpers;
 using Ermes.Enums;
 using Ermes.MapRequests;
 using Ermes.Missions;
@@ -245,7 +245,21 @@ namespace Ermes.Consumers
                     string fileExtension = "jpg";
                     string uploadedFileName = string.Concat(Guid.NewGuid().ToString(), ".", fileExtension);
                     var fileNameWithFolder = ResourceManager.Cameras.GetRelativeMediaPath(eventData.Camera.Name, eventData.Camera.CamDirection, uploadedFileName);
-                    AsyncHelper.RunSync(() => _azureCameraStorageManager.UploadFile(fileNameWithFolder, fileBytes, "image/jpeg"));
+                    AsyncHelper.RunSync(() => _azureCameraStorageManager.UploadFile(fileNameWithFolder, fileBytes, ErmesConsts.IMAGE_MIME_TYPE));
+
+                    string thumbnailName = ResourceManager.CameraThumbnails.GetJpegThumbnailFilename(uploadedFileName);
+                    string thumbnailPath = ResourceManager.CameraThumbnails.GetRelativeMediaPath(eventData.Camera.Name, eventData.Camera.CamDirection, thumbnailName);
+                    try
+                    {
+                        AsyncHelper.RunSync(() => _azureCameraThumbnailStorageManager.UploadFile(thumbnailPath, ErmesCoreCommon.CreateThumbnailFromImage(fileBytes, ErmesConsts.Thumbnail.SIZE, ErmesConsts.Thumbnail.QUALITY), ErmesConsts.IMAGE_MIME_TYPE));
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error(e.Message);
+                        Logger.WarnFormat("Upload of Thumbnail fails, try to upload original image");
+
+                        AsyncHelper.RunSync(() => _azureCameraThumbnailStorageManager.UploadFile(thumbnailPath, fileBytes, ErmesConsts.IMAGE_MIME_TYPE));
+                    }
 
                     var stations = AsyncHelper.RunSync(() => _sensorServiceManager.GetStations());
                     SensorServiceStation station = stations.Where(s => s.Name == eventData.Camera.Name).FirstOrDefault();
@@ -293,7 +307,8 @@ namespace Ermes.Consumers
                             distance = eventData.FireLocation.Distance,
                             latitude = eventData.FireLocation.Latitude,
                             longitude = eventData.FireLocation.Longitude
-                        }
+                        },
+                        thumbnail_uri = ResourceManager.CameraThumbnails.GetMediaPath(eventData.Camera.Name, eventData.Camera.CamDirection, uploadedFileName)
                     };
                     AsyncHelper.RunSync(() => _sensorServiceManager.CreateMeasure(sensor.Id, DateTime.UtcNow, DateTime.UtcNow, ResourceManager.Cameras.GetMediaPath(eventData.Camera.Name, eventData.Camera.CamDirection, uploadedFileName), metadata));
                 }
