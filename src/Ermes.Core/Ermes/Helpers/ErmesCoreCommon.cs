@@ -22,8 +22,9 @@ namespace Ermes.Core.Helpers
                 logger.Info($"DestRect created: {destRect.Size}");
                 var destImage = new Bitmap(thumbnailSize, thumbnailSize);
                 logger.Info($"DestImage created: {destImage.Size}");
-                destImage.SetResolution(Math.Min(120, image.HorizontalResolution), Math.Min(120, image.VerticalResolution));
-                logger.Info($"DestImage setResolution done: {image.HorizontalResolution}, {image.VerticalResolution}");
+                //destImage.SetResolution(Math.Min(120, image.HorizontalResolution), Math.Min(120, image.VerticalResolution));
+                //logger.Info($"DestImage setResolution done: {image.HorizontalResolution}, {image.VerticalResolution}");
+                logger.Info($"setResolution commented");
                 using (var graphics = Graphics.FromImage(destImage))
                 {
                     logger.Info($"graphics created");
