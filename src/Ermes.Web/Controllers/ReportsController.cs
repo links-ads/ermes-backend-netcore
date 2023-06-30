@@ -1,11 +1,9 @@
 ﻿using Abp.Azure;
 using Abp.AzureCognitiveServices.CognitiveServices;
-using Abp.AzureCognitiveServices.CognitiveServices.ComputerVision;
 using Abp.BackgroundJobs;
 using Abp.Extensions;
 using Abp.IO.Extensions;
 using Abp.UI;
-using Ermes;
 using Ermes.Attributes;
 using Ermes.Authorization;
 using Ermes.Categories;
@@ -23,7 +21,6 @@ using Ermes.Persons;
 using Ermes.Reports;
 using Ermes.Reports.Dto;
 using Ermes.Resources;
-using Ermes.Web.Controllers;
 using Ermes.Web.Controllers.Dto;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -402,7 +399,7 @@ namespace Ermes.Web.Controllers
                     string uploadedFileName = string.Concat(Guid.NewGuid().ToString(), ".", fileExtension);
 
                     var fileNameWithFolder = ResourceManager.Reports.GetRelativeMediaPath(report.Id, uploadedFileName);
-                    await _azureReportStorageManager.UploadFile(fileNameWithFolder, fileBytes, mimeType);                    
+                    await _azureReportStorageManager.UploadFile(fileNameWithFolder, fileBytes, mimeType);
                     MediaType mediaType = ErmesCommon.GetMediaTypeFromMimeType(mimeType);
 
                     if (mediaType == MediaType.Image)
@@ -423,12 +420,13 @@ namespace Ermes.Web.Controllers
                                     Confidence = t.Confidence
                                 }).ToList());
                             }
-                            if(imageAnalysis != null && imageAnalysis.Adult != null)
+                            if (imageAnalysis != null && imageAnalysis.Adult != null)
                             {
                                 if (report.AdultInfo == null)
                                     report.AdultInfo = new List<ReportAdultInfo>();
 
-                                var info = new ReportAdultInfo() { 
+                                var info = new ReportAdultInfo()
+                                {
                                     IsAdultContent = imageAnalysis.Adult.IsAdultContent,
                                     IsGoryContent = imageAnalysis.Adult.IsGoryContent,
                                     IsRacyContent = imageAnalysis.Adult.IsRacyContent,
@@ -454,14 +452,15 @@ namespace Ermes.Web.Controllers
                         string thumbnailPath = ResourceManager.Thumbnails.GetRelativeMediaPath(report.Id, thumbnailName);
                         try
                         {
-                            await _azureThumbnailStorageManager.UploadFile(thumbnailPath, ErmesCommon.GetJpegThumbnail(fileBytes, AppConsts.ThumbnailSize, AppConsts.ThumbnailQuality), MimeTypeNames.ImageJpeg);
+                            await _azureThumbnailStorageManager.UploadFile(thumbnailPath, ErmesCommon.GetJpegThumbnail(fileBytes, ErmesConsts.Thumbnail.SIZE, ErmesConsts.Thumbnail.QUALITY, Logger), MimeTypeNames.ImageJpeg);
                         }
                         catch (Exception e)
                         {
                             Logger.Error(e.Message);
                             //Use Cognitive services to create image thumbnail
-                            if (imageStream != null) {
-                                var newFileBytes = await _cognitiveServicesManager.GetImageThumbnail(AppConsts.ThumbnailSize, AppConsts.ThumbnailSize, imageStream);
+                            if (imageStream != null)
+                            {
+                                var newFileBytes = await _cognitiveServicesManager.GetImageThumbnail(ErmesConsts.Thumbnail.SIZE, ErmesConsts.Thumbnail.SIZE, imageStream);
                                 if (newFileBytes != null)
                                 {
                                     await _azureThumbnailStorageManager.UploadFile(thumbnailPath, newFileBytes, MimeTypeNames.ImageJpeg);
@@ -503,7 +502,7 @@ namespace Ermes.Web.Controllers
                         report.Tags = report.Tags.Where(t => t.MediaURI != item).ToList();
 
                         //Delete Adult Info
-                        report.AdultInfo= report.AdultInfo.Where(t => t.MediaURI != item).ToList();
+                        report.AdultInfo = report.AdultInfo.Where(t => t.MediaURI != item).ToList();
                     }
                 }
             }

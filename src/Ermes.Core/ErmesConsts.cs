@@ -17,6 +17,22 @@
         public const string SafersProjectName = "SAFERS";
         public const string ShelterProjectName = "SHELTER";
         public const string DefaultYear = "2020";
+        public const string IMAGE_MIME_TYPE = "image/jpeg";
+
+        public class Thumbnail
+        {
+            /// <summary>
+            /// Thumbnail image export quality
+            /// </summary>
+            public const int QUALITY = 75;
+            /// <summary>
+            /// Thumbnail image size
+            /// </summary>
+            public const int SIZE = 256;
+        }
+        
+
+        
 
         public class BusType
         {
