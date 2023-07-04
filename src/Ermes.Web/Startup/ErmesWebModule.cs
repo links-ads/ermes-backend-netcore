@@ -9,10 +9,13 @@ using Ermes.EntityFrameworkCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.Configuration;
+using Abp.Hangfire.Configuration;
+using Abp.Hangfire;
 
 namespace Ermes.Web.Startup
 {
     [DependsOn(
+        typeof(AbpHangfireAspNetCoreModule),
         typeof(ErmesApplicationModule), 
         typeof(ErmesEntityFrameworkCoreModule), 
         typeof(AbpAspNetCoreModule),
@@ -39,6 +42,8 @@ namespace Ermes.Web.Startup
                     typeof(ErmesApplicationModule).GetAssembly()
                 );
             Configuration.Modules.AbpAspNetCore().DefaultWrapResultAttribute.WrapOnSuccess = false;
+
+            Configuration.BackgroundJobs.UseHangfire();
         }
 
         public override void Initialize()

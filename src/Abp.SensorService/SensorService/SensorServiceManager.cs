@@ -1,4 +1,5 @@
-﻿using Abp.SensorService.Configuration;
+﻿using Abp.Application.Features;
+using Abp.SensorService.Configuration;
 using Abp.SensorService.Model;
 using Abp.SensorService.Utility;
 using Newtonsoft.Json;
@@ -130,6 +131,36 @@ namespace Abp.SensorService
             });
             var responseValue = await HttpHelper.SendHttpRequestAsync(HttpClient, HttpMethod.Post, uri, jsonContent);
             return JsonConvert.DeserializeObject<SensorServiceMeasure>(responseValue);
+        }
+
+        public async Task<bool> DeleteStation(string stationId)
+        {
+            if (HttpClient == null)
+                GetHttpClient();
+
+            Uri uri = new Uri(string.Format("{0}stations/{1}", HttpClient.BaseAddress, stationId));
+            await HttpHelper.SendHttpRequestAsync(HttpClient, HttpMethod.Delete, uri);
+            return true;
+        }
+
+        public async Task<bool> DeleteSensor(string sensorId)
+        {
+            if (HttpClient == null)
+                GetHttpClient();
+
+            Uri uri = new Uri(string.Format("{0}sensors/{1}", HttpClient.BaseAddress, sensorId));
+            await HttpHelper.SendHttpRequestAsync(HttpClient, HttpMethod.Delete, uri);
+            return true;
+        }
+
+        public async Task<bool> DeleteMeasure(string measureId)
+        {
+            if (HttpClient == null)
+                GetHttpClient();
+
+            Uri uri = new Uri(string.Format("{0}measurements/{1}", HttpClient.BaseAddress, measureId));
+            await HttpHelper.SendHttpRequestAsync(HttpClient, HttpMethod.Delete, uri);
+            return true;
         }
     }
 }
