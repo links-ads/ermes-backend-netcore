@@ -74,5 +74,11 @@
             public const string COMPLETE_WIZARD = "CompleteWizard";
             public const string VALIDATE_REPORT = "ValidateReport";
         }
+
+        public struct PurgeStationImagesJob
+        {
+            public const int startingHour = 1;
+            public const string startingCron = "0 1 * * *";
+        }
     }
 }
