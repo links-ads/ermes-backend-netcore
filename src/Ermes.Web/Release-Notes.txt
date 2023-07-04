@@ -1,5 +1,9 @@
 Ver.
 --------------------------------
+
+
+Ver. 4.13.1 - 2023-07-04
+--------------------------------
 - Feature - Job for purging old measurements (appsettings edited)(#148)
 
 Ver. 4.13.0 - 2023-06-27
