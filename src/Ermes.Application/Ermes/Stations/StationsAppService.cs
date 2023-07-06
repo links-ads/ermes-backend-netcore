@@ -27,19 +27,27 @@ namespace Ermes.Stations
             PagedResultDto<StationDto> result = new PagedResultDto<StationDto>();
             input.StartDate = input.StartDate.HasValue ? input.StartDate : DateTime.MinValue;
             input.EndDate = input.EndDate.HasValue ? input.EndDate : DateTime.MaxValue;
-            var fullStationList = await _sensorServiceManager.GetStations();
-            var stations = new List<StationDto>();
-            foreach (var station in fullStationList)
+            try
             {
-                var summary = await _sensorServiceManager.GetStationSummary(station.Id, input.StartDate.Value, input.EndDate.Value);
-                stations.Add(ObjectMapper.Map<StationDto>(summary));
+                var fullStationList = await _sensorServiceManager.GetStations();
+                var stations = new List<StationDto>();
+                foreach (var station in fullStationList)
+                {
+                    var summary = await _sensorServiceManager.GetStationSummary(station.Id, input.StartDate.Value, input.EndDate.Value);
+                    stations.Add(ObjectMapper.Map<StationDto>(summary));
+                }
+                result.TotalCount = stations.Count;
+                result.Items = stations
+                            .OrderBy(a => a.Name)
+                            .Skip(input.SkipCount)
+                            .Take(input.MaxResultCount)
+                            .ToList();
             }
-            result.TotalCount = stations.Count;
-            result.Items = stations
-                        .OrderBy(a => a.Name)
-                        .Skip(input.SkipCount)
-                        .Take(input.MaxResultCount)
-                        .ToList();
+            catch(Exception e)
+            {
+                Logger.ErrorFormat("GetStation exceptio: {0}", e.Message.ToString());
+                result.Items = new List<StationDto>();
+            }
 
             return result;
         }
