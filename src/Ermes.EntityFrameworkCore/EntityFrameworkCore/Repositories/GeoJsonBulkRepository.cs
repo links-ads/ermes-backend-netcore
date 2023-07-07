@@ -901,7 +901,7 @@ namespace Ermes.GeoJson
         {
             return _dbContextProvider.GetDbContext()
                 .Alerts
-                .FromSqlInterpolated($"SELECT * FROM alerts WHERE ST_INTERSECTS(\"AreaOfInterest\", {boundingBox}) and {startDate} < \"Sent\" and {endDate} > \"Sent\"");
+                .FromSqlInterpolated($"SELECT * FROM alerts WHERE ST_INTERSECTS(\"BoundingBox\", {boundingBox}) and {startDate} < \"Sent\" and {endDate} > \"Sent\"");
         }
     }
 
