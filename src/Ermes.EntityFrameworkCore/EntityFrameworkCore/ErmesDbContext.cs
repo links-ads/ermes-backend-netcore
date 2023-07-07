@@ -85,6 +85,7 @@ namespace Ermes.EntityFrameworkCore
         public virtual DbSet<MapRequestLayer> MapRequestLayers { get; set; }
         public virtual DbSet<CommunicationReceiver> CommunicationReceivers { get; set; }
         public virtual DbSet<Alert> Alerts { get; set; }
+        public virtual DbSet<AlertAreaOfInterest> AlertAreasOfInterest { get; set; }
         public virtual DbSet<CapInfo> CapInfoList { get; set; }
         public virtual DbSet<Station> Stations { get; set; }
 

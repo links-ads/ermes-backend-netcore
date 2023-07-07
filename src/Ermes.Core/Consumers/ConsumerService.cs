@@ -194,11 +194,13 @@ namespace Ermes.Consumers
                 try
                 {
                     var alert = ObjectMapper.Map<Alert>(eventData);
-                    alert.FullAreaOfInterest = eventData.Info.First().Area.First().FullGeometry;
-                    alert.AreaOfInterest = alert.FullAreaOfInterest.Envelope;
+                    var fullGeometry = eventData.Info.First().Area.First().FullGeometry;
+                    alert.BoundingBox = fullGeometry.Envelope;
                     
                     alert.IsARecommendation = true;
                     alert.Id = _alertManager.InsertAlertAndGetId(alert);
+                    AlertAreaOfInterest alertAreaOfInterest = new AlertAreaOfInterest(alert.Id, fullGeometry);
+                    alert.AlertAreaOfInterestId = _alertManager.InsertAlertAreaOfInterestAndGetId(alertAreaOfInterest);
                     CurrentUnitOfWork.SaveChanges();
 
                     foreach (var item in eventData.Info)

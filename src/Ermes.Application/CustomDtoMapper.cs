@@ -266,12 +266,11 @@ namespace Ermes
                 .ForMember(dto => dto.w_speed, options => options.MapFrom(b => b.WindSpeed));
 
             configuration.CreateMap<Alert, AlertDto>()
-                .ForMember(dto => dto.Centroid, options => options.MapFrom(b => new PointPosition(b.AreaOfInterest.Centroid.X, b.AreaOfInterest.Centroid.Y)));
+                .ForMember(dto => dto.Centroid, options => options.MapFrom(b => new PointPosition(b.BoundingBox.Centroid.X, b.BoundingBox.Centroid.Y)));
             configuration.CreateMap<Alert, RabbitMqAlert>()
                 .ReverseMap()
                 .ForMember(a => a.Info, options => options.Ignore())
-                .ForMember(a => a.AreaOfInterest, options => options.Ignore())
-                .ForMember(a => a.FullAreaOfInterest, options => options.Ignore());
+                .ForMember(a => a.BoundingBox, options => options.Ignore());
             configuration.CreateMap<CapInfo, CapInfoDto>();
             configuration.CreateMap<CapInfo, RabbitMqAlertInfo>()
                 .ReverseMap();

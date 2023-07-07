@@ -1,6 +1,7 @@
 Ver.
 --------------------------------
 - Bugfix - Fix return value of GetStation API (#150)
+- Feature - Optimization for alerts' areas of interest (migration added)(#149)
 
 Ver. 4.13.1 - 2023-07-04
 --------------------------------

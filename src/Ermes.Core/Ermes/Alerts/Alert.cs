@@ -67,13 +67,14 @@ namespace Ermes.Alerts
         /// </summary>
         [Required]
         [Column(TypeName = "geography")]
-        public Geometry AreaOfInterest { get; set; }
-
-        [Column(TypeName = "geography")]
-        public Geometry FullAreaOfInterest { get; set; }
+        public Geometry BoundingBox { get; set; }
 
         public DateTime CreationTime { get; set; }
 
         public virtual ICollection<CapInfo> Info { get; set; }
+
+        [ForeignKey("AlertAreaOfInterestId")]
+        public virtual AlertAreaOfInterest AlertAreaOfInterest { get; set; }
+        public int? AlertAreaOfInterestId { get; set; }
     }
 }
