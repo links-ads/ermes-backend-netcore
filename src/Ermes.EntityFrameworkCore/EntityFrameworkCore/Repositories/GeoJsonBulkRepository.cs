@@ -298,7 +298,7 @@ namespace Ermes.GeoJson
                         a.""Sent"" as ""startDateFilter"", 
                         a.""Sent"" as ""endDateFilter"",
                         'Alert' as ""type"", 
-                        ST_CENTROID(a.""AreaOfInterest"") as ""location"", 
+                        ST_CENTROID(a.""BoundingBox"") as ""location"", 
                         a.""Status"" as ""status"",
                         null as ""organizationId"",
                         null as ""organizationName"",

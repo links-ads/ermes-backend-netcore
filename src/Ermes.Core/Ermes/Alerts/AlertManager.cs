@@ -10,15 +10,19 @@ namespace Ermes.Alerts
 {
     public class AlertManager : DomainService
     {
+        public IQueryable<Alert> AlertWithAreas { get { return AlertRepository.GetAll().Include(a => a.Info).Include(a => a.AlertAreaOfInterest); } }
         public IQueryable<Alert> Alerts { get { return AlertRepository.GetAll().Include(a => a.Info); } }
+        public IQueryable<AlertAreaOfInterest> AlertAreasOfInterest { get { return AlertAreaOfInterestRepository.GetAll(); } }
         public IQueryable<CapInfo> CapInfoList  { get { return CapInfoRepository.GetAll(); } }
         protected IRepository<Alert> AlertRepository { get; set; }
+        protected IRepository<AlertAreaOfInterest> AlertAreaOfInterestRepository { get; set; }
         protected IRepository<CapInfo> CapInfoRepository { get; set; }
 
-        public AlertManager(IRepository<Alert> alertRepository, IRepository<CapInfo> capInfoRepository)
+        public AlertManager(IRepository<Alert> alertRepository, IRepository<CapInfo> capInfoRepository, IRepository<AlertAreaOfInterest> alertAreaOfInterestRepository)
         {
             AlertRepository = alertRepository;
             CapInfoRepository = capInfoRepository;
+            AlertAreaOfInterestRepository = alertAreaOfInterestRepository;
         }
 
         public async Task<List<Alert>> GetAlertsAsync()
@@ -31,6 +35,11 @@ namespace Ermes.Alerts
             return AlertRepository.InsertAndGetId(alert);
         }
 
+        public int InsertAlertAreaOfInterestAndGetId(AlertAreaOfInterest alertAreaOfInterest)
+        {
+            return AlertAreaOfInterestRepository.InsertAndGetId(alertAreaOfInterest);
+        }
+
         public int InsertCapInfoAndGetId(CapInfo info)
         {
             return CapInfoRepository.InsertAndGetId(info);
@@ -38,7 +47,7 @@ namespace Ermes.Alerts
 
         public async Task<Alert> GetAlertByIdAsync(int alertId)
         {
-            return await Alerts.SingleOrDefaultAsync(a => a.Id == alertId);
+            return await AlertWithAreas.SingleOrDefaultAsync(a => a.Id == alertId);
         }
     }
 }

@@ -133,7 +133,7 @@ namespace Ermes.Alerts
             {
                 Feature = new FeatureDto<AlertDto>()
                 {
-                    Geometry = input.IncludeArea ? writer.Write(alert.FullAreaOfInterest) : null,
+                    Geometry = input.IncludeArea ? writer.Write(alert.AlertAreaOfInterest.AreaOfInterest) : null,
                     Properties = ObjectMapper.Map<AlertDto>(alert)
                 }
             };
