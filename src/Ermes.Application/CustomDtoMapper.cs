@@ -137,7 +137,8 @@ namespace Ermes
                             .ForMember(entity => entity.MediaURIs, options => options.Ignore())
                             .ForMember(entity => entity.Tags, options => options.Ignore())
                             .ForMember(entity => entity.AdultInfo, options => options.Ignore())
-                            .ForMember(entity => entity.Creator, options => options.Ignore());
+                            .ForMember(entity => entity.Creator, options => options.Ignore())
+                            .ForMember(entity => entity.Validations, options => options.Ignore());
             configuration.CreateMap<ReportValidation, ReportValidationDto>()
                             .ForMember(dto => dto.ValidatorDisplayName, options => options.MapFrom(a => a.Person.Username != null && a.Person.Username != string.Empty ? a.Person.Username : a.Person.Email))
                             .ReverseMap();
