@@ -229,7 +229,7 @@ namespace Ermes.Web.Startup
                 app.UseHangfireDashboard("/hangfire", new DashboardOptions
                 {
                     Authorization = new[] { new App_Start.AbpHangfireAuthorizationFilter() },
-                    AppPath = "/Application/Index"
+                    AppPath = "/swagger"
                 });
 
                 // Disable automatic retry for all hangfire job and disable concurrent execution
