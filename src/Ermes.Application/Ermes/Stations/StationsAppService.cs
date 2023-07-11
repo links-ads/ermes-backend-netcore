@@ -1,6 +1,8 @@
 ﻿using Abp.Application.Services.Dto;
 using Abp.SensorService;
+using Abp.UI;
 using Ermes.Attributes;
+using Ermes.Dto;
 using Ermes.Dto.Datatable;
 using Ermes.Ermes.Stations;
 using Ermes.Stations.Dto;
@@ -16,9 +18,11 @@ namespace Ermes.Stations
     public class StationsAppService : ErmesAppServiceBase, IStationsAppService
     {
         private readonly SensorServiceManager _sensorServiceManager;
-        public StationsAppService(SensorServiceManager sensorServiceManager)
+        private readonly StationManager _stationManager;
+        public StationsAppService(SensorServiceManager sensorServiceManager, StationManager stationManager)
         {
             _sensorServiceManager = sensorServiceManager;
+            _stationManager = stationManager;
         }
 
         #region Private
@@ -43,9 +47,9 @@ namespace Ermes.Stations
                             .Take(input.MaxResultCount)
                             .ToList();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                Logger.ErrorFormat("GetStation exceptio: {0}", e.Message.ToString());
+                Logger.ErrorFormat("GetStation exception: {0}", e.Message.ToString());
                 result.Items = new List<StationDto>();
             }
 
@@ -107,6 +111,89 @@ namespace Ermes.Stations
             {
                 Measurements = measures
             };
+        }
+
+
+        [OpenApiOperation("Delete station",
+            @"
+                Delete a station both from sensor service module and API Gateway
+                Input:
+                    - Id: station id coming from sensor service module
+
+                Output: true if the entity has been successfully deleted, false otherwise
+                Exception: Sensor service module not available
+            "
+        )]
+        public virtual async Task<bool> DeleteStation(IdInput<string> input)
+        {
+            if (input == null || input.Id == "")
+                throw new UserFriendlyException(L("InvalidEntityId", "Station", ""));
+
+            try
+            {
+                if (await _sensorServiceManager.DeleteStation(input.Id))
+                    await _stationManager.DeleteStationBySensorServiceIdAsync(input.Id);
+            }
+            catch (Exception ex)
+            {
+                throw new UserFriendlyException(ex.Message);
+            }
+
+            return true;
+        }
+
+        [OpenApiOperation("Delete sensor",
+            @"
+                Delete a sensor from sensor service module and API Gateway
+                Input:
+                    - Id: sensor id coming from sensor service module
+
+                Output: true if the entity has been successfully deleted, false otherwise
+                Exception: Sensor service module not available
+            "
+        )]
+        public virtual async Task<bool> DeleteSensor(IdInput<string> input)
+        {
+            if (input == null || input.Id == "")
+                throw new UserFriendlyException(L("InvalidEntityId", "Sensor", ""));
+
+            try
+            {
+                await _sensorServiceManager.DeleteSensor(input.Id);
+            }
+            catch (Exception ex)
+            {
+                throw new UserFriendlyException(ex.Message);
+            }
+
+            return true;
+        }
+
+        [OpenApiOperation("Delete measure",
+            @"
+                Delete a measure from sensor service module
+                Input:
+                    - Id: measure id coming from sensor service module
+
+                Output: true if the entity has been successfully deleted, false otherwise
+                Exception: Sensor service module not available
+            "
+        )]
+        public virtual async Task<bool> DeleteMeasure(IdInput<string> input)
+        {
+            if (input == null || input.Id == "")
+                throw new UserFriendlyException(L("InvalidEntityId", "Measure", ""));
+
+            try
+            {
+                await _sensorServiceManager.DeleteMeasure(input.Id);
+            }
+            catch (Exception ex)
+            {
+                throw new UserFriendlyException(ex.Message);
+            }
+
+            return true;
         }
     }
 }

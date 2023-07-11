@@ -1,6 +1,7 @@
 Ver.
 --------------------------------
 - Bugfix - Fix update report function (#151)
+- Feature - Delete APIs for StationsAppService added (#152)
 
 Ver. 4.13.2 - 2023-07-07
 --------------------------------
