@@ -1,6 +1,6 @@
 Ver.
 --------------------------------
-
+- Feature - Delete APIs for StationsAppService added (#152)
 
 Ver. 4.13.2 - 2023-07-07
 --------------------------------

@@ -1,15 +1,11 @@
 ﻿using Abp.Domain.Repositories;
 using Abp.Domain.Services;
-using Ermes.Reports;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Ermes.Stations
 {
-    public class StationManager: DomainService
+    public class StationManager : DomainService
     {
         public IQueryable<Station> Stations { get { return StationRepository.GetAll(); } }
         protected IRepository<Station> StationRepository { get; set; }
@@ -33,5 +29,9 @@ namespace Ermes.Stations
             return Stations.FirstOrDefault(s => s.SensorServiceId == id);
         }
 
+        public async Task DeleteStationBySensorServiceIdAsync(string stationId)
+        {
+            await StationRepository.DeleteAsync(s => s.SensorServiceId == stationId);
+        }
     }
 }
