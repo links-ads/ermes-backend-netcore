@@ -19,7 +19,7 @@ namespace Ermes.Configuration
                 new SettingDefinition(LocalizationSettingNames.DefaultLanguage, "en"),
                 new SettingDefinition(AppSettings.General.HouseOrganization, "Protezione Civile Piemonte"),
                 new SettingDefinition(AppSettings.JobSettings.Station_JobEnabled, "true"),
-                new SettingDefinition(AppSettings.JobSettings.Stations_DaysToBeKept, "30")
+                new SettingDefinition(AppSettings.JobSettings.Stations_DaysToBeKept, "7")
             };
         }
     }

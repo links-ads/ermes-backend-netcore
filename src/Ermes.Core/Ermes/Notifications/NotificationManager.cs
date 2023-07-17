@@ -38,5 +38,10 @@ namespace Ermes.Notifications
         { 
             return NotificationReceivedRepository.InsertOrUpdateAndGetId(notificationReceived);
         }
+
+        public async Task DeleteNotificationReceivedOlderThanDateAsync(DateTime date)
+        {
+            await NotificationReceivedRepository.DeleteAsync(n => n.CreationTime < date);
+        }
     }
 }

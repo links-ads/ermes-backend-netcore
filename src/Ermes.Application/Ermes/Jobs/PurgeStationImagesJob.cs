@@ -5,6 +5,7 @@ using Abp.Dependency;
 using Abp.Domain.Uow;
 using Abp.SensorService;
 using Ermes.Configuration;
+using Ermes.Notifications;
 using Ermes.Resources;
 using Ermes.Stations.Dto;
 using Newtonsoft.Json;
@@ -23,11 +24,13 @@ namespace Ermes.Jobs
     {
         private readonly IAzureManager _azureManager;
         private readonly SensorServiceManager _sensorServiceManager;
+        private readonly NotificationManager _notificationManager;
 
-        public PurgeStationImagesJob(IAzureManager azureManager, SensorServiceManager sensorServiceManager)
+        public PurgeStationImagesJob(IAzureManager azureManager, SensorServiceManager sensorServiceManager, NotificationManager notificationManager)
         {
             _azureManager = azureManager;
             _sensorServiceManager = sensorServiceManager;
+            _notificationManager = notificationManager;
         }
 
         [UnitOfWork(IsDisabled = true)]
@@ -39,11 +42,12 @@ namespace Ermes.Jobs
             if (SettingManager.GetSettingValue<bool>(AppSettings.JobSettings.Station_JobEnabled))
             {
                 var dayToKeeep = SettingManager.GetSettingValue<int>(AppSettings.JobSettings.Stations_DaysToBeKept);
-
+                var refDate = DateTime.UtcNow.AddDays(-dayToKeeep);
+                //Station Management
                 var fullStationList = await _sensorServiceManager.GetStations();
                 foreach (var station in fullStationList)
                 {
-                    var summary = await _sensorServiceManager.GetStationSummary(station.Id, DateTime.MinValue, DateTime.UtcNow.AddDays(-dayToKeeep));
+                    var summary = await _sensorServiceManager.GetStationSummary(station.Id, DateTime.MinValue, refDate);
                     foreach (var sensor in summary.Sensors)
                     {
                         foreach (var measurement in sensor.Measurements)
@@ -66,6 +70,9 @@ namespace Ermes.Jobs
                         }
                     }
                 }
+
+                //Notification received management
+                await _notificationManager.DeleteNotificationReceivedOlderThanDateAsync(refDate);
             }
 
             return;
