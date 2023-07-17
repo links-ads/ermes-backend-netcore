@@ -43,36 +43,51 @@ namespace Ermes.Jobs
             {
                 var dayToKeeep = SettingManager.GetSettingValue<int>(AppSettings.JobSettings.Stations_DaysToBeKept);
                 var refDate = DateTime.UtcNow.AddDays(-dayToKeeep);
-                //Station Management
-                var fullStationList = await _sensorServiceManager.GetStations();
-                foreach (var station in fullStationList)
-                {
-                    var summary = await _sensorServiceManager.GetStationSummary(station.Id, DateTime.MinValue, refDate);
-                    foreach (var sensor in summary.Sensors)
-                    {
-                        foreach (var measurement in sensor.Measurements)
-                        {
-                            var metadata = JsonConvert.DeserializeObject<MetadataDto>(JsonConvert.SerializeObject(measurement.Metadata));
-                            if (!metadata.Detection.fire && !metadata.Detection.smoke)
-                            {
-                                Logger.InfoFormat("Removing Station {0} - Sensor {1} - Measure {2}...", station.Name, sensor.Description, measurement.Id);
-                                string imageName = measurement.Measure.Split('/').LastOrDefault();
-                                if (imageName != null)
-                                {
-                                    string filename = ResourceManager.Cameras.GetRelativeMediaPath(station.Name, sensor.Description, imageName);
-                                    await _azureStorageManager.DeleteBlobAsync(filename);
-                                    filename = ResourceManager.CameraThumbnails.GetRelativeMediaPath(station.Name, sensor.Description, imageName);
-                                    await _azureThumbnailStorageManager.DeleteBlobAsync(filename);
 
-                                    await _sensorServiceManager.DeleteMeasure(measurement.Id);
+                try
+                {
+                    //Station Management
+                    var fullStationList = await _sensorServiceManager.GetStations();
+                    foreach (var station in fullStationList)
+                    {
+                        var summary = await _sensorServiceManager.GetStationSummary(station.Id, DateTime.MinValue, refDate);
+                        foreach (var sensor in summary.Sensors)
+                        {
+                            foreach (var measurement in sensor.Measurements)
+                            {
+                                var metadata = JsonConvert.DeserializeObject<MetadataDto>(JsonConvert.SerializeObject(measurement.Metadata));
+                                if (!metadata.Detection.fire && !metadata.Detection.smoke)
+                                {
+                                    Logger.InfoFormat("Removing Station {0} - Sensor {1} - Measure {2}...", station.Name, sensor.Description, measurement.Id);
+                                    string imageName = measurement.Measure.Split('/').LastOrDefault();
+                                    if (imageName != null)
+                                    {
+                                        string filename = ResourceManager.Cameras.GetRelativeMediaPath(station.Name, sensor.Description, imageName);
+                                        await _azureStorageManager.DeleteBlobAsync(filename);
+                                        filename = ResourceManager.CameraThumbnails.GetRelativeMediaPath(station.Name, sensor.Description, imageName);
+                                        await _azureThumbnailStorageManager.DeleteBlobAsync(filename);
+
+                                        await _sensorServiceManager.DeleteMeasure(measurement.Id);
+                                    }
                                 }
                             }
                         }
                     }
                 }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex.Message);
+                }
 
-                //Notification received management
-                await _notificationManager.DeleteNotificationReceivedOlderThanDateAsync(refDate);
+                try
+                {
+                    //Notification received management
+                    await _notificationManager.DeleteNotificationReceivedOlderThanDateAsync(refDate);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex.Message);
+                }
             }
 
             return;
