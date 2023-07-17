@@ -232,10 +232,12 @@ namespace Ermes
                             .ForMember(dto => dto.Organization, options => options.MapFrom(b => b.Creator.Organization))
                             .ForMember(dto => dto.Username, options => options.MapFrom(b => b.Creator.Username))
                             .ForMember(dto => dto.Email, options => options.MapFrom(b => b.Creator.Email))
+                            .ForMember(dto => dto.MapRequestType, options => options.MapFrom(b => b.Type))
                             .AfterMap((src, dest) => dest.Duration.LowerBound = dest.Duration.LowerBound.ToUniversalTime())
                             .AfterMap((src, dest) => dest.Duration.UpperBound = dest.Duration.UpperBound.ToUniversalTime())
                             .ReverseMap()
-                            .ForMember(entity => entity.Code, options => options.Ignore());
+                            .ForMember(entity => entity.Code, options => options.Ignore())
+                            .ForMember(entity => entity.Type, options => options.MapFrom(b => b.MapRequestType));
             configuration.CreateMap<MapRequests.MapRequest, MapRequestNotificationDto>();
             configuration.CreateMap<MapRequests.MapRequestLayer, MapRequestLayerDto>()
                             .ReverseMap();
