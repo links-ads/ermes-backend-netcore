@@ -10,6 +10,7 @@ namespace Ermes.Reports.Dto
     public class ReportDto
     {
         public int Id { get; set; }
+        public string Type { get; } = "Report";
         public HazardType Hazard { get; set; }
         public GeneralStatus Status { get; set; }
         public ReportContentType Content { get; set; }
