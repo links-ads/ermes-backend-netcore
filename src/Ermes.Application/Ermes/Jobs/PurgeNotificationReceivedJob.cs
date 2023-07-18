@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 namespace Ermes.Jobs
 {
     [Serializable]
-    public class PurgeNotificationReceivedArgs
+    public class PurgeNotificationReceivedJobArgs
     {
     }
 
-    public class PurgeNotificationReceivedJob : AsyncBackgroundJob<PurgeNotificationReceivedArgs>, ITransientDependency
+    public class PurgeNotificationReceivedJob : AsyncBackgroundJob<PurgeNotificationReceivedJobArgs>, ITransientDependency
     {
         private readonly NotificationManager _notificationManager;
 
@@ -24,7 +24,7 @@ namespace Ermes.Jobs
         }
 
         [UnitOfWork(IsDisabled = true)]
-        protected override async Task ExecuteAsync(PurgeNotificationReceivedArgs args)
+        protected override async Task ExecuteAsync(PurgeNotificationReceivedJobArgs args)
         {
 
             if (SettingManager.GetSettingValue<bool>(AppSettings.JobSettings.NotificationReceived_JobEnabled))
