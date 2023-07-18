@@ -18,6 +18,8 @@ namespace Ermes.Configuration
 
         public static class JobSettings
         {
+            public const string NotificationReceived_JobEnabled = "App.JobSettings.NotificationReceived.JobEnabled";
+            public const string NotificationReceived_DaysToBeKept = "App.JobSettings.NotificationReceived.DaysToBeKept";
             public const string Station_JobEnabled = "App.JobSettings.Stations.JobEnabled";
             public const string Stations_DaysToBeKept = "App.JobSettings.Stations.DaysToBeKept";
         }
