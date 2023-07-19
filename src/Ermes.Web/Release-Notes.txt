@@ -1,4 +1,8 @@
-Ver.
+Ver. 4.14.1 - 2023-07-18
+--------------------------------
+- Feature - Job for notification received added
+
+Ver. 4.14.0 - 2023-07-17
 --------------------------------
 - Feature - Purge job settig update to 7 days (#153)
 - Bugfix - Fix MapRequest create function (#154)

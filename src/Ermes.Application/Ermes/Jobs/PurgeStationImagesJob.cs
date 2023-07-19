@@ -5,7 +5,6 @@ using Abp.Dependency;
 using Abp.Domain.Uow;
 using Abp.SensorService;
 using Ermes.Configuration;
-using Ermes.Notifications;
 using Ermes.Resources;
 using Ermes.Stations.Dto;
 using Newtonsoft.Json;
@@ -24,13 +23,11 @@ namespace Ermes.Jobs
     {
         private readonly IAzureManager _azureManager;
         private readonly SensorServiceManager _sensorServiceManager;
-        private readonly NotificationManager _notificationManager;
 
-        public PurgeStationImagesJob(IAzureManager azureManager, SensorServiceManager sensorServiceManager, NotificationManager notificationManager)
+        public PurgeStationImagesJob(IAzureManager azureManager, SensorServiceManager sensorServiceManager)
         {
             _azureManager = azureManager;
             _sensorServiceManager = sensorServiceManager;
-            _notificationManager = notificationManager;
         }
 
         [UnitOfWork(IsDisabled = true)]
@@ -73,16 +70,6 @@ namespace Ermes.Jobs
                             }
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error(ex.Message);
-                }
-
-                try
-                {
-                    //Notification received management
-                    await _notificationManager.DeleteNotificationReceivedOlderThanDateAsync(refDate);
                 }
                 catch (Exception ex)
                 {

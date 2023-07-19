@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ermes.MapRequests
 {
@@ -29,7 +28,11 @@ namespace Ermes.MapRequests
         /// Key is one of the value contained in FireBreakType enum
         /// Value is a LINESTRING
         /// </summary>
-        public Dictionary<string,string> FireBreak { get; set; }
+        public Dictionary<string, string> FireBreak { get; set; }
 
+        /// <summary>
+        /// Field added for the client frontend, that has to store in Value some additional properties
+        /// </summary>
+        public Dictionary<string, string> FireBreakFullFeature { get; set; }
     }
 }

@@ -79,6 +79,12 @@
         {
             public const int startingHour = 1;
             public const string startingCron = "0 1 * * *";
+        }        
+        
+        public struct PurgeNotificationReceivedJob
+        {
+            public const int startingHour = 1;
+            public const string startingCron = "0 4 * * *";
         }
     }
 }
