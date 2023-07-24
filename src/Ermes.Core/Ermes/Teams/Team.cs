@@ -12,7 +12,7 @@ namespace Ermes.Teams
     [Table("teams")]
     public class Team:AuditedEntity
     {
-        private const int MaxTeamNameLength = 255;
+        public const int MAX_TEAMNAME_LENGTH = 255;
         public Team(int organizationId, string name)
         {
             OrganizationId = organizationId;
@@ -23,7 +23,7 @@ namespace Ermes.Teams
         public virtual Organization Organization { get; set; }
         public virtual int OrganizationId { get; set; }
 
-        [StringLength(MaxTeamNameLength)]
+        [StringLength(MAX_TEAMNAME_LENGTH)]
         public string Name { get; set; }
     }
 }
