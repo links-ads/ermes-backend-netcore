@@ -4,6 +4,7 @@ using Ermes.Enums;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Ermes.Reports.Dto
 {
@@ -18,6 +19,7 @@ namespace Ermes.Reports.Dto
         public DateTime Timestamp { get; set; }
         public List<MediaURIDto> MediaURIs { get; set; }
         public List<ReportExtensionData> ExtensionData { get; set; }
+        [StringLength(Report.MAX_DESCRIPTION_LENGTH)]
         public string Description { get; set; }
         public string Username { get; set; }
         public string Email { get; set; }

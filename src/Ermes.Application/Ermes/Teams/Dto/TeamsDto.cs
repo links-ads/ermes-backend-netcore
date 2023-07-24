@@ -1,14 +1,9 @@
-﻿using Ermes.Auth.Dto;
-using Ermes.Dto.Datatable;
-using Ermes.Organizations;
+﻿using Ermes.Dto.Datatable;
 using Ermes.Organizations.Dto;
-using Ermes.Persons;
-using Ermes.Profile.Dto;
 using Ermes.Users.Dto;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace Ermes.Teams.Dto
 {
@@ -23,6 +18,7 @@ namespace Ermes.Teams.Dto
     {
         public int Id { get; set; }
         [Required]
+        [StringLength(Team.MAX_TEAMNAME_LENGTH)]
         public string Name { get; set; }
         public int? OrganizationId { get; set; }
         public OrganizationDto Organization { get; set; }
@@ -42,5 +38,5 @@ namespace Ermes.Teams.Dto
         public List<ListUsernamesDto> Members { get; set; }
     }
     public class GetTeamsInput : DTPagedSortedAndFilteredInputDto { }
-    
+
 }

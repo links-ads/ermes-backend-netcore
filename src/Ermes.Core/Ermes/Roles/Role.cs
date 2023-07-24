@@ -10,8 +10,8 @@ namespace Ermes.Roles
     [Table("roles")]
     public class Role : AuditedEntity
     {
-        public const int MaxDescriptionLength = 255;
-        public const int MaxNameLength = 50;
+        public const int MAX_DESCRIPTION_LENGTH = 255;
+        public const int MAX_NAME_LENGTH = 50;
         public Role(){}
 
         public Role(string name, string description, bool isDefault = false, bool superRole = false)
@@ -25,12 +25,12 @@ namespace Ermes.Roles
         /// <summary>
         /// Role name
         /// </summary>
-        [StringLength(MaxNameLength)]
+        [StringLength(MAX_NAME_LENGTH)]
         public string Name { get; set; }
         /// <summary>
         /// Role description
         /// </summary>
-        [StringLength(MaxDescriptionLength)]
+        [StringLength(MAX_DESCRIPTION_LENGTH)]
         public string Description { get; set; }
         /// <summary>
         /// A role is marked as default it will be assigned during registration when no roles 

@@ -1,24 +1,20 @@
-﻿using Abp.Domain.Entities;
-using Abp.Domain.Entities.Auditing;
+﻿using Abp.Domain.Entities.Auditing;
 using Ermes.Enums;
 using Ermes.Helpers;
-using Ermes.Interfaces;
 using Ermes.Missions;
-using Ermes.Organizations;
 using Ermes.Persons;
 using NetTopologySuite.Geometries;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 
 namespace Ermes.Reports
 {
     [Table("reports")]
     public class Report : AuditedEntity
     {
-        public const int MaxDescriptionLength = 1000;
+        public const int MAX_DESCRIPTION_LENGTH = 1000;
 
         public Report()
         {
@@ -47,7 +43,7 @@ namespace Ermes.Reports
         public List<string> MediaURIs { get; set; }
         [Column(TypeName = "jsonb")]
         public List<ReportExtensionData> ExtensionData { get; set; }
-        [StringLength(MaxDescriptionLength)]
+        [StringLength(MAX_DESCRIPTION_LENGTH)]
         public string Description { get; set; }
         [ForeignKey("CreatorUserId")]
         public Person Creator { get; set; }
@@ -73,7 +69,7 @@ namespace Ermes.Reports
         [NotMapped]
         public bool IsEditable { get; set; }
         public bool IsPublic { get; set; }
-        
+
         [Column("ContentType")]
         public string ContentString
         {
