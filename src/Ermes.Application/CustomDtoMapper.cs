@@ -262,6 +262,7 @@ namespace Ermes
                 .ForMember(dto => dto.start, options => options.MapFrom(b => b.start.ToUniversalTime()))
                 .ForMember(dto => dto.end, options => options.MapFrom(b => b.end.ToUniversalTime()));
             configuration.CreateMap<MapRequestBody, MapRequestWildFireSimulationBody>()
+                .ForMember(dto => dto.datatype_id, options => options.MapFrom(b => b.datatype_id.ToString()))
                 .ForMember(dto => dto.start, options => options.MapFrom(b => b.start.ToUniversalTime()))
                 .ForMember(dto => dto.end, options => options.MapFrom(b => b.end.ToUniversalTime()));
             configuration.CreateMap<BoundaryCondition, BoundaryConditionBody>()
