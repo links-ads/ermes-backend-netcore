@@ -31,6 +31,7 @@ namespace Ermes.Notifiers.MessageBody
         public bool do_spotting { get; set; }
         public decimal probabilityRange { get; set; }
         public int time_limit { get; set; }
+        public string datatype_id { get; set; }
         public List<BoundaryConditionBody> boundary_conditions { get; set; }
     }
 

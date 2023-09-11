@@ -1,3 +1,13 @@
+Ver.
+--------------------------------
+
+
+Ver. 4.14.3 - 2023-09-11
+--------------------------------
+- Bugfix - Fix GetReports visibility management 
+
+Ver. 4.14.2 - 2023-07-24
+--------------------------------
 - Bugfix - Validation errors added in DTO classes (#155)
 
 Ver. 4.14.1 - 2023-07-18
