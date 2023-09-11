@@ -98,6 +98,14 @@ namespace Ermes.Reports
                 query = query.Where(a => contentList.Contains(a.ContentString));
             }
 
+            if (input.Visibility != VisibilityType.All)
+            {
+                if(input.Visibility == VisibilityType.Private)
+                    query = query.Where(r => !r.IsPublic);
+                else
+                    query = query.Where(r => r.IsPublic);
+            }
+
             query = query.DTFilterBy(input);
 
             var person = _session.LoggedUserPerson;
