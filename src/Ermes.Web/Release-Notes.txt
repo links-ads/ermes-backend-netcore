@@ -2,6 +2,10 @@ Ver.
 --------------------------------
 
 
+Ver. 4.14.4 - 2023-09-12
+--------------------------------
+- Bugfix - Fix sorting for paginated APIs 
+
 Ver. 4.14.3 - 2023-09-11
 --------------------------------
 - Bugfix - Fix GetReports visibility management 

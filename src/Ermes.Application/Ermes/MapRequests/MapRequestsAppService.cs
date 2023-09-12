@@ -138,7 +138,7 @@ namespace Ermes.MapRequests
 
             if (input?.Order != null && input.Order.Count == 0)
             {
-                query = query.OrderByDescending(a => a.Duration.LowerBound);
+                query = query.OrderByDescending(a => a.Duration.LowerBound).ThenByDescending(a => a.Id);
                 query = query.PageBy(input);
             }
             else
