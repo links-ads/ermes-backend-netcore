@@ -16,5 +16,6 @@ namespace Ermes.Ermes.Stations
         Task<bool> DeleteStation(IdInput<string> input);
         Task<bool> DeleteSensor(IdInput<string> input);
         Task<bool> DeleteMeasure(IdInput<string> input);
+        Task<ValidateMeasureOutput> ValidateMeasure(ValidateMeasureInput input);
     }
 }
