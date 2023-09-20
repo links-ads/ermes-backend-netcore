@@ -1,11 +1,14 @@
 ﻿using Abp.Application.Services.Dto;
+using Abp.AutoMapper;
 using Abp.SensorService;
+using Abp.SensorService.Model;
 using Abp.UI;
 using Ermes.Attributes;
 using Ermes.Dto;
 using Ermes.Dto.Datatable;
 using Ermes.Ermes.Stations;
 using Ermes.Stations.Dto;
+using Newtonsoft.Json;
 using NSwag.Annotations;
 using System;
 using System.Collections.Generic;
@@ -19,10 +22,12 @@ namespace Ermes.Stations
     {
         private readonly SensorServiceManager _sensorServiceManager;
         private readonly StationManager _stationManager;
-        public StationsAppService(SensorServiceManager sensorServiceManager, StationManager stationManager)
+        private readonly ErmesAppSession _session;
+        public StationsAppService(SensorServiceManager sensorServiceManager, StationManager stationManager, ErmesAppSession session)
         {
             _sensorServiceManager = sensorServiceManager;
             _stationManager = stationManager;
+            _session = session;
         }
 
         #region Private
@@ -194,6 +199,46 @@ namespace Ermes.Stations
             }
 
             return true;
+        }
+
+        [OpenApiOperation("Validate measure",
+            @"
+                Validate a measure by sending information on fire and smoke
+                Input:
+                    - MeasureId: id of the measure
+                    - Fire: true if the measure contains fire
+                    - Smoke: true if the measure contains smoke
+
+                Output: full measure object, with updated metadata object
+                Exception: Sensor service module not available or invalid measure id
+            "
+        )]
+        public virtual async Task<ValidateMeasureOutput> ValidateMeasure(ValidateMeasureInput input)
+        {
+            if (input.MeasureId == null || input.MeasureId == string.Empty)
+                throw new UserFriendlyException(L("InvalidEntityId", "Measure", ""));
+
+            var res = new ValidateMeasureOutput();
+            try
+            {
+                dynamic metadata = input.Metadata;
+                metadata.validation = JsonConvert.SerializeObject(new
+                {
+                    smoke = input.Smoke,
+                    fire = input.Fire,
+                    validationTime = DateTime.UtcNow,
+                    validator = _session.LoggedUserPerson.Email
+                });
+
+                var response = await _sensorServiceManager.UpdateMetadataOfMeasure(input.MeasureId, metadata);
+                res.Measure = ObjectMapper.Map<MeasureDto>(response);
+            }
+            catch(Exception ex)
+            {
+                throw new UserFriendlyException(ex.Message);
+            }
+
+            return res;
         }
     }
 }

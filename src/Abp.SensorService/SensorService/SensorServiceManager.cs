@@ -71,6 +71,15 @@ namespace Abp.SensorService
             return JsonConvert.DeserializeObject<SensorServiceStation>(responseValue);
         }
 
+        public async Task<SensorServiceMeasure> GetMeasureById(string measureId)
+        {
+            if (HttpClient == null)
+                GetHttpClient();
+            Uri uri = new Uri(HttpClient.BaseAddress + string.Format("measures/{0}", measureId));
+            var responseValue = await HttpHelper.SendHttpRequestAsync(HttpClient, HttpMethod.Get, uri);
+            return JsonConvert.DeserializeObject<SensorServiceMeasure>(responseValue);
+        }
+
         public async Task<SensorServiceStation> CreateStation(string name, decimal latitude, decimal longitude, decimal altitude, string owner, string brand, string productCode = "", string address = "address")
         {
             if (HttpClient == null)
@@ -129,6 +138,17 @@ namespace Abp.SensorService
                 unit,
                 metadata
             });
+            var responseValue = await HttpHelper.SendHttpRequestAsync(HttpClient, HttpMethod.Post, uri, jsonContent);
+            return JsonConvert.DeserializeObject<SensorServiceMeasure>(responseValue);
+        }
+
+        public async Task<SensorServiceMeasure> UpdateMetadataOfMeasure(string measureId, object metadata)
+        {
+            if (HttpClient == null)
+                GetHttpClient();
+
+            Uri uri = new Uri(string.Format("{0}measurements/{1}", HttpClient.BaseAddress, measureId));
+            var jsonContent = JsonConvert.SerializeObject(metadata);
             var responseValue = await HttpHelper.SendHttpRequestAsync(HttpClient, HttpMethod.Post, uri, jsonContent);
             return JsonConvert.DeserializeObject<SensorServiceMeasure>(responseValue);
         }
