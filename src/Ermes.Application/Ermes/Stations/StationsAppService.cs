@@ -231,7 +231,7 @@ namespace Ermes.Stations
                     fire = input.Fire,
                     validationTime = DateTime.UtcNow,
                     validator = _session.LoggedUserPerson.Email
-                }));
+                }, new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Include }));
 
                 var response = await _sensorServiceManager.UpdateMetadataOfMeasure(input.MeasureId, metadata);
                 res.Measure = ObjectMapper.Map<MeasureDto>(response);
