@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using NSwag.Annotations;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -221,14 +222,16 @@ namespace Ermes.Stations
             var res = new ValidateMeasureOutput();
             try
             {
-                dynamic metadata = input.Metadata;
-                metadata.validation = JsonConvert.SerializeObject(new
+                dynamic metadata = new ExpandoObject();
+                if(input.Metadata != null)
+                    metadata = input.Metadata;
+                metadata.validation = JsonConvert.DeserializeObject(JsonConvert.SerializeObject( new
                 {
                     smoke = input.Smoke,
                     fire = input.Fire,
                     validationTime = DateTime.UtcNow,
                     validator = _session.LoggedUserPerson.Email
-                });
+                }));
 
                 var response = await _sensorServiceManager.UpdateMetadataOfMeasure(input.MeasureId, metadata);
                 res.Measure = ObjectMapper.Map<MeasureDto>(response);

@@ -148,7 +148,9 @@ namespace Abp.SensorService
                 GetHttpClient();
 
             Uri uri = new Uri(string.Format("{0}measurements/{1}", HttpClient.BaseAddress, measureId));
-            var jsonContent = JsonConvert.SerializeObject(metadata);
+            var jsonContent = JsonConvert.SerializeObject(new {
+                metadata = metadata
+            });
             var responseValue = await HttpHelper.SendHttpRequestAsync(HttpClient, HttpMethod.Post, uri, jsonContent);
             return JsonConvert.DeserializeObject<SensorServiceMeasure>(responseValue);
         }
