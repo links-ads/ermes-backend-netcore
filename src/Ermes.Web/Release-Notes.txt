@@ -1,6 +1,6 @@
 Ver.
 --------------------------------
-- Bugfix - Fix GetTimeSeriesOutput class
+- Bugfix - Fix GetTimeSeriesOutput class (#156)
 
 Ver. 4.15.1 - 2023-09-22
 --------------------------------
