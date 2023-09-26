@@ -518,6 +518,15 @@ namespace Ermes.Enums
         Possible,
         Unlikely        
     }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum TimeSeriesVariableType
+    {
+        Unknown = -1,
+        String = 0,
+        Number = 1,
+        Boolean = 2
+    }
     #endregion
 
 }
