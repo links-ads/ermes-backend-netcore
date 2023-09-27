@@ -2,13 +2,11 @@
 using Ermes.Helpers;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace Ermes.Layers.Dto
 {
-    public class GetTimeSeriesInput: ICustomValidate
+    public class GetTimeSeriesInput : ICustomValidate
     {
         [Required]
         public string DatatypeId { get; set; }

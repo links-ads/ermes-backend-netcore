@@ -217,7 +217,7 @@ namespace Ermes.Layers
                     - DatatypeId: datatype_id of the layers to retrieve the attribute time series (required)
                     - Point: point string in WKT format. Example: 'POINT(7 45)' (required)
                     - Crs: coordinate reference system. Example: 'EPSG:4326' (required)
-                    - RequestCode: request code of the layers to retrieve the attribute time series from
+                    - RequestCode: request code related to the map request of interest
                     - LayerName: the name of the layer
                     - StartDate: start date, format YYYY-MM-DDTHH:MM:SS.000Z
                     - EndDate: end date, format YYYY-MM-DDTHH:MM:SS.000Z
@@ -230,6 +230,7 @@ namespace Ermes.Layers
             var result = new GetTimeSeriesOutput();
             input.StartDate = input.StartDate == null ? DateTime.MinValue : input.StartDate;
             input.EndDate = input.EndDate == null ? DateTime.MaxValue : input.EndDate;
+            input.RequestCode = input.RequestCode == null || input.RequestCode == string.Empty || input.RequestCode.Contains(AppConsts.Ermes_House_Partner) ? input.RequestCode : string.Format("{0}.{1}", AppConsts.Ermes_House_Partner, input.RequestCode);
             try
             {
                 var response = await _importerMananger.GetTimeSeries(input.DatatypeId, input.Point, input.Crs, input.RequestCode, input.LayerName, input.StartDate, input.EndDate);
@@ -240,11 +241,8 @@ namespace Ermes.Layers
             {
                 throw new UserFriendlyException(e.Message);
             }
-
             return result;
         }
-
-
         [OpenApiOperation("Gets the resource file given the layer name or the resource id",
             @"
                 Input:
