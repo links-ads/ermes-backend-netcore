@@ -146,6 +146,8 @@ namespace Ermes.Consumers
                             break;
                         case "202":
                             layer.Status = LayerImportStatusType.Processing;
+                            if (mr.MapRequestLayers.Select(l => l.Status == LayerImportStatusType.Processing).Count() == mr.MapRequestLayers.Count)
+                                mr.Status = MapRequestStatusType.Processing;
                             break;
                         case "400":
                         case "404":
