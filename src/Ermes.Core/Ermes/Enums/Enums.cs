@@ -301,11 +301,13 @@ namespace Ermes.Enums
     [JsonConverter(typeof(StringEnumConverter))]
     public enum MapRequestStatusType
     {
-        RequestSubmitted,
-        ContentAvailable,
+        RequestSubmitted = 0,
+        Processing = 10,
+        ContentAvailable = 20,
         [Obsolete] //kept for retrocompatibility
-        ContentNotAvailable,
-        Canceled
+        ContentNotAvailable = 30,
+        Canceled = 40,
+        Error = 50
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
