@@ -87,6 +87,18 @@ namespace Ermes.Communications
             else
                 query = _communicationManager.Communications.Where(a => new NpgsqlRange<DateTime>(input.StartDate.Value, input.EndDate.Value).Contains(a.Duration));
 
+            if (input.Scopes != null && input.Scopes.Count > 0)
+            {
+                var list = input.Scopes.Select(a => a.ToString()).ToList();
+                query = query.Where(a => list.Contains(a.ScopeString));
+            }
+
+            if (input.Restrictions != null && input.Restrictions.Count > 0)
+            {
+                var list = input.Restrictions.Select(a => a.ToString()).ToList();
+                query = query.Where(a => list.Contains(a.RestrictionString));
+            }
+
             query = query.DTFilterBy(input);
 
             var person = _session.LoggedUserPerson;

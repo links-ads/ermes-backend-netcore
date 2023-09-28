@@ -120,28 +120,18 @@ namespace Ermes.Web.Controllers
 
             //Admin can see everything
             hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Communications.Communication_CanSeeCrossOrganization);
-            List<CommunicationRestrictionType> communicationRestrictionTypes =
-                new List<CommunicationRestrictionType>() { CommunicationRestrictionType.None };
+            List<CommunicationRestrictionType> communicationRestrictionTypes = input.CommunicationRestrictionTypes == null ? new List<CommunicationRestrictionType>() { CommunicationRestrictionType.None } : input.CommunicationRestrictionTypes;
             if (!hasPermission)
             {
                 foreach (var item in _session.Roles)
                 {
-                    if (item != AppRoles.CITIZEN)
+                    if (item == AppRoles.CITIZEN)
                     {
-                        communicationRestrictionTypes.Add(CommunicationRestrictionType.Professional);
-                        communicationRestrictionTypes.Add(CommunicationRestrictionType.Organization);
-                    }
-                    else
-                    {
-                        communicationRestrictionTypes.Add(CommunicationRestrictionType.Citizen);
+                        //communicationRestrictionTypes.Add(CommunicationRestrictionType.Citizen);
+                        communicationRestrictionTypes = new List<CommunicationRestrictionType> { CommunicationRestrictionType.Citizen };
                         input.ReportVisibilityType = VisibilityType.Public;
                     }
                 }
-            }
-            else
-            {
-                communicationRestrictionTypes.Add(CommunicationRestrictionType.Professional);
-                communicationRestrictionTypes.Add(CommunicationRestrictionType.Organization);
             }
 
             Person person = _personManager.GetPersonById(_session.LoggedUserPerson.Id);
@@ -163,6 +153,7 @@ namespace Ermes.Web.Controllers
                     input.ReportVisibilityType,
                     input.ReportContentTypes,
                     communicationRestrictionTypes,
+                    input.CommunicationScopeTypes,
                     AppConsts.Srid,
                     personName,
                     person.OrganizationId.HasValue ? person.Organization.ParentId : null,
