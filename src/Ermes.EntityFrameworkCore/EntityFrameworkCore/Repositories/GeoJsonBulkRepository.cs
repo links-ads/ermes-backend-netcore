@@ -106,6 +106,7 @@ namespace Ermes.GeoJson
             VisibilityType visibilityType,
             List<ReportContentType> reportContentTypes,
             List<CommunicationRestrictionType> communicationRestrictionTypes,
+            List<CommunicationScopeType> communicationScopeTypes,
             int srid,
             string personName,
             int? parentId,
@@ -146,6 +147,7 @@ namespace Ermes.GeoJson
                         null as ""reportContentTypeFilter"",
                         null as ""reportIsPublicFilter"",
                         null as ""communicationRestrictionFilter"",
+                        null as ""communicationScopeFilter"",
                         0 as ""teamFilter"",
                         null as ""receivers""
                     from public.missions m
@@ -177,6 +179,7 @@ namespace Ermes.GeoJson
                         null as ""reportContentTypeFilter"",
                         null as ""reportIsPublicFilter"",
                         c.""Restriction"" as ""communicationRestrictionFilter"",
+                        c.""Scope"" as ""communicationScopeFilter"",
                         0 as ""teamFilter"",
                         (
     	                    select array_agg(cr.""OrganizationId"")
@@ -212,6 +215,7 @@ namespace Ermes.GeoJson
                         r.""ContentType"" as ""reportContentTypeFilter"",
                         r.""IsPublic""::text as ""reportIsPublicFilter"",
                         null as ""communicationRestrictionFilter"",
+                        null as ""communicationScopeFilter"",
                         0 as ""teamFilter"",
                         null as ""receivers""
                     from public.reports r 
@@ -243,6 +247,7 @@ namespace Ermes.GeoJson
                         null as ""reportContentTypeFilter"",
                         null as ""reportIsPublicFilter"",
                         null as ""communicationRestrictionFilter"",
+                        null as ""communicationScopeFilter"",
                         0 as ""teamFilter"",
                         null as ""receivers""
                     from public.map_requests mr
@@ -274,6 +279,7 @@ namespace Ermes.GeoJson
                         null as ""reportContentTypeFilter"",
                         null as ""reportIsPublicFilter"",
                         null as ""communicationRestrictionFilter"",
+                        null as ""communicationScopeFilter"",
                         t.""Id"" as ""TeamId"",
                         null as ""receivers""
                         FROM (
@@ -315,6 +321,7 @@ namespace Ermes.GeoJson
                         null as ""reportContentTypeFilter"",
                         null as ""reportIsPublicFilter"",
                         null as ""communicationRestrictionFilter"",
+                        null as ""communicationScopeFilter"",
                         0 as ""teamFilter"",
                         null as ""receivers""
                     from public.alerts a 
@@ -345,6 +352,7 @@ namespace Ermes.GeoJson
                             null as ""reportContentTypeFilter"",
                             null as ""reportIsPublicFilter"",
                             null as ""communicationRestrictionFilter"",
+                            null as ""communicationScopeFilter"",
                             0 as ""teamFilter"",
                             null as ""receivers""
                         from public.stations s 
@@ -431,6 +439,16 @@ namespace Ermes.GeoJson
                     Value = communicationRestrictionTypes.Select(a => a.ToString()).ToArray()
                 };
                 command.Parameters.Add(parameter);
+
+                if (communicationScopeTypes != null && communicationScopeTypes.Count > 0)
+                {
+                    command.CommandText += @" and (tmp.""communicationScopeFilter"" is null or tmp.""communicationScopeFilter"" = any(array[@communicationScopeFilter]))";
+                    var p = new NpgsqlParameter("@communicationScopeFilter", NpgsqlDbType.Array | NpgsqlDbType.Text)
+                    {
+                        Value = communicationScopeTypes.Select(a => a.ToString()).ToArray()
+                    };
+                    command.Parameters.Add(p);
+                }
 
                 if (statusTypes != null && statusTypes.Count > 0)
                 {
