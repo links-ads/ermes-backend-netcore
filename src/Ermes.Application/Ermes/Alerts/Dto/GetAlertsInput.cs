@@ -14,8 +14,6 @@ namespace Ermes.Alerts.Dto
         public DateTime? EndDate { get; set; }
         public PointPosition NorthEastBoundary { get; set; }
         public PointPosition SouthWestBoundary { get; set; }
-        public List<CapStatusType> Status { get; set; }
-        public List<CapMsgType> MsgTypes { get; set; }
-        public List<CapScopeType> Scopes { get; set; }
+        public List<string> Restrictions { get; set; }
     }
 }

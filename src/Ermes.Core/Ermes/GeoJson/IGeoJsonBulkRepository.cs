@@ -69,6 +69,7 @@ namespace Ermes.GeoJson
             List<ReportContentType> reportContentTypes,
             List<CommunicationRestrictionType> communicationRestrictionTypes,
             List<CommunicationScopeType> communicationScopeTypes,
+            List<string> alertRestrictionTypes,
             int srid,
             string personName,
             int? organizationParentId,

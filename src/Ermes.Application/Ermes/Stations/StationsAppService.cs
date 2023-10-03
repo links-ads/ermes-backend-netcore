@@ -7,7 +7,9 @@ using Ermes.Attributes;
 using Ermes.Dto;
 using Ermes.Dto.Datatable;
 using Ermes.Ermes.Stations;
+using Ermes.Helpers;
 using Ermes.Stations.Dto;
+using NetTopologySuite.Geometries;
 using Newtonsoft.Json;
 using NSwag.Annotations;
 using System;
@@ -15,6 +17,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Ermes.Stations
 {
@@ -40,6 +43,11 @@ namespace Ermes.Stations
             try
             {
                 var fullStationList = await _sensorServiceManager.GetStations();
+                if(input.SouthWestBoundary != null && input.NorthEastBoundary != null)
+                {
+                    Geometry boundingBox = GeometryHelper.GetPolygonFromBoundaries(input.SouthWestBoundary, input.NorthEastBoundary);
+                    fullStationList = fullStationList.Where(a => boundingBox.Contains(GeometryHelper.GetPointFromCoordinates(a.Location.Coordinates))).ToList();
+                }
                 var stations = new List<StationDto>();
                 foreach (var station in fullStationList)
                 {

@@ -154,6 +154,7 @@ namespace Ermes.Web.Controllers
                     input.ReportContentTypes,
                     communicationRestrictionTypes,
                     input.CommunicationScopeTypes,
+                    input.AlertRestrictionTypes,
                     AppConsts.Srid,
                     personName,
                     person.OrganizationId.HasValue ? person.Organization.ParentId : null,
