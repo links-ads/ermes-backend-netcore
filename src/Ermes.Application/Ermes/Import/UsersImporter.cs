@@ -150,7 +150,7 @@ namespace Ermes.Import
                     UserDto user = new UserDto();
                     var person = personManager.GetPersonByEmail(row.GetString("Email"));
                     if (person != null)
-                        throw new NotImplementedException();
+                        throw new NotImplementedException(string.Format("Person with Email {0} already exists, cannot be created", person.Email));
                     else
                     {
                         result.ElementsAdded++;
