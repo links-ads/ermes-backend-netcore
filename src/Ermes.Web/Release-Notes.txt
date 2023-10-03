@@ -1,7 +1,7 @@
 Ver.
 --------------------------------
 - Feature - Added 'processing' as Map Request status (#160)
-- Feature - Communication filters added (#159)
+- Feature - Added fitlers for: Communications, Alerts, Stations (#159)
 
 Ver. 4.15.2 - 2023-09-26
 --------------------------------
