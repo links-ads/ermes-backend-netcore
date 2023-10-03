@@ -48,20 +48,10 @@ namespace Ermes.Alerts
             else
                 query = _alertManager.Alerts.Where(a => new NpgsqlRange<DateTime>(input.StartDate.Value, input.EndDate.Value).Contains(a.Sent));
 
-            if (input.Status != null && input.Status.Count > 0)
-            {
-                var list = input.Status.Select(a => a.ToString()).ToList();
-                query = query.Where(a => list.Contains(a.StatusString));
-            }
-
-            if (input.MsgTypes != null && input.MsgTypes.Count > 0)
-            {
-                var msgTypeList = input.MsgTypes.Select(a => a.ToString()).ToList();
-                query = query.Where(a => msgTypeList.Contains(a.MsgTypeString));
-            }
+            if (input.Restrictions != null && input.Restrictions.Count > 0)
+                query = query.Where(a => input.Restrictions.Contains(a.Restriction));
 
             query = query.DTFilterBy(input);
-
 
             result.TotalCount = await query.CountAsync();
 
@@ -101,9 +91,7 @@ namespace Ermes.Alerts
                     - StartDate and EndDate to define a time window of interest
                     - SouthWestBoundary: bottom-left corner of the bounding box for a spatial query. (optional) (to be filled together with NorthEast property)
                     - NorthEastBoundary: top-right corner of the bounding box for a spatial query format. (optional) (to be filled together with SouthWest property)
-                    - Status: filter result by status
-                    - MsgTypes: filter result by msgType
-                    - Scope: filter result by scope
+                    - Restriction: filter result by Restriction (Citizen/Professional)
                 Output: list of AlertDto elements
             "
         )]

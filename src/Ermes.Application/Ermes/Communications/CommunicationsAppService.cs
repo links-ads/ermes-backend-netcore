@@ -208,6 +208,8 @@ namespace Ermes.Communications
                     - StartDate and EndDate to define a time window of interest
                     - SouthWestBoundary: bottom-left corner of the bounding box for a spatial query. (optional) (to be filled together with NorthEast property)
                     - NorthEastBoundary: top-right corner of the bounding box for a spatial query format. (optional) (to be filled together with SouthWest property)
+                    - Scopes: list of scopes of interest
+                    - Restrictions: list of restriction of interest
                 Output: list of CommunicationDto elements
 
                 N.B.: The visibility depends on the 'Restriction' field of the Communication. More in the details:

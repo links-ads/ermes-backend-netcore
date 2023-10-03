@@ -27,6 +27,7 @@ namespace Ermes.GeoJson.Dto
         public List<ReportContentType> ReportContentTypes { get; set; }
         public List<CommunicationRestrictionType> CommunicationRestrictionTypes { get; set; }
         public List<CommunicationScopeType> CommunicationScopeTypes { get; set; }
+        public List<string> AlertRestrictionTypes { get; set; }
     }
 
     public class GeoJsonItem

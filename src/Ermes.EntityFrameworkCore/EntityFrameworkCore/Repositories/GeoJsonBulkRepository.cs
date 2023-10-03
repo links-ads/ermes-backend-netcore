@@ -107,6 +107,7 @@ namespace Ermes.GeoJson
             List<ReportContentType> reportContentTypes,
             List<CommunicationRestrictionType> communicationRestrictionTypes,
             List<CommunicationScopeType> communicationScopeTypes,
+            List<string> alertRestrictionTypes,
             int srid,
             string personName,
             int? parentId,
@@ -148,6 +149,7 @@ namespace Ermes.GeoJson
                         null as ""reportIsPublicFilter"",
                         null as ""communicationRestrictionFilter"",
                         null as ""communicationScopeFilter"",
+                        null as ""alertRestrictionFilter"",
                         0 as ""teamFilter"",
                         null as ""receivers""
                     from public.missions m
@@ -180,6 +182,7 @@ namespace Ermes.GeoJson
                         null as ""reportIsPublicFilter"",
                         c.""Restriction"" as ""communicationRestrictionFilter"",
                         c.""Scope"" as ""communicationScopeFilter"",
+                        null as ""alertRestrictionFilter"",
                         0 as ""teamFilter"",
                         (
     	                    select array_agg(cr.""OrganizationId"")
@@ -216,6 +219,7 @@ namespace Ermes.GeoJson
                         r.""IsPublic""::text as ""reportIsPublicFilter"",
                         null as ""communicationRestrictionFilter"",
                         null as ""communicationScopeFilter"",
+                        null as ""alertRestrictionFilter"",
                         0 as ""teamFilter"",
                         null as ""receivers""
                     from public.reports r 
@@ -248,6 +252,7 @@ namespace Ermes.GeoJson
                         null as ""reportIsPublicFilter"",
                         null as ""communicationRestrictionFilter"",
                         null as ""communicationScopeFilter"",
+                        null as ""alertRestrictionFilter"",
                         0 as ""teamFilter"",
                         null as ""receivers""
                     from public.map_requests mr
@@ -280,6 +285,7 @@ namespace Ermes.GeoJson
                         null as ""reportIsPublicFilter"",
                         null as ""communicationRestrictionFilter"",
                         null as ""communicationScopeFilter"",
+                        null as ""alertRestrictionFilter"",
                         t.""Id"" as ""TeamId"",
                         null as ""receivers""
                         FROM (
@@ -322,6 +328,7 @@ namespace Ermes.GeoJson
                         null as ""reportIsPublicFilter"",
                         null as ""communicationRestrictionFilter"",
                         null as ""communicationScopeFilter"",
+                        a.""Restriction"" as ""alertRestrictionFilter"",
                         0 as ""teamFilter"",
                         null as ""receivers""
                     from public.alerts a 
@@ -353,6 +360,7 @@ namespace Ermes.GeoJson
                             null as ""reportIsPublicFilter"",
                             null as ""communicationRestrictionFilter"",
                             null as ""communicationScopeFilter"",
+                            null as ""alertRestrictionFilter"",
                             0 as ""teamFilter"",
                             null as ""receivers""
                         from public.stations s 
@@ -537,6 +545,16 @@ namespace Ermes.GeoJson
                     var p = new NpgsqlParameter("@reportContentTypes", NpgsqlDbType.Array | NpgsqlDbType.Text)
                     {
                         Value = reportContentTypes.Select(a => a.ToString()).ToArray()
+                    };
+                    command.Parameters.Add(p);
+                }
+
+                if (alertRestrictionTypes != null && alertRestrictionTypes.Count > 0)
+                {
+                    command.CommandText += @" and (tmp.""alertRestrictionFilter"" is null or tmp.""alertRestrictionFilter"" = any(array[@alertRestrictionTypes]))";
+                    var p = new NpgsqlParameter("@alertRestrictionTypes", NpgsqlDbType.Array | NpgsqlDbType.Text)
+                    {
+                        Value = alertRestrictionTypes.ToArray()
                     };
                     command.Parameters.Add(p);
                 }
