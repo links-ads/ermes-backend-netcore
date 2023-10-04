@@ -31,14 +31,14 @@ namespace Ermes.GeoJson
         {
             return _dbContextProvider.GetDbContext()
                 .Communications
-                .FromSqlInterpolated($"SELECT * FROM communications WHERE ST_INTERSECTS(\"AreaOfInterest\", {boundingBox}) and tsrange({startDate},{endDate}) && \"Duration\"");
+                .FromSqlInterpolated($"SELECT * FROM communications WHERE ST_INTERSECTS(ST_CENTROID(\"AreaOfInterest\"), {boundingBox}) and tsrange({startDate},{endDate}) && \"Duration\"");
         }
 
         public IQueryable<Mission> GetMissions(DateTime startDate, DateTime endDate, Geometry boundingBox)
         {
             return _dbContextProvider.GetDbContext()
                 .Missions
-                .FromSqlInterpolated($"SELECT * FROM missions WHERE ST_INTERSECTS(\"AreaOfInterest\", {boundingBox}) and tsrange({startDate},{endDate}) && \"Duration\"");
+                .FromSqlInterpolated($"SELECT * FROM missions WHERE ST_INTERSECTS(ST_CENTROID(\"AreaOfInterest\"), {boundingBox}) and tsrange({startDate},{endDate}) && \"Duration\"");
         }
 
         public IQueryable<Report> GetReports(DateTime startDate, DateTime endDate, Geometry boundingBox)
@@ -52,7 +52,7 @@ namespace Ermes.GeoJson
         {
             return _dbContextProvider.GetDbContext()
                 .MapRequests
-                .FromSqlInterpolated($"SELECT * FROM map_requests WHERE ST_INTERSECTS(\"AreaOfInterest\", {boundingBox}) and tsrange({startDate},{endDate}) && \"Duration\"");
+                .FromSqlInterpolated($"SELECT * FROM map_requests WHERE ST_INTERSECTS(ST_CENTROID(\"AreaOfInterest\"), {boundingBox}) and tsrange({startDate},{endDate}) && \"Duration\"");
         }
 
         public IQueryable<PersonActionTracking> GetPersonActionTrackings(DateTime startDate, DateTime endDate, Geometry boundingBox)
@@ -901,7 +901,7 @@ namespace Ermes.GeoJson
         {
             return _dbContextProvider.GetDbContext()
                 .Alerts
-                .FromSqlInterpolated($"SELECT * FROM alerts WHERE ST_INTERSECTS(\"BoundingBox\", {boundingBox}) and {startDate} < \"Sent\" and {endDate} > \"Sent\"");
+                .FromSqlInterpolated($"SELECT * FROM alerts WHERE ST_INTERSECTS(ST_CENTROID(\"BoundingBox\"), {boundingBox}) and {startDate} <= \"Sent\" and {endDate} >= \"Sent\"");
         }
     }
 
