@@ -126,7 +126,8 @@ namespace Ermes.Web.Controllers
             else
                 communicationScopeTypes = input.CommunicationScopeTypes;
 
-            List<CommunicationRestrictionType> communicationRestrictionTypes = input.CommunicationRestrictionTypes == null ? new List<CommunicationRestrictionType>() { CommunicationRestrictionType.None, CommunicationRestrictionType.Organization, CommunicationRestrictionType.Professional, CommunicationRestrictionType.Citizen } : input.CommunicationRestrictionTypes;
+            List<CommunicationRestrictionType> communicationRestrictionTypes = 
+                input.CommunicationRestrictionTypes == null || (input.CommunicationRestrictionTypes.Count == 1 && input.CommunicationRestrictionTypes.Contains(CommunicationRestrictionType.None)) ? new List<CommunicationRestrictionType>() { CommunicationRestrictionType.None, CommunicationRestrictionType.Organization, CommunicationRestrictionType.Professional, CommunicationRestrictionType.Citizen } : input.CommunicationRestrictionTypes;
             if (!hasPermission)
             {
                 foreach (var item in _session.Roles)
