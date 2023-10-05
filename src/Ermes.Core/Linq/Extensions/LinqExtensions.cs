@@ -163,14 +163,16 @@ namespace Ermes.Linq.Extensions
             {
                 return organizationIdList == null
                         ? query
-                        .Where(c => c.ScopeString == CommunicationScopeType.Public.ToString() || c.RestrictionString == CommunicationRestrictionType.Citizen.ToString())
+                        
                         : query
                         .Where(c =>
                             c.ScopeString == CommunicationScopeType.Public.ToString() ||
-                            c.RestrictionString == CommunicationRestrictionType.Professional.ToString() || (
-                                c.RestrictionString == CommunicationRestrictionType.Organization.ToString() &&
-                                //Organization visibility
-                                (c.CommunicationReceivers.Select(a => a.OrganizationId).Any(a => organizationIdList.Contains(a)))
+                            (
+                                c.ScopeString == CommunicationScopeType.Restricted.ToString() &&
+                                    (
+                                        c.RestrictionString != CommunicationRestrictionType.Organization.ToString() || 
+                                        c.CommunicationReceivers.Select(a => a.OrganizationId).Any(a => organizationIdList.Contains(a))
+                                    )
                             )
                         );
             }
