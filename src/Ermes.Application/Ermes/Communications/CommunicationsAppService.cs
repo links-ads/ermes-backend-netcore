@@ -77,6 +77,7 @@ namespace Ermes.Communications
             IQueryable<Communication> query;
             input.StartDate = input.StartDate.HasValue ? input.StartDate : DateTime.MinValue;
             input.EndDate = input.EndDate.HasValue ? input.EndDate : DateTime.MaxValue;
+            bool includeNone = false;
 
             if (input.NorthEastBoundary != null && input.SouthWestBoundary != null)
             {
@@ -91,10 +92,14 @@ namespace Ermes.Communications
             {
                 var list = input.Scopes.Select(a => a.ToString()).ToList();
                 query = query.Where(a => list.Contains(a.ScopeString));
+                includeNone = input.Scopes.Contains(CommunicationScopeType.Public);
             }
 
             if (input.Restrictions != null && input.Restrictions.Count > 0)
             {
+                if (includeNone)
+                    input.Restrictions.Add(CommunicationRestrictionType.None);
+
                 var list = input.Restrictions.Select(a => a.ToString()).ToList();
                 query = query.Where(a => list.Contains(a.RestrictionString));
             }
