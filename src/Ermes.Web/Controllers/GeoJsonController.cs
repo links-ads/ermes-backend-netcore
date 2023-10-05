@@ -120,7 +120,13 @@ namespace Ermes.Web.Controllers
 
             //Admin can see everything
             hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Communications.Communication_CanSeeCrossOrganization);
-            List<CommunicationRestrictionType> communicationRestrictionTypes = input.CommunicationRestrictionTypes == null ? new List<CommunicationRestrictionType>() { CommunicationRestrictionType.None } : input.CommunicationRestrictionTypes;
+            List<CommunicationScopeType> communicationScopeTypes;
+            if(input.CommunicationScopeTypes == null || input.CommunicationScopeTypes.Count == 0)
+                communicationScopeTypes = new List<CommunicationScopeType>() { CommunicationScopeType.Public, CommunicationScopeType.Restricted };
+            else
+                communicationScopeTypes = input.CommunicationScopeTypes;
+
+            List<CommunicationRestrictionType> communicationRestrictionTypes = input.CommunicationRestrictionTypes == null ? new List<CommunicationRestrictionType>() { CommunicationRestrictionType.None, CommunicationRestrictionType.Organization, CommunicationRestrictionType.Professional, CommunicationRestrictionType.Citizen } : input.CommunicationRestrictionTypes;
             if (!hasPermission)
             {
                 foreach (var item in _session.Roles)
@@ -133,6 +139,10 @@ namespace Ermes.Web.Controllers
                     }
                 }
             }
+
+            //ensure None is present when we receive Public form client
+            if (communicationScopeTypes.Contains(CommunicationScopeType.Public))
+                communicationRestrictionTypes.Add(CommunicationRestrictionType.None);
 
             Person person = _personManager.GetPersonById(_session.LoggedUserPerson.Id);
             string personName = person.Username ?? person.Email;
@@ -153,7 +163,7 @@ namespace Ermes.Web.Controllers
                     input.ReportVisibilityType,
                     input.ReportContentTypes,
                     communicationRestrictionTypes,
-                    input.CommunicationScopeTypes,
+                    communicationScopeTypes,
                     input.AlertRestrictionTypes,
                     AppConsts.Srid,
                     personName,
