@@ -120,6 +120,8 @@ namespace Ermes.Web.Controllers
 
             //Admin can see everything
             hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Communications.Communication_CanSeeCrossOrganization);
+
+            //TODO: refactor this part
             List<CommunicationScopeType> communicationScopeTypes;
             if(input.CommunicationScopeTypes == null || input.CommunicationScopeTypes.Count == 0)
                 communicationScopeTypes = new List<CommunicationScopeType>() { CommunicationScopeType.Public, CommunicationScopeType.Restricted };
@@ -128,6 +130,9 @@ namespace Ermes.Web.Controllers
 
             List<CommunicationRestrictionType> communicationRestrictionTypes = 
                 input.CommunicationRestrictionTypes == null || (input.CommunicationRestrictionTypes.Count == 1 && input.CommunicationRestrictionTypes.Contains(CommunicationRestrictionType.None)) ? new List<CommunicationRestrictionType>() { CommunicationRestrictionType.None, CommunicationRestrictionType.Organization, CommunicationRestrictionType.Professional, CommunicationRestrictionType.Citizen } : input.CommunicationRestrictionTypes;
+
+            if (communicationScopeTypes.Contains(CommunicationScopeType.Public))
+                communicationRestrictionTypes.Add(CommunicationRestrictionType.None);
             if (!hasPermission)
             {
                 foreach (var item in _session.Roles)
