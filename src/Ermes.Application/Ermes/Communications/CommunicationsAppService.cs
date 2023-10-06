@@ -78,6 +78,9 @@ namespace Ermes.Communications
             input.StartDate = input.StartDate.HasValue ? input.StartDate : DateTime.MinValue;
             input.EndDate = input.EndDate.HasValue ? input.EndDate : DateTime.MaxValue;
             bool includeNone = false;
+            var person = _session.LoggedUserPerson;
+            var roles = await _personManager.GetPersonRoleNamesAsync(person.Id);
+
 
             if (input.NorthEastBoundary != null && input.SouthWestBoundary != null)
             {
@@ -93,20 +96,34 @@ namespace Ermes.Communications
                 var list = input.Scopes.Select(a => a.ToString()).ToList();
                 query = query.Where(a => list.Contains(a.ScopeString));
                 includeNone = input.Scopes.Contains(CommunicationScopeType.Public);
+
             }
 
             if (input.Restrictions != null && input.Restrictions.Count > 0)
             {
                 if (includeNone)
                     input.Restrictions.Add(CommunicationRestrictionType.None);
+                if (roles.Any(r => r == AppRoles.CITIZEN))
+                    input.Restrictions = new List<CommunicationRestrictionType> { CommunicationRestrictionType.None, CommunicationRestrictionType.Citizen };
+
 
                 var list = input.Restrictions.Select(a => a.ToString()).ToList();
                 query = query.Where(a => list.Contains(a.RestrictionString));
             }
+            else
+            {
+                input.Restrictions = new List<CommunicationRestrictionType>() { CommunicationRestrictionType.None, CommunicationRestrictionType.Professional, CommunicationRestrictionType.Organization, CommunicationRestrictionType.Citizen };
+                if (roles.Any(r => r == AppRoles.CITIZEN))
+                    input.Restrictions = input.Restrictions.Where(a => a == CommunicationRestrictionType.None || a == CommunicationRestrictionType.Citizen).ToList();
+
+                if (input.Restrictions.Count > 0)
+                {
+                    var list = input.Restrictions.Select(a => a.ToString()).ToList();
+                    query = query.Where(a => list.Contains(a.RestrictionString));
+                }
+            }
 
             query = query.DTFilterBy(input);
-
-            var person = _session.LoggedUserPerson;
 
             //Admin can see everything
             var hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Communications.Communication_CanSeeCrossOrganization);
