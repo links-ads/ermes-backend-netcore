@@ -1,6 +1,89 @@
 Ver.
 --------------------------------
+
+
+Ver. 4.15.3 - 2023-10-05
+--------------------------------
+- Feature - Added 'Processing' as Map Request status (#160)
+- Feature - Added fitlers for: Communications, Alerts, Stations (#159)
+
+Ver. 4.15.2 - 2023-09-26
+--------------------------------
+- Bugfix - Fix GetTimeSeriesOutput class (#156)
+
+Ver. 4.15.1 - 2023-09-22
+--------------------------------
+- Bugfix - Fix ValidateMeasureInput class
+
+Ver. 4.15.0 - 2023-09-20
+--------------------------------
+- Feature - Validation for measures added (#157)
+
+Ver. 4.14.4 - 2023-09-12
+--------------------------------
+- Bugfix - Fix sorting for paginated APIs 
+
+Ver. 4.14.3 - 2023-09-11
+--------------------------------
+- Bugfix - Fix GetReports visibility management 
+
+Ver. 4.14.2 - 2023-07-24
+--------------------------------
+- Bugfix - Validation errors added in DTO classes (#155)
+
+Ver. 4.14.1 - 2023-07-18
+--------------------------------
+- Feature - Job for notification received added
+
+Ver. 4.14.0 - 2023-07-17
+--------------------------------
+- Feature - Purge job settig update to 7 days (#153)
+- Bugfix - Fix MapRequest create function (#154)
+
+Ver. 4.13.3 - 2023-07-11
+--------------------------------
+- Bugfix - Fix update report function (#151)
+- Feature - Delete APIs for StationsAppService added (#152)
+- Bugfix - Fix hangfire 'back to site' url
+
+Ver. 4.13.2 - 2023-07-07
+--------------------------------
+- Bugfix - Fix return value of GetStation API (#150)
+- Feature - Optimization for alerts' areas of interest (migration added)(#149)
+
+Ver. 4.13.1 - 2023-07-04
+--------------------------------
+- Feature - Job for purging old measurements (appsettings edited)(#148)
+
+Ver. 4.13.0 - 2023-06-27
+--------------------------------
+- Bugfix - Report cannot be validated twice by the same person (#146)
+- Feature - Alert's AreaOfInterest performance improvement (migration added)(#147)
+
+Ver. 4.12.2 - 2023-06-26
+--------------------------------
+- Feature - Station entity added (migration added)(#145)
+
+Ver. 4.12.1 - 2023-06-26
+--------------------------------
+- Feature - Fix create sensor function, Id prop added to sensorDto (#145)
+
+Ver. 4.12.0 - 2023-06-23
+--------------------------------
+- Feature - SensorService module added, event.camera events management, StationsAppService added (appsettings updated)(#145)
+
+Ver. 4.11.4 - 2023-06-21
+--------------------------------
+- Feature - Centroid, Type and Id properties added to AlertDto (#144)
+
+Ver. 4.11.0 - 2023-06-20
+--------------------------------
+- Feature - NotificationReceived and Alerts added (migration added) (#144)
+
+Ver. 4.10.0 - 2023-06-16
+--------------------------------
 - Feature - Bus configuration based on settings and not on project name (app.config and appsettings to be updated)
+- Feature - Map request type management added (migration added)(#143)
 
 Ver. 4.9.1 - 2023-05-23
 --------------------------------

@@ -1,5 +1,6 @@
 ﻿using Abp.EntityFrameworkCore;
 using Ermes.Activations;
+using Ermes.Alerts;
 using Ermes.Communications;
 using Ermes.EntityFrameworkCore;
 using Ermes.Enums;
@@ -30,14 +31,14 @@ namespace Ermes.GeoJson
         {
             return _dbContextProvider.GetDbContext()
                 .Communications
-                .FromSqlInterpolated($"SELECT * FROM communications WHERE ST_INTERSECTS(\"AreaOfInterest\", {boundingBox}) and tsrange({startDate},{endDate}) && \"Duration\"");
+                .FromSqlInterpolated($"SELECT * FROM communications WHERE ST_INTERSECTS(ST_CENTROID(\"AreaOfInterest\"), {boundingBox}) and tsrange({startDate},{endDate}) && \"Duration\"");
         }
 
         public IQueryable<Mission> GetMissions(DateTime startDate, DateTime endDate, Geometry boundingBox)
         {
             return _dbContextProvider.GetDbContext()
                 .Missions
-                .FromSqlInterpolated($"SELECT * FROM missions WHERE ST_INTERSECTS(\"AreaOfInterest\", {boundingBox}) and tsrange({startDate},{endDate}) && \"Duration\"");
+                .FromSqlInterpolated($"SELECT * FROM missions WHERE ST_INTERSECTS(ST_CENTROID(\"AreaOfInterest\"), {boundingBox}) and tsrange({startDate},{endDate}) && \"Duration\"");
         }
 
         public IQueryable<Report> GetReports(DateTime startDate, DateTime endDate, Geometry boundingBox)
@@ -51,7 +52,7 @@ namespace Ermes.GeoJson
         {
             return _dbContextProvider.GetDbContext()
                 .MapRequests
-                .FromSqlInterpolated($"SELECT * FROM map_requests WHERE ST_INTERSECTS(\"AreaOfInterest\", {boundingBox}) and tsrange({startDate},{endDate}) && \"Duration\"");
+                .FromSqlInterpolated($"SELECT * FROM map_requests WHERE ST_INTERSECTS(ST_CENTROID(\"AreaOfInterest\"), {boundingBox}) and tsrange({startDate},{endDate}) && \"Duration\"");
         }
 
         public IQueryable<PersonActionTracking> GetPersonActionTrackings(DateTime startDate, DateTime endDate, Geometry boundingBox)
@@ -100,12 +101,13 @@ namespace Ermes.GeoJson
             List<HazardType> hazardTypes,
             List<GeneralStatus> reportStatusTypes,
             List<MissionStatusType> missionStatusTypes,
-            List<HazardType> mapRequestHazardTypes,
-            List<LayerType> mapRequestLayerTypes,
             List<MapRequestStatusType> mapRequestStatusTypes,
+            List<MapRequestType> mapRequestTypes,
             VisibilityType visibilityType,
             List<ReportContentType> reportContentTypes,
             List<CommunicationRestrictionType> communicationRestrictionTypes,
+            List<CommunicationScopeType> communicationScopeTypes,
+            List<string> alertRestrictionTypes,
             int srid,
             string personName,
             int? parentId,
@@ -141,12 +143,13 @@ namespace Ermes.GeoJson
                         null as ""hazardFilter"",
                         null as ""reportStatusFilter"",
                         m.""CurrentStatus"" as ""missionStatusFilter"",
-                        null as ""mapRequestHazardFilter"",
                         null as ""mapRequestStatusFilter"",
-                        null as ""mapRequestLayerFilter"",
+                        null as ""mapRequestTypeFilter"",
                         null as ""reportContentTypeFilter"",
                         null as ""reportIsPublicFilter"",
                         null as ""communicationRestrictionFilter"",
+                        null as ""communicationScopeFilter"",
+                        null as ""alertRestrictionFilter"",
                         0 as ""teamFilter"",
                         null as ""receivers""
                     from public.missions m
@@ -173,12 +176,13 @@ namespace Ermes.GeoJson
                         null as ""hazardFilter"",
                         null as ""reportStatusFilter"",
                         null as ""missionStatusFilter"",
-                        null as ""mapRequestHazardFilter"",
                         null as ""mapRequestStatusFilter"",
-                        null as ""mapRequestLayerFilter"",
+                        null as ""mapRequestTypeFilter"",
                         null as ""reportContentTypeFilter"",
                         null as ""reportIsPublicFilter"",
                         c.""Restriction"" as ""communicationRestrictionFilter"",
+                        c.""Scope"" as ""communicationScopeFilter"",
+                        null as ""alertRestrictionFilter"",
                         0 as ""teamFilter"",
                         (
     	                    select array_agg(cr.""OrganizationId"")
@@ -209,12 +213,13 @@ namespace Ermes.GeoJson
                         r.""Hazard"" as ""hazardFilter"",
                         r.""Status"" as ""reportStatusFilter"",
                         null as ""missionStatusFilter"",
-                        null as ""mapRequestHazardFilter"",
                         null as ""mapRequestStatusFilter"",
-                        null as ""mapRequestLayerFilter"",
+                        null as ""mapRequestTypeFilter"",
                         r.""ContentType"" as ""reportContentTypeFilter"",
                         r.""IsPublic""::text as ""reportIsPublicFilter"",
                         null as ""communicationRestrictionFilter"",
+                        null as ""communicationScopeFilter"",
+                        null as ""alertRestrictionFilter"",
                         0 as ""teamFilter"",
                         null as ""receivers""
                     from public.reports r 
@@ -241,12 +246,13 @@ namespace Ermes.GeoJson
                         null as ""hazardFilter"",
                         null as ""reportStatusFilter"",
                         null as ""missionStatusFilter"",
-                        mr.""Hazard"" as ""mapRequestHazardFilter"",
                         mr.""Status"" as ""mapRequestStatusFilter"",
-                        mr.""Layer"" as ""mapRequestLayerFilter"",
+                        mr.""Type"" as ""mapRequestTypeFilter"",
                         null as ""reportContentTypeFilter"",
                         null as ""reportIsPublicFilter"",
                         null as ""communicationRestrictionFilter"",
+                        null as ""communicationScopeFilter"",
+                        null as ""alertRestrictionFilter"",
                         0 as ""teamFilter"",
                         null as ""receivers""
                     from public.map_requests mr
@@ -273,12 +279,13 @@ namespace Ermes.GeoJson
                         null as ""hazardFilter"",
                         null as ""reportStatusFilter"",
                         null as ""missionStatusFilter"",
-                        null as ""mapRequestHazardFilter"",
                         null as ""mapRequestStatusFilter"",
-                        null as ""mapRequestLayerFilter"",
+                        null as ""mapRequestTypeFilter"",
                         null as ""reportContentTypeFilter"",
                         null as ""reportIsPublicFilter"",
                         null as ""communicationRestrictionFilter"",
+                        null as ""communicationScopeFilter"",
+                        null as ""alertRestrictionFilter"",
                         t.""Id"" as ""TeamId"",
                         null as ""receivers""
                         FROM (
@@ -294,6 +301,69 @@ namespace Ermes.GeoJson
                     left join public.activity_translations at2 on at2.""CoreId"" = pa.""CurrentActivityId""
                     where (at2.""Language"" = @language or at2.""Language"" is null)
                     and (pa.""Location"" is not null and not ST_Equals(pa.""Location""::geometry, st_geomfromtext('POINT(0 0)', @srid)))
+                    union
+                    select 
+                        a.""Id"" as ""id"", 
+                        c.""Description"" as ""details"", 
+                        to_char(a.""Sent"", 'YYYY-MM-DD""T""HH24:MI:SSZ') as ""startDate"", 
+                        to_char(a.""Sent"", 'YYYY-MM-DD""T""HH24:MI:SSZ') as ""endDate"", 
+                        a.""Sent"" as ""startDateFilter"", 
+                        a.""Sent"" as ""endDateFilter"",
+                        'Alert' as ""type"", 
+                        ST_CENTROID(a.""BoundingBox"") as ""location"", 
+                        a.""Status"" as ""status"",
+                        null as ""organizationId"",
+                        null as ""organizationName"",
+                        null as ""organizationParentId"",
+                        null as ""extensionData"",
+                        a.""Sender"" as ""creator"",
+                        null as ""statusFilter"",
+                        0 as ""activityFilter"",
+                        null as ""hazardFilter"",
+                        null as ""reportStatusFilter"",
+                        null as ""missionStatusFilter"",
+                        null as ""mapRequestStatusFilter"",
+                        null as ""mapRequestTypeFilter"",
+                        null as ""reportContentTypeFilter"",
+                        null as ""reportIsPublicFilter"",
+                        null as ""communicationRestrictionFilter"",
+                        null as ""communicationScopeFilter"",
+                        a.""Restriction"" as ""alertRestrictionFilter"",
+                        0 as ""teamFilter"",
+                        null as ""receivers""
+                    from public.alerts a 
+                    join public.alerts_cap_info c on a.""Id"" = c.""AlertId""
+                    union
+                        select 
+                            s.""Id"" as ""id"", 
+                            s.""SensorServiceId"" as ""details"", 
+                            to_char(to_timestamp(0), 'YYYY-MM-DD""T""HH24:MI:SSZ') as ""startDate"", 
+                            to_char(to_timestamp(10000000000), 'YYYY-MM-DD""T""HH24:MI:SSZ') as ""endDate"", 
+                            null as ""startDateFilter"", 
+                            null as ""endDateFilter"",
+                            'Station' as ""type"", 
+                            ST_CENTROID(s.""Location"") as ""location"", 
+                            null as ""status"",
+                            null as ""organizationId"",
+                            null as ""organizationName"",
+                            null as ""organizationParentId"",
+                            null as ""extensionData"",
+                            s.""Owner"" as ""creator"",
+                            null as ""statusFilter"",
+                            0 as ""activityFilter"",
+                            null as ""hazardFilter"",
+                            null as ""reportStatusFilter"",
+                            null as ""missionStatusFilter"",
+                            null as ""mapRequestStatusFilter"",
+                            null as ""mapRequestTypeFilter"",
+                            null as ""reportContentTypeFilter"",
+                            null as ""reportIsPublicFilter"",
+                            null as ""communicationRestrictionFilter"",
+                            null as ""communicationScopeFilter"",
+                            null as ""alertRestrictionFilter"",
+                            0 as ""teamFilter"",
+                            null as ""receivers""
+                        from public.stations s 
                 ) tmp 
                 where 
                     tsrange(@startDate, @endDate, '[]') &&
@@ -331,7 +401,7 @@ namespace Ermes.GeoJson
                 if (organizationIdList != null)
                 {
                     command.CommandText += @" 
-                        and (((tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations]) or tmp.""organizationId"" is null) and tmp.""type"" in ('Mission', 'MapRequest')) or 
+                        and (((tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations]) or tmp.""organizationId"" is null) and tmp.""type"" in ('Mission', 'MapRequest', 'Alert', 'Station')) or 
                         ((tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations]) or tmp.""reportIsPublicFilter"" = 'true') and tmp.""type"" = 'Report') or
                         ((tmp.""organizationId"" = any(array[@organizations]) or tmp.""organizationParentId"" = any(array[@organizations])) and tmp.""type"" = 'Person') or
                         (tmp.""type"" = 'Communication' and tmp.""communicationRestrictionFilter"" = any(array[@restrictionTypes]) and (tmp.""communicationRestrictionFilter"" != 'Organization' or array[@organizations] && tmp.""receivers"" ";
@@ -377,6 +447,16 @@ namespace Ermes.GeoJson
                     Value = communicationRestrictionTypes.Select(a => a.ToString()).ToArray()
                 };
                 command.Parameters.Add(parameter);
+
+                if (communicationScopeTypes != null && communicationScopeTypes.Count > 0)
+                {
+                    command.CommandText += @" and (tmp.""communicationScopeFilter"" is null or tmp.""communicationScopeFilter"" = any(array[@communicationScopeFilter]))";
+                    var p = new NpgsqlParameter("@communicationScopeFilter", NpgsqlDbType.Array | NpgsqlDbType.Text)
+                    {
+                        Value = communicationScopeTypes.Select(a => a.ToString()).ToArray()
+                    };
+                    command.Parameters.Add(p);
+                }
 
                 if (statusTypes != null && statusTypes.Count > 0)
                 {
@@ -439,22 +519,12 @@ namespace Ermes.GeoJson
                     command.Parameters.Add(p);
                 }
 
-                if (mapRequestHazardTypes != null && mapRequestHazardTypes.Count > 0)
+                if (mapRequestTypes != null && mapRequestTypes.Count > 0)
                 {
-                    command.CommandText += @" and (tmp.""mapRequestHazardFilter"" is null or tmp.""mapRequestHazardFilter"" = any(array[@mapRequestHazardTypes]))";
-                    var p = new NpgsqlParameter("@mapRequestHazardTypes", NpgsqlDbType.Array | NpgsqlDbType.Text)
+                    command.CommandText += @" and (tmp.""mapRequestTypeFilter"" is null or tmp.""mapRequestTypeFilter"" = any(array[@mapRequestTypes]))";
+                    var p = new NpgsqlParameter("@mapRequestTypes", NpgsqlDbType.Array | NpgsqlDbType.Text)
                     {
-                        Value = mapRequestHazardTypes.Select(a => a.ToString()).ToArray()
-                    };
-                    command.Parameters.Add(p);
-                }
-
-                if (mapRequestLayerTypes != null && mapRequestLayerTypes.Count > 0)
-                {
-                    command.CommandText += @" and (tmp.""mapRequestLayerFilter"" is null or tmp.""mapRequestLayerFilter"" = any(array[@mapRequestLayerTypes]))";
-                    var p = new NpgsqlParameter("@mapRequestLayerTypes", NpgsqlDbType.Array | NpgsqlDbType.Text)
-                    {
-                        Value = mapRequestLayerTypes.Select(a => a.ToString()).ToArray()
+                        Value = mapRequestTypes.Select(a => a.ToString()).ToArray()
                     };
                     command.Parameters.Add(p);
                 }
@@ -475,6 +545,16 @@ namespace Ermes.GeoJson
                     var p = new NpgsqlParameter("@reportContentTypes", NpgsqlDbType.Array | NpgsqlDbType.Text)
                     {
                         Value = reportContentTypes.Select(a => a.ToString()).ToArray()
+                    };
+                    command.Parameters.Add(p);
+                }
+
+                if (alertRestrictionTypes != null && alertRestrictionTypes.Count > 0)
+                {
+                    command.CommandText += @" and (tmp.""alertRestrictionFilter"" is null or tmp.""alertRestrictionFilter"" = any(array[@alertRestrictionTypes]))";
+                    var p = new NpgsqlParameter("@alertRestrictionTypes", NpgsqlDbType.Array | NpgsqlDbType.Text)
+                    {
+                        Value = alertRestrictionTypes.ToArray()
                     };
                     command.Parameters.Add(p);
                 }
@@ -851,6 +931,13 @@ namespace Ermes.GeoJson
 
                 return result;
             }
+        }
+
+        public IQueryable<Alert> GetAlerts(DateTime startDate, DateTime endDate, Geometry boundingBox)
+        {
+            return _dbContextProvider.GetDbContext()
+                .Alerts
+                .FromSqlInterpolated($"SELECT * FROM alerts WHERE ST_INTERSECTS(ST_CENTROID(\"BoundingBox\"), {boundingBox}) and {startDate} <= \"Sent\" and {endDate} >= \"Sent\"");
         }
     }
 

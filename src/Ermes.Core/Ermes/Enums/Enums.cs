@@ -180,7 +180,9 @@ namespace Ermes.Enums
         PersonActionActivity = 80,
         Person = 90,
         Gamification = 100,
-        Team = 110
+        Team = 110,
+        Alert = 120,
+        Station = 130
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -299,11 +301,21 @@ namespace Ermes.Enums
     [JsonConverter(typeof(StringEnumConverter))]
     public enum MapRequestStatusType
     {
-        RequestSubmitted,
-        ContentAvailable,
+        RequestSubmitted = 0,
+        Processing = 10,
+        ContentAvailable = 20,
         [Obsolete] //kept for retrocompatibility
-        ContentNotAvailable,
-        Canceled
+        ContentNotAvailable = 30,
+        Canceled = 40,
+        Error = 50
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum MapRequestType
+    {
+        FireAndBurnedArea,
+        PostEventMonitoring,
+        WildfireSimulation
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -412,4 +424,111 @@ namespace Ermes.Enums
         Citizen,
         Professional
     }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum FireBreakType
+    {
+        Canadair,
+        Helicopter,
+        WaterLine,
+        Vehicle
+
+    }
+
+    #region CAP Standard
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum CapStatusType
+    {
+        Draft,
+        Test,
+        System,
+        Exercise,
+        Actual
+    }
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum CapMsgType
+    {
+        Notification,
+        Alert,
+        Update,
+        Cancel,
+        Ack,
+        Error
+    }
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum CapScopeType
+    {
+        Public,
+        Restricted,
+        Private
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum CapCategoryType
+    {
+        Geo,
+        Met,
+        Safety,
+        Security,
+        Rescue,
+        Fire,
+        Health,
+        Env,
+        Transport,
+        Infra,
+        CBRNE,
+        Other
+    }
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum CapResponseType
+    {
+        None,
+        Shelter,
+        Evacuate,
+        Prepare,
+        Execute,
+        Avoid,
+        Monitor,
+        Assess,
+        AllClear        
+    }
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum CapUrgencyType
+    {
+        Unknown,
+        Immediate,
+        Expected,
+        Future,
+        Past        
+    }
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum CapSeverityType
+    {
+        Unknown,
+        Extreme,
+        Severe,
+        Moderate,
+        Minor        
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum CapCertaintyType
+    {
+        Unknown,
+        Observed,
+        Likely,
+        Possible,
+        Unlikely        
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum TimeSeriesVariableType
+    {
+        Unknown = -1,
+        String = 0,
+        Number = 1,
+        Boolean = 2
+    }
+    #endregion
+
 }

@@ -17,7 +17,7 @@ namespace Abp.Azure.Storage
 
         #region CTors
 
-        private AzureStorageManager(){}
+        private AzureStorageManager() { }
 
         public AzureStorageManager(string connectionString, string containerName)
         {
@@ -40,7 +40,7 @@ namespace Abp.Azure.Storage
         public async Task<bool> UploadFile(string fileName, string uploadFileName, string contentType)
         {
             byte[] file = File.ReadAllBytes(uploadFileName);
-            return await UploadFile(fileName,file,contentType);
+            return await UploadFile(fileName, file, contentType);
         }
 
         public async Task<bool> UploadFile(string blobName, byte[] file, string contentType)

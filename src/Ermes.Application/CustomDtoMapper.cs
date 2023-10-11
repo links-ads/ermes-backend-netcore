@@ -1,4 +1,5 @@
 ﻿using Abp.AutoMapper;
+using Abp.SensorService.Model;
 using Abp.SocialMedia.Dto;
 using Abp.SocialMedia.Model;
 using AutoMapper;
@@ -6,11 +7,14 @@ using Ermes.Actions.Dto;
 using Ermes.Activations;
 using Ermes.Activities;
 using Ermes.Activities.Dto;
+using Ermes.Alerts;
+using Ermes.Alerts.Dto;
 using Ermes.Answers;
 using Ermes.Auth.Dto;
 using Ermes.Categories;
 using Ermes.Communications;
 using Ermes.Communications.Dto;
+using Ermes.Consumers.RabbitMq;
 using Ermes.Dashboard.Dto;
 using Ermes.Dto.Spatial;
 using Ermes.EntityHistory;
@@ -23,11 +27,13 @@ using Ermes.Import.Dto;
 using Ermes.Layers;
 using Ermes.Layers.Dto;
 using Ermes.Logging.Dto;
+using Ermes.MapRequests;
 using Ermes.MapRequests.Dto;
 using Ermes.Missions;
 using Ermes.Missions.Dto;
 using Ermes.Notifications;
 using Ermes.Notifications.Dto;
+using Ermes.Notifiers.MessageBody;
 using Ermes.Organizations;
 using Ermes.Organizations.Dto;
 using Ermes.Permissions;
@@ -41,12 +47,15 @@ using Ermes.Resources;
 using Ermes.Roles;
 using Ermes.Roles.Dto;
 using Ermes.Social.Dto;
+using Ermes.Stations;
+using Ermes.Stations.Dto;
 using Ermes.Teams;
 using Ermes.Teams.Dto;
 using Ermes.Tips;
 using Ermes.Users.Dto;
 using io.fusionauth.domain;
 using NetTopologySuite.Geometries;
+using NetTopologySuite.GeometriesGraph;
 using NetTopologySuite.IO;
 using System;
 using System.Linq;
@@ -128,7 +137,8 @@ namespace Ermes
                             .ForMember(entity => entity.MediaURIs, options => options.Ignore())
                             .ForMember(entity => entity.Tags, options => options.Ignore())
                             .ForMember(entity => entity.AdultInfo, options => options.Ignore())
-                            .ForMember(entity => entity.Creator, options => options.Ignore());
+                            .ForMember(entity => entity.Creator, options => options.Ignore())
+                            .ForMember(entity => entity.Validations, options => options.Ignore());
             configuration.CreateMap<ReportValidation, ReportValidationDto>()
                             .ForMember(dto => dto.ValidatorDisplayName, options => options.MapFrom(a => a.Person.Username != null && a.Person.Username != string.Empty ? a.Person.Username : a.Person.Email))
                             .ReverseMap();
@@ -222,10 +232,12 @@ namespace Ermes
                             .ForMember(dto => dto.Organization, options => options.MapFrom(b => b.Creator.Organization))
                             .ForMember(dto => dto.Username, options => options.MapFrom(b => b.Creator.Username))
                             .ForMember(dto => dto.Email, options => options.MapFrom(b => b.Creator.Email))
+                            .ForMember(dto => dto.MapRequestType, options => options.MapFrom(b => b.Type))
                             .AfterMap((src, dest) => dest.Duration.LowerBound = dest.Duration.LowerBound.ToUniversalTime())
                             .AfterMap((src, dest) => dest.Duration.UpperBound = dest.Duration.UpperBound.ToUniversalTime())
                             .ReverseMap()
-                            .ForMember(entity => entity.Code, options => options.Ignore());
+                            .ForMember(entity => entity.Code, options => options.Ignore())
+                            .ForMember(entity => entity.Type, options => options.MapFrom(b => b.MapRequestType));
             configuration.CreateMap<MapRequests.MapRequest, MapRequestNotificationDto>();
             configuration.CreateMap<MapRequests.MapRequestLayer, MapRequestLayerDto>()
                             .ReverseMap();
@@ -242,6 +254,32 @@ namespace Ermes
                 .ForMember(dto => dto.Username, options => options.MapFrom(b => b.Username))
                 .ForMember(dto => dto.Email, options => options.MapFrom(b => b.Email))
                 .ForMember(dto => dto.Points, options => options.MapFrom(b => b.Points));
+
+            configuration.CreateMap<MapRequestBody, MapRequestFireAndBurnedAreaBody>()
+                .ForMember(dto => dto.start, options => options.MapFrom(b => b.start.ToUniversalTime()))
+                .ForMember(dto => dto.end, options => options.MapFrom(b => b.end.ToUniversalTime()));
+            configuration.CreateMap<MapRequestBody, MapRequestPostEventMonitoringBody>()
+                .ForMember(dto => dto.start, options => options.MapFrom(b => b.start.ToUniversalTime()))
+                .ForMember(dto => dto.end, options => options.MapFrom(b => b.end.ToUniversalTime()));
+            configuration.CreateMap<MapRequestBody, MapRequestWildFireSimulationBody>()
+                .ForMember(dto => dto.datatype_id, options => options.MapFrom(b => b.datatype_id.ToString()))
+                .ForMember(dto => dto.start, options => options.MapFrom(b => b.start.ToUniversalTime()))
+                .ForMember(dto => dto.end, options => options.MapFrom(b => b.end.ToUniversalTime()));
+            configuration.CreateMap<BoundaryCondition, BoundaryConditionBody>()
+                .ForMember(dto => dto.w_dir, options => options.MapFrom(b => b.WindDirection))
+                .ForMember(dto => dto.w_speed, options => options.MapFrom(b => b.WindSpeed));
+
+            configuration.CreateMap<Alert, AlertDto>()
+                .ForMember(dto => dto.Centroid, options => options.MapFrom(b => new PointPosition(b.BoundingBox.Centroid.X, b.BoundingBox.Centroid.Y)));
+            configuration.CreateMap<Alert, RabbitMqAlert>()
+                .ReverseMap()
+                .ForMember(a => a.Info, options => options.Ignore())
+                .ForMember(a => a.BoundingBox, options => options.Ignore());
+            configuration.CreateMap<CapInfo, CapInfoDto>();
+            configuration.CreateMap<CapInfo, RabbitMqAlertInfo>()
+                .ReverseMap();
+            configuration.CreateMap<CapArea, CapAreaDto>();
+            configuration.CreateMap<CapArea, RabbitMqAlertArea>().ReverseMap();
 
             #region GeoJsons
             configuration.CreateMap<Communication, FeatureDto<GeoJsonItem>>()
@@ -277,6 +315,27 @@ namespace Ermes
             configuration.CreateMap<Activation, ActivationDto>()
                             .ForMember(dto => dto.Y, options => options.MapFrom(c => c.Counter))
                             .ReverseMap();
+
+            configuration.CreateMap<Station, SensorServiceStation>()
+                .ForMember(a => a.Id, options => options.MapFrom(s => s.SensorServiceId))
+                .ReverseMap()
+                .ForMember(s => s.SensorServiceId, options => options.MapFrom(c => c.Id))
+                .ForMember(s => s.Id, options => options.Ignore())
+                .ForMember(s => s.Location, options => options.MapFrom(a => new Point((double)a.Location.Coordinates[1], (double)a.Location.Coordinates[0])));
+            configuration.CreateMap<StationDto, SensorServiceStation>()
+                .ReverseMap()
+                .ForMember(dto => dto.Type, options => options.Ignore())
+                .ForMember(dto => dto.StationType, options => options.MapFrom(b => b.ProductCode));
+            configuration.CreateMap<SensorDto, SensorServiceSensor>().ReverseMap();
+
+            configuration.CreateMap<MeasureDto, SensorServiceMeasure>().ReverseMap()
+                .ForMember(dto => dto.Timestamp, options => options.MapFrom(b => b.DateStart));
+
+
+            configuration.CreateMap<SensorServiceStationLocation, PointPosition>()
+                .ForMember(pos => pos.Latitude, options => options.MapFrom(b => b.Coordinates[0]))
+                .ForMember(pos => pos.Longitude, options => options.MapFrom(b => b.Coordinates[1]))
+                .ReverseMap();
             #endregion
 
 

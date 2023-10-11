@@ -7,11 +7,9 @@ using Ermes.Localization;
 using Ermes.Net.MimeTypes;
 using OfficeOpenXml;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using static Ermes.Excel.Common.ExcelCommon;
 
@@ -61,9 +59,9 @@ namespace Ermes.Import
                         layer.GroupKey = row.GetString("Group Key");
                         layer.SubGroupKey = row.GetString("SubGroup Key");
                         layer.PartnerName = row.GetString("Partner Name");
-                        layer.Type = row.GetEnum<LayerType>("Type");
                         layer.Format = row.GetEnum<FormatType>("Format");
                         layer.CanBeVisualized = row.GetBoolean("Can be visualized");
+                        layer.IsActive = row.GetBoolean("Is Active");
                         layer.Frequency = row.GetEnum<FrequencyType>("Update Frequency");
                         layer.UnitOfMeasure = row.GetString("Unit of measure");
                         layer.Order = row.GetInt("Order").Value;

@@ -98,6 +98,14 @@ namespace Ermes.Reports
                 query = query.Where(a => contentList.Contains(a.ContentString));
             }
 
+            if (input.Visibility != VisibilityType.All)
+            {
+                if(input.Visibility == VisibilityType.Private)
+                    query = query.Where(r => !r.IsPublic);
+                else
+                    query = query.Where(r => r.IsPublic);
+            }
+
             query = query.DTFilterBy(input);
 
             var person = _session.LoggedUserPerson;
@@ -131,7 +139,7 @@ namespace Ermes.Reports
                             .Select(r =>
                             {
                                 r.IsEditable = person.Id == r.CreatorId;
-                                r.CanBeValidated = person.Id != r.CreatorId;
+                                r.CanBeValidated = person.Id != r.CreatorId && r.Validations.Where(a => a.PersonId == person.Id).Count() == 0;
                                 r.Upvotes = r.Validations.Count(b => b.IsValid);
                                 r.Downvotes = r.Validations.Count(b => !b.IsValid);
                                 return r;
@@ -240,7 +248,7 @@ namespace Ermes.Reports
 
             var properties = ObjectMapper.Map<ReportDto>(report);
             properties.IsEditable = (report.CreatorUserId == _session.UserId);
-            properties.CanBeValidated = (report.CreatorUserId != _session.UserId);
+            properties.CanBeValidated = report.CreatorUserId != _session.UserId && report.Validations.Where(a => a.PersonId == _session.LoggedUserPerson.Id).Count() == 0;
             var writer = new GeoJsonWriter();
             return new GetEntityByIdOutput<ReportDto>()
             {

@@ -2,7 +2,6 @@
 using Ermes.Dto;
 using Ermes.Dto.Spatial;
 using Ermes.Enums;
-using Ermes.Organizations.Dto;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -13,6 +12,7 @@ namespace Ermes.Communications.Dto
     public class CommunicationDto : ICustomValidate
     {
         public int Id { get; set; }
+        public string Type { get; } = "Communication";
         [Required]
         public string Message { get; set; }
         public RangeDto<DateTime> Duration { get; set; }

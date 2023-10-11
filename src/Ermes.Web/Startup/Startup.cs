@@ -31,6 +31,11 @@ using Abp.AzureCognitiveServices;
 using Abp.SocialMedia;
 using Abp.Importer;
 using Ermes.ExternalServices.Csi.Configuration;
+using Abp.SensorService;
+using Hangfire;
+using Abp.Hangfire;
+using Ermes.Web.App_Start;
+using Hangfire.PostgreSql;
 
 namespace Ermes.Web.Startup
 {
@@ -97,6 +102,9 @@ namespace Ermes.Web.Startup
             );
             services.Configure<AbpImporterSettings>(
                 _appConfiguration.GetSection("Importer")
+            );
+            services.Configure<AbpSensorServiceSettings>(
+                _appConfiguration.GetSection("SensorService")
             );
 
 
@@ -170,6 +178,11 @@ namespace Ermes.Web.Startup
                 }
             }
 
+            services.AddHangfire(config =>
+            {
+                config.UsePostgreSqlStorage(_appConfiguration.GetConnectionString("Default"));
+            });
+
             services.AddApplicationInsightsTelemetry();
 
             //Configure Abp and Dependency Injection
@@ -199,6 +212,9 @@ namespace Ermes.Web.Startup
             app.UseMiddleware<JwtTokenMiddleware>(client);
             app.UseAuthentication();
 
+            app.UseHangfireServer();
+            
+
             app.UseStaticFiles();
             app.UseRouting();
             app.UseAuthorization();
@@ -206,6 +222,23 @@ namespace Ermes.Web.Startup
             app.UseEndpoints(endpoints => {
                 endpoints.MapDefaultControllerRoute();
             });
+
+            if (bool.Parse(_appConfiguration["App:HangfireEnabled"]))
+            {
+                //Enable it to use HangFire dashboard (uncomment only if it's enabled in ImproveWebModule)
+                app.UseHangfireDashboard("/hangfire", new DashboardOptions
+                {
+                    Authorization = new[] { new App_Start.AbpHangfireAuthorizationFilter() },
+                    AppPath = "/swagger"
+                });
+
+                // Disable automatic retry for all hangfire job and disable concurrent execution
+                GlobalJobFilters.Filters.Add(new AutomaticRetryAttribute { Attempts = 0 });
+                GlobalJobFilters.Filters.Add(new DisableConcurrentExecutionAttribute(60 * 5));
+
+                // Setup recurring jobs
+                JobsBootstrapper.SetupJobs();
+            }
 
             app.UseOpenApi();
             app.UseSwaggerUi3(options =>

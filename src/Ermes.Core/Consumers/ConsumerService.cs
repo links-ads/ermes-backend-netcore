@@ -1,45 +1,70 @@
-﻿using Abp.Domain.Uow;
+﻿using Abp.Azure;
+using Abp.Domain.Uow;
+using Abp.SensorService;
+using Abp.SensorService.Model;
 using Abp.Threading;
+using Ermes.Alerts;
 using Ermes.Consumers.Kafka;
 using Ermes.Consumers.RabbitMq;
+using Ermes.Core.Helpers;
 using Ermes.Enums;
 using Ermes.MapRequests;
 using Ermes.Missions;
+using Ermes.Notifications;
 using Ermes.Notifiers;
 using Ermes.Persons;
+using Ermes.Resources;
+using Ermes.Stations;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Transactions;
 
 namespace Ermes.Consumers
 {
-    public class ConsumerService: ErmesDomainServiceBase, IConsumerService
+    public class ConsumerService : ErmesDomainServiceBase, IConsumerService
     {
         private readonly MissionManager _missionManager;
         private readonly PersonManager _personManager;
         private readonly NotifierService _notifierService;
         private readonly MapRequestManager _mapRequestManager;
+        private readonly NotificationManager _notificationManager;
+        private readonly AlertManager _alertManager;
+        private readonly StationManager _stationManager;
+        private readonly IAzureManager _azureManager;
+        private readonly SensorServiceManager _sensorServiceManager;
+
 
         public ConsumerService(
-            MissionManager missionManager, 
+            MissionManager missionManager,
             NotifierService notifierService,
             PersonManager personManager,
-            MapRequestManager mapRequestManager)
+            MapRequestManager mapRequestManager,
+            NotificationManager notificationManager,
+            AlertManager alertManager,
+            StationManager stationManager,
+            IAzureManager azureManager,
+            SensorServiceManager sensorServiceManager)
         {
             _missionManager = missionManager;
             _notifierService = notifierService;
             _personManager = personManager;
             _mapRequestManager = mapRequestManager;
+            _notificationManager = notificationManager;
+            _alertManager = alertManager;
+            _stationManager = stationManager;
+            _azureManager = azureManager;
+            _sensorServiceManager = sensorServiceManager;
         }
 
         public void ConsumeBusNotification(string message, string routingKey)
         {
+            _notificationManager.InsertNotificationReceived(new NotificationReceived(routingKey, message));
             //Consume the message based on routing key prop
             //Kafka bus does not use routingKey, while for RabbitMq it is a mandatory field
             if (routingKey != "")
-                //TODO: to be generalized, only map request status update is managed
                 ConsumeRabbitMqNotification(message, routingKey);
             else
                 ConsumeKafkaNotification(message);
@@ -50,9 +75,24 @@ namespace Ermes.Consumers
         {
             try
             {
-                var eventData = JsonConvert.DeserializeObject<RabbitMqResponse>(message);
-                eventData.request_code = routingKey.Split('.')[^1];
-                HandleMapRequestStatusChange(eventData);
+                if (routingKey.Contains("status"))
+                {
+                    var eventData = JsonConvert.DeserializeObject<RabbitMqResponse>(message);
+                    eventData.request_code = routingKey.Split('.')[^1];
+                    HandleMapRequestStatusChange(eventData);
+                }
+                else if (routingKey.Contains("notification.sem"))
+                {
+                    var eventData = JsonConvert.DeserializeObject<RabbitMqAlert>(message);
+                    HandleAlertMessage(eventData);
+                }
+                else if (routingKey.Contains("event.camera"))
+                {
+                    var eventData = JsonConvert.DeserializeObject<RabbitMqCameraEvent>(message);
+                    HandleCameraMessage(eventData);
+                }
+                else
+                    Console.WriteLine("No management for messages with routing key: " + routingKey);
             }
             catch (Exception e)
             {
@@ -106,6 +146,8 @@ namespace Ermes.Consumers
                             break;
                         case "202":
                             layer.Status = LayerImportStatusType.Processing;
+                            if (mr.MapRequestLayers.Select(l => l.Status == LayerImportStatusType.Processing).Count() == mr.MapRequestLayers.Count)
+                                mr.Status = MapRequestStatusType.Processing;
                             break;
                         case "400":
                         case "404":
@@ -124,12 +166,161 @@ namespace Ermes.Consumers
                         default:
                             break;
                     }
-                    
+
                     CurrentUnitOfWork.SaveChanges();
                 }
                 catch (Exception e)
                 {
                     Logger.ErrorFormat("HandleMapRequestStatusChange exception: {0}", e.Message);
+                }
+
+                unitOfWork.Complete();
+            }
+        }
+
+        [UnitOfWork(IsDisabled = true)]
+        private void HandleAlertMessage(RabbitMqAlert eventData)
+        {
+            using (var unitOfWork = UnitOfWorkManager.Begin(new UnitOfWorkOptions
+            {
+                IsolationLevel = IsolationLevel.ReadCommitted,
+                IsTransactional = true,
+                Timeout = TimeSpan.FromMinutes(30),
+                FilterOverrides =
+                        {
+                            new DataFilterConfiguration(AbpDataFilters.MayHaveTenant,false),
+                            new DataFilterConfiguration(AbpDataFilters.MustHaveTenant, false)
+                        }
+            }))
+            {
+                try
+                {
+                    var alert = ObjectMapper.Map<Alert>(eventData);
+                    var fullGeometry = eventData.Info.First().Area.First().FullGeometry;
+                    alert.BoundingBox = fullGeometry.Envelope;
+                    
+                    alert.IsARecommendation = true;
+                    alert.Id = _alertManager.InsertAlertAndGetId(alert);
+                    AlertAreaOfInterest alertAreaOfInterest = new AlertAreaOfInterest(alert.Id, fullGeometry);
+                    alert.AlertAreaOfInterestId = _alertManager.InsertAlertAreaOfInterestAndGetId(alertAreaOfInterest);
+                    CurrentUnitOfWork.SaveChanges();
+
+                    foreach (var item in eventData.Info)
+                    {
+                        var info = ObjectMapper.Map<CapInfo>(item);
+                        info.AlertId = alert.Id;
+                        _alertManager.InsertCapInfoAndGetId(info);
+                    }
+
+
+                    CurrentUnitOfWork.SaveChanges();
+                }
+                catch (Exception e)
+                {
+                    Logger.ErrorFormat("HandleAlertMessage exception: {0}", e.Message);
+                }
+
+                unitOfWork.Complete();
+            }
+        }
+
+        [UnitOfWork(IsDisabled = true)]
+        private void HandleCameraMessage(RabbitMqCameraEvent eventData)
+        {
+            using (var unitOfWork = UnitOfWorkManager.Begin(new UnitOfWorkOptions
+            {
+                IsolationLevel = IsolationLevel.ReadCommitted,
+                IsTransactional = true,
+                Timeout = TimeSpan.FromMinutes(30),
+                FilterOverrides =
+                        {
+                            new DataFilterConfiguration(AbpDataFilters.MayHaveTenant,false),
+                            new DataFilterConfiguration(AbpDataFilters.MustHaveTenant, false)
+                        }
+            }))
+            {
+                try
+                {
+
+                    WebClient client = new WebClient();
+                    byte[] fileBytes = client.DownloadData(eventData.Link);
+                    var _azureCameraStorageManager = _azureManager.GetStorageManager(ResourceManager.GetBasePath(ResourceManager.Cameras.ContainerName));
+                    var _azureCameraThumbnailStorageManager = _azureManager.GetStorageManager(ResourceManager.GetBasePath(ResourceManager.CameraThumbnails.ContainerName));
+
+                    //TODO: to be generalized + implement thumbnails
+                    string fileExtension = "jpg";
+                    string uploadedFileName = string.Concat(Guid.NewGuid().ToString(), ".", fileExtension);
+                    var fileNameWithFolder = ResourceManager.Cameras.GetRelativeMediaPath(eventData.Camera.Name, eventData.Camera.CamDirection, uploadedFileName);
+                    AsyncHelper.RunSync(() => _azureCameraStorageManager.UploadFile(fileNameWithFolder, fileBytes, ErmesConsts.IMAGE_MIME_TYPE));
+
+                    string thumbnailName = ResourceManager.CameraThumbnails.GetJpegThumbnailFilename(uploadedFileName);
+                    string thumbnailPath = ResourceManager.CameraThumbnails.GetRelativeMediaPath(eventData.Camera.Name, eventData.Camera.CamDirection, thumbnailName);
+                    try
+                    {
+                        AsyncHelper.RunSync(() => _azureCameraThumbnailStorageManager.UploadFile(thumbnailPath, ErmesCoreCommon.CreateThumbnailFromImage(fileBytes, ErmesConsts.Thumbnail.SIZE, ErmesConsts.Thumbnail.QUALITY, Logger), ErmesConsts.IMAGE_MIME_TYPE));
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error(e.Message);
+                        Logger.WarnFormat("Upload of Thumbnail fails, try to upload original image");
+
+                        AsyncHelper.RunSync(() => _azureCameraThumbnailStorageManager.UploadFile(thumbnailPath, fileBytes, ErmesConsts.IMAGE_MIME_TYPE));
+                    }
+
+                    var stations = AsyncHelper.RunSync(() => _sensorServiceManager.GetStations());
+                    SensorServiceStation station = stations.Where(s => s.Name == eventData.Camera.Name).FirstOrDefault();
+                    SensorServiceSensor sensor;
+                    if (station == null) //create station and sensor if not present
+                    {
+                        station = AsyncHelper.RunSync(() => _sensorServiceManager.CreateStation(eventData.Camera.Name, eventData.Camera.Latitude, eventData.Camera.Longitude, eventData.Camera.Altitude, eventData.Camera.Owner, eventData.Camera.Model, eventData.Camera.Type));
+                        sensor = AsyncHelper.RunSync(() => _sensorServiceManager.CreateSensor(station.Id, eventData.Camera.CamDirection, eventData.Camera.CamDirection, "degree"));
+                    }
+                    else
+                    {
+                        station = AsyncHelper.RunSync(() => _sensorServiceManager.GetStationInfo(station.Id));
+                        sensor = station.Sensors.Where(s => s.Type == eventData.Camera.CamDirection).FirstOrDefault();
+                        sensor ??= AsyncHelper.RunSync(() => _sensorServiceManager.CreateSensor(station.Id, eventData.Camera.CamDirection, eventData.Camera.CamDirection, "degree"));
+                    }
+
+                    //for optimization purposes during GetFeatureCollection, also check and create station locally
+                    Station localStation = _stationManager.GetStationBySensorServiceId(station.Id);
+                    if (localStation == null)
+                    {
+                        localStation = ObjectMapper.Map<Station>(station);
+                        _stationManager.InsertStation(localStation);
+                    }
+
+                    object metadata = new
+                    {
+                        detection = new
+                        {
+                            not_available = eventData.Detection.NotAvailable,
+                            fire = eventData.Detection.Fire,
+                            smoke = eventData.Detection.Smoke,
+
+                        },
+                        class_of_fire = new
+                        {
+                            not_available = eventData.ClassOfFire.NotAvailable,
+                            class_1 = eventData.ClassOfFire.Class1,
+                            class_2 = eventData.ClassOfFire.Class2,
+                            class_3 = eventData.ClassOfFire.Class3,
+                        },
+                        fire_location = new
+                        {
+                            not_available = eventData.FireLocation.NotAvailable,
+                            direction = eventData.FireLocation.Direction,
+                            distance = eventData.FireLocation.Distance,
+                            latitude = eventData.FireLocation.Latitude,
+                            longitude = eventData.FireLocation.Longitude
+                        },
+                        thumbnail_uri = ResourceManager.CameraThumbnails.GetMediaPath(eventData.Camera.Name, eventData.Camera.CamDirection, uploadedFileName)
+                    };
+                    AsyncHelper.RunSync(() => _sensorServiceManager.CreateMeasure(sensor.Id, DateTime.UtcNow, DateTime.UtcNow, ResourceManager.Cameras.GetMediaPath(eventData.Camera.Name, eventData.Camera.CamDirection, uploadedFileName), metadata));
+                }
+                catch (Exception e)
+                {
+                    Logger.ErrorFormat("HandleCameraEventMessage exception: {0}", e.Message);
                 }
 
                 unitOfWork.Complete();
@@ -250,7 +441,7 @@ namespace Ermes.Consumers
                                 {
                                     CoordinatorPersonId = mission.CoordinatorPersonId,
                                     CoordinatorTeamId = mission.CoordinatorTeamId,
-                                    Description = mission.Description, 
+                                    Description = mission.Description,
                                     Id = mission.Id,
                                     Notes = mission.Notes,
                                     OrganizationId = mission.OrganizationId,

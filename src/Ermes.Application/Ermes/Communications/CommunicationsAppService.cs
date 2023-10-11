@@ -77,6 +77,10 @@ namespace Ermes.Communications
             IQueryable<Communication> query;
             input.StartDate = input.StartDate.HasValue ? input.StartDate : DateTime.MinValue;
             input.EndDate = input.EndDate.HasValue ? input.EndDate : DateTime.MaxValue;
+            bool includeNone = false;
+            var person = _session.LoggedUserPerson;
+            var roles = await _personManager.GetPersonRoleNamesAsync(person.Id);
+
 
             if (input.NorthEastBoundary != null && input.SouthWestBoundary != null)
             {
@@ -87,9 +91,39 @@ namespace Ermes.Communications
             else
                 query = _communicationManager.Communications.Where(a => new NpgsqlRange<DateTime>(input.StartDate.Value, input.EndDate.Value).Contains(a.Duration));
 
-            query = query.DTFilterBy(input);
+            if (input.Scopes != null && input.Scopes.Count > 0)
+            {
+                var list = input.Scopes.Select(a => a.ToString()).ToList();
+                query = query.Where(a => list.Contains(a.ScopeString));
+                includeNone = input.Scopes.Contains(CommunicationScopeType.Public);
 
-            var person = _session.LoggedUserPerson;
+            }
+
+            if (input.Restrictions != null && input.Restrictions.Count > 0)
+            {
+                if (includeNone)
+                    input.Restrictions.Add(CommunicationRestrictionType.None);
+                if (roles.Any(r => r == AppRoles.CITIZEN))
+                    input.Restrictions = new List<CommunicationRestrictionType> { CommunicationRestrictionType.None, CommunicationRestrictionType.Citizen };
+
+
+                var list = input.Restrictions.Select(a => a.ToString()).ToList();
+                query = query.Where(a => list.Contains(a.RestrictionString));
+            }
+            else
+            {
+                input.Restrictions = new List<CommunicationRestrictionType>() { CommunicationRestrictionType.None, CommunicationRestrictionType.Professional, CommunicationRestrictionType.Organization, CommunicationRestrictionType.Citizen };
+                if (roles.Any(r => r == AppRoles.CITIZEN))
+                    input.Restrictions = input.Restrictions.Where(a => a == CommunicationRestrictionType.None || a == CommunicationRestrictionType.Citizen).ToList();
+
+                if (input.Restrictions.Count > 0)
+                {
+                    var list = input.Restrictions.Select(a => a.ToString()).ToList();
+                    query = query.Where(a => list.Contains(a.RestrictionString));
+                }
+            }
+
+            query = query.DTFilterBy(input);
 
             //Admin can see everything
             var hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Communications.Communication_CanSeeCrossOrganization);
@@ -115,7 +149,7 @@ namespace Ermes.Communications
 
             if (input?.Order != null && input.Order.Count == 0)
             {
-                query = query.OrderByDescending(a => a.Duration.LowerBound);
+                query = query.OrderByDescending(a => a.Duration.LowerBound).ThenByDescending(a => a.Id);
                 query = query.PageBy(input);
             }
             else
@@ -196,6 +230,8 @@ namespace Ermes.Communications
                     - StartDate and EndDate to define a time window of interest
                     - SouthWestBoundary: bottom-left corner of the bounding box for a spatial query. (optional) (to be filled together with NorthEast property)
                     - NorthEastBoundary: top-right corner of the bounding box for a spatial query format. (optional) (to be filled together with SouthWest property)
+                    - Scopes: list of scopes of interest
+                    - Restrictions: list of restriction of interest
                 Output: list of CommunicationDto elements
 
                 N.B.: The visibility depends on the 'Restriction' field of the Communication. More in the details:

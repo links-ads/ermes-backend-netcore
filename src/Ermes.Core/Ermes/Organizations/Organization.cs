@@ -12,10 +12,10 @@ namespace Ermes.Organizations
     [Table("organizations")]
     public class Organization : AuditedEntity
     {
-        public const int MaxShortNameLength = 30;
-        public const int MaxNameLength = 100;
-        public const int MaxDescriptionLength = 1024;
-        public const int MaxWebSiteLength = 255;
+        public const int MAX_SHORTNAME_LENGTH = 30;
+        public const int MAX_NAME_LENGTH = 100;
+        public const int MAX_DESCRIPTION_LENGTH = 1024;
+        public const int MAX_WEBSITE_LENGTH = 255;
 
         public Organization(){}
         public Organization(string name)
@@ -33,26 +33,26 @@ namespace Ermes.Organizations
         /// Organization short name
         /// </summary>
         [Required]
-        [StringLength(MaxShortNameLength)]
+        [StringLength(MAX_SHORTNAME_LENGTH)]
         public string ShortName { get; set; }
         
         /// <summary>
         /// Organization Name
         /// </summary>
         [Required]
-        [StringLength(MaxNameLength)]
+        [StringLength(MAX_NAME_LENGTH)]
         public string Name { get; set; }
         
         /// <summary>
         /// Organization Description
         /// </summary>
-        [StringLength(MaxDescriptionLength)]
+        [StringLength(MAX_DESCRIPTION_LENGTH)]
         public string Description { get; set; }
         
         /// <summary>
         /// Organization Web site
         /// </summary>
-        [StringLength(MaxWebSiteLength)]
+        [StringLength(MAX_WEBSITE_LENGTH)]
         public string WebSite { get; set; }
         
         /// <summary>

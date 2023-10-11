@@ -20,5 +20,9 @@ namespace Ermes.MapRequests.Dto
         public int DataTypeId { get; set; }
         public MapRequestStatusType Status { get; set; }
         public string ErrorMessage { get; set; }
+        public MapRequestType Type { get; set; }
+        public string Description { get; set; }
+        public bool DoSpotting { get; set; }
+        public List<BoundaryCondition> BoundaryConditions { get; set; }
     }
 }

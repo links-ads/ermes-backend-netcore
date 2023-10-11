@@ -1,35 +1,31 @@
-﻿using Abp.Domain.Entities;
-using Abp.Domain.Entities.Auditing;
+﻿using Abp.Domain.Entities.Auditing;
 using Ermes.Enums;
 using Ermes.Helpers;
-using Ermes.Interfaces;
 using Ermes.Organizations;
 using Ermes.Persons;
 using Ermes.Teams;
 using NetTopologySuite.Geometries;
 using NpgsqlTypes;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 
 namespace Ermes.Missions
 {
     [Table("missions")]
     public class Mission : AuditedEntity
     {
-        public const int MaxTitleLength = 255;
-        public const int MaxDescriptionLength = 1000;
-        public const int MaxNotesLength = 1000;
+        public const int MAX_TITLE_LENGTH = 255;
+        public const int MAX_DESCRIPTION_LENGTH = 1000;
+        public const int MAX_NOTES_LENGTH = 1000;
 
         public Mission()
         {
         }
         [Required]
-        [StringLength(MaxTitleLength)]
+        [StringLength(MAX_TITLE_LENGTH)]
         public string Title { get; set; }
-        [StringLength(MaxDescriptionLength)]
+        [StringLength(MAX_DESCRIPTION_LENGTH)]
         public string Description { get; set; }
         public NpgsqlRange<DateTime> Duration { get; set; }
 
@@ -55,14 +51,14 @@ namespace Ermes.Missions
         public virtual Team CoordinatorTeam { get; set; }
         public virtual int? CoordinatorTeamId { get; set; }
 
-        [StringLength(MaxNotesLength)]
+        [StringLength(MAX_NOTES_LENGTH)]
         public string Notes { get; set; }
 
         [ForeignKey("CreatorUserId")]
         public virtual Person CreatorPerson { get; set; }
 
         [ForeignKey("OrganizationId")]
-        public virtual Organization Organization {get; set;}
+        public virtual Organization Organization { get; set; }
         public virtual int OrganizationId { get; set; }
 
     }

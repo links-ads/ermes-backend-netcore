@@ -1,5 +1,6 @@
 ﻿using Abp.Domain.Repositories;
 using Ermes.Activations;
+using Ermes.Alerts;
 using Ermes.Communications;
 using Ermes.Enums;
 using Ermes.MapRequests;
@@ -62,12 +63,13 @@ namespace Ermes.GeoJson
             List<HazardType> hazardTypes,
             List<GeneralStatus> reportStatusTypes,
             List<MissionStatusType> missionStatusTypes,
-            List<HazardType> mapRequestHazardTypes,
-            List<LayerType> mapRequestLayerTypes,
             List<MapRequestStatusType> mapRequestStatusTypes,
+            List<MapRequestType> mapRequestTypes,
             VisibilityType visibilityType,
             List<ReportContentType> reportContentTypes,
             List<CommunicationRestrictionType> communicationRestrictionTypes,
+            List<CommunicationScopeType> communicationScopeTypes,
+            List<string> alertRestrictionTypes,
             int srid,
             string personName,
             int? organizationParentId,
@@ -75,5 +77,6 @@ namespace Ermes.GeoJson
         );
 
         public List<Activation> GetPersonActivations(DateTime StartDate, DateTime EndDate, ActionStatusType statusType);
+        public IQueryable<Alert> GetAlerts(DateTime startDate, DateTime endDate, Geometry boundingBox);
     }
 }

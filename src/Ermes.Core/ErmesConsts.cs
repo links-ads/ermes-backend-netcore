@@ -17,6 +17,22 @@
         public const string SafersProjectName = "SAFERS";
         public const string ShelterProjectName = "SHELTER";
         public const string DefaultYear = "2020";
+        public const string IMAGE_MIME_TYPE = "image/jpeg";
+
+        public class Thumbnail
+        {
+            /// <summary>
+            /// Thumbnail image export quality
+            /// </summary>
+            public const int QUALITY = 75;
+            /// <summary>
+            /// Thumbnail image size
+            /// </summary>
+            public const int SIZE = 256;
+        }
+        
+
+        
 
         public class BusType
         {
@@ -57,6 +73,18 @@
             public const string FIRST_LOGIN = "FirstLogin";
             public const string COMPLETE_WIZARD = "CompleteWizard";
             public const string VALIDATE_REPORT = "ValidateReport";
+        }
+
+        public struct PurgeStationImagesJob
+        {
+            public const int startingHour = 1;
+            public const string startingCron = "0 1 * * *";
+        }        
+        
+        public struct PurgeNotificationReceivedJob
+        {
+            public const int startingHour = 1;
+            public const string startingCron = "0 4 * * *";
         }
     }
 }

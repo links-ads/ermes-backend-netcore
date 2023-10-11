@@ -24,6 +24,8 @@ namespace Ermes.Resources
         private const string ImportAnswers_Container_Name = "import-answers";
         private const string ImportUsers_Container_Name = "import-users";
         private const string ImportGamificationActions_Container_Name = "import-gamificationactions";
+        private const string Cameras_Container_Name = "cameras";
+        private const string Camera_Thumbnails_Container_Name = "camera-thumbnails";
         private static string baseResourcesUrl = string.Empty;
         private static readonly Lazy<IAzureConnectionProvider> _connectionProvider;
         static ResourceManager()
@@ -56,9 +58,28 @@ namespace Ermes.Resources
             return uri.AbsoluteUri;
         }
 
+        private static string BuildTwoLevelsResourceUrl(string context, string folderLevel1, string folderLevel2, string fileName)
+        {
+            if (string.IsNullOrWhiteSpace(fileName)) return string.Empty;
+
+            Uri uri = new Uri(GetBaseResourcesUrl());
+            IList<string> parts = new List<string>
+            {
+                BuildTwoLevelsResourcePath(context, folderLevel1, folderLevel2, fileName)
+            };
+
+            uri = new Uri(parts.Aggregate(uri.AbsoluteUri, (current, path) => string.Format("{0}/{1}", current.TrimEnd('/'), path.TrimStart('/'))));
+            return uri.AbsoluteUri;
+        }
+
         private static string BuildRelativeResourceUrl(int identifier, string fileName)
         {
             return (FormatIdentifier(identifier) + "/" + fileName).Trim();
+        }
+
+        private static string BuildTwoLevelsRelativeResourceUrl(string folderLevel1, string folderLevel2, string fileName)
+        {
+            return (folderLevel1 + "/" + folderLevel2 + "/" +  fileName).Trim();
         }
 
         public static class Reports
@@ -92,6 +113,39 @@ namespace Ermes.Resources
             public static string GetRelativeMediaPath(int reportId, string fileName)
             {
                 return BuildRelativeResourceUrl(reportId, fileName);
+            }
+        }
+
+        public static class Cameras
+        {
+            public static string ContainerName { get { return Cameras_Container_Name; } }
+            public static string GetMediaPath(string cameraName, string cameraOrientation, string fileName)
+            {
+                return BuildTwoLevelsResourceUrl(Cameras_Container_Name, cameraName, cameraOrientation, fileName);
+            }
+
+            public static string GetRelativeMediaPath(string cameraName, string cameraOrientation, string fileName)
+            {
+                return BuildTwoLevelsRelativeResourceUrl(cameraName, cameraOrientation, fileName);
+            }
+        }
+
+        public static class CameraThumbnails
+        {
+            public static string ContainerName { get { return Camera_Thumbnails_Container_Name; } }
+            public static string GetMediaPath(string cameraName, string cameraOrientation, string fileName)
+            {
+                return BuildTwoLevelsResourceUrl(Camera_Thumbnails_Container_Name, cameraName, cameraOrientation, fileName);
+            }
+            public static string GetJpegThumbnailFilename(string fileName)
+            {
+                //TODO: function to be checked
+                //return fileName.Split('.').FirstOrDefault() + ".jpg";
+                return fileName;
+            }
+            public static string GetRelativeMediaPath(string cameraName, string cameraOrientation, string fileName)
+            {
+                return BuildTwoLevelsRelativeResourceUrl(cameraName, cameraOrientation, fileName);
             }
         }
 
@@ -183,6 +237,21 @@ namespace Ermes.Resources
             parts.Add(context);
             parts.Add(FormatIdentifier(identifier));
             parts.Add(fileName);
+
+            return string.Join("/", parts).Trim();
+        }
+
+        private static string BuildTwoLevelsResourcePath(string context, string foldelLevel1, string foldelLevel2, string fileName)
+        {
+            if (string.IsNullOrWhiteSpace(fileName)) return string.Empty;
+
+            IList<string> parts = new List<string>
+            {
+                context,
+                foldelLevel1,
+                foldelLevel2,
+                fileName
+            };
 
             return string.Join("/", parts).Trim();
         }
