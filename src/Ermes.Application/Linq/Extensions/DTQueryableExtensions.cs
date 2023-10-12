@@ -246,6 +246,7 @@ namespace Ermes.Linq.Extensions
                 else
                 {
                     predicate = predicate.Or(p => p.Code != null && p.Code.ToLower().Contains(search.Value));
+                    predicate = predicate.Or(p => p.Title != null && p.Title.ToLower().Contains(search.Value));
                     predicate = predicate.Or(p => p.StatusString.ToLower().Contains(search.Value));
                     predicate = predicate.Or(p => p.Creator.Username != null && p.Creator.Username.ToLower().Contains(search.Value));
                 }

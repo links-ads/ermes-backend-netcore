@@ -1,5 +1,9 @@
 Ver.
 --------------------------------
+
+
+Ver. 4.15.3 - 2023-10-05
+--------------------------------
 - Feature - Added 'Processing' as Map Request status (#160)
 - Feature - Added fitlers for: Communications, Alerts, Stations (#159)
 
