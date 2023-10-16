@@ -165,18 +165,12 @@ namespace Ermes.Layers
                             (a, b) => new { Layer = a, b.Details }
                         )
                     .ToList();
-                    result.AssociatedLayers = joinedLayerList.Select(a => ObjectMapper.Map<LayerDto>(a.Layer)).ToList();
 
-                    /*
-                     * It is useless to map all the details about the associated layers, since all the needed information
-                     * can be retrieved through GetTimeSeries API.
-                     
-                        result.AssociatedLayers =
-                            joinedLayerList
-                            .Select(a => new { LayerDto = ObjectMapper.Map<LayerDto>(a.Layer), a.Details })
-                            .Select(a => { a.LayerDto.Details = a.Details; return a.LayerDto; })
-                            .ToList();
-                    */
+                    result.AssociatedLayers =
+                        joinedLayerList
+                        .Select(a => new { LayerDto = ObjectMapper.Map<LayerDto>(a.Layer), a.Details })
+                        .Select(a => { a.LayerDto.Details = a.Details; return a.LayerDto; })
+                        .ToList();
                 }
                 catch (Exception e)
                 {

@@ -2,6 +2,10 @@ Ver.
 --------------------------------
 
 
+Ver. 4.15.4 - 2023-10-12
+--------------------------------
+- Bugfix - Associated layer details added (#162)
+
 Ver. 4.15.3 - 2023-10-05
 --------------------------------
 - Feature - Added 'Processing' as Map Request status (#160)
