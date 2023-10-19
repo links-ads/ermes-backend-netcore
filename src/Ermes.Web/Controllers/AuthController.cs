@@ -1,5 +1,6 @@
 ﻿using Ermes.Interfaces;
 using Ermes.Web.Controllers.Dto;
+using Ermes.Web.Utils;
 using FusionAuthNetCore;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Auth.OAuth2.Responses;
@@ -14,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Security.Cryptography.Pkcs;
 using System.Security.Policy;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -35,37 +37,44 @@ namespace Ermes.Web.Controllers
         public async Task<IActionResult> TokenRetrieve(string code, string userState, string state, string error, string errorReason, string errorDescription)
         {
             var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
-            if (code == null || userState != "Authenticated") 
-            {
-                return BadRequest(error);
-            }
-
+            //if(CodeHelper.CodeVerifier == null)
+            //    CodeHelper.Init(
             var tokenResponse = await client.ExchangeOAuthCodeForAccessTokenAsync(code, _fusionAuthSettings.Value.ClientId, _fusionAuthSettings.Value.ClientSecret,  $"{Request.Scheme}://{Request.Host}/auth/oauth-callback");
             if (tokenResponse.WasSuccessful())
             {
                 Response.Cookies.Append(
-                    "X-Access-Token",
+                    "app.at",
                     tokenResponse.successResponse.access_token,
                     new CookieOptions
                     {
-                        HttpOnly = true,
+                        HttpOnly = false,
                         SameSite=  SameSiteMode.Strict,
                         Secure = false
                     }
                 );
                 Response.Cookies.Append(
-                    "X-Refresh-Token",
+                    "app.rt",
                     tokenResponse.successResponse.refresh_token,
                     new CookieOptions
                     {
-                        HttpOnly = true,
+                        HttpOnly = false,
                         SameSite = SameSiteMode.Strict,
                         Secure = false
                     }
                 );
 
+                Response.Cookies.Append(
+                    "app.test",
+                    "prova",
+                    new CookieOptions
+                    {
+                        HttpOnly = false,
+                        SameSite = SameSiteMode.Unspecified,
+                        Secure = false
+                    }
+                );
+
                 return Redirect(string.Format("{0}/callback/?state={1}", _fusionAuthSettings.Value.ClientBasePath, userState));
-                //return Redirect(string.Format("{0}/callback&state={1}&userId={2}", _fusionAuthSettings.Value.ClientBasePath, userState, tokenResponse.successResponse.userId));
             }
 
             return BadRequest();

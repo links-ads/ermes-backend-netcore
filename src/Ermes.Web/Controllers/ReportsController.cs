@@ -182,7 +182,7 @@ namespace Ermes.Web.Controllers
             //Not mapped automatically, in update phase we need to ignore this prop
             report.Timestamp = reportDto.Timestamp;
 
-            //citizens' report are public by default
+            //citizens' reports are public by default
             report.IsPublic = _session.Roles != null && _session.Roles.Contains(AppRoles.CITIZEN);
             //Need Id here, so that I can create Azure Report container
             report.Id = await _reportManager.InsertReportAsync(report);
