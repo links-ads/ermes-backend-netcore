@@ -1,6 +1,6 @@
 Ver.
 --------------------------------
-
+- Feature - New APIs for Externals added, auth managemnt through API Key (appsettings update)(#163)
 
 Ver. 4.15.4 - 2023-10-12
 --------------------------------
