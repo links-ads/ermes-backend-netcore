@@ -5,6 +5,7 @@
         public const string LocalizationSourceName = "Ermes";
         public const string ConnectionStringName = "Default";
         public const string TokenClaim = "Token";
+        public const string ApiKeyClaim = "ApiKey";
         public const string FusionAuthUserGuidClaim = "FusionAuthUserGuid";
         public const string RolesClaim = "Roles";
         public const string ValidFromClaim = "ValidFrom";
@@ -18,6 +19,7 @@
         public const string ShelterProjectName = "SHELTER";
         public const string DefaultYear = "2020";
         public const string IMAGE_MIME_TYPE = "image/jpeg";
+        public const string EXTERNAL_ORGANIZATION_NAME = "Corpo AIB";
 
         public class Thumbnail
         {

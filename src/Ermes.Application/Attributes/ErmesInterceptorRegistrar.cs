@@ -1,11 +1,8 @@
 ﻿using Abp.Dependency;
 using Castle.Core;
-using Castle.MicroKernel.Registration;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace Ermes.Attributes
 {
@@ -20,10 +17,12 @@ namespace Ermes.Attributes
                 {
                     handler.ComponentModel.Interceptors.Add(new InterceptorReference(typeof(ErmesAuthorizationInterceptor)));
                 }
-                if(type.IsSubclassOf(typeof(ErmesAppServiceBase)) || type.GetTypeInfo().IsDefined(typeof(ErmesAuthorizeAttribute), true))
+                if (type.IsSubclassOf(typeof(ErmesAppServiceBase)) || type.GetTypeInfo().IsDefined(typeof(ErmesAuthorizeAttribute), true))
                     handler.ComponentModel.Interceptors.Add(new InterceptorReference(typeof(ErmesLoadUserInterceptor)));
                 if (type.GetTypeInfo().IsDefined(typeof(ErmesGamificationAttribute), true))
                     handler.ComponentModel.Interceptors.Add(new InterceptorReference(typeof(ErmesGamificationInterceptor)));
+                if (type.GetTypeInfo().IsDefined(typeof(ErmesApiKeyAttribute), true))
+                    handler.ComponentModel.Interceptors.Add(new InterceptorReference(typeof(ErmesApiKeyInterceptor)));
             };
         }
 
