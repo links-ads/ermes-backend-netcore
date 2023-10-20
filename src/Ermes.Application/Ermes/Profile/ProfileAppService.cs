@@ -157,28 +157,7 @@ namespace Ermes.Profile
 
             return result;
         }
-        //private async Task<User> UpdateUserAsync(User user)
-        //{
-        //    var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
-        //    var request = new UserRequest()
-        //    {
-        //        user = user,
-        //        sendSetPasswordEmail = false,
-        //        skipVerification = true
-        //    };
 
-        //    var response = await client.UpdateUserAsync(user.id, request);
-        //    if (response.WasSuccessful())
-        //    {
-        //        Logger.Info("Ermes: Update User: " + user.username);
-        //        return response.successResponse.user;
-        //    }
-        //    else
-        //    {
-        //        var fa_error = FusionAuth.ManageErrorResponse(response);
-        //        throw new UserFriendlyException(fa_error.ErrorCode, fa_error.HasTranslation ? L(fa_error.Message) : fa_error.Message);
-        //    }
-        //}
         private async Task<User> GetUserAsync(Guid userGuid)
         {
             var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
@@ -209,9 +188,10 @@ namespace Ermes.Profile
             if (person == null)
                 throw new UserFriendlyException(L("InvalidPersonId", input.Id));
 
-            // Security
-            if (_session.LoggedUserPerson.OrganizationId.HasValue && person.OrganizationId != _session.LoggedUserPerson.OrganizationId)
-                throw new UserFriendlyException(L("Forbidden_DifferentOrganizations"));
+            // Security commented after issue #164
+            //User now can change the organization he belongs to
+            //if (_session.LoggedUserPerson.OrganizationId.HasValue && person.OrganizationId != _session.LoggedUserPerson.OrganizationId)
+            //    throw new UserFriendlyException(L("Forbidden_DifferentOrganizations"));
             // TODO-Security: Add Check: Same User or Role allowing Other User Access
             if (_session.UserId != person.Id) // for the moment allow only same user
                 throw new UserFriendlyException(L("Forbidden_InsufficientRole"));
@@ -488,6 +468,41 @@ namespace Ermes.Profile
         {
             PagedResultDto<OrganizationDto> result = await InternalGetOrganizations(input);
             return new DTResult<OrganizationDto>(0, result.TotalCount, result.Items.Count, result.Items.ToList());
+        }
+
+        [OpenApiOperation("Change Organization",
+            @"
+                Allow user to change his organization
+                Input:
+                    - OrganizationId: Id of the new organization
+                    - TaxCode: tax code of the user, if the organization requires it
+                Output: a ProfileDto object
+            "
+        )]
+        public virtual async Task<GetProfileOutput> ChangeOrganization(ChangeOrganizationInput input)
+        {
+            var org = await _organizationManager.GetOrganizationByIdAsync(input.OrganizationId);
+
+            if (org == null)
+                throw new UserFriendlyException(L("InvalidEntityId", "Organization", input.OrganizationId));
+
+            Person person = await _personManager.GetPersonByIdAsync(_session.LoggedUserPerson.Id);
+
+            if (org.MembersHaveTaxCode) {  
+                if(input.TaxCode == null || input.TaxCode == string.Empty)
+                    throw new UserFriendlyException(L("InvalidTaxCode"));
+
+                int? legacyId = await _csiManager.SearchVolontarioAsync(input.TaxCode, person.Id);
+                if (legacyId.HasValue && legacyId.Value >= 0)
+                    person.LegacyId = legacyId;
+                else
+                    throw new UserFriendlyException(L("InvalidVolterTaxCode"));
+            }
+
+            person.OrganizationId = input.OrganizationId;
+            person.TeamId = null;
+            await CurrentUnitOfWork.SaveChangesAsync();
+            return await GetProfileById(new IdInput<long>() { Id = _session.UserId.Value });
         }
     }
 }
