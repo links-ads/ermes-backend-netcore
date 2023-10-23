@@ -1,6 +1,8 @@
 ﻿using Abp.Domain.Repositories;
 using Abp.Domain.Services;
+using Ermes.Missions;
 using Microsoft.EntityFrameworkCore;
+using NpgsqlTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +15,7 @@ namespace Ermes.Alerts
         public IQueryable<Alert> AlertWithAreas { get { return AlertRepository.GetAll().Include(a => a.Info).Include(a => a.AlertAreaOfInterest); } }
         public IQueryable<Alert> Alerts { get { return AlertRepository.GetAll().Include(a => a.Info); } }
         public IQueryable<AlertAreaOfInterest> AlertAreasOfInterest { get { return AlertAreaOfInterestRepository.GetAll(); } }
-        public IQueryable<CapInfo> CapInfoList  { get { return CapInfoRepository.GetAll(); } }
+        public IQueryable<CapInfo> CapInfoList { get { return CapInfoRepository.GetAll(); } }
         protected IRepository<Alert> AlertRepository { get; set; }
         protected IRepository<AlertAreaOfInterest> AlertAreaOfInterestRepository { get; set; }
         protected IRepository<CapInfo> CapInfoRepository { get; set; }
@@ -23,6 +25,12 @@ namespace Ermes.Alerts
             AlertRepository = alertRepository;
             CapInfoRepository = capInfoRepository;
             AlertAreaOfInterestRepository = alertAreaOfInterestRepository;
+        }
+
+        public IQueryable<Alert> GetAlerts(DateTime startDate, DateTime endDate)
+        {
+            NpgsqlRange<DateTime> range = new NpgsqlRange<DateTime>(startDate, endDate);
+            return Alerts.Where(a => range.Contains(a.Sent));
         }
 
         public async Task<List<Alert>> GetAlertsAsync()

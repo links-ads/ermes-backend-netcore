@@ -1,7 +1,9 @@
 ﻿using Abp.Domain.Repositories;
 using Abp.Domain.Services;
 using Ermes.Enums;
+using Ermes.Missions;
 using Microsoft.EntityFrameworkCore;
+using NpgsqlTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Ermes.Communications
 {
-    public class CommunicationManager: DomainService
+    public class CommunicationManager : DomainService
     {
         public IQueryable<Communication> Communications { get { return CommunicationRepository.GetAll().Include(a => a.Creator).Include(a => a.Creator.Organization).Include(a => a.CommunicationReceivers); } }
         public IQueryable<CommunicationReceiver> CommunicationReceivers { get { return CommunicationReceiverRepository.GetAll().Include(a => a.Communication).Include(a => a.Organization); } }
@@ -35,7 +37,7 @@ namespace Ermes.Communications
         {
             var coId = await CommunicationRepository.InsertOrUpdateAndGetIdAsync(co);
 
-            if(co.Scope == CommunicationScopeType.Restricted && co.Restriction == CommunicationRestrictionType.Organization && receivers != null)
+            if (co.Scope == CommunicationScopeType.Restricted && co.Restriction == CommunicationRestrictionType.Organization && receivers != null)
             {
                 foreach (var receiver in receivers)
                 {
@@ -56,6 +58,13 @@ namespace Ermes.Communications
         public async Task DeleteCommunicationsByPersonIdAsync(long personId)
         {
             await CommunicationRepository.DeleteAsync(c => c.CreatorUserId.HasValue && c.CreatorUserId.Value == personId);
+        }
+
+        public IQueryable<Communication> GetCommunications(DateTime startDate, DateTime endDate)
+        {
+            NpgsqlRange<DateTime> range = new NpgsqlRange<DateTime>(startDate, endDate);
+            return Communications
+                    .Where(m => m.Duration.Overlaps(range));
         }
     }
 }
