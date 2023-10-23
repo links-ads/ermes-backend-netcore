@@ -488,6 +488,10 @@ namespace Ermes.Profile
 
             Person person = await _personManager.GetPersonByIdAsync(_session.LoggedUserPerson.Id);
 
+            //Current user cannot be coordinator of missions belonging to his old organization
+            var coordinatedMissions = _missionManager.Missions.Where(m => m.CoordinatorPersonId.HasValue && m.CoordinatorPersonId.Value == person.Id).ToList();
+            coordinatedMissions = coordinatedMissions.Select(m => { m.CoordinatorPersonId = null; return m; }).ToList();
+
             if (org.MembersHaveTaxCode) {  
                 if(input.TaxCode == null || input.TaxCode == string.Empty)
                     throw new UserFriendlyException(L("InvalidTaxCode"));
