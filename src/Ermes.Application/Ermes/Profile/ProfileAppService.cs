@@ -488,9 +488,17 @@ namespace Ermes.Profile
 
             Person person = await _personManager.GetPersonByIdAsync(_session.LoggedUserPerson.Id);
 
-            //Current user cannot be coordinator of missions belonging to his old organization
-            var coordinatedMissions = _missionManager.Missions.Where(m => m.CoordinatorPersonId.HasValue && m.CoordinatorPersonId.Value == person.Id).ToList();
+            //When user changes org:
+            // 1. he cannot be coordinator of missions belonging to his old organization
+            // 2. his reports cannot be associated to a mission belonging to his old organization
+            var orgMissions = _missionManager.Missions.Where(m => m.OrganizationId == person.OrganizationId).ToList();
+
+            var coordinatedMissions = orgMissions.Where(m => m.CoordinatorPersonId.HasValue && m.CoordinatorPersonId.Value == person.Id).ToList();
             coordinatedMissions = coordinatedMissions.Select(m => { m.CoordinatorPersonId = null; return m; }).ToList();
+
+            var orgMissionIds = orgMissions.Select(m => m.Id).ToList();
+            var relatedReports = _reportManager.Reports.Where(r => r.CreatorUserId == person.Id && r.RelativeMissionId.HasValue && orgMissionIds.Contains(r.RelativeMissionId.Value)).ToList();
+            relatedReports = relatedReports.Select(r => { r.RelativeMissionId = null; return r; }).ToList();
 
             if (org.MembersHaveTaxCode) {  
                 if(input.TaxCode == null || input.TaxCode == string.Empty)
