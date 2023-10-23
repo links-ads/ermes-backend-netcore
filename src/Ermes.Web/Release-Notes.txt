@@ -1,6 +1,6 @@
 Ver.
 --------------------------------
-
+- Feature - GetStatistics API updated (sdk to be updated)(#165)
 
 Ver. 4.15.4 - 2023-10-12
 --------------------------------

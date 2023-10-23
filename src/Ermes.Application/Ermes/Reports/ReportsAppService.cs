@@ -78,7 +78,7 @@ namespace Ermes.Reports
                 query = query.Include(a => a.Creator).Include(a => a.Creator.Organization).Include(a => a.Validations);
             }
             else
-                query = _reportManager.Reports.Where(a => new NpgsqlRange<DateTime>(input.StartDate.Value, input.EndDate.Value).Contains(a.Timestamp));
+                query = _reportManager.GetReports(input.StartDate.Value, input.EndDate.Value);
 
             if (input.Status != null && input.Status.Count > 0)
             {
@@ -100,7 +100,7 @@ namespace Ermes.Reports
 
             if (input.Visibility != VisibilityType.All)
             {
-                if(input.Visibility == VisibilityType.Private)
+                if (input.Visibility == VisibilityType.Private)
                     query = query.Where(r => !r.IsPublic);
                 else
                     query = query.Where(r => r.IsPublic);

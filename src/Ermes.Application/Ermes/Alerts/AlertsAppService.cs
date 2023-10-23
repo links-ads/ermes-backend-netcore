@@ -46,7 +46,7 @@ namespace Ermes.Alerts
                 query = query.Include(a => a.Info);
             }
             else
-                query = _alertManager.Alerts.Where(a => new NpgsqlRange<DateTime>(input.StartDate.Value, input.EndDate.Value).Contains(a.Sent));
+                query = _alertManager.GetAlerts(input.StartDate.Value, input.EndDate.Value);
 
             if (input.Restrictions != null && input.Restrictions.Count > 0)
                 query = query.Where(a => input.Restrictions.Contains(a.Restriction));

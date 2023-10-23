@@ -1,6 +1,7 @@
 ﻿using Abp.Domain.Repositories;
 using Abp.Domain.Services;
 using Microsoft.EntityFrameworkCore;
+using NpgsqlTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,9 +43,9 @@ namespace Ermes.Reports
 
         public IQueryable<Report> GetReports(DateTime startDate, DateTime endDate)
         {
+            NpgsqlRange<DateTime> range = new NpgsqlRange<DateTime>(startDate, endDate);
             return Reports
-                       .Where(r => r.Timestamp >= startDate && r.Timestamp <= endDate);
-                       
+                       .Where(r => range.Contains(r.Timestamp));
         }
 
         public async Task<List<Report>> GetReportsByPersonAsync(long personId)
