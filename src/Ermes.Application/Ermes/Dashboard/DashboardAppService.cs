@@ -97,20 +97,17 @@ namespace Ermes.Dashboard
             if (start > end)
                 throw new UserFriendlyException(L("TimeWindowLimitError"));
             var timestap = end.Subtract(start);
+
+            Geometry boundingBox = null;
+            if (input.NorthEastBoundary != null && input.SouthWestBoundary != null)
+                boundingBox = GeometryHelper.GetPolygonFromBoundaries(input.SouthWestBoundary, input.NorthEastBoundary);
+
             //TODO: could be restored, but check needs to be implemented client-side
             //if (timestap.TotalDays > 30)
             //    throw new UserFriendlyException(L("TimeWindowSizeError"));
 
             //Reports////////////
-            IQueryable<Report> queryReport;
-
-            if (input.NorthEastBoundary != null && input.SouthWestBoundary != null)
-            {
-                Geometry boundingBox = GeometryHelper.GetPolygonFromBoundaries(input.SouthWestBoundary, input.NorthEastBoundary);
-                queryReport = _geoJsonBulkRepository.GetReports(start, end, boundingBox);
-            }
-            else
-                queryReport = _reportManager.GetReports(start, end);
+            IQueryable<Report> queryReport = boundingBox != null ? _geoJsonBulkRepository.GetReports(start, end, boundingBox) : _reportManager.GetReports(start, end);
 
             var hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Reports.Report_CanSeeCrossOrganization);
             if (!hasPermission)
@@ -118,15 +115,7 @@ namespace Ermes.Dashboard
             /////////////////////
 
             //Missions///////////
-            IQueryable<Mission> queryMission;
-
-            if (input.NorthEastBoundary != null && input.SouthWestBoundary != null)
-            {
-                Geometry boundingBox = GeometryHelper.GetPolygonFromBoundaries(input.SouthWestBoundary, input.NorthEastBoundary);
-                queryMission = _geoJsonBulkRepository.GetMissions(input.StartDate.Value, input.EndDate.Value, boundingBox);
-            }
-            else
-                queryMission = _missionManager.GetMissions(start, end);
+            IQueryable<Mission> queryMission = boundingBox != null ? _geoJsonBulkRepository.GetMissions(start, end, boundingBox) : _missionManager.GetMissions(start, end);
 
             hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Missions.Mission_CanSeeCrossOrganization);
             if (!hasPermission)
@@ -142,21 +131,13 @@ namespace Ermes.Dashboard
                 orgIdList = _session.LoggedUserPerson.OrganizationId.HasValue ? new int[] { _session.LoggedUserPerson.OrganizationId.Value } : null;
 
             string personName = _session.LoggedUserPerson.Username ?? _session.LoggedUserPerson.Email;
-            var items = _geoJsonBulkRepository.GetPersonActions(start, end, orgIdList, null, null, null, null, personName, null, _languageManager.CurrentLanguage.Name);
+            var items = _geoJsonBulkRepository.GetPersonActions(start, end, orgIdList, null, null, null, boundingBox, personName, null, _languageManager.CurrentLanguage.Name);
             var deserialized = JsonConvert.DeserializeObject<GetActionsOutput>(items);
             var actions = deserialized != null && deserialized.PersonActions != null ? deserialized.PersonActions : new List<PersonActionDto>();
             ////////////////////
 
             //Map Requests///////////
-            IQueryable<MapRequest> queryMapRequests;
-
-            if (input.NorthEastBoundary != null && input.SouthWestBoundary != null)
-            {
-                Geometry boundingBox = GeometryHelper.GetPolygonFromBoundaries(input.SouthWestBoundary, input.NorthEastBoundary);
-                queryMapRequests = _geoJsonBulkRepository.GetMapRequests(input.StartDate.Value, input.EndDate.Value, boundingBox);
-            }
-            else
-                queryMapRequests = _mapRequestManager.GetMapRequests(start, end);
+            IQueryable<MapRequest> queryMapRequests = boundingBox != null ? _geoJsonBulkRepository.GetMapRequests(start, end, boundingBox) : _mapRequestManager.GetMapRequests(start, end);
 
             hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.MapRequests.MapRequest_CanSeeCrossOrganization);
             if (!hasPermission)
@@ -167,34 +148,12 @@ namespace Ermes.Dashboard
             //////////////////////
 
             //Alerts///////////
-            IQueryable<Alert> queryAlerts;
-
-            if (input.NorthEastBoundary != null && input.SouthWestBoundary != null)
-            {
-                Geometry boundingBox = GeometryHelper.GetPolygonFromBoundaries(input.SouthWestBoundary, input.NorthEastBoundary);
-                queryAlerts = _geoJsonBulkRepository.GetAlerts(input.StartDate.Value, input.EndDate.Value, boundingBox);
-            }
-            else
-                queryAlerts = _alertManager.GetAlerts(input.StartDate.Value, input.EndDate.Value);
-
-            hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.MapRequests.MapRequest_CanSeeCrossOrganization);
-            if (!hasPermission)
-            {
-                if (_session.LoggedUserPerson.OrganizationId.HasValue)
-                    queryMapRequests = queryMapRequests.DataOwnership(new List<int>() { _session.LoggedUserPerson.OrganizationId.Value });
-            }
+            IQueryable<Alert> queryAlerts = boundingBox != null ? _geoJsonBulkRepository.GetAlerts(start, end, boundingBox) : _alertManager.GetAlerts(start, end);
             //////////////////////
 
             //Communications///////////
-            IQueryable<Communication> queryCommunications;
+            IQueryable<Communication> queryCommunications = boundingBox != null ? _geoJsonBulkRepository.GetCommunications(start, end, boundingBox) : _communicationManager.GetCommunications(start, end);
 
-            if (input.NorthEastBoundary != null && input.SouthWestBoundary != null)
-            {
-                Geometry boundingBox = GeometryHelper.GetPolygonFromBoundaries(input.SouthWestBoundary, input.NorthEastBoundary);
-                queryCommunications = _geoJsonBulkRepository.GetCommunications(input.StartDate.Value, input.EndDate.Value, boundingBox);
-            }
-            else
-                queryCommunications = _communicationManager.GetCommunications(start, end);
             //Admin can see everything
             hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Communications.Communication_CanSeeCrossOrganization);
 
