@@ -102,6 +102,7 @@
     "InvalidVolterTaxCode": "Codice fiscale non valido",
     "RequestedFileDoesNotExists": "Il file richiesto non esiste",
     "InvalidReportVerifierOwner": "Un utente non può validare le proprie segnalazioni",
-    "InvalidReportVerifierDuplicate": "Questa segnalazione è già stata validata da questo utente"
+    "InvalidReportVerifierDuplicate": "Questa segnalazione è già stata validata da questo utente",
+    "TaxCodeAlreadyInUse": "Questo codice fiscale è già stato associato ad un altro utente"
   }
 }

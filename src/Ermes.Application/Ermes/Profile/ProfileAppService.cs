@@ -507,7 +507,12 @@ namespace Ermes.Profile
 
                 int? legacyId = await _csiManager.SearchVolontarioAsync(input.TaxCode, person.Id);
                 if (legacyId.HasValue && legacyId.Value >= 0)
+                {
+                    var existingPerson = _personManager.GetPersonByLegacyId(legacyId.Value);
+                    if (existingPerson != null && existingPerson.Id != person.Id)
+                        throw new UserFriendlyException("TaxCodeAlreadyInUse");
                     person.LegacyId = legacyId;
+                }
                 else
                     throw new UserFriendlyException(L("InvalidVolterTaxCode"));
             }
