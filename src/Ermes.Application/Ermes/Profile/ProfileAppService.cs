@@ -500,8 +500,9 @@ namespace Ermes.Profile
             var relatedReports = _reportManager.Reports.Where(r => r.CreatorUserId == person.Id && r.RelativeMissionId.HasValue && orgMissionIds.Contains(r.RelativeMissionId.Value)).ToList();
             relatedReports = relatedReports.Select(r => { r.RelativeMissionId = null; return r; }).ToList();
 
-            if (org.MembersHaveTaxCode) {  
-                if(input.TaxCode == null || input.TaxCode == string.Empty)
+            if (org.MembersHaveTaxCode)
+            {
+                if (input.TaxCode == null || input.TaxCode == string.Empty)
                     throw new UserFriendlyException(L("InvalidTaxCode"));
 
                 int? legacyId = await _csiManager.SearchVolontarioAsync(input.TaxCode, person.Id);
@@ -510,6 +511,8 @@ namespace Ermes.Profile
                 else
                     throw new UserFriendlyException(L("InvalidVolterTaxCode"));
             }
+            else
+                person.LegacyId = null;
 
             person.OrganizationId = input.OrganizationId;
             person.TeamId = null;
