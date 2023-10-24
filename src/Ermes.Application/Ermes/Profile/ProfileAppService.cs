@@ -157,28 +157,7 @@ namespace Ermes.Profile
 
             return result;
         }
-        //private async Task<User> UpdateUserAsync(User user)
-        //{
-        //    var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
-        //    var request = new UserRequest()
-        //    {
-        //        user = user,
-        //        sendSetPasswordEmail = false,
-        //        skipVerification = true
-        //    };
 
-        //    var response = await client.UpdateUserAsync(user.id, request);
-        //    if (response.WasSuccessful())
-        //    {
-        //        Logger.Info("Ermes: Update User: " + user.username);
-        //        return response.successResponse.user;
-        //    }
-        //    else
-        //    {
-        //        var fa_error = FusionAuth.ManageErrorResponse(response);
-        //        throw new UserFriendlyException(fa_error.ErrorCode, fa_error.HasTranslation ? L(fa_error.Message) : fa_error.Message);
-        //    }
-        //}
         private async Task<User> GetUserAsync(Guid userGuid)
         {
             var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
@@ -209,9 +188,10 @@ namespace Ermes.Profile
             if (person == null)
                 throw new UserFriendlyException(L("InvalidPersonId", input.Id));
 
-            // Security
-            if (_session.LoggedUserPerson.OrganizationId.HasValue && person.OrganizationId != _session.LoggedUserPerson.OrganizationId)
-                throw new UserFriendlyException(L("Forbidden_DifferentOrganizations"));
+            // Security commented after issue #164
+            //User now can change the organization he belongs to
+            //if (_session.LoggedUserPerson.OrganizationId.HasValue && person.OrganizationId != _session.LoggedUserPerson.OrganizationId)
+            //    throw new UserFriendlyException(L("Forbidden_DifferentOrganizations"));
             // TODO-Security: Add Check: Same User or Role allowing Other User Access
             if (_session.UserId != person.Id) // for the moment allow only same user
                 throw new UserFriendlyException(L("Forbidden_InsufficientRole"));
@@ -488,6 +468,61 @@ namespace Ermes.Profile
         {
             PagedResultDto<OrganizationDto> result = await InternalGetOrganizations(input);
             return new DTResult<OrganizationDto>(0, result.TotalCount, result.Items.Count, result.Items.ToList());
+        }
+
+        [OpenApiOperation("Change Organization",
+            @"
+                Allow user to change his organization
+                Input:
+                    - OrganizationId: Id of the new organization
+                    - TaxCode: tax code of the user, if the organization requires it
+                Output: a ProfileDto object
+            "
+        )]
+        public virtual async Task<GetProfileOutput> ChangeOrganization(ChangeOrganizationInput input)
+        {
+            var org = await _organizationManager.GetOrganizationByIdAsync(input.OrganizationId);
+
+            if (org == null)
+                throw new UserFriendlyException(L("InvalidEntityId", "Organization", input.OrganizationId));
+
+            Person person = await _personManager.GetPersonByIdAsync(_session.LoggedUserPerson.Id);
+
+            //When user changes org:
+            // 1. he cannot be coordinator of missions belonging to his old organization
+            // 2. his reports cannot be associated to a mission belonging to his old organization
+            var orgMissions = _missionManager.Missions.Where(m => m.OrganizationId == person.OrganizationId).ToList();
+
+            var coordinatedMissions = orgMissions.Where(m => m.CoordinatorPersonId.HasValue && m.CoordinatorPersonId.Value == person.Id).ToList();
+            coordinatedMissions = coordinatedMissions.Select(m => { m.CoordinatorPersonId = null; return m; }).ToList();
+
+            var orgMissionIds = orgMissions.Select(m => m.Id).ToList();
+            var relatedReports = _reportManager.Reports.Where(r => r.CreatorUserId == person.Id && r.RelativeMissionId.HasValue && orgMissionIds.Contains(r.RelativeMissionId.Value)).ToList();
+            relatedReports = relatedReports.Select(r => { r.RelativeMissionId = null; return r; }).ToList();
+
+            if (org.MembersHaveTaxCode)
+            {
+                if (input.TaxCode == null || input.TaxCode == string.Empty)
+                    throw new UserFriendlyException(L("InvalidTaxCode"));
+
+                int? legacyId = await _csiManager.SearchVolontarioAsync(input.TaxCode, person.Id);
+                if (legacyId.HasValue && legacyId.Value >= 0)
+                {
+                    var existingPerson = _personManager.GetPersonByLegacyId(legacyId.Value);
+                    if (existingPerson != null && existingPerson.Id != person.Id)
+                        throw new UserFriendlyException(L("TaxCodeAlreadyInUse"));
+                    person.LegacyId = legacyId;
+                }
+                else
+                    throw new UserFriendlyException(L("InvalidVolterTaxCode"));
+            }
+            else
+                person.LegacyId = null;
+
+            person.OrganizationId = input.OrganizationId;
+            person.TeamId = null;
+            await CurrentUnitOfWork.SaveChangesAsync();
+            return await GetProfileById(new IdInput<long>() { Id = _session.UserId.Value });
         }
     }
 }

@@ -16,6 +16,7 @@ namespace Ermes
         private readonly PersonManager _personManager;
         private readonly ITypedCache<Guid, long?> _userIdFromFAGuidCache;
         private readonly PersonCache _personCache;
+
         public ErmesAppSession(
             IPrincipalAccessor principalAccessor,
             IMultiTenancyConfig multiTenancy,
@@ -99,6 +100,20 @@ namespace Ermes
                 if (userid == null)
                     return null;
                 return _personCache.Get(userid.Value);
+            }
+        }
+
+        public string ApiKey
+        {
+            get
+            {
+                var apiKeyClaim = PrincipalAccessor.Principal?.Claims.FirstOrDefault(c => c.Type == ErmesConsts.ApiKeyClaim);
+                if (string.IsNullOrEmpty(apiKeyClaim?.Value))
+                {
+                    return null;
+                }
+
+                return apiKeyClaim.Value;
             }
         }
     }

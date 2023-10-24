@@ -1,7 +1,5 @@
 ﻿using Abp.Application.Services.Dto;
-using Abp.AutoMapper;
 using Abp.SensorService;
-using Abp.SensorService.Model;
 using Abp.UI;
 using Ermes.Attributes;
 using Ermes.Dto;
@@ -17,7 +15,6 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Ermes.Stations
 {
@@ -43,7 +40,7 @@ namespace Ermes.Stations
             try
             {
                 var fullStationList = await _sensorServiceManager.GetStations();
-                if(input.SouthWestBoundary != null && input.NorthEastBoundary != null)
+                if (input.SouthWestBoundary != null && input.NorthEastBoundary != null)
                 {
                     Geometry boundingBox = GeometryHelper.GetPolygonFromBoundaries(input.SouthWestBoundary, input.NorthEastBoundary);
                     fullStationList = fullStationList.Where(a => boundingBox.Contains(GeometryHelper.GetPointFromCoordinates(a.Location.Coordinates))).ToList();
@@ -231,9 +228,9 @@ namespace Ermes.Stations
             try
             {
                 dynamic metadata = new ExpandoObject();
-                if(input.Metadata != null)
+                if (input.Metadata != null)
                     metadata = input.Metadata;
-                metadata.validation = JsonConvert.DeserializeObject(JsonConvert.SerializeObject( new
+                metadata.validation = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(new
                 {
                     smoke = input.Smoke,
                     fire = input.Fire,
@@ -244,7 +241,7 @@ namespace Ermes.Stations
                 var response = await _sensorServiceManager.UpdateMetadataOfMeasure(input.MeasureId, metadata);
                 res.Measure = ObjectMapper.Map<MeasureDto>(response);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new UserFriendlyException(ex.Message);
             }

@@ -1,7 +1,5 @@
 ﻿using io.fusionauth;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -38,7 +36,7 @@ namespace Ermes.Web.Middlewares
                 identity.AddClaim(new Claim(ErmesConsts.ValidFromClaim, tokenS.ValidFrom.ToString()));
                 identity.AddClaim(new Claim(ErmesConsts.ValidToClaim, tokenS.ValidTo.ToString()));
                 identity.AddClaim(new Claim(ErmesConsts.RolesClaim, string.Join(',', tokenS.Claims.Where(a => a.Type == "roles").Select(a => a.Value).ToList())));
-                //Incapso l'identità in una ClaimsPrincipal e la associo alla richiesta corrente
+                //Incapsulo l'identità in una ClaimsPrincipal e la associo alla richiesta corrente
                 context.User = new ClaimsPrincipal(identity);
             }
 

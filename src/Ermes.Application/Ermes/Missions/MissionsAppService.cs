@@ -87,14 +87,14 @@ namespace Ermes.Missions
                 query = query.Include(a => a.CreatorPerson).Include(a => a.CreatorPerson.Organization);
             }
             else
-                query = _missionManager.Missions.Include(m => m.Organization).Where(a => new NpgsqlRange<DateTime>(input.StartDate.Value, input.EndDate.Value).Contains(a.Duration));
+                query = _missionManager.GetMissions(input.StartDate.Value, input.EndDate.Value);
 
             if (input.Status != null && input.Status.Count > 0)
             {
                 //input.Status.Contains throw an exception
                 //I need to go through the strings rather then the enum
                 var list = input.Status.Select(a => a.ToString()).ToList();
-                query = query.Where(a =>list.Contains(a.CurrentStatusString));
+                query = query.Where(a => list.Contains(a.CurrentStatusString));
             }
 
             query = query.DTFilterBy(input);
@@ -133,7 +133,7 @@ namespace Ermes.Missions
                     report.IsEditable = (currentUserPerson.Id == rx.CreatorUserId);
                     return report;
                 }).ToList();
-                return md; 
+                return md;
             }).ToList();
 
             return result;
@@ -145,7 +145,7 @@ namespace Ermes.Missions
             if (!currentUserOrganizationId.HasValue)
                 throw new UserFriendlyException(L("OrganizationRequiredForOperation"));
 
-            if(oldMission != null && oldMission.OrganizationId != currentUserOrganizationId && oldMission.Organization.ParentId != currentUserOrganizationId)
+            if (oldMission != null && oldMission.OrganizationId != currentUserOrganizationId && oldMission.Organization.ParentId != currentUserOrganizationId)
                 throw new UserFriendlyException(L("OrganizationMismatch"));
 
             if (newMissionData.CoordinatorPersonId.HasValue && newMissionData.CoordinatorTeamId.HasValue)
@@ -259,7 +259,7 @@ namespace Ermes.Missions
         }
         #endregion
 
-        [OpenApiOperation("Create or Update a Mission", 
+        [OpenApiOperation("Create or Update a Mission",
             @"
                 Input: GeoJson feature, with MissionDto element in Properties field
                 If the input contains an Id > 0, an update is performed, otherwise a new mission is created
@@ -370,7 +370,7 @@ namespace Ermes.Missions
                 throw new UserFriendlyException(L("EntityOutsideOrganization"));
             if (mission.CoordinatorPersonId.HasValue && mission.CoordinatorPersonId.Value != person.Id)
                 throw new UserFriendlyException(L("Forbidden_InsufficientRoleOrUnassociatedEntity"));
-            if(mission.CoordinatorTeamId.HasValue && mission.CoordinatorTeamId.Value != person.TeamId)
+            if (mission.CoordinatorTeamId.HasValue && mission.CoordinatorTeamId.Value != person.TeamId)
                 throw new UserFriendlyException(L("Forbidden_InsufficientRoleOrUnassociatedEntity"));
 
             if (_missionManager.CheckNewStatus(mission.CurrentStatus, input.Status))
@@ -402,7 +402,7 @@ namespace Ermes.Missions
         public virtual async Task<bool> DeleteMission(IdInput<int> input)
         {
             var mission = await GetMissionAsync(input.Id);
-            if(mission.CurrentStatus != MissionStatusType.Deleted)
+            if (mission.CurrentStatus != MissionStatusType.Deleted)
             {
                 mission.CurrentStatus = MissionStatusType.Deleted;
                 return true;
