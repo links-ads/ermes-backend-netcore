@@ -74,6 +74,7 @@ namespace Ermes.Missions
         {
             NpgsqlRange<DateTime> range = new NpgsqlRange<DateTime>(startDate, endDate);
             return Missions
+                    .Include(m => m.Organization)
                     .Where(m => m.Duration.Overlaps(range));
         }
 

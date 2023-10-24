@@ -1,7 +1,5 @@
-﻿using Abp.Authorization;
-using Castle.DynamicProxy;
+﻿using Castle.DynamicProxy;
 using Ermes.Helpers;
-using System;
 
 namespace Ermes.Attributes
 {
@@ -9,11 +7,9 @@ namespace Ermes.Attributes
     {
         private readonly ErmesAuthorizationHelper _authorizationHelper;
         public ErmesAuthorizationInterceptor(
-                //ErmesAppSession session,
                 ErmesAuthorizationHelper authorizationHelper
             )
         {
-            //_session = session;
             _authorizationHelper = authorizationHelper;
         }
 

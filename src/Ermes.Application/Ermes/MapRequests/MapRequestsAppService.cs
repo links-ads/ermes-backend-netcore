@@ -102,7 +102,7 @@ namespace Ermes.MapRequests
                 query = query.Include(a => a.Creator.Organization).Include(a => a.MapRequestLayers);
             }
             else
-                query = _mapRequestManager.MapRequests.Where(a => new NpgsqlRange<DateTime>(input.StartDate.Value, input.EndDate.Value).Contains(a.Duration));
+                query = _mapRequestManager.GetMapRequests(input.StartDate.Value, input.EndDate.Value);
 
             if (input.Status != null && input.Status.Count > 0)
             {
@@ -122,14 +122,12 @@ namespace Ermes.MapRequests
 
             query = query.DTFilterBy(input);
 
-            var currentUserPerson = _session.LoggedUserPerson;
-
-            //List of Missions available only for pro users
+            //List of MR available only for pro users
             var hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.MapRequests.MapRequest_CanSeeCrossOrganization);
             if (!hasPermission)
             {
-                if (filterByOrganization && currentUserPerson.OrganizationId.HasValue)
-                    query = query.DataOwnership(new List<int>() { currentUserPerson.OrganizationId.Value });
+                if (filterByOrganization && _session.LoggedUserPerson.OrganizationId.HasValue)
+                    query = query.DataOwnership(new List<int>() { _session.LoggedUserPerson.OrganizationId.Value });
                 else
                     return result;
             }

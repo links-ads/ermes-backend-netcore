@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Ermes.Attributes
+﻿namespace Ermes.Attributes
 {
     public interface IErmesAuthorizeAttribute
     {

@@ -89,7 +89,7 @@ namespace Ermes.Communications
                 query = query.Include(a => a.Creator).Include(a => a.Creator.Organization).Include(a => a.CommunicationReceivers);
             }
             else
-                query = _communicationManager.Communications.Where(a => new NpgsqlRange<DateTime>(input.StartDate.Value, input.EndDate.Value).Contains(a.Duration));
+                query = _communicationManager.GetCommunications(input.StartDate.Value, input.EndDate.Value);
 
             if (input.Scopes != null && input.Scopes.Count > 0)
             {
