@@ -510,7 +510,7 @@ namespace Ermes.Profile
                 {
                     var existingPerson = _personManager.GetPersonByLegacyId(legacyId.Value);
                     if (existingPerson != null && existingPerson.Id != person.Id)
-                        throw new UserFriendlyException("TaxCodeAlreadyInUse");
+                        throw new UserFriendlyException(L("TaxCodeAlreadyInUse"));
                     person.LegacyId = legacyId;
                 }
                 else
