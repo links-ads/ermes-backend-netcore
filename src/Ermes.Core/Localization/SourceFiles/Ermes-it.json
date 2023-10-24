@@ -30,6 +30,7 @@
     "InvalidRole": "Ruolo non valido: {0}",
     "InvalidReportRequestId": "Id ReportRequest non valido: {0}",
     "InvalidCommunicationId": "Id Comunicazione non valido: {0}",
+    "InvalidTaxCode": "Codice fiscale non valido",
     "MissingRequiredField": "Il campo {0} non può essere mancante o essere nullo",
     "OrganizationCannotBeDeleted": "Organizzazione con id {0} non pu� essere eliminata. Alcuni utenti fanno ancora parte di essa",
     "FusionAuthUnknonwError": "Errore sconosciuto fa FusionAuth",

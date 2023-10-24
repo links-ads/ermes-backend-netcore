@@ -36,6 +36,7 @@ using Hangfire;
 using Abp.Hangfire;
 using Ermes.Web.App_Start;
 using Hangfire.PostgreSql;
+using Ermes.ExternalServices.Externals;
 
 namespace Ermes.Web.Startup
 {
@@ -106,6 +107,9 @@ namespace Ermes.Web.Startup
             services.Configure<AbpSensorServiceSettings>(
                 _appConfiguration.GetSection("SensorService")
             );
+            services.Configure<ExternalsSettings>(
+                _appConfiguration.GetSection("Externals")
+            );
 
 
             services.AddCors(options =>
@@ -159,8 +163,19 @@ namespace Ermes.Web.Startup
                     Type = OpenApiSecuritySchemeType.ApiKey
                 });
 
+                options.AddSecurity("ApiKey", Enumerable.Empty<string>(), new OpenApiSecurityScheme()
+                {
+                    Description = "Nella casella sottostante inserisci l'ApiKey. Esempio: <strong><code>eyJhbGci...</code></strong><br><br><br><br>",
+                    Name = "X-API-Key",
+                    In = OpenApiSecurityApiKeyLocation.Header,
+                    Type = OpenApiSecuritySchemeType.ApiKey
+                });
+
                 options.OperationProcessors.Add(
                     new AspNetCoreOperationSecurityScopeProcessor("JWT"));
+
+                options.OperationProcessors.Add(
+                    new AspNetCoreOperationSecurityScopeProcessor("ApiKey"));
             });
 
             if (bool.Parse(_appConfiguration["Bus:IsEnabled"]))
@@ -210,6 +225,8 @@ namespace Ermes.Web.Startup
             }
 
             app.UseMiddleware<JwtTokenMiddleware>(client);
+            app.UseMiddleware<ApiKeyMiddleware>();
+            
             app.UseAuthentication();
 
             app.UseHangfireServer();
@@ -225,7 +242,7 @@ namespace Ermes.Web.Startup
 
             if (bool.Parse(_appConfiguration["App:HangfireEnabled"]))
             {
-                //Enable it to use HangFire dashboard (uncomment only if it's enabled in ImproveWebModule)
+                //Enable it to use HangFire dashboard (uncomment only if it's enabled in ErmesWebModule)
                 app.UseHangfireDashboard("/hangfire", new DashboardOptions
                 {
                     Authorization = new[] { new App_Start.AbpHangfireAuthorizationFilter() },

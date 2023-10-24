@@ -265,6 +265,11 @@ namespace Ermes.Persons
             return Persons.SingleOrDefault(p => p.Email == email);
         }
 
+        public Person GetPersonByLegacyId(int legacyId)
+        {
+            return Persons.SingleOrDefault(p => p.LegacyId == legacyId);
+        }
+
         public async Task<List<string>> GetPersonRoleNamesAsync(long personId)
         {
             return await PersonRoles

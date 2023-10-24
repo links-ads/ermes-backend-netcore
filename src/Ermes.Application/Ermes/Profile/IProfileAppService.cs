@@ -18,6 +18,7 @@ namespace Profile
         Task<bool> UpdateRegistrationToken(UpdateRegistrationTokenInput input);
         Task<DTResult<PersonDto>> GetOrganizationMembers(GetOrganizationMembersInput input);
         Task<DTResult<OrganizationDto>> GetOrganizations(GetOrganizationsInput input);
+        Task<GetProfileOutput> ChangeOrganization(ChangeOrganizationInput input);
         ///TDB
         ///GetRemoteSettings
         ///UpdateRemoteSettings

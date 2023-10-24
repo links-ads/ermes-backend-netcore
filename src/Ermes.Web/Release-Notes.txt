@@ -1,5 +1,7 @@
 Ver.
 --------------------------------
+- Feature - New APIs for Externals added, auth management through API Key (appsettings update)(#163)
+- Feature - ChangeOrganization API added (sdk to be updated)(#164)
 - Feature - GetStatistics API updated (sdk to be updated)(#165)
 
 Ver. 4.15.4 - 2023-10-12
