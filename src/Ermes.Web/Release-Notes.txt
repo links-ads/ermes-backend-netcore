@@ -1,6 +1,6 @@
 Ver.
 --------------------------------
-
+- Feature - Auth Controller added (appsettings updated)(Fusion auth to be update)(#142)
 
 Ver. 4.16.0 - 2023-10-24
 --------------------------------

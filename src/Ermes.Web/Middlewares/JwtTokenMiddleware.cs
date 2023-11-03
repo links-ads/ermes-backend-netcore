@@ -18,13 +18,18 @@ namespace Ermes.Web.Middlewares
         }
         public async Task Invoke(HttpContext context)
         {
-            var token = context.Request.Headers["Authorization"].ToString();
-            if(token == null || token == string.Empty)
-                token = context.Request.Cookies["X-Access-Token"];
-            if (token != "" && await VerifyToken(token))
+            string token = null;
+            if(context.Request.Cookies != null && context.Request.Cookies.Count > 0)
             {
-                if (!context.Response.Headers.ContainsKey("Token"))
-                    context.Response.Headers.Add("Token", token);
+                context.Request.Cookies.TryGetValue("app.at", out token);
+            }
+            if (token == null)
+                token = context.Request.Headers["Authorization"].ToString();
+            
+            if (token != string.Empty && await VerifyToken(token))
+            {
+                //if (!context.Response.Headers.ContainsKey("Token"))
+                //    context.Response.Headers.Add("Token", token);
 
                 var handler = new JwtSecurityTokenHandler();
                 var tokenS = handler.ReadToken(token) as JwtSecurityToken;

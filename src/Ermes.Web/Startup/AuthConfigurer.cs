@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Ermes.Web.Utils;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Ermes.Web.Startup
@@ -23,6 +23,8 @@ namespace Ermes.Web.Startup
             {
                 authenticationBuilder.AddJwtBearer(options =>
                 {
+                    options.Authority = configuration["FusionAuth:Url"];
+                    options.Audience = configuration["FusionAuth:ClientId"];
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = true,
@@ -32,7 +34,18 @@ namespace Ermes.Web.Startup
                         ValidIssuer = configuration["Authentication:JwtBearer:Issuer"],
                         ValidAudience = configuration["Authentication:JwtBearer:Audience"]
                     };
+                })
+                .AddOpenIdConnect("oidc", options =>
+                {
+                    options.Authority = configuration["FusionAuth:Url"];
+                    options.ClientId = configuration["FusionAuth:ClientId"];
+                    options.ClientSecret = configuration["FusionAuth:ClientSecret"];
+
+                    options.UsePkce = true;
+                    options.ResponseType = "code";
+                    options.RequireHttpsMetadata = false;
                 });
+
             }
         }
     }

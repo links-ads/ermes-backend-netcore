@@ -1,23 +1,11 @@
 ﻿using Ermes.Interfaces;
-using Ermes.Web.Controllers.Dto;
 using Ermes.Web.Utils;
 using FusionAuthNetCore;
-using Google.Apis.Auth.OAuth2;
-using Google.Apis.Auth.OAuth2.Responses;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient.Server;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using NSwag.Annotations;
 using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Security.Cryptography.Pkcs;
-using System.Security.Policy;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Ermes.Web.Controllers
@@ -25,10 +13,12 @@ namespace Ermes.Web.Controllers
     public class AuthController : ErmesControllerBase, IBackofficeApi
     {
         private readonly IOptions<FusionAuthSettings> _fusionAuthSettings;
+        private readonly IOptions<ErmesSettings> _ermesSettings;
 
-        public AuthController(IOptions<FusionAuthSettings> fusionAuthSettings)
+        public AuthController(IOptions<FusionAuthSettings> fusionAuthSettings, IOptions<ErmesSettings> ermesSettings)
         {
             _fusionAuthSettings = fusionAuthSettings;
+            _ermesSettings = ermesSettings;
         }
 
         [HttpGet]
@@ -37,9 +27,8 @@ namespace Ermes.Web.Controllers
         public async Task<IActionResult> TokenRetrieve(string code, string userState, string state, string error, string errorReason, string errorDescription)
         {
             var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
-            //if(CodeHelper.CodeVerifier == null)
-            //    CodeHelper.Init(
-            var tokenResponse = await client.ExchangeOAuthCodeForAccessTokenAsync(code, _fusionAuthSettings.Value.ClientId, _fusionAuthSettings.Value.ClientSecret,  $"{Request.Scheme}://{Request.Host}/auth/oauth-callback");
+
+            var tokenResponse = await client.ExchangeOAuthCodeForAccessTokenAsync(code, _fusionAuthSettings.Value.ClientId, _fusionAuthSettings.Value.ClientSecret, $"{Request.Scheme}://{Request.Host}/auth/oauth-callback");
             if (tokenResponse.WasSuccessful())
             {
                 Response.Cookies.Append(
@@ -47,8 +36,8 @@ namespace Ermes.Web.Controllers
                     tokenResponse.successResponse.access_token,
                     new CookieOptions
                     {
-                        HttpOnly = false,
-                        SameSite=  SameSiteMode.Strict,
+                        HttpOnly = true,
+                        SameSite = SameSiteMode.Lax,
                         Secure = false
                     }
                 );
@@ -57,58 +46,50 @@ namespace Ermes.Web.Controllers
                     tokenResponse.successResponse.refresh_token,
                     new CookieOptions
                     {
-                        HttpOnly = false,
-                        SameSite = SameSiteMode.Strict,
+                        HttpOnly = true,
+                        SameSite = SameSiteMode.Lax,
                         Secure = false
                     }
                 );
 
                 Response.Cookies.Append(
-                    "app.test",
-                    "prova",
+                    "app.at_exp",
+                    DateTime.Now.AddSeconds(tokenResponse.successResponse.expires_in.Value).Ticks.ToString(),
                     new CookieOptions
                     {
                         HttpOnly = false,
-                        SameSite = SameSiteMode.Unspecified,
+                        SameSite = SameSiteMode.Lax,
                         Secure = false
                     }
                 );
 
-                return Redirect(string.Format("{0}/callback/?state={1}", _fusionAuthSettings.Value.ClientBasePath, userState));
-            }
+                Response.Cookies.Append(
+                    "app.idt",
+                    tokenResponse.successResponse.id_token,
+                    new CookieOptions
+                    {
+                        HttpOnly = false,
+                        SameSite = SameSiteMode.Lax,
+                        Secure = false
+                    }
+                );
 
+                return Redirect($"{_fusionAuthSettings.Value.ClientBasePath}/callback?userState={userState}&state={state}");
+            }
+            
             return BadRequest();
         }
 
         [HttpGet]
         [Route("auth/logout-callback")]
-        [OpenApiOperation("Perform logout operation")]
-        public async Task<IActionResult> Logout()
+        public virtual IActionResult Logout()
         {
-            Response.Cookies.Append(
-                "X-Access-Token",
-                "expired",
-                new CookieOptions
-                {
-                    HttpOnly = true,
-                    SameSite = SameSiteMode.Strict,
-                    Secure = false,
-                    Expires = DateTime.UtcNow.AddDays(-1)
-                }
-            );
-            Response.Cookies.Append(
-                "X-Refresh-Token",
-                "expired",
-                new CookieOptions
-                {
-                    HttpOnly = true,
-                    SameSite = SameSiteMode.Strict,
-                    Secure = false,
-                    Expires = DateTime.UtcNow.AddDays(-1)
-                }
-            );
-            return Redirect(string.Format("{0}/logout-callback", _fusionAuthSettings.Value.ClientBasePath));
-
+            Response.Cookies.Append("app.at", string.Empty);
+            Response.Cookies.Append("app.rt", string.Empty);
+            Response.Cookies.Append("app.at_exp", string.Empty);
+            Response.Cookies.Append("app.idt", string.Empty);
+            return Redirect($"{_ermesSettings.Value.WebAppBaseUrl}/logout-callback");
         }
+
     }
 }
