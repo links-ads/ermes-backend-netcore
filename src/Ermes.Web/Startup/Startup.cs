@@ -1,42 +1,41 @@
-﻿using System;
+﻿using Abp;
 using Abp.AspNetCore;
-using Abp.Castle.Logging.Log4Net;
-using Abp.EntityFrameworkCore;
-using Ermes.EntityFrameworkCore;
-using Castle.Facilities.Logging;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Configuration;
-using Abp.Timing;
-using Ermes.Configuration;
-using Ermes.Web.Converters;
-using System.Linq;
-using Ermes.Web.Middlewares;
-using NSwag;
-using NSwag.Generation.Processors.Security;
-using NSwag.AspNetCore;
-using Abp.Extensions;
-using io.fusionauth;
-using FusionAuthNetCore;
-using Abp;
-using Abp.Chatbot;
-using Abp.BusProducer;
+using Abp.AzureCognitiveServices;
 using Abp.BusConsumer;
 using Abp.BusConsumer.Kafka;
 using Abp.BusConsumer.RabbitMq;
-using Abp.AzureCognitiveServices;
-using Abp.SocialMedia;
+using Abp.BusProducer;
+using Abp.Castle.Logging.Log4Net;
+using Abp.Chatbot;
+using Abp.EntityFrameworkCore;
+using Abp.Extensions;
 using Abp.Importer;
-using Ermes.ExternalServices.Csi.Configuration;
 using Abp.SensorService;
-using Hangfire;
-using Abp.Hangfire;
-using Ermes.Web.App_Start;
-using Hangfire.PostgreSql;
+using Abp.SocialMedia;
+using Abp.Timing;
+using Castle.Facilities.Logging;
+using Ermes.Configuration;
+using Ermes.EntityFrameworkCore;
+using Ermes.ExternalServices.Csi.Configuration;
 using Ermes.ExternalServices.Externals;
+using Ermes.Web.App_Start;
+using Ermes.Web.Converters;
+using Ermes.Web.Middlewares;
+using FusionAuthNetCore;
+using Hangfire;
+using Hangfire.PostgreSql;
+using io.fusionauth;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using NSwag;
+using NSwag.AspNetCore;
+using NSwag.Generation.Processors.Security;
+using System;
+using System.Linq;
 
 namespace Ermes.Web.Startup
 {
@@ -131,7 +130,8 @@ namespace Ermes.Web.Startup
                 });
             });
 
-            services.AddOpenApiDocument(options => {
+            services.AddOpenApiDocument(options =>
+            {
                 options.DocumentName = ErmesConsts.SwaggerAppDocumentName;
                 options.Version = "v1";
                 options.Title = "Project APIs";
@@ -149,7 +149,8 @@ namespace Ermes.Web.Startup
                     new AspNetCoreOperationSecurityScopeProcessor("JWT"));
             });
 
-            services.AddOpenApiDocument(options => {
+            services.AddOpenApiDocument(options =>
+            {
                 options.DocumentName = ErmesConsts.SwaggerBackofficeDocumentName;
                 options.Version = "v1";
                 options.Title = "Backoffice APIs";
@@ -198,6 +199,11 @@ namespace Ermes.Web.Startup
                 config.UsePostgreSqlStorage(_appConfiguration.GetConnectionString("Default"));
             });
 
+            services.AddAuthorization();
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(60 * 24);
+            });
             services.AddApplicationInsightsTelemetry();
 
             //Configure Abp and Dependency Injection
@@ -226,17 +232,19 @@ namespace Ermes.Web.Startup
 
             app.UseMiddleware<JwtTokenMiddleware>(client);
             app.UseMiddleware<ApiKeyMiddleware>();
-            
+
             app.UseAuthentication();
 
             app.UseHangfireServer();
-            
+
 
             app.UseStaticFiles();
             app.UseRouting();
             app.UseAuthorization();
+
             app.UseCors(DefaultCorsPolicyName);
-            app.UseEndpoints(endpoints => {
+            app.UseEndpoints(endpoints =>
+            {
                 endpoints.MapDefaultControllerRoute();
             });
 

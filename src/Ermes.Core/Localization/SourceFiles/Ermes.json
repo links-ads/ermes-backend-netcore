@@ -30,7 +30,7 @@
     "InvalidReportRequestId": "Invalid ReportRequest Id: {0}",
     "InvalidCommunicationId": "Invalid Communication Id: {0}",
     "InvalidEntityId": "Invalid Id for entity {1}: {0}",
-    "InvalidTaxCode":  "Invalid tax code",
+    "InvalidTaxCode": "Invalid tax code",
     "MissingRequiredField": "The field {0} cannot be missing or be null",
     "OrganizationCannotBeDeleted": "Organization with id {0} cannot be deleted. Some users are still part of it",
     "FusionAuthUnknonwError": "FusionAuth unknown error",
@@ -106,6 +106,7 @@
     "InvalidVolterTaxCode": "Invalid tax code",
     "RequestedFileDoesNotExists": "Requested file does not exists",
     "InvalidReportVerifierOwner": "A user cannot validate his own report",
-    "InvalidReportVerifierDuplicate": "This report has already been validated by this user"
+    "InvalidReportVerifierDuplicate": "This report has already been validated by this user",
+    "TaxCodeAlreadyInUse":  "This tax code has already been associated to another account"
   }
 }
