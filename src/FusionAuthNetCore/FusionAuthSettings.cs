@@ -13,6 +13,5 @@ namespace FusionAuthNetCore
         public string ApplicationId { get; set; }
         public string ClientId { get; set; }
         public string ClientSecret { get; set; }
-        public string ClientBasePath { get; set; }
     }
 }

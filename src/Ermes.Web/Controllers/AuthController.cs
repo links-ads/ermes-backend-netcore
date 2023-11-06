@@ -1,5 +1,4 @@
 ﻿using Ermes.Interfaces;
-using Ermes.Web.Utils;
 using FusionAuthNetCore;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -74,9 +73,9 @@ namespace Ermes.Web.Controllers
                     }
                 );
 
-                return Redirect($"{_fusionAuthSettings.Value.ClientBasePath}/callback?userState={userState}&state={state}");
+                return Redirect($"{_ermesSettings.Value.WebAppBaseUrl}/callback?userState={userState}&state={state}");
             }
-            
+
             return BadRequest();
         }
 
