@@ -26,8 +26,11 @@ namespace Ermes.Web.Controllers
         public async Task<IActionResult> TokenRetrieve(string code, string userState, string state, string error, string errorReason, string errorDescription)
         {
             var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
-            string redirectUri = $"{Request.Scheme}://{Request.Host}/api/services/app/auth/oauth-callback";
-            Console.WriteLine(redirectUri);
+            //TODO: to be improved by editing nginx configuration
+            string scheme = "http";
+            if (Request.Headers != null && Request.Headers.Count > 0)
+                scheme = Request.Headers["X-Forwarded-Proto"];
+            string redirectUri = $"{scheme}://{Request.Host}/api/services/app/auth/oauth-callback";
             var tokenResponse = await client.ExchangeOAuthCodeForAccessTokenAsync(code, _fusionAuthSettings.Value.ClientId, _fusionAuthSettings.Value.ClientSecret, redirectUri);
             if (tokenResponse.WasSuccessful())
             {
