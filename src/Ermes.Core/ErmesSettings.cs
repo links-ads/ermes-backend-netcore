@@ -10,5 +10,6 @@ namespace Ermes
         public bool HangfireEnabled { get; set; }
         public string ErmesProject { get; set; } = "FASTER";
         public string WebAppBaseUrl { get; set; }
+        public string AppDomain { get; set; }
     }
 }

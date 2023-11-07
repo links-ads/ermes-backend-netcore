@@ -34,55 +34,34 @@ namespace Ermes.Web.Controllers
             var tokenResponse = await client.ExchangeOAuthCodeForAccessTokenAsync(code, _fusionAuthSettings.Value.ClientId, _fusionAuthSettings.Value.ClientSecret, redirectUri);
             if (tokenResponse.WasSuccessful())
             {
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    SameSite = SameSiteMode.Lax,
+                    Secure = scheme == "https",
+                    Domain = $".{_ermesSettings.Value.AppDomain}"
+                };
                 Response.Cookies.Append(
                     "app.at",
                     tokenResponse.successResponse.access_token,
-                    new CookieOptions
-                    {
-                        HttpOnly = true,
-                        SameSite = SameSiteMode.Lax,
-                        Secure = scheme == "https",
-                        Domain = $"{_ermesSettings.Value.WebAppBaseUrl}",
-                        IsEssential = true
-                    }
+                    cookieOptions
                 );
                 Response.Cookies.Append(
                     "app.rt",
                     tokenResponse.successResponse.refresh_token,
-                    new CookieOptions
-                    {
-                        HttpOnly = true,
-                        SameSite = SameSiteMode.Lax,
-                        Secure = scheme == "https",
-                        Domain = $"{_ermesSettings.Value.WebAppBaseUrl}",
-                        IsEssential = true
-                    }
+                    cookieOptions
                 );
-
+                cookieOptions.HttpOnly = false;
                 Response.Cookies.Append(
                     "app.at_exp",
                     DateTime.Now.AddSeconds(tokenResponse.successResponse.expires_in.Value).Ticks.ToString(),
-                    new CookieOptions
-                    {
-                        HttpOnly = false,
-                        SameSite = SameSiteMode.Lax,
-                        Secure = scheme == "https",
-                        Domain = $"{_ermesSettings.Value.WebAppBaseUrl}",
-                        IsEssential = true
-                    }
+                    cookieOptions
                 );
 
                 Response.Cookies.Append(
                     "app.idt",
                     tokenResponse.successResponse.id_token,
-                    new CookieOptions
-                    {
-                        HttpOnly = false,
-                        SameSite = SameSiteMode.Lax,
-                        Secure = scheme == "https",
-                        Domain = $"{_ermesSettings.Value.WebAppBaseUrl}",
-                        IsEssential = false
-                    }
+                    cookieOptions
                 );
 
                 return Redirect($"{_ermesSettings.Value.WebAppBaseUrl}/callback?userState={userState}&state={state}");
