@@ -21,7 +21,7 @@ namespace Ermes.Web.Controllers
         }
 
         [HttpGet]
-        [Route("auth/oauth-callback")]
+        [Route("api/services/app/auth/oauth-callback")]
         [OpenApiOperation("Exchange authorization code for token. The API returns token and refresh token to the final client")]
         public async Task<IActionResult> TokenRetrieve(string code, string userState, string state, string error, string errorReason, string errorDescription)
         {
@@ -80,7 +80,7 @@ namespace Ermes.Web.Controllers
         }
 
         [HttpGet]
-        [Route("auth/logout-callback")]
+        [Route("api/services/app/auth/logout-callback")]
         public virtual IActionResult Logout()
         {
             Response.Cookies.Append("app.at", string.Empty);
