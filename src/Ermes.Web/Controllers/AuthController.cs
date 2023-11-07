@@ -26,8 +26,9 @@ namespace Ermes.Web.Controllers
         public async Task<IActionResult> TokenRetrieve(string code, string userState, string state, string error, string errorReason, string errorDescription)
         {
             var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
-
-            var tokenResponse = await client.ExchangeOAuthCodeForAccessTokenAsync(code, _fusionAuthSettings.Value.ClientId, _fusionAuthSettings.Value.ClientSecret, $"{Request.Scheme}://{Request.Host}/auth/oauth-callback");
+            string redirectUri = $"{Request.Scheme}://{Request.Host}/api/services/app/auth/oauth-callback";
+            Console.WriteLine(redirectUri);
+            var tokenResponse = await client.ExchangeOAuthCodeForAccessTokenAsync(code, _fusionAuthSettings.Value.ClientId, _fusionAuthSettings.Value.ClientSecret, redirectUri);
             if (tokenResponse.WasSuccessful())
             {
                 Response.Cookies.Append(
@@ -75,8 +76,11 @@ namespace Ermes.Web.Controllers
 
                 return Redirect($"{_ermesSettings.Value.WebAppBaseUrl}/callback?userState={userState}&state={state}");
             }
-
-            return BadRequest();
+            else
+            {
+                var faError = FusionAuth.ManageErrorResponse(tokenResponse);
+                return BadRequest(faError.Message);
+            }
         }
 
         [HttpGet]
