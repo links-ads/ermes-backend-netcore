@@ -28,7 +28,7 @@ namespace Ermes.Web.Controllers
             var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
             //TODO: to be improved by editing nginx configuration
             string scheme = "http";
-            if (Request.Headers != null && Request.Headers.Count > 0)
+            if (Request.Headers != null && Request.Headers.Count > 0 && Request.Headers.ContainsKey("X-Forwarded-Proto"))
                 scheme = Request.Headers["X-Forwarded-Proto"];
             string redirectUri = $"{scheme}://{Request.Host}/api/services/app/auth/oauth-callback";
             var tokenResponse = await client.ExchangeOAuthCodeForAccessTokenAsync(code, _fusionAuthSettings.Value.ClientId, _fusionAuthSettings.Value.ClientSecret, redirectUri);
