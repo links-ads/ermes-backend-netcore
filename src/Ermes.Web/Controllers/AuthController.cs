@@ -76,8 +76,11 @@ namespace Ermes.Web.Controllers
 
                 return Redirect($"{_ermesSettings.Value.WebAppBaseUrl}/callback?userState={userState}&state={state}");
             }
-
-            return BadRequest();
+            else
+            {
+                var faError = FusionAuth.ManageErrorResponse(tokenResponse);
+                return BadRequest(faError.Message);
+            }
         }
 
         [HttpGet]
