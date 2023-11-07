@@ -20,6 +20,7 @@
         public const string DefaultYear = "2020";
         public const string IMAGE_MIME_TYPE = "image/jpeg";
         public const string EXTERNAL_ORGANIZATION_NAME = "Corpo AIB";
+        public const string DEFAULT_DSS_USERNAME = "dss.manager";
 
         public class Thumbnail
         {
