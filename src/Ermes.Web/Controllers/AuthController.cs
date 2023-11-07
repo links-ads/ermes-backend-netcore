@@ -41,7 +41,7 @@ namespace Ermes.Web.Controllers
                     {
                         HttpOnly = true,
                         SameSite = SameSiteMode.Lax,
-                        Secure = false
+                        Secure = scheme == "https"
                     }
                 );
                 Response.Cookies.Append(
@@ -51,7 +51,7 @@ namespace Ermes.Web.Controllers
                     {
                         HttpOnly = true,
                         SameSite = SameSiteMode.Lax,
-                        Secure = false
+                        Secure = scheme == "https"
                     }
                 );
 
@@ -62,7 +62,7 @@ namespace Ermes.Web.Controllers
                     {
                         HttpOnly = false,
                         SameSite = SameSiteMode.Lax,
-                        Secure = false
+                        Secure = scheme == "https"
                     }
                 );
 
@@ -73,7 +73,7 @@ namespace Ermes.Web.Controllers
                     {
                         HttpOnly = false,
                         SameSite = SameSiteMode.Lax,
-                        Secure = false
+                        Secure = scheme == "https"
                     }
                 );
 
