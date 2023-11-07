@@ -41,7 +41,9 @@ namespace Ermes.Web.Controllers
                     {
                         HttpOnly = true,
                         SameSite = SameSiteMode.Lax,
-                        Secure = scheme == "https"
+                        Secure = scheme == "https",
+                        Domain = $"{_ermesSettings.Value.WebAppBaseUrl}",
+                        IsEssential = true
                     }
                 );
                 Response.Cookies.Append(
@@ -51,7 +53,9 @@ namespace Ermes.Web.Controllers
                     {
                         HttpOnly = true,
                         SameSite = SameSiteMode.Lax,
-                        Secure = scheme == "https"
+                        Secure = scheme == "https",
+                        Domain = $"{_ermesSettings.Value.WebAppBaseUrl}",
+                        IsEssential = true
                     }
                 );
 
@@ -62,7 +66,9 @@ namespace Ermes.Web.Controllers
                     {
                         HttpOnly = false,
                         SameSite = SameSiteMode.Lax,
-                        Secure = scheme == "https"
+                        Secure = scheme == "https",
+                        Domain = $"{_ermesSettings.Value.WebAppBaseUrl}",
+                        IsEssential = true
                     }
                 );
 
@@ -73,7 +79,9 @@ namespace Ermes.Web.Controllers
                     {
                         HttpOnly = false,
                         SameSite = SameSiteMode.Lax,
-                        Secure = scheme == "https"
+                        Secure = scheme == "https",
+                        Domain = $"{_ermesSettings.Value.WebAppBaseUrl}",
+                        IsEssential = false
                     }
                 );
 
