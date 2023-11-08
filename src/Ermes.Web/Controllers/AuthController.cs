@@ -1,4 +1,5 @@
 ﻿using Ermes.Interfaces;
+using Ermes.Web.Utils;
 using FusionAuthNetCore;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -27,43 +28,13 @@ namespace Ermes.Web.Controllers
         {
             var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
             //TODO: to be improved by editing nginx configuration
-            string scheme = "http";
-            if (Request.Headers != null && Request.Headers.Count > 0 && Request.Headers.ContainsKey("X-Forwarded-Proto"))
-                scheme = Request.Headers["X-Forwarded-Proto"];
+            string scheme = UrlHelper.GetSchemeFromRequest(Request);
+
             string redirectUri = $"{scheme}://{Request.Host}/api/services/app/auth/oauth-callback";
             var tokenResponse = await client.ExchangeOAuthCodeForAccessTokenAsync(code, _fusionAuthSettings.Value.ClientId, _fusionAuthSettings.Value.ClientSecret, redirectUri);
             if (tokenResponse.WasSuccessful())
             {
-                var cookieOptions = new CookieOptions
-                {
-                    HttpOnly = true,
-                    SameSite = SameSiteMode.Lax,
-                    Secure = scheme == "https",
-                    Domain = $".{_ermesSettings.Value.AppDomain}"
-                };
-                Response.Cookies.Append(
-                    "app.at",
-                    tokenResponse.successResponse.access_token,
-                    cookieOptions
-                );
-                Response.Cookies.Append(
-                    "app.rt",
-                    tokenResponse.successResponse.refresh_token,
-                    cookieOptions
-                );
-                cookieOptions.HttpOnly = false;
-                Response.Cookies.Append(
-                    "app.at_exp",
-                    DateTime.Now.AddSeconds(tokenResponse.successResponse.expires_in.Value).Ticks.ToString(),
-                    cookieOptions
-                );
-
-                Response.Cookies.Append(
-                    "app.idt",
-                    tokenResponse.successResponse.id_token,
-                    cookieOptions
-                );
-
+                CookieHelper.AddAuthCookies(Response, scheme, _ermesSettings.Value.AppDomain, tokenResponse.successResponse);
                 return Redirect($"{_ermesSettings.Value.WebAppBaseUrl}/callback?userState={userState}&state={state}");
             }
             else

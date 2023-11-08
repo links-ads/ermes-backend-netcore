@@ -230,7 +230,7 @@ namespace Ermes.Web.Startup
                 app.UseExceptionHandler("/Error");
             }
 
-            app.UseMiddleware<JwtTokenMiddleware>(client);
+            app.UseMiddleware<JwtTokenMiddleware>(client, _appConfiguration);
             app.UseMiddleware<ApiKeyMiddleware>();
 
             app.UseAuthentication();
