@@ -1,14 +1,11 @@
 ﻿using Abp.Domain.Repositories;
 using Abp.Domain.Services;
 using Ermes.Enums;
-using Ermes.Missions;
 using Microsoft.EntityFrameworkCore;
 using NpgsqlTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Ermes.Communications
@@ -37,6 +34,7 @@ namespace Ermes.Communications
         public async Task<int> CreateOrUpdateCommunicationAsync(Communication co, List<int> receivers = null)
         {
             co.Id = await CommunicationRepository.InsertOrUpdateAndGetIdAsync(co);
+            ManageReceivers(co, receivers);
             return co.Id;
         }
 

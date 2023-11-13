@@ -19,7 +19,6 @@ using Ermes.Notifiers;
 using Ermes.Persons;
 using Ermes.Resources;
 using Ermes.Stations;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
@@ -43,6 +42,7 @@ namespace Ermes.Consumers
         private readonly IAzureManager _azureManager;
         private readonly SensorServiceManager _sensorServiceManager;
         private readonly IOptions<DssSettings> _dssSettings;
+        private readonly CommunicationNotifier _communicationNotifier;
 
 
         public ConsumerService(
@@ -56,7 +56,8 @@ namespace Ermes.Consumers
             StationManager stationManager,
             IAzureManager azureManager,
             SensorServiceManager sensorServiceManager,
-            IOptions<DssSettings> dssSettings)
+            IOptions<DssSettings> dssSettings,
+            CommunicationNotifier communicationNotifier)
         {
             _missionManager = missionManager;
             _notifierService = notifierService;
@@ -69,6 +70,7 @@ namespace Ermes.Consumers
             _azureManager = azureManager;
             _sensorServiceManager = sensorServiceManager;
             _dssSettings = dssSettings;
+            _communicationNotifier = communicationNotifier;
         }
 
         public void ConsumeBusNotification(string message, string routingKey)
@@ -246,9 +248,10 @@ namespace Ermes.Consumers
                         else
                             throw new UserFriendlyException(L("MissingDssAccount"));
 
-                        _communicationManager.CreateOrUpdateCommunication(com);
-                    }
+                        com.Id = _communicationManager.CreateOrUpdateCommunication(com);
 
+                        AsyncHelper.RunSync(() => _communicationNotifier.SendCommunication(EntityWriteAction.Create, com.Id, com.CreatorUserId.Value, com.Message));
+                    }
 
                     CurrentUnitOfWork.SaveChanges();
                 }

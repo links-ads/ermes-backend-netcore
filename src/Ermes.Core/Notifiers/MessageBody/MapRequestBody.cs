@@ -1,7 +1,6 @@
 ﻿using NetTopologySuite.Geometries;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Ermes.Notifiers.MessageBody
 {
@@ -31,7 +30,9 @@ namespace Ermes.Notifiers.MessageBody
         public bool do_spotting { get; set; }
         public decimal probabilityRange { get; set; }
         public int time_limit { get; set; }
+#pragma warning disable CS0108 // Member hides inherited member; missing new keyword
         public string datatype_id { get; set; }
+#pragma warning restore CS0108 // Member hides inherited member; missing new keyword
         public List<BoundaryConditionBody> boundary_conditions { get; set; }
     }
 

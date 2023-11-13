@@ -1,25 +1,21 @@
 ﻿using Abp.Localization;
-using Ermes;
 using Ermes.Attributes;
+using Ermes.Authorization;
+using Ermes.Dto;
+using Ermes.Enums;
 using Ermes.GeoJson;
 using Ermes.GeoJson.Dto;
 using Ermes.Helpers;
 using Ermes.Interfaces;
+using Ermes.Net.MimeTypes;
+using Ermes.Organizations;
+using Ermes.Persons;
 using Microsoft.AspNetCore.Mvc;
 using NetTopologySuite.Geometries;
 using NSwag.Annotations;
-using System.Threading.Tasks;
-using Ermes.Web.Controllers;
 using System;
-using Ermes.Authorization;
-using Ermes.Organizations;
 using System.Collections.Generic;
-using Ermes.Enums;
-using Ermes.Persons;
-using Ermes.Web.Controllers.Dto;
-using Ermes.Net.MimeTypes;
-using System.IO;
-using Ermes.Dto;
+using System.Threading.Tasks;
 
 namespace Ermes.Web.Controllers
 {
@@ -36,10 +32,10 @@ namespace Ermes.Web.Controllers
         private const string FILE_NAME = "collection_{0}.json";
 
         public GeoJsonController(
-            IGeoJsonBulkRepository geoJsonBulkRepository, 
-            ErmesAppSession session, 
-            ILanguageManager languageManager, 
-            ErmesPermissionChecker permissionChecker, 
+            IGeoJsonBulkRepository geoJsonBulkRepository,
+            ErmesAppSession session,
+            ILanguageManager languageManager,
+            ErmesPermissionChecker permissionChecker,
             OrganizationManager organizationManager,
             PersonManager personManager,
             IAppFolders appFolders)
@@ -128,7 +124,7 @@ namespace Ermes.Web.Controllers
             else
                 communicationScopeTypes = input.CommunicationScopeTypes;
 
-            List<CommunicationRestrictionType> communicationRestrictionTypes = 
+            List<CommunicationRestrictionType> communicationRestrictionTypes =
                 input.CommunicationRestrictionTypes == null || (input.CommunicationRestrictionTypes.Count == 1 && input.CommunicationRestrictionTypes.Contains(CommunicationRestrictionType.None)) ? new List<CommunicationRestrictionType>() { CommunicationRestrictionType.None, CommunicationRestrictionType.Organization, CommunicationRestrictionType.Professional, CommunicationRestrictionType.Citizen } : input.CommunicationRestrictionTypes;
 
             if (communicationScopeTypes.Contains(CommunicationScopeType.Public))
