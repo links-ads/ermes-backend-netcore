@@ -77,7 +77,7 @@ namespace Ermes.Bus
                         ""language"":""en"",
                         ""category"":""Met"",
                         ""event"":""Probability of fire"",
-                        ""expires"":""2023-03-10T12:37:18+02:00"",
+                        ""expires"":""2023-03-11T12:37:18+02:00"",
                         ""description"":""Estimated alert level YELLOW.\r\nThe following prescriptions apply:\r\nDo not throw away cigarette butts or matches that are still lit.\r\nDo not light fires in the woods, except in designated areas.\r\nDo not park our cars over grass or dry leaves.\r\nDo not abandon litter in the woods.\r\nDo not burn stubble or agricultural residues near the forest or uncultivated areas.\r\nIn case of a forest fire, we immediately notify the appropriate authorities at 112.\r\nDo not stop to watch the fire along the road or in areas above the fire or downwind.\r\nLet's facilitate the intervention of emergency vehicles.\r\nIf we are in the fire, let's secure an escape route to the already burned area.\r\nDo not stop the vehicle in open areas free of vegetation with lights on, close windows and vents.\r\nAll citizens can defend the territory in the event of fire by promptly reporting the first signs of a possible forest fire to the single emergency number 112.\n We suggest to create a communication to citizens in the reference area: 2"",
                         ""area"": [
         {

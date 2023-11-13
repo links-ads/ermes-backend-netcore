@@ -134,6 +134,8 @@
     <Compile Include="Migrations\20230627080657_Alert_FullAreaOfInterest_Added.Designer.cs" />
     <Compile Include="Migrations\20230707093340_Alert_AreasOfInterest_Added.cs" />
     <Compile Include="Migrations\20230707093340_Alert_AreasOfInterest_Added.Designer.cs" />
+    <Compile Include="Migrations\20231113091654_Communication_Message_MaxLengthRemoved.cs" />
+    <Compile Include="Migrations\20231113091654_Communication_Message_MaxLengthRemoved.Designer.cs" />
     <Compile Include="Migrations\ErmesDbContextModelSnapshot.cs" />
     <Compile Include="Migrations\Seed\ModelBuilderExtensions.cs" />
   </ItemGroup>

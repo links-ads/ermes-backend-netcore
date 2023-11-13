@@ -15,6 +15,7 @@ using Abp.SocialMedia;
 using Abp.Timing;
 using Castle.Facilities.Logging;
 using Ermes.Configuration;
+using Ermes.Dss;
 using Ermes.EntityFrameworkCore;
 using Ermes.ExternalServices.Csi.Configuration;
 using Ermes.ExternalServices.Externals;
@@ -108,6 +109,10 @@ namespace Ermes.Web.Startup
             );
             services.Configure<ExternalsSettings>(
                 _appConfiguration.GetSection("Externals")
+            );
+
+            services.Configure<DssSettings>(
+                _appConfiguration.GetSection("Dss")
             );
 
 
