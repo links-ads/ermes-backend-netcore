@@ -1,6 +1,6 @@
 Ver.
 --------------------------------
-
+- Feature - Alert for citizens are converted in Communications (appsettings update)(#166)
 
 Ver. 4.16.0 - 2023-10-24
 --------------------------------

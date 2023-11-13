@@ -14,11 +14,9 @@ namespace Ermes.Communications
     [Table("communications")]
     public class Communication : AuditedEntity
     {
-        public const int MaxMessageLength = 1000;
         public Communication() { }
 
         [Required]
-        [StringLength(MaxMessageLength)]
         public string Message { get; set; }
         public NpgsqlRange<DateTime> Duration { get; set; }
         [Required]

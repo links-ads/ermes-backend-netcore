@@ -55,7 +55,6 @@ using Ermes.Tips;
 using Ermes.Users.Dto;
 using io.fusionauth.domain;
 using NetTopologySuite.Geometries;
-using NetTopologySuite.GeometriesGraph;
 using NetTopologySuite.IO;
 using NpgsqlTypes;
 using System;
@@ -283,7 +282,7 @@ namespace Ermes
             configuration.CreateMap<CapArea, RabbitMqAlertArea>().ReverseMap();
 
             configuration.CreateMap<Alert, Communication>()
-                .ForMember(comm => comm.Duration, options => options.MapFrom(b => new NpgsqlRange<DateTime>(b.Sent, b.Sent.AddDays(1))))
+                .ForMember(comm => comm.Duration, options => options.MapFrom(b => new NpgsqlRange<DateTime>(b.Sent, b.Info != null ? b.Info.First().Expires : b.Sent.AddDays(1))))
                 .ForMember(comm => comm.Restriction, options => options.MapFrom(a => CommunicationRestrictionType.Citizen))
                 .ForMember(comm => comm.Scope, options => options.MapFrom(a => CommunicationScopeType.Restricted))
                 .ForMember(comm => comm.Id, options => options.Ignore());
