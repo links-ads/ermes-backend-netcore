@@ -316,7 +316,8 @@ namespace Ermes.Enums
     {
         FireAndBurnedArea,
         PostEventMonitoring,
-        WildfireSimulation
+        WildfireSimulation,
+        FloodedArea
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
