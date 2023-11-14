@@ -9,7 +9,7 @@ using System.Text;
 
 namespace Ermes.Actions.Dto
 {
-    [AutoMap(typeof(PersonAction), typeof(PersonActionTracking), typeof(PersonActionActivity), typeof(PersonActionStatus))]
+    [AutoMap(typeof(PersonAction), typeof(PersonActionTracking), typeof(PersonActionActivity), typeof(PersonActionStatus), typeof(PersonActionSharingPosition))]
     public class PersonActionDto
     {
         public int Id { get; set; }
