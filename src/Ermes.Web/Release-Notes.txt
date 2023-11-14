@@ -1,5 +1,9 @@
 Ver.
 --------------------------------
+
+
+Ver. 4.17.0 - 2023-11-14
+--------------------------------
 - Feature - Alert for citizens are converted in Communications (appsettings update)(#166)
 - Feature - Management of Map request of type Flood (sdk to be updated)(layers to be imported)(#167)
 
