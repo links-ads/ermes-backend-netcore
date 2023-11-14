@@ -3,25 +3,23 @@ using Ermes.Enums;
 using Ermes.Helpers;
 using Ermes.Persons;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 
 namespace Ermes.Notifications
 {
     [Table("notifications")]
-    public class Notification: Entity<Guid>
+    public class Notification : Entity<Guid>
     {
-        private const int MaxNameLength = 255;
-        private const int MaxTitleLength = 100;
-        public const int MaxMessageLength = 1024;
-        public const int MaxFailureMessageLenght = 200;
+        private const int MAX_NAME_LENGTH = 255;
+        private const int MAX_TITLE_LENGTH = 100;
+        public const int MAX_MESSAGE_LENGTH = 1024;
+        public const int MAX_FAILURE_MESSAGE_LENGTH = 200;
 
         /// <summary>
         /// Name of the notification (i.e. MissionCreate, CommunicationUpdate,  WorkingHoursExceded, etc..)
         /// </summary>
-        [StringLength(MaxNameLength)]
+        [StringLength(MAX_NAME_LENGTH)]
         public string Name { get; set; }
 
         [ForeignKey("ReceiverId")]
@@ -57,9 +55,9 @@ namespace Ermes.Notifications
         [NotMapped]
         public EntityType Entity { get; set; }
 
-        [StringLength(MaxTitleLength)]
+        [StringLength(MAX_TITLE_LENGTH)]
         public string Title { get; set; }
-        [StringLength(MaxMessageLength)]
+        [StringLength(MAX_MESSAGE_LENGTH)]
         public string Message { get; set; }
 
         [ForeignKey("CreatorId")]
@@ -67,7 +65,7 @@ namespace Ermes.Notifications
         public long? CreatorId { get; set; }
         public DateTime Timestamp { get; set; }
 
-        [StringLength(MaxFailureMessageLenght)]
+        [StringLength(MAX_FAILURE_MESSAGE_LENGTH)]
         public string FailureMessage { get; set; }
 
     }

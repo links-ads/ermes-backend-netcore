@@ -85,7 +85,7 @@ namespace Ermes.Notifiers
             }
             catch (Exception ex)
             {
-                failureMessage = ex.Message.Truncate(Notification.MaxFailureMessageLenght);
+                failureMessage = ex.Message.Truncate(Notification.MAX_FAILURE_MESSAGE_LENGTH);
                 Logger.ErrorFormat("Ermes: Failure to send bus message for {1} {2} due exception {3}. EntityId: {0}", entityId, action.ToString(), entityType.ToString(), ex.Message);
             }
 
@@ -98,7 +98,7 @@ namespace Ermes.Notifiers
                     Entity = entityType,
                     EntityId = entityId,
                     Title = null,
-                    Message = payload.Truncate(Notification.MaxMessageLength),
+                    Message = payload.Truncate(Notification.MAX_MESSAGE_LENGTH),
                     Name = NotificationNameHelper.GetNotificationName(entityType, action),
                     ReceiverId = null,
                     Status = failureMessage == null ? NotificationStatus.Ok : NotificationStatus.Failed,
@@ -165,7 +165,7 @@ namespace Ermes.Notifiers
                     catch (Exception e)
                     {
                         Logger.InfoFormat("Ermes: PushNotifier not available: {0}", e.Message);
-                        failureMessage = e.Message.Truncate(Notification.MaxFailureMessageLenght);
+                        failureMessage = e.Message.Truncate(Notification.MAX_FAILURE_MESSAGE_LENGTH);
                         pushResult = null;
                     }
                     try
@@ -219,7 +219,7 @@ namespace Ermes.Notifiers
                     {
                         Logger.ErrorFormat("Ermes: Chatbot not available: {0}", e.Message);
                         webApiResult = null;
-                        failureMessage = e.Message.Truncate(Notification.MaxFailureMessageLenght);
+                        failureMessage = e.Message.Truncate(Notification.MAX_FAILURE_MESSAGE_LENGTH);
                     }
                     try
                     {
@@ -232,7 +232,7 @@ namespace Ermes.Notifiers
                                 Entity = entityType,
                                 EntityId = entityId,
                                 Title = title.Params != null ? L(title.Key, title.Params) : L(title.Key),
-                                Message = body.Params != null ? L(body.Key, body.Params) : L(body.Key),
+                                Message = (body.Params != null ? L(body.Key, body.Params) : L(body.Key)).Truncate(Notification.MAX_MESSAGE_LENGTH),
                                 Name = NotificationNameHelper.GetNotificationName(entityType, action),
                                 ReceiverId = per.Id,
                                 Status = webApiResult == null ? NotificationStatus.SystemDisabled : webApiResult.Contains(per.FusionAuthUserGuid.ToString()) ? NotificationStatus.Ok : NotificationStatus.Failed,
