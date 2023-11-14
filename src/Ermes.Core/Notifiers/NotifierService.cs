@@ -153,7 +153,7 @@ namespace Ermes.Notifiers
                     //1) Send Push Notification
                     BaseNotificationData notData = new BaseNotificationData()
                     {
-                        Body = body.Params != null ? L(body.Key, body.Params) : L(body.Key),
+                        Body = (body.Params != null ? L(body.Key, body.Params) : L(body.Key)).Truncate(Notification.MAX_MESSAGE_LENGTH-1),
                         Title = title.Params != null ? L(title.Key, title.Params) : L(title.Key),
                         Receivers = receivers.Where(p => p.RegistrationToken != null).Select(p => p.RegistrationToken).ToList()
                     };
