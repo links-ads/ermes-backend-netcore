@@ -39,7 +39,8 @@ namespace Ermes.Notifiers
                 //Exclude persons in status = Off; citizens are by default in status = Ready
                 var statusTypes = new List<ActionStatusType>() { ActionStatusType.Active, ActionStatusType.Moving, ActionStatusType.Ready };
 
-                var items = _geoJsonBulkRepository.GetPersonActions(comm.Duration.LowerBound, comm.Duration.UpperBound, organizationReceiverIds?.ToArray(), statusTypes, null, comm.AreaOfInterest, null, "en", comm.Scope, comm.Restriction);
+                //Include persons that can be considered active 24h before communication lower bound
+                var items = _geoJsonBulkRepository.GetPersonActions(comm.Duration.LowerBound.AddHours(-24), comm.Duration.UpperBound, organizationReceiverIds?.ToArray(), statusTypes, null, comm.AreaOfInterest, null, "en", comm.Scope, comm.Restriction);
 
                 var actions = JsonConvert.DeserializeObject<PersonActionList>(items);
                 actions.PersonActions ??= new List<PersonActionSharingPosition>();
