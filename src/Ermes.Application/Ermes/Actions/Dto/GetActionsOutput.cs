@@ -1,9 +1,4 @@
-﻿using Ermes.Enums;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Ermes.Actions.Dto
 {
