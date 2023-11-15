@@ -1,6 +1,6 @@
 Ver.
 --------------------------------
-
+- Feature - Information about stations addded in GetStatistics (sdk to be updated)(#168)
 
 Ver. 4.17.0 - 2023-11-14
 --------------------------------
