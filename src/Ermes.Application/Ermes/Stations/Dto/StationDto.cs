@@ -1,7 +1,5 @@
 ﻿using Ermes.Dto.Spatial;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Ermes.Stations.Dto
 {
@@ -16,5 +14,6 @@ namespace Ermes.Stations.Dto
         public PointPosition Location { get; set; }
         public decimal Altitude { get; set; }
         public List<SensorDto> Sensors { get; set; }
+        public bool IsOnline { get; set; }
     }
 }

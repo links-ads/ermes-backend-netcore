@@ -4,7 +4,7 @@
       "commandName": "IISExpress",
       "launchBrowser": true,
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "SafersDevelopment"
+        "ASPNETCORE_ENVIRONMENT": "SafersLocal"
       }
     },
     "Ermes.Web": {
