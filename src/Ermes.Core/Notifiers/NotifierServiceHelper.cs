@@ -49,6 +49,7 @@ namespace Ermes.Notifiers
                         switch (mr.Type)
                         {
                             case MapRequestType.FireAndBurnedArea:
+                            case MapRequestType.FloodedArea:
                                 var typedBody1 = ObjectMapper.Map<MapRequestFireAndBurnedAreaBody>(body);
                                 typedBody1.frequency = mr.Frequency;
                                 typedBody1.resolution = mr.Resolution;
