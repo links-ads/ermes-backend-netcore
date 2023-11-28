@@ -2,6 +2,8 @@
 using Abp.AzureCognitiveServices.CognitiveServices;
 using Abp.BackgroundJobs;
 using Abp.UI;
+using Ermes.Activities.Dto;
+using Ermes.Activities;
 using Ermes.Attributes;
 using Ermes.Authorization;
 using Ermes.Categories;
@@ -36,6 +38,7 @@ namespace Ermes.Web.Controllers
         private readonly IBackgroundJobManager _backgroundJobManager;
         private readonly IOptions<ErmesSettings> _ermesSettings;
         private readonly IOptions<FusionAuthSettings> _fusionAuthSettings;
+        private readonly ActivityManager _activityManager;
 
         public ExternalsController(
                         ReportManager reportManager,
@@ -48,7 +51,8 @@ namespace Ermes.Web.Controllers
                         ICognitiveServicesManager cognitiveServicesManager,
                         IOptions<ErmesSettings> ermesSettings,
                         IOptions<FusionAuthSettings> fusionAuthSettings,
-                        IBackgroundJobManager backgroundJobManager)
+                        IBackgroundJobManager backgroundJobManager,
+                        ActivityManager activityManager)
         {
             _httpContextAccessor = httpContextAccessor;
             _reportManager = reportManager;
@@ -61,6 +65,7 @@ namespace Ermes.Web.Controllers
             _cognitiveServicesManager = cognitiveServicesManager;
             _ermesSettings = ermesSettings;
             _fusionAuthSettings = fusionAuthSettings;
+            _activityManager = activityManager;
         }
 
         [Route("api/services/app/Externals/CreateOrUpdateReport")]
@@ -125,6 +130,24 @@ namespace Ermes.Web.Controllers
                 throw new UserFriendlyException(L("InvalidEntityId", "Report", input.Report.Id));
 
             return res;
+        }
+
+        [Route("api/services/app/Externals/GetActivities")]
+        [OpenApiOperation("Get Activities",
+            @"
+                This api provides the list of all possible activies that a person can perform during his working session. Only leaf activity of the hierarchy are returned.
+                Input: FullList. If true, all activities are returned, otherwise, only leaf activities will be included in the result list
+                Output: list of ActivityDto items
+            "
+        )]
+        public virtual async Task<GetActivitiesOutput> GetActivities(GetActivitiesInput input)
+        {
+            List<Activity> actList = input.FullList ? await _activityManager.GetAllAsync() : await _activityManager.GetLeafActivities();
+
+            return new GetActivitiesOutput()
+            {
+                Activities = ObjectMapper.Map<List<ActivityDto>>(actList)
+            };
         }
 
     }

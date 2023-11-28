@@ -1,22 +1,16 @@
 ﻿using Abp.Application.Services.Dto;
-using Abp.AutoMapper;
 using Abp.Linq.Extensions;
-using Abp.ObjectMapping;
 using Abp.UI;
 using Ermes.Attributes;
 using Ermes.Authorization;
 using Ermes.CompetenceAreas;
 using Ermes.Dto.Datatable;
-using Ermes.Helpers;
 using Ermes.Linq.Extensions;
 using Ermes.Organizations.Dto;
 using Ermes.Persons;
-using Ermes.Persons.Dto;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Ermes.Organizations
@@ -26,13 +20,11 @@ namespace Ermes.Organizations
     {
         private readonly OrganizationManager _organizationManager;
         private readonly CompetenceAreaManager _compAreaManager;
-        private readonly IObjectMapper _objectMapper;
         private readonly PersonManager _personManager;
         private readonly ErmesAppSession _session;
         private readonly ErmesPermissionChecker _permissionChecker;
         public OrganizationsAppService(
-                OrganizationManager organizationManager, 
-                IObjectMapper objectMapper,
+                OrganizationManager organizationManager,
                 CompetenceAreaManager compAreaManager,
                 PersonManager personManager,
                 ErmesAppSession session,
@@ -40,7 +32,6 @@ namespace Ermes.Organizations
             )
         {
             _organizationManager = organizationManager;
-            _objectMapper = objectMapper;
             _compAreaManager = compAreaManager;
             _personManager = personManager;
             _session = session;
@@ -63,11 +54,11 @@ namespace Ermes.Organizations
                     throw new UserFriendlyException(L("MissingPermission"));
             }
 
-            if(! (await _organizationManager.CheckParent(newOrganization.ParentId)))
+            if (!(await _organizationManager.CheckParent(newOrganization.ParentId)))
                 throw new UserFriendlyException(L("InvalidParentId", newOrganization.ParentId.Value));
 
-            var newOrg = _objectMapper.Map<Organization>(newOrganization);
-            
+            var newOrg = ObjectMapper.Map<Organization>(newOrganization);
+
             var newOrgId = await _organizationManager.InsertOrganizationAsync(newOrg);
             Logger.Info("Ermes: CreateOrganization with new Id: " + newOrgId);
             return newOrgId;
@@ -89,7 +80,7 @@ namespace Ermes.Organizations
 
             var org = await _organizationManager.GetOrganizationByIdAsync(updatedOrganization.Id);
 
-            _objectMapper.Map(updatedOrganization, org);
+            ObjectMapper.Map(updatedOrganization, org);
             Logger.Info("Ermes: UpdateOrganization with name: " + updatedOrganization.Name);
             return updatedOrganization;
         }
@@ -123,7 +114,7 @@ namespace Ermes.Organizations
             }
 
             var items = await query.ToListAsync();
-            result.Items = _objectMapper.Map<List<OrganizationDto>>(items);
+            result.Items = ObjectMapper.Map<List<OrganizationDto>>(items);
             return result;
         }
         #endregion
@@ -141,7 +132,7 @@ namespace Ermes.Organizations
             return res;
         }
 
-        
+
         public virtual async Task<DTResult<OrganizationDto>> GetOrganizations(GetOrganizationsInput input)
         {
             PagedResultDto<OrganizationDto> result = await InternalGetOrganizations(input);
@@ -158,7 +149,7 @@ namespace Ermes.Organizations
                 throw new UserFriendlyException(L("OrganizationCannotBeDeleted", input.OrganizationId));
 
             var person = _session.LoggedUserPerson;
-            if(!person.OrganizationId.HasValue)
+            if (!person.OrganizationId.HasValue)
             {
                 if (_permissionChecker.IsGranted(_session.Roles, AppPermissions.Organizations.Organization_CanDeleteCrossOrganization))
                     await _organizationManager.DeleteOrganizationAsync(input.OrganizationId);
@@ -167,7 +158,7 @@ namespace Ermes.Organizations
             }
             else
             {
-                if(person.OrganizationId.Value == org.Id || person.OrganizationId.Value == org.ParentId)
+                if (person.OrganizationId.Value == org.Id || person.OrganizationId.Value == org.ParentId)
                     await _organizationManager.DeleteOrganizationAsync(input.OrganizationId);
                 else
                     throw new UserFriendlyException(L("MissingPermission"));

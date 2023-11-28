@@ -1,12 +1,8 @@
-﻿using Abp.ObjectMapping;
-using Ermes;
-using Ermes.Activities.Dto;
+﻿using Ermes.Activities.Dto;
 using Ermes.Attributes;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 using NSwag.Annotations;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Ermes.Activities
 {
@@ -14,11 +10,9 @@ namespace Ermes.Activities
     public class ActivitiesAppService : ErmesAppServiceBase, IActivitiesAppService
     {
         private readonly ActivityManager _activityManager;
-        private readonly IObjectMapper _objectMapper;
-        public ActivitiesAppService(ActivityManager activityManager, IObjectMapper objectMapper)
+        public ActivitiesAppService(ActivityManager activityManager)
         {
             _activityManager = activityManager;
-            _objectMapper = objectMapper;
         }
 
         [OpenApiOperation("Get Activities",
@@ -32,14 +26,14 @@ namespace Ermes.Activities
         {
             List<Activity> actList;
 
-            if(input.FullList)
+            if (input.FullList)
                 actList = await _activityManager.GetAllAsync();
             else
                 actList = await _activityManager.GetLeafActivities();
-                                    
+
             return new GetActivitiesOutput()
             {
-                Activities = _objectMapper.Map<List<ActivityDto>>(actList)
+                Activities = ObjectMapper.Map<List<ActivityDto>>(actList)
             };
         }
     }
