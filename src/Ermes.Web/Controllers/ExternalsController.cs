@@ -146,8 +146,11 @@ namespace Ermes.Web.Controllers
             };
         }
 
+
+        /// Duplication of code contained in ActionsAppService, optimization required
         [Route("api/services/app/Externals/CreatePersonAction")]
         [HttpPost]
+        [SwaggerResponse(typeof(CreatePersonActionOutput))]
         [OpenApiOperation("Create Person Action",
             @"
                         There are four types of actions a person can perform:
@@ -163,7 +166,7 @@ namespace Ermes.Web.Controllers
                         Output: the actions that has been created
                     "
         )]
-        public virtual async Task<CreatePersonActionOutput> CreatePersonAction(CreatePersonActionForExternalsInput input)
+        public virtual async Task<CreatePersonActionOutput> CreatePersonAction([FromBody] CreatePersonActionForExternalsInput input)
         {
             var res = new CreatePersonActionOutput();
 
@@ -231,7 +234,7 @@ namespace Ermes.Web.Controllers
                     res.PersonAction = ObjectMapper.Map<PersonActionDto>(p_status);
                     break;
                 case PersonActionType.PersonActionActivity:
-                    var activity = await _activityManager.getActivityTranslationByCoreIdAndLangAsync(input.PersonAction.ActivityId, _languageManager.CurrentLanguage.Name);
+                    var activity = await _activityManager.getActivityTranslationByCoreIdAndLangAsync(input.PersonAction.ActivityId, "it");
                     if (activity == null)
                         throw new UserFriendlyException(400, L("InvalidActivityId"));
                     var p_activity = ObjectMapper.Map<PersonActionActivity>(input.PersonAction);
@@ -265,7 +268,7 @@ namespace Ermes.Web.Controllers
             return res;
         }
 
-        private async Task<Tuple<Person,int, List<string>>> GetExternalPersonAsync(int volterId)
+        private async Task<Tuple<Person, int, List<string>>> GetExternalPersonAsync(int volterId)
         {
             var roleList = new List<string>() { AppRoles.FIRST_RESPONDER };
 

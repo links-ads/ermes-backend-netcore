@@ -20,6 +20,7 @@ namespace Ermes.Activities
         protected IRepository<ActivityTranslation> ActivityTranslationRepository { get; set; }
         private readonly PersonManager PersonManager;
         private readonly OrganizationManager OrganizationManager;
+        ///private readonly CsiManager OrganizationManager;
 
         public ActivityManager(
             IRepository<Activity> activityRepository, 
@@ -69,41 +70,6 @@ namespace Ermes.Activities
         {
             var parentListId = await Activities.Where(a => a.ParentId.HasValue).Select(a => a.ParentId.Value).ToListAsync();
             return await Activities.Where(a => a.ParentId.HasValue || !parentListId.Contains(a.Id)).ToListAsync();
-        }
-
-        public async Task CreateInterventionAsync(long personId, double? latitude, double? longitude, DateTime timestamp, ActionStatusType status, string activityName = "Sorveglianza")
-        {
-            var person = await _personManager.GetPersonByIdAsync(personId);
-            /*
-             * Some persons inside Protezione Civile Piemonte do not have an associated legacyId
-             * but they can operate on the field. In this case it is not necessary to open/close an intervention
-             */
-            if (!person.OrganizationId.HasValue || !person.LegacyId.HasValue)
-                return;
-
-            //It is not necessary to create an intervention when first responder goes back to Active status without passing through Off status
-            //Example: Active -> Moving -> Active -> Off
-            //This must create only one Intervention
-            if (person.CurrentOperationLegacyId.HasValue && status == ActionStatusType.Active)
-                return;
-
-            var refOrg = await _organizationManager.GetOrganizationByIdAsync(person.OrganizationId.Value);
-            var housePartner = await SettingManager.GetSettingValueAsync(AppSettings.General.HouseOrganization);
-            if (refOrg.Name == housePartner || (refOrg.ParentId.HasValue && refOrg.Parent.Name == housePartner))
-            {
-                var operationLegacyId = await _csiManager.InsertInterventiVolontariAsync(personId, person.LegacyId.Value, latitude, longitude, activityName, timestamp, status == ActionStatusType.Off ? AppConsts.CSI_OFFLINE : AppConsts.CSI_ACTIVITY, person.CurrentOperationLegacyId);
-                if (operationLegacyId > 0)
-                {
-                    if (status == ActionStatusType.Off)
-                        person.CurrentOperationLegacyId = null;
-                    else if (status == ActionStatusType.Active)
-                        person.CurrentOperationLegacyId = operationLegacyId;
-                }
-                else
-                {
-                    Logger.ErrorFormat("####CreateInterventionAsync failed for personId:{0} at Timestamp {1}", personId, timestamp);
-                }
-            }
         }
     }
 }
