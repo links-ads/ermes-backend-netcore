@@ -347,7 +347,7 @@ namespace Ermes.Migrations
                             ('REP.1', 'Reporting', 'DoReport', 5, 'Do a report'),
                             ('REP.2', 'Reporting', 'FirstReport', 10, 'This is the first report created by the user'),
 
-                            ('REW.1', 'Reviewing', 'VoteReport', 1, 'Vote a report'),
+                            ('REW.1', 'Reviewing', 'ValidateReport', 1, 'Validate a report'),
                             ('REW.2', 'Reviewing', 'ReportGetValidatedByPeer', 1, 'Report has been validated by a peer'),
                             ('REW.3', 'Reviewing', 'ReportGetRejectedByPeer', -1, 'Report has been rejected by a peer'),
                             ('REW.4', 'Reviewing', 'ReportGetValidatedByPro', 5, 'Report has been validated by a professional'),

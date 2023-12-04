@@ -1,10 +1,14 @@
-﻿using Abp.Domain.Repositories;
+﻿using Abp;
+using Abp.Domain.Repositories;
 using Abp.Domain.Services;
+using Ermes.Configuration;
+using Ermes.Enums;
+using Ermes.Organizations;
+using Ermes.Persons;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Ermes.Activities
@@ -13,12 +17,21 @@ namespace Ermes.Activities
     {
         public IQueryable<Activity> Activities { get { return ActivityRepository.GetAll().Include(a => a.Translations); } }
         protected IRepository<Activity> ActivityRepository { get; set; }
-        protected IRepository<ActivityTranslation> ActivityTranslationRepository {get; set;}
+        protected IRepository<ActivityTranslation> ActivityTranslationRepository { get; set; }
+        private readonly PersonManager PersonManager;
+        private readonly OrganizationManager OrganizationManager;
+        ///private readonly CsiManager OrganizationManager;
 
-        public ActivityManager(IRepository<Activity> activityRepository, IRepository<ActivityTranslation> activityTranslationRepository)
+        public ActivityManager(
+            IRepository<Activity> activityRepository, 
+            IRepository<ActivityTranslation> activityTranslationRepository,
+            PersonManager personManager,
+            OrganizationManager organizationManager)
         {
             ActivityRepository = activityRepository;
             ActivityTranslationRepository = activityTranslationRepository;
+            PersonManager = personManager;
+            OrganizationManager = organizationManager;
         }
 
         public async Task<List<Activity>> GetAllAsync()
