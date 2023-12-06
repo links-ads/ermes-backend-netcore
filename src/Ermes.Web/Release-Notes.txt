@@ -1,5 +1,9 @@
 Ver.
 --------------------------------
+
+
+Ver. 4.17.2 - 2023-12-06
+--------------------------------
 - Feature - APIs for externals added (#169)
 - Feature - PRO alert converted in communication (#170)
 
