@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Ermes.Activities.Dto
+﻿namespace Ermes.Activities.Dto
 {
     public class GetActivitiesInput
     {

@@ -1,13 +1,11 @@
 ﻿using Abp.Domain.Repositories;
 using Abp.Domain.Services;
 using Ermes.Enums;
-using Ermes.Missions;
 using Microsoft.EntityFrameworkCore;
 using NpgsqlTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Ermes.Communications
@@ -35,19 +33,29 @@ namespace Ermes.Communications
 
         public async Task<int> CreateOrUpdateCommunicationAsync(Communication co, List<int> receivers = null)
         {
-            var coId = await CommunicationRepository.InsertOrUpdateAndGetIdAsync(co);
+            co.Id = await CommunicationRepository.InsertOrUpdateAndGetIdAsync(co);
+            ManageReceivers(co, receivers);
+            return co.Id;
+        }
 
+        public int CreateOrUpdateCommunication(Communication co, List<int> receivers = null)
+        {
+            co.Id = CommunicationRepository.InsertOrUpdateAndGetId(co);
+            ManageReceivers(co, receivers);
+            return co.Id;
+        }
+
+        private void ManageReceivers(Communication co, List<int> receivers = null)
+        {
             if (co.Scope == CommunicationScopeType.Restricted && co.Restriction == CommunicationRestrictionType.Organization && receivers != null)
             {
                 foreach (var receiver in receivers)
                 {
-                    var newItem = new CommunicationReceiver(coId, receiver);
+                    var newItem = new CommunicationReceiver(co.Id, receiver);
                     CommunicationReceiverRepository.Insert(newItem);
                     co.CommunicationReceivers.Add(newItem);
                 }
             }
-
-            return coId;
         }
 
         public async Task DeleteCommunicationAsync(Communication co)

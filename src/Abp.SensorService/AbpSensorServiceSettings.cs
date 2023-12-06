@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Abp.SensorService
+﻿namespace Abp.SensorService
 {
     public class AbpSensorServiceSettings
     {

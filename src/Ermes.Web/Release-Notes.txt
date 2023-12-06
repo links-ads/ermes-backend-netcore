@@ -2,6 +2,20 @@ Ver.
 --------------------------------
 - Feature - Auth Controller added (appsettings updated)(Fusion auth to be update)(#142)
 
+Ver. 4.17.2 - 2023-12-06
+--------------------------------
+- Feature - APIs for externals added (#169)
+- Feature - PRO alert converted in communication (#170)
+
+Ver. 4.17.1 - 2023-11-15
+--------------------------------
+- Feature - Information about stations addded in GetStatistics (sdk to be updated)(#168)
+
+Ver. 4.17.0 - 2023-11-14
+--------------------------------
+- Feature - Alert for citizens are converted in Communications (appsettings update)(#166)
+- Feature - Management of Map request of type Flood (sdk to be updated)(layers to be imported)(#167)
+
 Ver. 4.16.0 - 2023-10-24
 --------------------------------
 - Feature - New APIs for Externals added, auth management through API Key (appsettings update)(#163)

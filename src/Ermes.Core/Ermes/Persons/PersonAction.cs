@@ -1,12 +1,10 @@
-﻿using Abp.Domain.Entities;
-using Abp.Domain.Entities.Auditing;
+﻿using Abp.Domain.Entities.Auditing;
 using Ermes.Activities;
 using Ermes.Enums;
 using Ermes.Helpers;
-using Ermes.Interfaces;
-using Ermes.Organizations;
 using NetTopologySuite.Geometries;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -50,5 +48,10 @@ namespace Ermes.Persons
 
         [Column(TypeName = "jsonb")]
         public string CurrentExtensionData { get; set; }
+    }
+
+    public class PersonActionList
+    {
+        public List<PersonActionSharingPosition> PersonActions { get; set; }
     }
 }

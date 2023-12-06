@@ -55,8 +55,8 @@ using Ermes.Tips;
 using Ermes.Users.Dto;
 using io.fusionauth.domain;
 using NetTopologySuite.Geometries;
-using NetTopologySuite.GeometriesGraph;
 using NetTopologySuite.IO;
+using NpgsqlTypes;
 using System;
 using System.Linq;
 
@@ -280,6 +280,10 @@ namespace Ermes
                 .ReverseMap();
             configuration.CreateMap<CapArea, CapAreaDto>();
             configuration.CreateMap<CapArea, RabbitMqAlertArea>().ReverseMap();
+
+            configuration.CreateMap<Alert, Communication>()
+                .ForMember(comm => comm.Duration, options => options.MapFrom(b => new NpgsqlRange<DateTime>(b.Sent, b.Info != null ? b.Info.First().Expires : b.Sent.AddDays(1))))
+                .ForMember(comm => comm.Id, options => options.Ignore());
 
             #region GeoJsons
             configuration.CreateMap<Communication, FeatureDto<GeoJsonItem>>()

@@ -1,10 +1,8 @@
 ﻿using Abp.Domain.Repositories;
 using Abp.Domain.Services;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Ermes.Activities
@@ -13,9 +11,12 @@ namespace Ermes.Activities
     {
         public IQueryable<Activity> Activities { get { return ActivityRepository.GetAll().Include(a => a.Translations); } }
         protected IRepository<Activity> ActivityRepository { get; set; }
-        protected IRepository<ActivityTranslation> ActivityTranslationRepository {get; set;}
+        protected IRepository<ActivityTranslation> ActivityTranslationRepository { get; set; }
 
-        public ActivityManager(IRepository<Activity> activityRepository, IRepository<ActivityTranslation> activityTranslationRepository)
+        public ActivityManager(
+            IRepository<Activity> activityRepository,
+            IRepository<ActivityTranslation> activityTranslationRepository
+            )
         {
             ActivityRepository = activityRepository;
             ActivityTranslationRepository = activityTranslationRepository;

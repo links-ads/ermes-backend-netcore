@@ -1,4 +1,5 @@
 ﻿using Abp.Localization;
+using Abp.SensorService;
 using Abp.UI;
 using Ermes.Actions.Dto;
 using Ermes.Alerts;
@@ -6,7 +7,6 @@ using Ermes.Attributes;
 using Ermes.Authorization;
 using Ermes.Communications;
 using Ermes.Dashboard.Dto;
-using Ermes.Dto.Datatable;
 using Ermes.Enums;
 using Ermes.GeoJson;
 using Ermes.Helpers;
@@ -16,14 +16,13 @@ using Ermes.Missions;
 using Ermes.Organizations;
 using Ermes.Persons;
 using Ermes.Reports;
+using Ermes.Stations.Dto;
 using NetTopologySuite.Geometries;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Ermes.Dashboard
 {
@@ -41,6 +40,7 @@ namespace Ermes.Dashboard
         private readonly PersonManager _personManager;
         private readonly MapRequestManager _mapRequestManager;
         private readonly AlertManager _alertManager;
+        private readonly SensorServiceManager _sensorServiceManager;
         public DashboardAppService(
                 ReportManager reportManager,
                 MissionManager missionManager,
@@ -52,7 +52,8 @@ namespace Ermes.Dashboard
                 CommunicationManager communicationManager,
                 PersonManager personManager,
                 MapRequestManager mapRequestManager,
-                AlertManager alertManager
+                AlertManager alertManager,
+                SensorServiceManager sensorServiceManager
             )
         {
             _reportManager = reportManager;
@@ -66,6 +67,7 @@ namespace Ermes.Dashboard
             _personManager = personManager;
             _mapRequestManager = mapRequestManager;
             _alertManager = alertManager;
+            _sensorServiceManager = sensorServiceManager;
         }
         public virtual async Task<GetStatisticsOutput> GetStatistics(GetStatisticsInput input)
         {
@@ -175,6 +177,28 @@ namespace Ermes.Dashboard
             }
             //////////////////////
 
+            //Stations///////////
+            var fullStationList = await _sensorServiceManager.GetStations();
+            if (input.SouthWestBoundary != null && input.NorthEastBoundary != null)
+                fullStationList = fullStationList.Where(a => boundingBox.Contains(GeometryHelper.GetPointFromCoordinates(a.Location.Coordinates))).ToList();
+            
+            var stations = new List<StationDto>();
+            foreach (var station in fullStationList)
+            {
+                var summary = await _sensorServiceManager.GetStationSummary(station.Id, start, end);
+                var dto = ObjectMapper.Map<StationDto>(summary);
+                dto.IsOnline = dto.Sensors != null && dto.Sensors.Count > 0 && dto.Sensors.Any(a =>
+                    {
+                        var measure = a.Measurements.OrderByDescending(b => b.Timestamp).FirstOrDefault();
+                        return measure != null && measure.Timestamp > DateTime.UtcNow.AddMinutes(-10);
+                    }
+                );
+                //information about sensors not needed here
+                dto.Sensors = null;
+                stations.Add(dto);
+            }
+            //////////////////////
+
             var activations = _geoJsonBulkRepository.GetPersonActivations(start, end, ActionStatusType.Active);
             return new GetStatisticsOutput()
             {
@@ -237,7 +261,8 @@ namespace Ermes.Dashboard
                                             Label = g.Key,
                                             Value = g.Count()
                                         })
-                                        .ToList()
+                                        .ToList(),
+                Stations = stations
             };
         }
     }

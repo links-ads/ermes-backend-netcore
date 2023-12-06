@@ -732,6 +732,7 @@ namespace Ermes.GeoJson
         }
 
         //Extended version to retrieve the receivers of a communication
+        //Location field has been remapped to ActionLocation, otherwise ObjectMapper throws error while mapping to PersonActionSharingPosition
         public string GetPersonActions(
             DateTime startDate,
             DateTime endDate,
@@ -760,7 +761,7 @@ namespace Ermes.GeoJson
                     ST_Y((pa.""Location"")::geometry) as ""Latitude"",
                     ST_X((pa.""Location"")::geometry) as ""Longitude"",
                     pa.""CurrentExtensionData""::text as ""ExtensionData"",
-                    pa.""Location"",
+                    pa.""Location"" as ""ActionLocation"",
                     pa.""CurrentActivityId"" as ""ActivityId"",
                     at2.""Name"" as ""ActivityName"",
 	                pa.""Timestamp"", 
@@ -817,7 +818,7 @@ namespace Ermes.GeoJson
 
                 if (boundingBox != null)
                 {
-                    command.CommandText += @" and ST_INTERSECTS(tmp.""Location"", @boundingBox)";
+                    command.CommandText += @" and ST_INTERSECTS(tmp.""ActionLocation"", @boundingBox)";
                     var p = new NpgsqlParameter("@boundingBox", NpgsqlDbType.Geography)
                     {
                         Value = boundingBox

@@ -1,26 +1,20 @@
-﻿using Abp.Events.Bus;
+﻿using Abp.Dependency;
+using Abp.Domain.Uow;
+using Abp.Events.Bus;
 using Abp.Events.Bus.Handlers;
 using Ermes.Communications.Dto;
 using Ermes.Enums;
-using Ermes.Notifiers;
-using Ermes.Persons;
-using System.Threading.Tasks;
-using System.Linq;
-using Ermes.Reports.Dto;
+using Ermes.Gamification.Dto;
+using Ermes.MapRequests.Dto;
 using Ermes.Missions;
 using Ermes.Missions.Dto;
-using Abp.Dependency;
-using Abp.Domain.Uow;
-using Ermes.Communications;
-using Ermes.GeoJson;
-using System.Collections.Generic;
-using Newtonsoft.Json;
-using Ermes.Actions.Dto;
-using Microsoft.EntityFrameworkCore;
-using Ermes.MapRequests;
-using Ermes.MapRequests.Dto;
-using Ermes.Gamification.Dto;
+using Ermes.Notifiers;
+using Ermes.Persons;
+using Ermes.Reports.Dto;
 using Ermes.Teams.Dto;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ermes.EventHandlers
 {
@@ -44,53 +38,16 @@ namespace Ermes.EventHandlers
 
     public class CommunicationNotificationEventHandler : IAsyncEventHandler<NotificationEvent<CommunicationNotificationDto>>, ITransientDependency
     {
-        private readonly NotifierService _notifierService;
-        private readonly PersonManager _personManager;
-        private readonly CommunicationManager _communicationManager;
-        private readonly IGeoJsonBulkRepository _geoJsonBulkRepository;
-        public CommunicationNotificationEventHandler(NotifierService notifierService, PersonManager personManager, CommunicationManager communicationManager, IGeoJsonBulkRepository geoJsonBulkRepository)
+        private readonly CommunicationNotifier _communicationNotifier;
+        public CommunicationNotificationEventHandler(CommunicationNotifier communicationNotifier)
         {
-            _notifierService = notifierService;
-            _personManager = personManager;
-            _communicationManager = communicationManager;
-            _geoJsonBulkRepository = geoJsonBulkRepository;
+            _communicationNotifier = communicationNotifier;
         }
 
         [UnitOfWork]
         public virtual async Task HandleEventAsync(NotificationEvent<CommunicationNotificationDto> eventData)
         {
-            await _notifierService.SendBusNotification(eventData.CreatorId, eventData.EntityId, eventData.Content, eventData.Action, EntityType.Communication);
-
-            string titleKey = (eventData.Action == EntityWriteAction.Create) ? "Notification_Communication_Create_Title" : "Notification_Communication_Update_Title";
-            string[] bodyParams = new string[] { eventData.Content.Message };
-            //int? orgId = (await _personManager.GetPersonByIdAsync(eventData.CreatorId)).OrganizationId;
-            //if (!orgId.HasValue)
-            //    return;
-            List<long> personIdList;
-            try
-            {
-                //Need to filter receivers by the Area of Interest of the communication
-                var comm = await _communicationManager.GetCommunicationByIdAsync(eventData.EntityId);
-
-                //Exclude persons in status = Off; citizens are by default in status = Ready
-                var statusTypes = new List<ActionStatusType>() { ActionStatusType.Active, ActionStatusType.Moving, ActionStatusType.Ready };
-
-                var items = _geoJsonBulkRepository.GetPersonActions(comm.Duration.LowerBound, comm.Duration.UpperBound, eventData.Content.OrganizationReceiverIds?.ToArray(), statusTypes, null, comm.AreaOfInterest, null, "en", comm.Scope, comm.Restriction);
-                var actions = JsonConvert.DeserializeObject<GetActionsOutput>(items);
-                actions.PersonActions ??= new List<PersonActionDto>();
-                
-                personIdList = actions.PersonActions.Select(a => a.PersonId).ToList();
-            }
-            catch
-            {
-                personIdList = null;
-            }
-
-            var receivers = _personManager
-                                .Persons
-                                .Include(p => p.Organization)
-                                .Where(p => personIdList != null && personIdList.Contains(p.Id));
-            await _notifierService.SendUserNotification(eventData.CreatorId, receivers, eventData.EntityId, ("Notification_Communication_Create_Body", bodyParams), (titleKey, null), eventData.Action, EntityType.Communication);
+            await _communicationNotifier.SendCommunication(eventData.Action, eventData.EntityId, eventData.CreatorId, eventData.Content.Message, eventData.Content.OrganizationReceiverIds);
         }
     }
 
@@ -240,7 +197,7 @@ namespace Ermes.EventHandlers
                 case EntityWriteAction.FirstReport:
                     {
                         titleKey = "Notification_Gamification_FirstReport_Title";
-                        bodyKey =  "Notification_Gamification_FirstReport_Body";
+                        bodyKey = "Notification_Gamification_FirstReport_Body";
                         bodyParams = new string[] { eventData.Content.NewValue, eventData.Content.EarnedPoints.ToString() };
                         break;
                     }
@@ -251,7 +208,7 @@ namespace Ermes.EventHandlers
                         break;
                     }
             }
-            
+
             var receivers = _personManager.Persons.Where(p => p.Id == eventData.Content.PersonId);
 
             await _notifierService.SendUserNotification(eventData.CreatorId, receivers, eventData.EntityId, (bodyKey, bodyParams), (titleKey, null), eventData.Action, EntityType.Gamification, eventData.IncludeCreator);

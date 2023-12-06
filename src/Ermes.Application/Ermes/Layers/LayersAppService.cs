@@ -170,6 +170,7 @@ namespace Ermes.Layers
                         joinedLayerList
                         .Select(a => new { LayerDto = ObjectMapper.Map<LayerDto>(a.Layer), a.Details })
                         .Select(a => { a.LayerDto.Details = a.Details; return a.LayerDto; })
+                        .OrderBy(l => l.Order)
                         .ToList();
                 }
                 catch (Exception e)

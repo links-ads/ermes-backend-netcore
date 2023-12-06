@@ -3,10 +3,14 @@ using Abp.Domain.Uow;
 using Abp.SensorService;
 using Abp.SensorService.Model;
 using Abp.Threading;
+using Abp.UI;
 using Ermes.Alerts;
+using Ermes.Authorization;
+using Ermes.Communications;
 using Ermes.Consumers.Kafka;
 using Ermes.Consumers.RabbitMq;
 using Ermes.Core.Helpers;
+using Ermes.Dss;
 using Ermes.Enums;
 using Ermes.MapRequests;
 using Ermes.Missions;
@@ -15,6 +19,7 @@ using Ermes.Notifiers;
 using Ermes.Persons;
 using Ermes.Resources;
 using Ermes.Stations;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -30,11 +35,14 @@ namespace Ermes.Consumers
         private readonly PersonManager _personManager;
         private readonly NotifierService _notifierService;
         private readonly MapRequestManager _mapRequestManager;
+        private readonly CommunicationManager _communicationManager;
         private readonly NotificationManager _notificationManager;
         private readonly AlertManager _alertManager;
         private readonly StationManager _stationManager;
         private readonly IAzureManager _azureManager;
         private readonly SensorServiceManager _sensorServiceManager;
+        private readonly IOptions<DssSettings> _dssSettings;
+        private readonly CommunicationNotifier _communicationNotifier;
 
 
         public ConsumerService(
@@ -42,21 +50,27 @@ namespace Ermes.Consumers
             NotifierService notifierService,
             PersonManager personManager,
             MapRequestManager mapRequestManager,
+            CommunicationManager communicaitonManager,
             NotificationManager notificationManager,
             AlertManager alertManager,
             StationManager stationManager,
             IAzureManager azureManager,
-            SensorServiceManager sensorServiceManager)
+            SensorServiceManager sensorServiceManager,
+            IOptions<DssSettings> dssSettings,
+            CommunicationNotifier communicationNotifier)
         {
             _missionManager = missionManager;
             _notifierService = notifierService;
             _personManager = personManager;
             _mapRequestManager = mapRequestManager;
+            _communicationManager = communicaitonManager;
             _notificationManager = notificationManager;
             _alertManager = alertManager;
             _stationManager = stationManager;
             _azureManager = azureManager;
             _sensorServiceManager = sensorServiceManager;
+            _dssSettings = dssSettings;
+            _communicationNotifier = communicationNotifier;
         }
 
         public void ConsumeBusNotification(string message, string routingKey)
@@ -198,20 +212,46 @@ namespace Ermes.Consumers
                     var alert = ObjectMapper.Map<Alert>(eventData);
                     var fullGeometry = eventData.Info.First().Area.First().FullGeometry;
                     alert.BoundingBox = fullGeometry.Envelope;
-                    
                     alert.IsARecommendation = true;
-                    alert.Id = _alertManager.InsertAlertAndGetId(alert);
-                    AlertAreaOfInterest alertAreaOfInterest = new AlertAreaOfInterest(alert.Id, fullGeometry);
-                    alert.AlertAreaOfInterestId = _alertManager.InsertAlertAreaOfInterestAndGetId(alertAreaOfInterest);
+                    if (_dssSettings.Value.MustCreateAlert)
+                    {
+                        alert.Id = _alertManager.InsertAlertAndGetId(alert);
+                        AlertAreaOfInterest alertAreaOfInterest = new AlertAreaOfInterest(alert.Id, fullGeometry);
+                        alert.AlertAreaOfInterestId = _alertManager.InsertAlertAreaOfInterestAndGetId(alertAreaOfInterest);
+                    }
+
                     CurrentUnitOfWork.SaveChanges();
 
+                    string alertMessage = "";
                     foreach (var item in eventData.Info)
                     {
                         var info = ObjectMapper.Map<CapInfo>(item);
                         info.AlertId = alert.Id;
-                        _alertManager.InsertCapInfoAndGetId(info);
+                        if (_dssSettings.Value.MustCreateAlert)
+                            _alertManager.InsertCapInfoAndGetId(info);
+                        
+                        alertMessage = info.Description;
                     }
 
+                    if (_dssSettings.Value.MustConvertAlertInCommunication)
+                    {
+                        Communication com = ObjectMapper.Map<Communication>(alert);
+                        com.Message = alertMessage;
+                        com.AreaOfInterest = fullGeometry;
+                        com.CreationTime = DateTime.UtcNow;
+                        var creator = _personManager.GetPersonByUsername(ErmesConsts.DEFAULT_DSS_USERNAME);
+                        if (creator != null)
+                        {
+                            com.Creator = creator;
+                            com.CreatorUserId = creator.Id;
+                        }
+                        else
+                            throw new UserFriendlyException(L("MissingDssAccount"));
+
+                        com.Id = _communicationManager.CreateOrUpdateCommunication(com);
+
+                        AsyncHelper.RunSync(() => _communicationNotifier.SendCommunication(EntityWriteAction.Create, com.Id, com.CreatorUserId.Value, com.Message));
+                    }
 
                     CurrentUnitOfWork.SaveChanges();
                 }
