@@ -67,7 +67,7 @@ namespace Ermes.Bus
                 ""scope"":""Restricted"",
                 ""region"":""Catalonia"",
                 ""areaID"":""2"",
-                ""restriction"":""Citizen"",
+                ""restriction"":""Professional"",
                 ""organizationIds"":[
                 ],
                 ""code"":[

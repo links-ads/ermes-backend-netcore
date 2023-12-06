@@ -283,8 +283,6 @@ namespace Ermes
 
             configuration.CreateMap<Alert, Communication>()
                 .ForMember(comm => comm.Duration, options => options.MapFrom(b => new NpgsqlRange<DateTime>(b.Sent, b.Info != null ? b.Info.First().Expires : b.Sent.AddDays(1))))
-                .ForMember(comm => comm.Restriction, options => options.MapFrom(a => CommunicationRestrictionType.Citizen))
-                .ForMember(comm => comm.Scope, options => options.MapFrom(a => CommunicationScopeType.Restricted))
                 .ForMember(comm => comm.Id, options => options.Ignore());
 
             #region GeoJsons
