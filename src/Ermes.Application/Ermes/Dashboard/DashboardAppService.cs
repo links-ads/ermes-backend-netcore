@@ -178,24 +178,31 @@ namespace Ermes.Dashboard
             //////////////////////
 
             //Stations///////////
-            var fullStationList = await _sensorServiceManager.GetStations();
-            if (input.SouthWestBoundary != null && input.NorthEastBoundary != null)
-                fullStationList = fullStationList.Where(a => boundingBox.Contains(GeometryHelper.GetPointFromCoordinates(a.Location.Coordinates))).ToList();
-            
             var stations = new List<StationDto>();
-            foreach (var station in fullStationList)
+
+            try
             {
-                var summary = await _sensorServiceManager.GetStationSummary(station.Id, start, end);
-                var dto = ObjectMapper.Map<StationDto>(summary);
-                dto.IsOnline = dto.Sensors != null && dto.Sensors.Count > 0 && dto.Sensors.Any(a =>
-                    {
-                        var measure = a.Measurements.OrderByDescending(b => b.Timestamp).FirstOrDefault();
-                        return measure != null && measure.Timestamp > DateTime.UtcNow.AddMinutes(-10);
-                    }
-                );
-                //information about sensors not needed here
-                dto.Sensors = null;
-                stations.Add(dto);
+                var fullStationList = await _sensorServiceManager.GetStations();
+                if (input.SouthWestBoundary != null && input.NorthEastBoundary != null)
+                    fullStationList = fullStationList.Where(a => boundingBox.Contains(GeometryHelper.GetPointFromCoordinates(a.Location.Coordinates))).ToList();
+
+                foreach (var station in fullStationList)
+                {
+                    var summary = await _sensorServiceManager.GetStationSummary(station.Id, start, end);
+                    var dto = ObjectMapper.Map<StationDto>(summary);
+                    dto.IsOnline = dto.Sensors != null && dto.Sensors.Count > 0 && dto.Sensors.Any(a =>
+                        {
+                            var measure = a.Measurements.OrderByDescending(b => b.Timestamp).FirstOrDefault();
+                            return measure != null && measure.Timestamp > DateTime.UtcNow.AddMinutes(-10);
+                        }
+                    );
+                    //information about sensors not needed here
+                    dto.Sensors = null;
+                    stations.Add(dto);
+                }
+            }
+            catch (Exception e){
+                Logger.Warn(e.Message);
             }
             //////////////////////
 
