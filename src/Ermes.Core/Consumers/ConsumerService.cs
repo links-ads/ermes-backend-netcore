@@ -233,7 +233,7 @@ namespace Ermes.Consumers
                         alertMessage = info.Description;
                     }
 
-                    if (_dssSettings.Value.MustConvertAlertInCommunication && alert.Restriction.ToLower() == AppRoles.CITIZEN)
+                    if (_dssSettings.Value.MustConvertAlertInCommunication)
                     {
                         Communication com = ObjectMapper.Map<Communication>(alert);
                         com.Message = alertMessage;
