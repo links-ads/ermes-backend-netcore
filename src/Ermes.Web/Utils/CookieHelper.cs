@@ -53,6 +53,7 @@ namespace Ermes.Web.Utils
             };
             response.Cookies.Append("app.at", string.Empty, cookieOptions);
             response.Cookies.Append("app.rt", string.Empty, cookieOptions);
+            cookieOptions.HttpOnly = false;
             response.Cookies.Append("app.at_exp", string.Empty, cookieOptions);
             response.Cookies.Append("app.idt", string.Empty, cookieOptions);
         }
