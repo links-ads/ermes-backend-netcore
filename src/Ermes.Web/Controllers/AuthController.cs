@@ -1,13 +1,10 @@
 ﻿using Ermes.Interfaces;
 using Ermes.Web.Utils;
 using FusionAuthNetCore;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using NSwag.Annotations;
-using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Ermes.Web.Controllers
@@ -25,11 +22,11 @@ namespace Ermes.Web.Controllers
 
         [HttpGet]
         [Route("api/services/app/auth/oauth-callback")]
-        [OpenApiOperation("Exchange authorization code for token. The API returns token and refresh token to the final client")]
+        [OpenApiOperation("Exchange authorization code for token. The token and refresh token are returned inside cookies")]
         public async Task<IActionResult> TokenRetrieve(string code)
         {
             var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
-            
+
             string scheme = UrlHelper.GetSchemeFromRequest(Request);
             string domain = _ermesSettings.Value.AppDomain;
             var isThereOrigin = Request.Headers.TryGetValue("Origin", out StringValues source);
@@ -40,12 +37,13 @@ namespace Ermes.Web.Controllers
             else
                 return BadRequest("Invalid Origin Header");
 
+            Logger.InfoFormat("Scheme: {0}, Domain: {1}, isThereOrigin; {2}, RedirectUri: {3}", scheme, domain, isThereOrigin, redirectUri);
             var tokenResponse = await client.ExchangeOAuthCodeForAccessTokenAsync(code, _fusionAuthSettings.Value.ClientId, _fusionAuthSettings.Value.ClientSecret, redirectUri);
             if (tokenResponse.WasSuccessful())
             {
                 if (isThereOrigin && source[0].Contains("localhost"))
                     domain = _ermesSettings.Value.AppDomainLocal;
-                
+                Logger.InfoFormat("Domain: {0}, token:{1}", domain, tokenResponse.successResponse.access_token);
                 CookieHelper.AddAuthCookies(Response, scheme, domain, tokenResponse.successResponse);
                 return Ok();
             }
@@ -58,9 +56,15 @@ namespace Ermes.Web.Controllers
 
         [HttpGet]
         [Route("api/services/app/auth/logout-callback")]
+        [OpenApiOperation("Logout from the application. This funcion resets cookies")]
         public virtual IActionResult Logout()
         {
-            CookieHelper.ResetAuthCookies(Response);
+            string scheme = UrlHelper.GetSchemeFromRequest(Request);
+            string domain = _ermesSettings.Value.AppDomain;
+            var isThereOrigin = Request.Headers.TryGetValue("Origin", out StringValues source);
+            if (isThereOrigin && source[0].Contains("localhost"))
+                domain = _ermesSettings.Value.AppDomainLocal;
+            CookieHelper.ResetAuthCookies(Response, scheme, domain);
             return Ok();
         }
     }
