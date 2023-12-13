@@ -3,6 +3,7 @@ using io.fusionauth;
 using io.fusionauth.domain.oauth2;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Primitives;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -39,7 +40,15 @@ namespace Ermes.Web.Middlewares
                 {
                     context.Request.Cookies.TryGetValue("app.rt", out refreshToken);
                     var tokenResponse = await RefreshTokenAsync(refreshToken);
-                    CookieHelper.AddAuthCookies(context.Response, UrlHelper.GetSchemeFromRequest(context.Request), _appConfiguration["App:AppDomain"], tokenResponse);
+                    string scheme = UrlHelper.HTTP_SSL_SCHEME;
+                    string domain = _appConfiguration["App:AppDomain"];
+                    var isThereOrigin = context.Request.Headers.TryGetValue("Origin", out StringValues source);
+                    if (isThereOrigin && source[0].Contains("localhost"))
+                    {
+                        domain = _appConfiguration["App:AppDomainLocal"];
+                        scheme = UrlHelper.HTTP_SCHEME;
+                    }
+                    CookieHelper.AddAuthCookies(context.Response, scheme, domain, tokenResponse);
                 }
 
                 if (token != null)
