@@ -1,4 +1,5 @@
-﻿using io.fusionauth.domain.oauth2;
+﻿using Azure;
+using io.fusionauth.domain.oauth2;
 using Microsoft.AspNetCore.Http;
 using System;
 
@@ -38,6 +39,14 @@ namespace Ermes.Web.Utils
                 cookieOptions
             );
 
+        }
+
+        public static void ResetAuthCookies(HttpResponse response)
+        {
+            response.Cookies.Append("app.at", string.Empty);
+            response.Cookies.Append("app.rt", string.Empty);
+            response.Cookies.Append("app.at_exp", string.Empty);
+            response.Cookies.Append("app.idt", string.Empty);
         }
     }
 }
