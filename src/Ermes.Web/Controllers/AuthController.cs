@@ -20,6 +20,12 @@ namespace Ermes.Web.Controllers
             _ermesSettings = ermesSettings;
         }
 
+        /// <summary>
+        /// This API manually manage scheme and domain because we want to use the same FusionAuth tenant for both DEV and LOCAL env
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+
         [HttpGet]
         [Route("api/services/app/auth/oauth-callback")]
         [OpenApiOperation("Exchange authorization code for token. The token and refresh token are returned inside cookies")]
@@ -27,7 +33,7 @@ namespace Ermes.Web.Controllers
         {
             var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
 
-            string scheme = UrlHelper.GetSchemeFromRequest(Request);
+            string scheme = UrlHelper.HTTP_SSL_SCHEME;
             string domain = _ermesSettings.Value.AppDomain;
             var isThereOrigin = Request.Headers.TryGetValue("Origin", out StringValues source);
 
@@ -42,7 +48,10 @@ namespace Ermes.Web.Controllers
             if (tokenResponse.WasSuccessful())
             {
                 if (isThereOrigin && source[0].Contains("localhost"))
+                {
                     domain = _ermesSettings.Value.AppDomainLocal;
+                    scheme = UrlHelper.HTTP_SCHEME;
+                }
                 Logger.InfoFormat("Domain: {0}, token:{1}", domain, tokenResponse.successResponse.access_token);
                 CookieHelper.AddAuthCookies(Response, scheme, domain, tokenResponse.successResponse);
                 return Ok();
@@ -59,11 +68,14 @@ namespace Ermes.Web.Controllers
         [OpenApiOperation("Logout from the application. This funcion resets cookies")]
         public virtual IActionResult Logout()
         {
-            string scheme = UrlHelper.GetSchemeFromRequest(Request);
+            string scheme = UrlHelper.HTTP_SSL_SCHEME;
             string domain = _ermesSettings.Value.AppDomain;
             var isThereOrigin = Request.Headers.TryGetValue("Origin", out StringValues source);
             if (isThereOrigin && source[0].Contains("localhost"))
+            {
                 domain = _ermesSettings.Value.AppDomainLocal;
+                scheme = UrlHelper.HTTP_SCHEME;
+            }
             CookieHelper.ResetAuthCookies(Response, scheme, domain);
             return Ok();
         }
