@@ -1,5 +1,4 @@
 ﻿using Ermes.Interfaces;
-using Ermes.Web.Utils;
 using FusionAuthNetCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -12,50 +11,36 @@ namespace Ermes.Web.Controllers
     public class AuthController : ErmesControllerBase, IBackofficeApi
     {
         private readonly IOptions<FusionAuthSettings> _fusionAuthSettings;
-        private readonly IOptions<ErmesSettings> _ermesSettings;
 
-        public AuthController(IOptions<FusionAuthSettings> fusionAuthSettings, IOptions<ErmesSettings> ermesSettings)
+        public AuthController(IOptions<FusionAuthSettings> fusionAuthSettings)
         {
             _fusionAuthSettings = fusionAuthSettings;
-            _ermesSettings = ermesSettings;
         }
 
         /// <summary>
-        /// This API manually manage scheme and domain because we want to use the same FusionAuth tenant for both DEV and LOCAL env
+        /// This API checks Origin header to understand where the request is coming from. This is necessary 
+        /// because we want to use the same FusionAuth tenant for both DEV and LOCAL env
         /// </summary>
         /// <param name="code"></param>
         /// <returns></returns>
 
         [HttpGet]
         [Route("api/services/app/auth/oauth-callback")]
-        [OpenApiOperation("Exchange authorization code for token. The token and refresh token are returned inside cookies")]
+        [OpenApiOperation("Exchange authorization code for token")]
         public async Task<IActionResult> TokenRetrieve(string code)
         {
             var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
 
-            string scheme = UrlHelper.HTTP_SSL_SCHEME;
-            string domain = _ermesSettings.Value.AppDomain;
-            var isThereOrigin = Request.Headers.TryGetValue("Origin", out StringValues source);
-
+            var isThereOriginHeader = Request.Headers.TryGetValue("Origin", out StringValues source);
             string redirectUri;
-            if (isThereOrigin)
+            if (isThereOriginHeader)
                 redirectUri = $"{source[0]}/login-callback";
             else
                 return BadRequest("Invalid Origin Header");
 
-            Logger.InfoFormat("Scheme: {0}, Domain: {1}, isThereOrigin; {2}, RedirectUri: {3}", scheme, domain, isThereOrigin, redirectUri);
             var tokenResponse = await client.ExchangeOAuthCodeForAccessTokenAsync(code, _fusionAuthSettings.Value.ClientId, _fusionAuthSettings.Value.ClientSecret, redirectUri);
             if (tokenResponse.WasSuccessful())
-            {
-                if (isThereOrigin && source[0].Contains("localhost"))
-                {
-                    domain = _ermesSettings.Value.AppDomainLocal;
-                    scheme = UrlHelper.HTTP_SCHEME;
-                }
-                Logger.InfoFormat("Domain: {0}, token:{1}", domain, tokenResponse.successResponse.access_token);
-                CookieHelper.AddAuthCookies(Response, scheme, domain, tokenResponse.successResponse);
-                return Ok();
-            }
+                return Ok(new { tokenResponse.successResponse.access_token, tokenResponse.successResponse.refresh_token });
             else
             {
                 var faError = FusionAuth.ManageErrorResponse(tokenResponse);
@@ -64,20 +49,20 @@ namespace Ermes.Web.Controllers
         }
 
         [HttpGet]
-        [Route("api/services/app/auth/logout-callback")]
-        [OpenApiOperation("Logout from the application. This funcion resets cookies")]
-        public virtual IActionResult Logout()
+        [Route("api/services/app/auth/refresh-token")]
+        [OpenApiOperation("Exchange refresh token for a new access token")]
+        public async Task<IActionResult> RefreshToken(string refreshToken)
         {
-            string scheme = UrlHelper.HTTP_SSL_SCHEME;
-            string domain = _ermesSettings.Value.AppDomain;
-            var isThereOrigin = Request.Headers.TryGetValue("Origin", out StringValues source);
-            if (isThereOrigin && source[0].Contains("localhost"))
+            var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
+            var response = await client.ExchangeRefreshTokenForAccessTokenAsync(refreshToken, _fusionAuthSettings.Value.ClientId, _fusionAuthSettings.Value.ClientSecret, "openid offline_access", "");
+
+            if (response.WasSuccessful())
+                return Ok(response.successResponse);
+            else
             {
-                domain = _ermesSettings.Value.AppDomainLocal;
-                scheme = UrlHelper.HTTP_SCHEME;
+                var faError = FusionAuth.ManageErrorResponse(response);
+                return BadRequest(faError.Message);
             }
-            CookieHelper.ResetAuthCookies(Response, scheme, domain);
-            return Ok();
         }
     }
 }
