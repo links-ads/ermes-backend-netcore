@@ -5,11 +5,9 @@ using Ermes.Missions.Dto;
 using Ermes.Organizations.Dto;
 using Ermes.Teams.Dto;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace Ermes.Profile.Dto
 {
@@ -19,7 +17,7 @@ namespace Ermes.Profile.Dto
         public UserDto User { get; set; }
         public OrganizationDto Organization { get; set; }
         public TeamDto Team { get; set; }
-        public int CurrentActivityId  { get; set; }
+        public int CurrentActivityId { get; set; }
         public ActionStatusType CurrentStatus { get; set; }
         public long PersonId { get; set; }
         public Location? Location { get; set; }
@@ -32,6 +30,7 @@ namespace Ermes.Profile.Dto
         public string Level { get; set; }
         public List<MedalDto> Medals { get; set; }
         public List<BadgeDto> Badges { get; set; }
+        public string[] Permissions { get; set; }
 
     }
 

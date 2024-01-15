@@ -175,6 +175,29 @@ namespace Ermes
                 }
             }
 
+            foreach (var role in profile.User.Roles)
+            {
+                switch (role)
+                {
+                    case AppRoles.ADMINISTRATOR:
+                        profile.Permissions = AppRoles.ADMINISTRATOR_PERMISSION_LIST;
+                        break;
+                    case AppRoles.CITIZEN:
+                        profile.Permissions = AppRoles.CITIZEN_PERMISSION_LIST;
+                        break;
+                    case AppRoles.FIRST_RESPONDER:
+                    case AppRoles.TEAM_LEADER:
+                        profile.Permissions = AppRoles.FIRST_RESPONDER_PERMISSION_LIST;
+                        break;
+                    case AppRoles.ORGANIZATION_MANAGER:
+                    case AppRoles.DECISION_MAKER:
+                        profile.Permissions = AppRoles.ORGANIZATION_MANAGER_PERMISSION_LIST;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
             if (profile.User.Timezone == null)
                 profile.User.Timezone = AppConsts.DefaultTimezone;
 
