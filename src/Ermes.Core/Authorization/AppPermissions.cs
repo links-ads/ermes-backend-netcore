@@ -79,6 +79,7 @@ namespace Ermes.Authorization
             public const string Team_CanCreateTeamCrossOrganization = "Teams.CanCreateTeamCrossOrganization";
             public const string Team_CanViewAll = "Teams.CanViewAll";
             public const string Team_CanCreate = "Teams.CanCreate";
+            public const string Team_CanUpdate = "Teams.CanUpdate";
         }
 
         public static class Users

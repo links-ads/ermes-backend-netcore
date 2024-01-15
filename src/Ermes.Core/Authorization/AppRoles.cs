@@ -27,6 +27,7 @@
             AppPermissions.Teams.Team_CanViewAll,
             AppPermissions.Teams.Team_CanCreate,
             AppPermissions.Teams.Team_CanCreateTeamCrossOrganization,
+            AppPermissions.Teams.Team_CanUpdate,
             AppPermissions.Users.Users_CanCreate,
             AppPermissions.Users.Users_CanCreateCitizenOrPersonCrossOrganization,
             AppPermissions.Users.Users_CanSeeUncompletedUsers,
@@ -52,7 +53,8 @@
             AppPermissions.Communications.Communication_CanCreate,
             AppPermissions.MapRequests.MapRequest_CanCreate,
             AppPermissions.Missions.Mission_CanCreate,
-            AppPermissions.Teams.Team_CanCreate
+            AppPermissions.Teams.Team_CanCreate,
+            AppPermissions.Teams.Team_CanUpdate
         };
 
         public static readonly string[] DECISION_MAKER_PERMISSION_LIST = ORGANIZATION_MANAGER_PERMISSION_LIST;
