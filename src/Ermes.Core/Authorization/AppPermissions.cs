@@ -7,6 +7,7 @@ namespace Ermes.Authorization
     public static class AppPermissions
     {
         public const string App = "App";
+        public const string Permissions = "Permissions";
         public const string Backoffice = "Backoffice";
         public const string CompetenceArea = "CompetenceArea";
 
@@ -32,24 +33,25 @@ namespace Ermes.Authorization
             public const string Organization_CanDeleteCrossOrganization = "Organizations.CanDeleteCrossOrganization";
         }
 
-        public const string Permissions = "Permissions";
-
         public static class Missions
         {
             public const string Mission = "Missions";
             public const string Mission_CanSeeCrossOrganization = "Missions.CanSeeCrossOrganization";
+            public const string Mission_CanCreate = "Missions.CanCreate";
         }
 
         public static class Communications
         {
             public const string Communication = "Communications";
             public const string Communication_CanSeeCrossOrganization = "Communications.CanSeeCrossOrganization";
+            public const string Communication_CanCreate = "Communications.CanCreate";
         }
 
         public static class MapRequests
         {
             public const string MapRequest = "MapRequests";
             public const string MapRequest_CanSeeCrossOrganization = "MapRequests.CanSeeCrossOrganization";
+            public const string MapRequest_CanCreate = "MapRequests.CanCreate";
         }
 
         public static class Reports
@@ -74,8 +76,10 @@ namespace Ermes.Authorization
 
         public static class Teams
         {
-            public const string Team_CanCreateTeamCrossOrganization = "Team.CanCreateTeamCrossOrganization";
-            public const string Team_CanViewAll = "Team.CanViewAll";
+            public const string Team_CanCreateTeamCrossOrganization = "Teams.CanCreateTeamCrossOrganization";
+            public const string Team_CanViewAll = "Teams.CanViewAll";
+            public const string Team_CanCreate = "Teams.CanCreate";
+            public const string Team_CanUpdate = "Teams.CanUpdate";
         }
 
         public static class Users
@@ -83,6 +87,7 @@ namespace Ermes.Authorization
             public const string Users_CanCreateCitizenOrPersonCrossOrganization = "Users.CanCreateCitizenOrPersonCrossOrganization";
             public const string Users_CanEditColleagues = "Users.CanEditColleagues";
             public const string Users_CanSeeUncompletedUsers = "Users.Users_CanSeeUncompletedUsers";
+            public const string Users_CanCreate = "Users.CanCreate";
         }
     }
 }

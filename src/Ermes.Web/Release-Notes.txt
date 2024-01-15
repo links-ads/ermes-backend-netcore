@@ -1,6 +1,6 @@
 Ver.
 --------------------------------
-
+- Feature - Permission list added to ProfileDto class (sdk to be updated)(permissions to be re-imported)(#172)
 
 Ver. 4.17.2 - 2023-12-06
 --------------------------------

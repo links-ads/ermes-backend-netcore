@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Ermes.Authorization
+﻿namespace Ermes.Authorization
 {
     public static class AppRoles
     {
@@ -29,13 +25,19 @@ namespace Ermes.Authorization
             AppPermissions.Organizations.Organization_CanAssignPersonCrossOrganization,
             AppPermissions.Organizations.Organization_CanDeleteCrossOrganization,
             AppPermissions.Teams.Team_CanViewAll,
+            AppPermissions.Teams.Team_CanCreate,
             AppPermissions.Teams.Team_CanCreateTeamCrossOrganization,
+            AppPermissions.Teams.Team_CanUpdate,
+            AppPermissions.Users.Users_CanCreate,
             AppPermissions.Users.Users_CanCreateCitizenOrPersonCrossOrganization,
             AppPermissions.Users.Users_CanSeeUncompletedUsers,
+            AppPermissions.Missions.Mission_CanCreate,
             AppPermissions.Missions.Mission_CanSeeCrossOrganization,
             AppPermissions.Reports.Report_CanSeeCrossOrganization,
             AppPermissions.Actions.Action_CanSeeCrossOrganization,
+            AppPermissions.MapRequests.MapRequest_CanCreate,
             AppPermissions.MapRequests.MapRequest_CanSeeCrossOrganization,
+            AppPermissions.Communications.Communication_CanCreate,
             AppPermissions.Communications.Communication_CanSeeCrossOrganization,
             AppPermissions.Profiles.Profile_Delete
         };
@@ -44,21 +46,26 @@ namespace Ermes.Authorization
         {
             AppPermissions.Backoffice,
             AppPermissions.Organizations.Organization,
+            AppPermissions.Organizations.Organization_CanCreate,
             AppPermissions.Organizations.Organization_CanUpdate,
-            AppPermissions.Users.Users_CanEditColleagues
+            AppPermissions.Users.Users_CanCreate,
+            AppPermissions.Users.Users_CanEditColleagues,
+            AppPermissions.Communications.Communication_CanCreate,
+            AppPermissions.MapRequests.MapRequest_CanCreate,
+            AppPermissions.Missions.Mission_CanCreate,
+            AppPermissions.Teams.Team_CanCreate,
+            AppPermissions.Teams.Team_CanUpdate
         };
 
-        public static readonly string[] DECISION_MAKER_PERMISSION_LIST = new string[]
-        {
-            AppPermissions.Backoffice,
-            AppPermissions.Organizations.Organization,
-            AppPermissions.Organizations.Organization_CanUpdate,
-            AppPermissions.Users.Users_CanEditColleagues
-        };
+        public static readonly string[] DECISION_MAKER_PERMISSION_LIST = ORGANIZATION_MANAGER_PERMISSION_LIST;
 
         public static readonly string[] FIRST_RESPONDER_PERMISSION_LIST = new string[]
         {
             AppPermissions.Backoffice
         };
+
+        public static readonly string[] TEAM_LEADER_PERMISSION_LIST = FIRST_RESPONDER_PERMISSION_LIST;
+
+        public static readonly string[] CITIZEN_PERMISSION_LIST = new string[] { };
     }
 }
