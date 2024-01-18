@@ -20,7 +20,8 @@
             AppPermissions.Imports.Import_Layers,
             AppPermissions.Organizations.Organization,
             AppPermissions.Organizations.Organization_CanViewAll,
-            AppPermissions.Organizations.Organization_CanCreate,
+            AppPermissions.Organizations.Organization_CanCreate_Father,
+            AppPermissions.Organizations.Organization_CanCreate_Child,
             AppPermissions.Organizations.Organization_CanUpdateAll,
             AppPermissions.Organizations.Organization_CanAssignPersonCrossOrganization,
             AppPermissions.Organizations.Organization_CanDeleteCrossOrganization,
@@ -36,17 +37,18 @@
             AppPermissions.Reports.Report_CanSeeCrossOrganization,
             AppPermissions.Actions.Action_CanSeeCrossOrganization,
             AppPermissions.MapRequests.MapRequest_CanCreate,
+            AppPermissions.MapRequests.MapRequest_CanDelete,
             AppPermissions.MapRequests.MapRequest_CanSeeCrossOrganization,
             AppPermissions.Communications.Communication_CanCreate,
             AppPermissions.Communications.Communication_CanSeeCrossOrganization,
-            AppPermissions.Profiles.Profile_Delete
+            AppPermissions.Profiles.Profile_CanDelete
         };
 
         public static readonly string[] ORGANIZATION_MANAGER_PERMISSION_LIST = new string[]
         {
             AppPermissions.Backoffice,
             AppPermissions.Organizations.Organization,
-            AppPermissions.Organizations.Organization_CanCreate,
+            AppPermissions.Organizations.Organization_CanCreate_Child,
             AppPermissions.Organizations.Organization_CanUpdate,
             AppPermissions.Users.Users_CanCreate,
             AppPermissions.Users.Users_CanEditColleagues,
