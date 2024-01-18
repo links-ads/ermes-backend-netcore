@@ -323,7 +323,7 @@ namespace Ermes.Profile
                 refGuid = _session.FusionAuthUserGuid.Value;
             else
             {
-                var hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Profiles.Profile_Delete);
+                var hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Profiles.Profile_CanDelete);
                 if (!hasPermission)
                     throw new UserFriendlyException("MissingPermission");
 

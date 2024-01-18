@@ -45,8 +45,8 @@ namespace Ermes.Organizations
 
             if (!person.OrganizationId.HasValue)
             {
-                if (!_permissionChecker.IsGranted(_session.Roles, AppPermissions.Organizations.Organization_CanCreate))
-                    throw new UserFriendlyException(L("MissingPermission", AppPermissions.Organizations.Organization_CanCreate));
+                if (!_permissionChecker.IsGranted(_session.Roles, AppPermissions.Organizations.Organization_CanCreate_Father))
+                    throw new UserFriendlyException(L("MissingPermission", AppPermissions.Organizations.Organization_CanCreate_Father));
             }
             else
             {

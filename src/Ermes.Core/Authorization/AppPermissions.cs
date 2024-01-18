@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Ermes.Authorization
+﻿namespace Ermes.Authorization
 {
     public static class AppPermissions
     {
@@ -26,7 +22,8 @@ namespace Ermes.Authorization
         {
             public const string Organization = "Organizations";
             public const string Organization_CanViewAll = "Organizations.CanViewAll";
-            public const string Organization_CanCreate = "Organizations.CanCreate";
+            public const string Organization_CanCreate_Father = "Organizations.CanCreate.Father";
+            public const string Organization_CanCreate_Child = "Organizations.CanCreate.Child";
             public const string Organization_CanUpdate = "Organizations.CanUpdate";
             public const string Organization_CanUpdateAll = "Organizations.CanUpdateAll";
             public const string Organization_CanAssignPersonCrossOrganization = "Organizations.CanAssignPersonCrossOrganization";
@@ -52,6 +49,7 @@ namespace Ermes.Authorization
             public const string MapRequest = "MapRequests";
             public const string MapRequest_CanSeeCrossOrganization = "MapRequests.CanSeeCrossOrganization";
             public const string MapRequest_CanCreate = "MapRequests.CanCreate";
+            public const string MapRequest_CanDelete = "MapRequests.CanDelete";
         }
 
         public static class Reports
@@ -63,9 +61,9 @@ namespace Ermes.Authorization
         public static class Profiles
         {
             public const string Profile = "Profile";
-            public const string Profile_Create = "Profile.Create";
-            public const string Profile_Update = "Profile.Update";
-            public const string Profile_Delete = "Profile.Delete";
+            public const string Profile_CanCreate = "Profile.CanCreate";
+            public const string Profile_CanUpdate = "Profile.CanUpdate";
+            public const string Profile_CanDelete = "Profile.CanDelete";
         }
 
         public static class Actions
