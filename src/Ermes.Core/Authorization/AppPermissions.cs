@@ -78,6 +78,7 @@
             public const string Team_CanViewAll = "Teams.CanViewAll";
             public const string Team_CanCreate = "Teams.CanCreate";
             public const string Team_CanUpdate = "Teams.CanUpdate";
+            public const string Team_CanDelete = "Teams.CanDelete";
         }
 
         public static class Users
