@@ -22,7 +22,7 @@
         {
             public const string Organization = "Organizations";
             public const string Organization_CanViewAll = "Organizations.CanViewAll";
-            public const string Organization_CanCreate_Father = "Organizations.CanCreate.Father";
+            public const string Organization_CanCreate_Parent = "Organizations.CanCreate.Parent";
             public const string Organization_CanCreate_Child = "Organizations.CanCreate.Child";
             public const string Organization_CanUpdate = "Organizations.CanUpdate";
             public const string Organization_CanUpdateAll = "Organizations.CanUpdateAll";
