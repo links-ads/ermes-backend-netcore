@@ -45,11 +45,13 @@ namespace Ermes.Organizations
 
             if (!person.OrganizationId.HasValue)
             {
-                if (!_permissionChecker.IsGranted(_session.Roles, AppPermissions.Organizations.Organization_CanCreate_Father))
-                    throw new UserFriendlyException(L("MissingPermission", AppPermissions.Organizations.Organization_CanCreate_Father));
+                if (!_permissionChecker.IsGranted(_session.Roles, AppPermissions.Organizations.Organization_CanCreate_Parent))
+                    throw new UserFriendlyException(L("MissingPermission", AppPermissions.Organizations.Organization_CanCreate_Parent));
             }
             else
             {
+                if (!_permissionChecker.IsGranted(_session.Roles, AppPermissions.Organizations.Organization_CanCreate_Child))
+                    throw new UserFriendlyException(L("MissingPermission", AppPermissions.Organizations.Organization_CanCreate_Child));
                 if (person.OrganizationId.Value != newOrganization.ParentId)
                     throw new UserFriendlyException(L("MissingPermission"));
             }
