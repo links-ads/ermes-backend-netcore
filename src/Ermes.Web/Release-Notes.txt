@@ -1,5 +1,9 @@
 Ver.
 --------------------------------
+
+
+Ver. 4.18.0 - 2024-01-19
+--------------------------------
 - Feature - Auth Controller added (appsettings updated)(Fusion auth to be update)(#142)
 - Feature - Permission list added to ProfileDto class (sdk to be updated)(permissions to be re-imported)(#172)
 
