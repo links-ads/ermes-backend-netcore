@@ -68,7 +68,7 @@ namespace Ermes.ExternalServices.Csi
         public async Task<int> SearchVolontarioAsync(string taxCode, long personId)
         {
             //At the beginning, this was a GET request with a body
-            //Due to problems related to CSI infrastruction in production env,
+            //Due to problems related to CSI infrastructure in production env,
             //the request has been transformed into a POST
 
             var builder = new UriBuilder(CsiClient.BaseAddress + "/SearchVolontario");

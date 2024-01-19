@@ -1,5 +1,7 @@
 ﻿using io.fusionauth;
+using io.fusionauth.domain.oauth2;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -11,15 +13,17 @@ namespace Ermes.Web.Middlewares
     {
         private readonly RequestDelegate next;
         private readonly FusionAuthClient client;
-        public JwtTokenMiddleware(RequestDelegate next, FusionAuthClient _client)
+        private readonly IConfiguration _appConfiguration;
+        public JwtTokenMiddleware(RequestDelegate next, FusionAuthClient _client, IConfigurationRoot appConfiguration)
         {
             client = _client;
+            _appConfiguration = appConfiguration;
             this.next = next;
         }
         public async Task Invoke(HttpContext context)
         {
             var token = context.Request.Headers["Authorization"].ToString();
-            if (token != "" && await VerifyToken(token))
+            if (token != "" && await VerifyTokenAsync(token))
             {
                 if (!context.Response.Headers.ContainsKey("Token"))
                     context.Response.Headers.Add("Token", token);
@@ -41,7 +45,7 @@ namespace Ermes.Web.Middlewares
             await next.Invoke(context);
         }
 
-        private async Task<bool> VerifyToken(string token)
+        private async Task<bool> VerifyTokenAsync(string token)
         {
             var response = await client.ValidateJWTAsync(token);
 
@@ -49,6 +53,18 @@ namespace Ermes.Web.Middlewares
                 return true;
 
             return false;
+        }
+
+        private async Task<AccessToken> RefreshTokenAsync(string refreshToken)
+        {
+            var clientId = _appConfiguration["FusionAuth:ClientId"];
+            var clientSecret = _appConfiguration["FusionAuth:ClientSecret"];
+            var response = await client.ExchangeRefreshTokenForAccessTokenAsync(refreshToken, clientId, clientSecret, "openid offline_access", "");
+
+            if (response.WasSuccessful())
+                return response.successResponse;
+
+            return null;
         }
     }
 }

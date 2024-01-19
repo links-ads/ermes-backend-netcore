@@ -204,6 +204,11 @@ namespace Ermes.Web.Startup
                 config.UsePostgreSqlStorage(_appConfiguration.GetConnectionString("Default"));
             });
 
+            services.AddAuthorization();
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(60 * 24);
+            });
             services.AddApplicationInsightsTelemetry();
 
             //Configure Abp and Dependency Injection
@@ -230,7 +235,7 @@ namespace Ermes.Web.Startup
                 app.UseExceptionHandler("/Error");
             }
 
-            app.UseMiddleware<JwtTokenMiddleware>(client);
+            app.UseMiddleware<JwtTokenMiddleware>(client, _appConfiguration);
             app.UseMiddleware<ApiKeyMiddleware>();
 
             app.UseAuthentication();
@@ -241,6 +246,7 @@ namespace Ermes.Web.Startup
             app.UseStaticFiles();
             app.UseRouting();
             app.UseAuthorization();
+
             app.UseCors(DefaultCorsPolicyName);
             app.UseEndpoints(endpoints =>
             {
