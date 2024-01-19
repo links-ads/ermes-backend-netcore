@@ -20,7 +20,7 @@
             AppPermissions.Imports.Import_Layers,
             AppPermissions.Organizations.Organization,
             AppPermissions.Organizations.Organization_CanViewAll,
-            AppPermissions.Organizations.Organization_CanCreate_Father,
+            AppPermissions.Organizations.Organization_CanCreate_Parent,
             AppPermissions.Organizations.Organization_CanCreate_Child,
             AppPermissions.Organizations.Organization_CanUpdateAll,
             AppPermissions.Organizations.Organization_CanAssignPersonCrossOrganization,
