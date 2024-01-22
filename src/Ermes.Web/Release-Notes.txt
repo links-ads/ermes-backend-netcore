@@ -1,6 +1,6 @@
 Ver.
 --------------------------------
-
+- Feature - Creation of parent organization durig users import procedure (#173)
 
 Ver. 4.18.0 - 2024-01-19
 --------------------------------
