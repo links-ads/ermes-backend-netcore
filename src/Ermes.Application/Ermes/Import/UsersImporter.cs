@@ -162,13 +162,33 @@ namespace Ermes.Import
                         throw new UserFriendlyException(localizer.L("InvalidRoles"));
                     user.Roles = roles;
 
-                    var organizationName = row.GetString("OrganizationName");
+                    string parentOrganizationName = row.GetString("ParentOrganizationName");
+                    int? parentOrgId = null;
+                    if (parentOrganizationName != null && parentOrganizationName != string.Empty)
+                    {
+                        Organization org = await organizationManager.GetOrganizationByNameAsync(parentOrganizationName);
+                        if (org == null)
+                        {
+                            org = new Organization(parentOrganizationName);
+                            parentOrgId = await organizationManager.InsertOrganizationAsync(org);
+                        }
+                        else
+                        {
+                            if(org.ParentId.HasValue)
+                                throw new UserFriendlyException(string.Format("Impossible to set {0} as root Organization, it already has a parent", org.Name));
+
+                            parentOrgId = org.Id;
+                        }
+                    }
+
+                    string organizationName = row.GetString("OrganizationName");
                     if (organizationName != null && organizationName != string.Empty)
                     {
                         Organization org = await organizationManager.GetOrganizationByNameAsync(organizationName);
                         if (org == null)
                         {
                             org = new Organization(organizationName);
+                            org.ParentId = parentOrgId;
                             org.Id = await organizationManager.InsertOrganizationAsync(org);
                         }
                         
@@ -195,6 +215,8 @@ namespace Ermes.Import
                         else
                             person.LevelId = (await gamificationManager.GetDefaultLevel()).Id;
                     }
+
+
 
                     var email =  row.GetString("Email");
                     if (email == null || string.IsNullOrWhiteSpace(email))
