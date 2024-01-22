@@ -169,7 +169,8 @@ namespace Ermes.Import
                         Organization org = await organizationManager.GetOrganizationByNameAsync(parentOrganizationName);
                         if (org == null)
                         {
-                            org = new Organization(parentOrganizationName);
+                            string shortName = parentOrganizationName.Split(' ').Select(a => a.Substring(0,2).ToUpper()).Aggregate((a, b) => a + b);
+                            org = new Organization(parentOrganizationName, shortName);
                             parentOrgId = await organizationManager.InsertOrganizationAsync(org);
                         }
                         else
