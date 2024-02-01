@@ -55,6 +55,7 @@
             AppPermissions.Users.Users_CanEditColleagues,
             AppPermissions.Communications.Communication_CanCreate,
             AppPermissions.MapRequests.MapRequest_CanCreate,
+            AppPermissions.MapRequests.MapRequest_CanDelete,
             AppPermissions.Missions.Mission_CanCreate,
             AppPermissions.Teams.Team_CanCreate,
             AppPermissions.Teams.Team_CanUpdate,
