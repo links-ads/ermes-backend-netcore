@@ -2,6 +2,7 @@
 using Abp.Linq.Extensions;
 using Abp.UI;
 using Ermes.Alerts.Dto;
+using Ermes.Authorization;
 using Ermes.Dto;
 using Ermes.Dto.Datatable;
 using Ermes.Dto.Spatial;
@@ -9,6 +10,8 @@ using Ermes.Ermes.Alerts;
 using Ermes.GeoJson;
 using Ermes.Helpers;
 using Ermes.Linq.Extensions;
+using Ermes.Persons;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
@@ -25,10 +28,15 @@ namespace Ermes.Alerts
     {
         private readonly IGeoJsonBulkRepository _geoJsonBulkRepository;
         private readonly AlertManager _alertManager;
-        public AlertsAppService(AlertManager alertManager, IGeoJsonBulkRepository geoJsonBulkRepository)
+        private readonly ErmesAppSession _session;
+        private readonly PersonManager _personManager;
+
+        public AlertsAppService(AlertManager alertManager, IGeoJsonBulkRepository geoJsonBulkRepository, ErmesAppSession session, PersonManager personManager)
         {
             _alertManager = alertManager;
             _geoJsonBulkRepository = geoJsonBulkRepository;
+            _session = session;
+            _personManager = personManager;
         }
 
         #region Private
@@ -47,6 +55,17 @@ namespace Ermes.Alerts
             }
             else
                 query = _alertManager.GetAlerts(input.StartDate.Value, input.EndDate.Value);
+
+            var person = _session.LoggedUserPerson;
+            var roles = await _personManager.GetPersonRoleNamesAsync(person.Id);
+
+            if (roles.Contains(AppRoles.CITIZEN))
+            {
+                if (input.Restrictions == null)
+                    input.Restrictions = new List<string>();
+                
+                input.Restrictions.Add(AppConsts.ALERT_CITIZEN_RESTRICTION);
+            }
 
             if (input.Restrictions != null && input.Restrictions.Count > 0)
                 query = query.Where(a => input.Restrictions.Contains(a.Restriction));
