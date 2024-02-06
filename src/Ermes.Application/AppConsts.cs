@@ -42,8 +42,6 @@ namespace Ermes
         public const string CSI_ACTIVITY = "Doing activity";
 
         public const string GEOMETRY_POINT = "Point";
-
-        public const string ALERT_CITIZEN_RESTRICTION = "Citizen";
         
 
 
