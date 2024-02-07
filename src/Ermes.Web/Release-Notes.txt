@@ -1,5 +1,9 @@
 Ver.
 --------------------------------
+- Feature - Read property added to Report and ReportDto class (migration added)(#175)
+
+Ver. 4.18.1 - 2024-01-22
+--------------------------------
 - Feature - Creation of parent organization durig users import procedure (#173)
 
 Ver. 4.18.0 - 2024-01-19

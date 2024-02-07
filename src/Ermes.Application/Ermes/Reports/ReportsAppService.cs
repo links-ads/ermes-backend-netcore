@@ -21,7 +21,6 @@ using Ermes.Reports.Dto;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
-using NpgsqlTypes;
 using NSwag.Annotations;
 using System;
 using System.Collections.Generic;
@@ -248,7 +247,12 @@ namespace Ermes.Reports
 
             var properties = ObjectMapper.Map<ReportDto>(report);
             properties.IsEditable = (report.CreatorUserId == _session.UserId);
-            properties.CanBeValidated = report.CreatorUserId != _session.UserId && report.Validations.Where(a => a.PersonId == _session.LoggedUserPerson.Id).Count() == 0;
+            if (report.CreatorUserId != _session.UserId)
+            {
+                properties.CanBeValidated = report.Validations.Where(a => a.PersonId == _session.LoggedUserPerson.Id).Count() == 0;
+                report.Read = properties.Read = true;
+            }
+
             var writer = new GeoJsonWriter();
             return new GetEntityByIdOutput<ReportDto>()
             {

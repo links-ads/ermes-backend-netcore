@@ -44,7 +44,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Abp.Importer", "src\Abp.Imp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Migrator", "src\Migrator\Migrator.csproj", "{F90EF884-4208-4231-BDB2-87615F19BF3D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abp.SensorService", "src\Abp.SensorService\Abp.SensorService.csproj", "{E6A5A9CE-A07B-42BA-9983-FBD7DA5668B8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Abp.SensorService", "src\Abp.SensorService\Abp.SensorService.csproj", "{E6A5A9CE-A07B-42BA-9983-FBD7DA5668B8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

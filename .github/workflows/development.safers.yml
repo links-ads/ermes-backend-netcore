@@ -1,0 +1,23 @@
+name: Development build and deploy
+
+on:
+  push:
+    branches: [ "validation" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Publish
+      uses: appleboy/ssh-action@v0.1.10
+      with:
+        host: ${{ secrets.SAFERS_VM_IP_ADDRESS }}
+        username: ${{ secrets.SAFERS_VM_USERNAME }}
+        key: ${{ secrets.ADSADMIN_SSH_PRIVATE_KEY }}
+        port: ${{ secrets.SAFERS_VM_PORT }}
+        command_timeout: 30m
+        script: | 
+          cd projects/ermes-backend-netcore && git checkout validation && sh deploy-dev.sh
+

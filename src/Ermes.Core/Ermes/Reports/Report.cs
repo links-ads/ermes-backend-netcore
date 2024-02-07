@@ -80,6 +80,11 @@ namespace Ermes.Reports
         public ReportContentType Content { get; set; }
 
         public virtual ICollection<ReportValidation> Validations { get; set; }
+
+        /// <summary>
+        /// True after someone calls GetReportById
+        /// </summary>
+        public bool Read { get; set; }
     }
 
     public class ReportExtensionData
