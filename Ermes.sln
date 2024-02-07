@@ -44,7 +44,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Abp.Importer", "src\Abp.Imp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Migrator", "src\Migrator\Migrator.csproj", "{F90EF884-4208-4231-BDB2-87615F19BF3D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abp.SensorService", "src\Abp.SensorService\Abp.SensorService.csproj", "{E6A5A9CE-A07B-42BA-9983-FBD7DA5668B8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Abp.SensorService", "src\Abp.SensorService\Abp.SensorService.csproj", "{E6A5A9CE-A07B-42BA-9983-FBD7DA5668B8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{F4622B6E-A826-4AED-80B4-E082D27BEA49}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{DBF34BEC-5C3D-417C-BBF2-03654CEE2F7F}"
+	ProjectSection(SolutionItems) = preProject
+		development.safers.yml = development.safers.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -142,6 +149,7 @@ Global
 		{D8F161A8-B7ED-40A9-BFCE-05E9724A4BB0} = {AFAA0841-BD93-466F-B8F4-FB4EEC86F1FC}
 		{F90EF884-4208-4231-BDB2-87615F19BF3D} = {AFAA0841-BD93-466F-B8F4-FB4EEC86F1FC}
 		{E6A5A9CE-A07B-42BA-9983-FBD7DA5668B8} = {AFAA0841-BD93-466F-B8F4-FB4EEC86F1FC}
+		{DBF34BEC-5C3D-417C-BBF2-03654CEE2F7F} = {F4622B6E-A826-4AED-80B4-E082D27BEA49}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B516B1E8-1CEC-4BCC-BA92-93CB32845E37}
