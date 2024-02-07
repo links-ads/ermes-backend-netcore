@@ -47,5 +47,6 @@ namespace Ermes.Reports.Dto
         public int Upvotes { get; set; }
         public int Downvotes { get; set; }
         public List<ReportValidationDto> Validations { get; set; }
+        public bool Read { get; set; }
     }
 }
