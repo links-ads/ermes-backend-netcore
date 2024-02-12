@@ -1,6 +1,6 @@
 Ver.
 --------------------------------
-
+- Feature - new API for person action batch insert added (#174)
 
 Ver. 4.18.1 - 2024-01-22
 --------------------------------

@@ -24,6 +24,7 @@ using Microsoft.Extensions.Options;
 using NSwag.Annotations;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Ermes.Web.Controllers
@@ -146,6 +147,37 @@ namespace Ermes.Web.Controllers
             };
         }
 
+        /// Duplication of code contained in ActionsAppService, optimization required
+        [Route("api/services/app/Externals/CreatePersonActionBatch")]
+        [HttpPost]
+        [SwaggerResponse(typeof(CreatePersonActionBatchOutput))]
+        [OpenApiOperation("Create a list of Person Actions",
+            @"
+                        There are four types of actions a person can perform:
+                            - PersonActionSharingPosition: allows a person to share his live position with the control room;
+                            - PersonActionTracking: useful to track person position together with biometrical parameters (heart-rate, etc..).
+                                Tracking is enabled only when the person is in Active/Movement status
+                            - PersonActionStatus: allows a person to edit his current status. Possible values are: 
+                                    1) Off: the person is not at work
+                                    2) Moving: the person is moving toward a certain destination
+                                    3) Active: the person is working on a certain activity
+                            - PersonActionActivity: allows a person to specify the activity he's performing
+                        Input: list of actions that have to be created
+                        Output: the actions that have been created
+                    "
+        )]
+        public virtual async Task<CreatePersonActionBatchOutput> CreatePersonActionBatch([FromBody] CreatePersonActionBatchForExternalsInput input)
+        {
+            if(input == null || input.PersonActions == null) 
+                throw new UserFriendlyException(L("InvalidInput"));
+
+            var result = new CreatePersonActionBatchOutput() { PersonActions = new List<CreatePersonActionOutput>() };
+
+            foreach (var action in input.PersonActions.OrderBy(a => a.PersonAction.Timestamp).ToList())
+                result.PersonActions.Add(await CreatePersonAction(action));
+
+            return result;
+        }
 
         /// Duplication of code contained in ActionsAppService, optimization required
         [Route("api/services/app/Externals/CreatePersonAction")]
@@ -163,7 +195,7 @@ namespace Ermes.Web.Controllers
                                     3) Active: the person is working on a certain activity
                             - PersonActionActivity: allows a person to specify the activity he's performing
                         Input: the action that has to be created
-                        Output: the actions that has been created
+                        Output: the action that has been created
                     "
         )]
         public virtual async Task<CreatePersonActionOutput> CreatePersonAction([FromBody] CreatePersonActionForExternalsInput input)
