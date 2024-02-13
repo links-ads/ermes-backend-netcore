@@ -1,6 +1,6 @@
 Ver.
 --------------------------------
-
+Feature - CreatorFullName property added in APIs for externals (#177) 
 
 Ver. 4.18.1 - 2024-01-22
 --------------------------------

@@ -84,7 +84,7 @@ namespace Ermes.Web.Controllers
             await CurrentUnitOfWork.SaveChangesAsync();
             return person;
         }
-        protected async Task<User> CreateUserInternalAsync(int volterId, IOptions<FusionAuthSettings> _fusionAuthSettings, IOptions<ErmesSettings> _ermesSettings)
+        protected async Task<User> CreateUserInternalAsync(int volterId, string username, IOptions<FusionAuthSettings> _fusionAuthSettings, IOptions<ErmesSettings> _ermesSettings)
         {
             var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
             //Set the password based on current project
@@ -95,8 +95,8 @@ namespace Ermes.Web.Controllers
             var user = new User()
             {
                 active = true,
-                email = string.Format("{0}@{1}.eu", volterId.ToString(), project.ToLower()),
-                username = volterId.ToString(),
+                email = string.Format("{0}@{1}.eu", username, project.ToLower()),
+                username = username,
                 password = string.Concat(project.ToLower(), ErmesConsts.DefaultYear),
                 preferredLanguages = new List<string> { "it" }
             };

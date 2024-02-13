@@ -4,18 +4,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Ermes.Web.Controllers.Dto
 {
-    public class CreatePersonActionForExternalsInput : ICustomValidate
+    public class CreatePersonActionForExternalsInput : ExternalBase
     {
         [Required]
         public PersonActionDto PersonAction { get; set; }
-        public int VolterId { get; set; }
-
-        public void AddValidationErrors(CustomValidationContext context)
-        {
-            if (VolterId == 0)
-            {
-                context.Results.Add(new ValidationResult("Invalid VolterId"));
-            }
-        }
     }
 }
