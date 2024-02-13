@@ -1,5 +1,9 @@
 Ver.
 --------------------------------
+
+
+Ver. 4.18.2 - 2024-02-13
+--------------------------------
 - Feature - new API for person action batch insert added (#176)
 - Feature - Read property added to Report and ReportDto class (migration added)(#175)
 - Feature - CreatorFullName property added in APIs for externals (#177) 
