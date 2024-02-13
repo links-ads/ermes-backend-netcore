@@ -101,7 +101,7 @@ namespace Ermes.Web.Controllers
             var media = request.Form.Files;
 
             var res = new CreateOrUpdateReportForExternalsOutput();
-            var (creator, organizationId, roleList) = await GetExternalPersonAsync(input.VolterId);
+            var (creator, organizationId, roleList) = await GetExternalPersonAsync(input.VolterId, input.CreatorFullName);
 
             if (input.Report.Id == 0)
             {
@@ -202,7 +202,7 @@ namespace Ermes.Web.Controllers
         {
             var res = new CreatePersonActionOutput();
 
-            var (creator, organizationId, roleList) = await GetExternalPersonAsync(input.VolterId);
+            var (creator, organizationId, roleList) = await GetExternalPersonAsync(input.VolterId, input.CreatorFullName);
 
             long personId = creator.Id;
             var lastAction = await _personManager.GetLastPersonActionAsync(personId);
@@ -300,7 +300,7 @@ namespace Ermes.Web.Controllers
             return res;
         }
 
-        private async Task<Tuple<Person, int, List<string>>> GetExternalPersonAsync(int volterId)
+        private async Task<Tuple<Person, int, List<string>>> GetExternalPersonAsync(int volterId, string creatorFullName)
         {
             var roleList = new List<string>() { AppRoles.FIRST_RESPONDER };
 
@@ -311,7 +311,7 @@ namespace Ermes.Web.Controllers
             var creator = _personManager.GetPersonByLegacyId(volterId);
             if (creator == null)
             {
-                var currentUser = await CreateUserInternalAsync(volterId, _fusionAuthSettings, _ermesSettings);
+                var currentUser = await CreateUserInternalAsync(volterId, creatorFullName, _fusionAuthSettings, _ermesSettings);
                 var roles = await _personManager.GetRolesByName(roleList);
                 creator = await CreateOrUpdatePersonInternalAsync(creator, currentUser, externalOrg.Id, null, true, true, volterId, roles, _personManager);
             }
