@@ -24,5 +24,6 @@ namespace Ermes.Organizations.Dto
         public string ParentName { get; set; }
         public bool MembersHaveTaxCode { get; set; }
         public bool HasChildren { get; set; }
+        public bool IsActive { get; set; }
     }
 }

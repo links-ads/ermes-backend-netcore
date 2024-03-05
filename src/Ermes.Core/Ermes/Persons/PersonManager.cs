@@ -223,10 +223,6 @@ namespace Ermes.Persons
 
         public async Task<bool> CanOrganizationBeDeletedAsync(int organizationId)
         {
-            //No person associated to the organization
-            if (await Persons.CountAsync(p => p.OrganizationId == organizationId) > 0)
-                return false;
-
             //Organization must not have children
             if (await Organizations.CountAsync(o => o.ParentId.HasValue && o.ParentId.Value == organizationId) > 0)
                 return false;
@@ -354,6 +350,5 @@ namespace Ermes.Persons
         {
             await PersonRepository.DeleteAsync(p => p.Id == personId);
         }
-
     }
 }

@@ -14,7 +14,8 @@ namespace Profile
         Task<GetProfileOutput> GetProfileById(IdInput<long> input);
         Task<UpdateProfileOutput> UpdateProfile(UpdateProfileInput input);
         //Task<bool> UpdatePreferredLanguages(UpdatePreferredLanguagesInput input);
-        Task<bool> DeleteProfile(IdInput<Guid> input);
+        Task<bool> DeleteProfile(DeleteProfileInput input);
+        Task<GetProfileOutput> ReactivateProfile(ReactivateProfileInput input);
         Task<bool> UpdateRegistrationToken(UpdateRegistrationTokenInput input);
         Task<DTResult<PersonDto>> GetOrganizationMembers(GetOrganizationMembersInput input);
         Task<DTResult<OrganizationDto>> GetOrganizations(GetOrganizationsInput input);

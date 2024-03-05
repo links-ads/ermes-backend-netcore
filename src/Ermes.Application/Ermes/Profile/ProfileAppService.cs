@@ -307,18 +307,21 @@ namespace Ermes.Profile
 
         [OpenApiOperation("Delete profile",
             @"
-                Completely remove the person from the system
-                Input: Guid provided by FusionAuth
-                Output: true is the user, and all the associated resources, have been properly deleted
+                Remove the person from the system
+                Input: 
+                    - Guid provided by FusionAuth
+                    - HardDelete: if true, delete every info associated to the person, if false, deactivate account on FusionAuth
+                Output: true is the operation ends successfully
+                Notes: a user can be deleted by org manager of the same organization or belonging to a parent organization
             "
         )]
-        public virtual async Task<bool> DeleteProfile(IdInput<Guid> input)
+        public virtual async Task<bool> DeleteProfile(DeleteProfileInput input)
         {
             Guid refGuid;
 
             //The operation can be performed by:
             //  - admin
-            //  - the user itself
+            //  - the user on his own account
             if (input == null || input.Id == null || input.Id == Guid.Empty)
                 refGuid = _session.FusionAuthUserGuid.Value;
             else
@@ -329,36 +332,78 @@ namespace Ermes.Profile
 
                 refGuid = input.Id;
             }
-                      
+            
             var person = await _personManager.GetPersonByFusionAuthUserGuidAsync(refGuid);
 
-            await _notificationManager.DeleteNotificationsByPersonIdAsync(person.Id);
-            await _operationManager.DeleteOperationsByPersonIdAsync(person.Id);
-            await _reportManager.DeleteReportsByPersonIdAsync(person.Id);
-            await _communicationManager.DeleteCommunicationsByPersonIdAsync(person.Id);
-            await _mapRequestManager.DeleteMapRequestsByPersonIdAsync(person.Id);
-            await _missionManager.DeleteMissionsByPersonIdAsync(person.Id);
-            await _personManager.DeletePersonActionsByPersonIdAsync(person.Id);
-            await _personManager.DeletePersonRolesByPersonIdAsync(person.Id);
-
-            var roles = await _personManager.GetPersonRoleNamesAsync(person.Id);
-            if (roles.Any(r => r == AppRoles.CITIZEN))//remove gamification items
+            if (person.OrganizationId.HasValue)
             {
-                await _gamificationManager.DeleteAuditByPersonIdAsync(person.Id);
-                await _personManager.DeletePersonQuizzesByPersonIdAsync(person.Id);
-                await _personManager.DeletePersonTipsByPersonIdAsync(person.Id);
+                var loggedPerson = _session.LoggedUserPerson;
+                if (loggedPerson.OrganizationId != person.OrganizationId.Value && loggedPerson.OrganizationId != person.Organization.ParentId)
+                    throw new UserFriendlyException("EntityOutsideOrganization");
             }
 
+            return await DeleteUserInternalAsync(
+                refGuid, 
+                person, 
+                input.HardDelete, 
+                _notificationManager, 
+                _operationManager, 
+                _reportManager, 
+                _communicationManager, 
+                _mapRequestManager, 
+                _missionManager, 
+                _personManager, 
+                _gamificationManager, 
+                _fusionAuthSettings
+            );
+        }
+
+        [OpenApiOperation("Reactivate profile",
+            @"
+                Reactivate an already existing profile
+                Input: 
+                    - Email address of the profile to be reactiveted
+                Output: ProfileDto object
+                Notes: a user can be reactivated by org manager of the same organization or belonging to a parent organization
+            "
+        )]
+        public virtual async Task<GetProfileOutput> ReactivateProfile(ReactivateProfileInput input)
+        {
+            var person = _personManager.GetPersonByEmail(input.Email);
+            if (person == null)
+                throw new UserFriendlyException(L("InvalidEmailAddress"));
+            if (person.FusionAuthUserGuid == Guid.Empty)
+                throw new UserFriendlyException(L("InvalidGuid"));
+
+            var hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Profiles.Profile_CanReactivate);
+            if (!hasPermission)
+                throw new UserFriendlyException("MissingPermission");
+
+            //no additional checks needed for citizens
+            if (person.OrganizationId.HasValue) {
+                var loggedPerson = _session.LoggedUserPerson;
+                if (loggedPerson.OrganizationId != person.OrganizationId.Value && loggedPerson.OrganizationId != person.Organization.ParentId)
+                    throw new UserFriendlyException("EntityOutsideOrganization");
+            }
+
+            if (person.IsActive)
+                throw new UserFriendlyException(L("PersonIsActive"));
+
             var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
-            var response = await client.DeleteUserAsync(refGuid);
+
+            var response = await client.ReactivateUserAsync(person.FusionAuthUserGuid);
             if (!response.WasSuccessful())
             {
                 var fa_error = FusionAuth.ManageErrorResponse(response);
                 throw new UserFriendlyException(fa_error.ErrorCode, fa_error.HasTranslation ? L(fa_error.Message) : fa_error.Message);
             }
-            
-            await _personManager.DeletePersonByIdAsync(person.Id);
-            return true;
+
+            person.IsActive = true;
+            return new GetProfileOutput()
+            {
+                Profile = await GetProfileInternal(person, response.successResponse.user, _personManager, _missionManager, _gamificationManager, _session, _jobManager)
+            };
+
         }
 
         [OpenApiOperation("Update Registration Token",

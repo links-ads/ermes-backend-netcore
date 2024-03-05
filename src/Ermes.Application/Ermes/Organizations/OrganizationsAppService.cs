@@ -3,12 +3,23 @@ using Abp.Linq.Extensions;
 using Abp.UI;
 using Ermes.Attributes;
 using Ermes.Authorization;
+using Ermes.Communications;
 using Ermes.CompetenceAreas;
 using Ermes.Dto.Datatable;
+using Ermes.Gamification;
 using Ermes.Linq.Extensions;
+using Ermes.MapRequests;
+using Ermes.Missions;
+using Ermes.Notifications;
+using Ermes.Operations;
 using Ermes.Organizations.Dto;
 using Ermes.Persons;
+using Ermes.Reports;
+using Ermes.Teams;
+using FusionAuthNetCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using NSwag.Annotations;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,23 +30,51 @@ namespace Ermes.Organizations
     public class OrganizationsAppService : ErmesAppServiceBase, IOrganizationsAppService
     {
         private readonly OrganizationManager _organizationManager;
+        private readonly TeamManager _teamManager;
         private readonly CompetenceAreaManager _compAreaManager;
         private readonly PersonManager _personManager;
         private readonly ErmesAppSession _session;
         private readonly ErmesPermissionChecker _permissionChecker;
+        private readonly NotificationManager _notificationManager;
+        private readonly OperationManager _operationManager;
+        private readonly ReportManager _reportManager;
+        private readonly MapRequestManager _mapRequestManager;
+        private readonly CommunicationManager _communicationManager;
+        private readonly IOptions<FusionAuthSettings> _fusionAuthSettings;
+        private readonly MissionManager _missionManager;
+        private readonly GamificationManager _gamificationManager;
+
         public OrganizationsAppService(
                 OrganizationManager organizationManager,
+                TeamManager teamManager,
                 CompetenceAreaManager compAreaManager,
                 PersonManager personManager,
                 ErmesAppSession session,
-                ErmesPermissionChecker permissionChecker
+                ErmesPermissionChecker permissionChecker,
+                NotificationManager notificationManager,
+                OperationManager operationManager,
+                ReportManager reportManager,
+                MapRequestManager mapRequestManager,
+                CommunicationManager communicationManager,
+                MissionManager missionManager,
+                GamificationManager gamificationManager,
+                IOptions<FusionAuthSettings> fusionAuthSettings
             )
         {
             _organizationManager = organizationManager;
+            _teamManager = teamManager;
             _compAreaManager = compAreaManager;
             _personManager = personManager;
             _session = session;
             _permissionChecker = permissionChecker;
+            _fusionAuthSettings = fusionAuthSettings;
+            _notificationManager = notificationManager;
+            _operationManager = operationManager;
+            _reportManager = reportManager;
+            _communicationManager = communicationManager;
+            _mapRequestManager = mapRequestManager;
+            _missionManager = missionManager;
+            _gamificationManager = gamificationManager;
         }
 
         #region Private Methods
@@ -60,7 +99,7 @@ namespace Ermes.Organizations
                 throw new UserFriendlyException(L("InvalidParentId", newOrganization.ParentId.Value));
 
             var newOrg = ObjectMapper.Map<Organization>(newOrganization);
-
+            newOrg.IsActive = true;
             var newOrgId = await _organizationManager.InsertOrganizationAsync(newOrg);
             Logger.Info("Ermes: CreateOrganization with new Id: " + newOrgId);
             return newOrgId;
@@ -119,6 +158,27 @@ namespace Ermes.Organizations
             result.Items = ObjectMapper.Map<List<OrganizationDto>>(items);
             return result;
         }
+
+        private async Task<bool> BulkDeleteUsersAsync(int organizationId)
+        {
+            var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
+            var persons = await _personManager.GetPersonsByOrganizationIdAsync(organizationId);
+            var response = await client.DeleteUsersByQueryAsync(new io.fusionauth.domain.api.UserDeleteRequest()
+            {
+                hardDelete = true,
+                userIds = persons.Select(a => a.FusionAuthUserGuid).ToList()
+            });
+
+            if (response.WasSuccessful())
+            {
+                return true;
+            }
+            else
+            {
+                var fa_error = FusionAuth.ManageErrorResponse(response);
+                throw new UserFriendlyException(fa_error.ErrorCode, fa_error.HasTranslation ? L(fa_error.Message) : fa_error.Message);
+            }
+        }
         #endregion
         public virtual async Task<CreateOrUpdateOrganizationOutput> CreateOrUpdateOrganization(CreateOrUpdateOrganizationInput input)
         {
@@ -134,39 +194,82 @@ namespace Ermes.Organizations
             return res;
         }
 
-
         public virtual async Task<DTResult<OrganizationDto>> GetOrganizations(GetOrganizationsInput input)
         {
             PagedResultDto<OrganizationDto> result = await InternalGetOrganizations(input);
             return new DTResult<OrganizationDto>(input.Draw, result.TotalCount, result.Items.Count, result.Items.ToList());
         }
 
+        [OpenApiOperation("Delete Organization",
+            @"
+                Remove:
+                    - organization (soft)
+                    - teams (hard)
+                    - members of the organization (soft)
+                Input: OrganizationId
+                Output: true if the operation completes with success
+                Note: Admin can delete father organizations, 
+                while organization managers can only delete organizations that are child of the org they belong to
+            "
+        )]
         public virtual async Task<bool> DeleteOrganization(DeleteOrganizationInput input)
         {
             var org = await _organizationManager.GetOrganizationByIdAsync(input.OrganizationId);
             if (org == null)
                 throw new UserFriendlyException(L("InvalidOrganizationId", input.OrganizationId));
 
-            if (!await _personManager.CanOrganizationBeDeletedAsync(input.OrganizationId))
-                throw new UserFriendlyException(L("OrganizationCannotBeDeleted", input.OrganizationId));
+            if (!_permissionChecker.IsGranted(_session.Roles, AppPermissions.Organizations.Organization_CanDelete))
+                throw new UserFriendlyException(L("MissingPermission"));
 
             var person = _session.LoggedUserPerson;
-            if (!person.OrganizationId.HasValue)
-            {
-                if (_permissionChecker.IsGranted(_session.Roles, AppPermissions.Organizations.Organization_CanDeleteCrossOrganization))
-                    await _organizationManager.DeleteOrganizationAsync(input.OrganizationId);
-                else
-                    throw new UserFriendlyException(L("MissingPermission"));
-            }
+
+            if (person.OrganizationId.HasValue && person.OrganizationId.Value != org.ParentId)
+                throw new UserFriendlyException(L("MissingPermission"));
             else
             {
-                if (person.OrganizationId.Value == org.Id || person.OrganizationId.Value == org.ParentId)
-                    await _organizationManager.DeleteOrganizationAsync(input.OrganizationId);
-                else
+                if (!_permissionChecker.IsGranted(_session.Roles, AppPermissions.Organizations.Organization_CanDeleteCrossOrganization))
                     throw new UserFriendlyException(L("MissingPermission"));
+                if (!await _personManager.CanOrganizationBeDeletedAsync(input.OrganizationId))
+                    throw new UserFriendlyException(L("OrganizationCannotBeDeleted", input.OrganizationId));
             }
 
-            Logger.Info("Ermes: DeleteOrganization with Id: " + input.OrganizationId + "by Person: " + person.Username);
+
+            var persons = await _personManager.GetPersonsByOrganizationIdAsync(input.OrganizationId);
+
+            foreach (var item in persons)
+            {
+                item.TeamId = null;
+                item.Team = null;
+            }
+            var teams = await _teamManager.GetTeamsByOrganizationIdAsync(input.OrganizationId);
+            foreach (var item in teams)
+            {
+                await _teamManager.DeleteTeamAsync(item.Id);
+                Logger.Info(string.Format("Ermes: Deleted Team {0} with Id {1}", item.Name, item.Id));
+            }
+
+            foreach (var item in persons)
+            {
+                await DeleteUserInternalAsync(
+                        item.FusionAuthUserGuid,
+                        item,
+                        false,
+                        _notificationManager,
+                        _operationManager,
+                        _reportManager,
+                        _communicationManager,
+                        _mapRequestManager,
+                        _missionManager,
+                        _personManager,
+                        _gamificationManager,
+                        _fusionAuthSettings
+                    );
+                Logger.Info(string.Format("Ermes: Deleted Person {0} with Id {1}", item.Username, item.Id));
+            }
+
+            org.IsActive = false;
+            Logger.Info(string.Format("Ermes: De-activate Organization {0} with Id {1} by {2}", org.Name, input.OrganizationId, person.Username));
+
             return true;
         }
 

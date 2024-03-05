@@ -24,6 +24,7 @@
             AppPermissions.Organizations.Organization_CanCreate_Child,
             AppPermissions.Organizations.Organization_CanUpdateAll,
             AppPermissions.Organizations.Organization_CanAssignPersonCrossOrganization,
+            AppPermissions.Organizations.Organization_CanDelete,
             AppPermissions.Organizations.Organization_CanDeleteCrossOrganization,
             AppPermissions.Teams.Team_CanViewAll,
             AppPermissions.Teams.Team_CanCreate,
@@ -42,7 +43,8 @@
             AppPermissions.MapRequests.MapRequest_CanSeeCrossOrganization,
             AppPermissions.Communications.Communication_CanCreate,
             AppPermissions.Communications.Communication_CanSeeCrossOrganization,
-            AppPermissions.Profiles.Profile_CanDelete
+            AppPermissions.Profiles.Profile_CanDelete,
+            AppPermissions.Profiles.Profile_CanReactivate
         };
 
         public static readonly string[] ORGANIZATION_MANAGER_PERMISSION_LIST = new string[]
@@ -51,6 +53,7 @@
             AppPermissions.Organizations.Organization,
             AppPermissions.Organizations.Organization_CanCreate_Child,
             AppPermissions.Organizations.Organization_CanUpdate,
+            AppPermissions.Organizations.Organization_CanDelete,
             AppPermissions.Users.Users_CanCreate,
             AppPermissions.Users.Users_CanEditColleagues,
             AppPermissions.Communications.Communication_CanCreate,
@@ -59,7 +62,9 @@
             AppPermissions.Missions.Mission_CanCreate,
             AppPermissions.Teams.Team_CanCreate,
             AppPermissions.Teams.Team_CanUpdate,
-            AppPermissions.Teams.Team_CanDelete
+            AppPermissions.Teams.Team_CanDelete,
+            AppPermissions.Profiles.Profile_CanDelete,
+            AppPermissions.Profiles.Profile_CanReactivate
         };
 
         public static readonly string[] DECISION_MAKER_PERMISSION_LIST = ORGANIZATION_MANAGER_PERMISSION_LIST;

@@ -44,5 +44,10 @@ namespace Ermes.Teams
         {
             return await Teams.SingleOrDefaultAsync(t => t.Name == teamName && t.OrganizationId == organizationId);
         }
+
+        public virtual async Task<List<Team>> GetTeamsByOrganizationIdAsync(int organizationId)
+        {
+            return await Teams.Where(t => t.OrganizationId == organizationId).ToListAsync();
+        }
     }
 }

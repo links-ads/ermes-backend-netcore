@@ -3,16 +3,20 @@ using Abp.BackgroundJobs;
 using Abp.UI;
 using Ermes.Auth.Dto;
 using Ermes.Authorization;
+using Ermes.Communications;
 using Ermes.Enums;
-using Ermes.EventHandlers;
 using Ermes.Gamification;
 using Ermes.Gamification.Dto;
+using Ermes.MapRequests;
 using Ermes.Missions;
 using Ermes.Missions.Dto;
+using Ermes.Notifications;
+using Ermes.Operations;
 using Ermes.Organizations;
 using Ermes.Organizations.Dto;
 using Ermes.Persons;
 using Ermes.Profile.Dto;
+using Ermes.Reports;
 using Ermes.Roles;
 using Ermes.Teams;
 using Ermes.Teams.Dto;
@@ -78,8 +82,8 @@ namespace Ermes
                 var org = await _organizationManager.GetOrganizationByIdAsync(organizationId.Value);
                 if (org == null)
                     throw new UserFriendlyException(L("InvalidOrganizationId", organizationId));
-                
-                
+
+
                 //TODO: add here check for a self registered user
                 if (!users_CanCreateCitizenOrPersonCrossOrganization)
                 {
@@ -143,7 +147,7 @@ namespace Ermes
             profile.CurrentMissions = ObjectMapper.Map<List<MissionDto>>(_missionManager.GetCurrentMissions(person));
 
             profile.User.Roles = await _personManager.GetPersonRoleNamesAsync(profile.PersonId);
-            if(profile.User.Roles.Count == 0)
+            if (profile.User.Roles.Count == 0)
             {
                 var reg = user?.registrations?.ElementAt(0);
                 if (reg != null) //look for roles from FusionAuth
@@ -242,8 +246,8 @@ namespace Ermes
             };
 
             var response = await client.UpdateUserAsync(userToUpdate.user.id, userToUpdate);
-            
-            if(response.WasSuccessful())
+
+            if (response.WasSuccessful())
                 return response.successResponse.user;
             else
             {
@@ -264,7 +268,7 @@ namespace Ermes
             }
 
             person.OrganizationId = organizationId;
-            if(teamId.HasValue)
+            if (teamId.HasValue)
                 person.TeamId = teamId;
             person.IsFirstLogin = isFirstLogin;
             person.IsNewUser = isNewUser;
@@ -359,8 +363,9 @@ namespace Ermes
 
             var fa_users = ObjectMapper.Map<List<User>>(users);
 
-            fa_users.Select(u => {
-                    u.registrations = new List<UserRegistration>() {
+            fa_users.Select(u =>
+            {
+                u.registrations = new List<UserRegistration>() {
                         new UserRegistration()
                         {
                             applicationId = new Guid(_fusionAuthSettings.Value.ApplicationId),
@@ -368,10 +373,10 @@ namespace Ermes
                             verified = true
                         }
                     };
-                    u.verified = true;
-                    u.active = true;
-                    return u;
-                }).ToList();
+                u.verified = true;
+                u.active = true;
+                return u;
+            }).ToList();
             //Create user on FusionAuth
             var import = new ImportRequest()
             {
@@ -388,6 +393,66 @@ namespace Ermes
                 var fa_error = FusionAuth.ManageErrorResponse(response);
                 throw new UserFriendlyException(fa_error.ErrorCode, fa_error.HasTranslation ? L(fa_error.Message) : fa_error.Message);
             }
+        }
+
+        protected async Task<bool> DeleteUserInternalAsync(
+            Guid refGuid,
+            Person person,
+            bool hardDelete,
+            NotificationManager _notificationManager,
+            OperationManager _operationManager,
+            ReportManager _reportManager,
+            CommunicationManager _communicationManager,
+            MapRequestManager _mapRequestManager,
+            MissionManager _missionManager,
+            PersonManager _personManager,
+            GamificationManager _gamificationManager,
+            IOptions<FusionAuthSettings> _fusionAuthSettings
+        )
+        {
+            var client = FusionAuth.GetFusionAuthClient(_fusionAuthSettings.Value);
+            if (hardDelete)
+            {
+                await _notificationManager.DeleteNotificationsByPersonIdAsync(person.Id);
+                await _operationManager.DeleteOperationsByPersonIdAsync(person.Id);
+                await _reportManager.DeleteReportsByPersonIdAsync(person.Id);
+                await _communicationManager.DeleteCommunicationsByPersonIdAsync(person.Id);
+                await _mapRequestManager.DeleteMapRequestsByPersonIdAsync(person.Id);
+                await _missionManager.DeleteMissionsByPersonIdAsync(person.Id);
+                await _personManager.DeletePersonActionsByPersonIdAsync(person.Id);
+                await _personManager.DeletePersonRolesByPersonIdAsync(person.Id);
+
+                var roles = await _personManager.GetPersonRoleNamesAsync(person.Id);
+                if (roles.Any(r => r == AppRoles.CITIZEN))//remove gamification items
+                {
+                    await _gamificationManager.DeleteAuditByPersonIdAsync(person.Id);
+                    await _personManager.DeletePersonQuizzesByPersonIdAsync(person.Id);
+                    await _personManager.DeletePersonTipsByPersonIdAsync(person.Id);
+                }
+
+                var response = await client.DeleteUserAsync(refGuid);
+                if (!response.WasSuccessful())
+                {
+                    var fa_error = FusionAuth.ManageErrorResponse(response);
+                    throw new UserFriendlyException(fa_error.ErrorCode, fa_error.HasTranslation ? L(fa_error.Message) : fa_error.Message);
+                }
+
+                await _personManager.DeletePersonByIdAsync(person.Id);
+            }
+            else
+            {
+                var response = await client.DeactivateUserAsync(refGuid);
+                if (!response.WasSuccessful())
+                {
+                    var fa_error = FusionAuth.ManageErrorResponse(response);
+                    throw new UserFriendlyException(fa_error.ErrorCode, fa_error.HasTranslation ? L(fa_error.Message) : fa_error.Message);
+                }
+
+                person.TeamId = null;
+                person.IsActive = false;
+            }
+
+            return true;
         }
     }
 }

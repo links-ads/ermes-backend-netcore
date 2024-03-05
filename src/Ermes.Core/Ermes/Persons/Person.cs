@@ -1,21 +1,18 @@
-﻿using Abp.Domain.Entities.Auditing;
+﻿using Abp.Domain.Entities;
+using Abp.Domain.Entities.Auditing;
 using Ermes.Gamification;
-using Ermes.Operations;
 using Ermes.Organizations;
-using Ermes.Persons.Cache;
 using Ermes.Reports;
 using Ermes.Teams;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace Ermes.Persons
 {
     [Table("persons")]
-    public class Person : AuditedEntity<long>, IPersonBase
+    public class Person : AuditedEntity<long>, IPersonBase, IPassivable
     {
         private const int MaxUsernameLength = 255;
         private const int MaxEmailLength = 255;
@@ -75,5 +72,11 @@ namespace Ermes.Persons
         public string Email { get; set; }
 
         public virtual ICollection<ReportValidation> ReportValidations { get; set; }
+
+        /// <summary>
+        /// Better IsActive than SoftDeleted, because even if the user cannot access the platform,
+        /// we want to show his position and his reports on the frontend
+        /// </summary>
+        public bool IsActive { get; set; } = true;
     }
 }

@@ -28,6 +28,7 @@
             public const string Organization_CanUpdateAll = "Organizations.CanUpdateAll";
             public const string Organization_CanAssignPersonCrossOrganization = "Organizations.CanAssignPersonCrossOrganization";
             public const string Organization_CanDeleteCrossOrganization = "Organizations.CanDeleteCrossOrganization";
+            public const string Organization_CanDelete = "Organizations.CanDelete";
         }
 
         public static class Missions
@@ -64,6 +65,7 @@
             public const string Profile_CanCreate = "Profile.CanCreate";
             public const string Profile_CanUpdate = "Profile.CanUpdate";
             public const string Profile_CanDelete = "Profile.CanDelete";
+            public const string Profile_CanReactivate = "Profile.CanReactivate";
         }
 
         public static class Actions

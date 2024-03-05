@@ -1,7 +1,11 @@
 Ver.
 --------------------------------
+- Feature - Delete of Organizations and persons (migration added)(permissions update)(#178)
+
+Ver. 4.18.2 - 2024-02-13
+--------------------------------
+- Feature - New API for person action batch insert added (#176)
 - Feature - Read property added to Report and ReportDto class (migration added)(#175)
-- Feature - new API for person action batch insert added (#176)
 - Feature - CreatorFullName property added in APIs for externals (#177) 
 
 Ver. 4.18.1 - 2024-01-22
