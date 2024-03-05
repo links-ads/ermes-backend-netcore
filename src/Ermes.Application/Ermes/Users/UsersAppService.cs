@@ -1,17 +1,12 @@
 ﻿using Abp.Application.Services.Dto;
-using Abp.Authorization;
 using Abp.BackgroundJobs;
 using Abp.UI;
 using Ermes.Attributes;
-using Ermes.Auth.Dto;
 using Ermes.Authorization;
-using Ermes.Dto;
 using Ermes.Dto.Datatable;
 using Ermes.Gamification;
-using Ermes.Helpers;
 using Ermes.Missions;
 using Ermes.Organizations;
-using Ermes.Permissions;
 using Ermes.Persons;
 using Ermes.Profile.Dto;
 using Ermes.Roles;
@@ -19,7 +14,6 @@ using Ermes.Teams;
 using Ermes.Users.Dto;
 using FusionAuthNetCore;
 using io.fusionauth.domain;
-using io.fusionauth.domain.api;
 using io.fusionauth.domain.api.user;
 using io.fusionauth.domain.search;
 using Microsoft.Extensions.Options;
@@ -145,9 +139,9 @@ namespace Ermes.Users
                     {
                         var person = await _personManager.GetPersonByFusionAuthUserGuidAsync(item.id.Value, item.email, item.username);
                         ProfileDto profile = await GetProfileInternal(person, item, _personManager, _missionManager, _gamificationManager, _session, _jobManager);
-                        if(!item.verified.HasValue || !item.verified.Value)
+                        if (!item.verified.HasValue || !item.verified.Value)
                             list.Add(profile);
-                        else if(!profile.User.Roles.Any(a => a == AppRoles.CITIZEN || a == AppRoles.ADMINISTRATOR) && !person.OrganizationId.HasValue)
+                        else if (!profile.User.Roles.Any(a => a == AppRoles.CITIZEN || a == AppRoles.ADMINISTRATOR) && !person.OrganizationId.HasValue)
                             list.Add(profile);
                     }
                     result.TotalCount = list.Count;

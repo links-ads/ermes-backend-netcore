@@ -138,6 +138,10 @@
     <Compile Include="Migrations\20231113091654_Communication_Message_MaxLengthRemoved.Designer.cs" />
     <Compile Include="Migrations\20240207150740_Report_Read_Property_Added.cs" />
     <Compile Include="Migrations\20240207150740_Report_Read_Property_Added.Designer.cs" />
+    <Compile Include="Migrations\20240301104248_Person_IsActive_Added.cs" />
+    <Compile Include="Migrations\20240301104248_Person_IsActive_Added.Designer.cs" />
+    <Compile Include="Migrations\20240305081358_Organization_IsActive_Added.cs" />
+    <Compile Include="Migrations\20240305081358_Organization_IsActive_Added.Designer.cs" />
     <Compile Include="Migrations\ErmesDbContextModelSnapshot.cs" />
     <Compile Include="Migrations\Seed\ModelBuilderExtensions.cs" />
   </ItemGroup>

@@ -14,6 +14,5 @@ namespace Ermes.Users
         Task<DTResult<ProfileDto>> GetUsers(GetUsersInput input);
         Task<CreateOrUpdateUserOutput> CreateOrUpdateUser(UpdateProfileInput input);
         Task<DTResult<ProfileDto>> GetUncompletedUsers(GetUncompletedUsersInput input);
-
     }
 }
