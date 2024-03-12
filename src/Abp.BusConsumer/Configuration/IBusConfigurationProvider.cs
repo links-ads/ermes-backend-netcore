@@ -14,6 +14,7 @@ namespace Abp.BusConsumer.Configuration
         string GetVirtualHost();
         string GetExchange();
         string GetQueue();
+        bool MustDeclareBindings();
 
     }
 }
