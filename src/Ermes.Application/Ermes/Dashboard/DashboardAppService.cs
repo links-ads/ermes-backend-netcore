@@ -147,6 +147,7 @@ namespace Ermes.Dashboard
                 if (_session.LoggedUserPerson.OrganizationId.HasValue)
                     queryMapRequests = queryMapRequests.DataOwnership(new List<int>() { _session.LoggedUserPerson.OrganizationId.Value });
             }
+            queryMapRequests = queryMapRequests.Where(x => x.Status != MapRequestStatusType.Canceled);
             //////////////////////
 
             //Alerts///////////
