@@ -99,5 +99,10 @@ namespace Abp.BusConsumer.Configuration
 
             return _busSettings.Value.Queue;
         }
+
+        public bool MustDeclareBindings()
+        {
+            return _busSettings.Value.MustDeclareBindings;
+        }
     }
 }
