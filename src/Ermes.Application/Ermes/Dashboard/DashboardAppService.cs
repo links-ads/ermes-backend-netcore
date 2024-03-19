@@ -23,6 +23,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Ermes.Dashboard
 {
@@ -114,6 +115,20 @@ namespace Ermes.Dashboard
             var hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Reports.Report_CanSeeCrossOrganization);
             if (!hasPermission)
                 queryReport = queryReport.DataOwnership(person.OrganizationId.HasValue ? new List<int>() { person.OrganizationId.Value } : null);
+
+            if (input.ReportHazards != null && input.ReportHazards.Count > 0)
+            {
+                var hazardList = input.ReportHazards.Select(a => a.ToString()).ToList();
+                queryReport = queryReport.Where(a => hazardList.Contains(a.HazardString));
+            }
+
+            if (input.ReportVisibility != VisibilityType.All)
+            {
+                if (input.ReportVisibility == VisibilityType.Private)
+                    queryReport = queryReport.Where(r => !r.IsPublic);
+                else
+                    queryReport = queryReport.Where(r => r.IsPublic);
+            }
             /////////////////////
 
             //Missions///////////
@@ -122,6 +137,14 @@ namespace Ermes.Dashboard
             hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Missions.Mission_CanSeeCrossOrganization);
             if (!hasPermission)
                 queryMission = queryMission.DataOwnership(person.OrganizationId.HasValue ? new List<int>() { person.OrganizationId.Value } : null);
+
+            if (input.MissionStatus != null && input.MissionStatus.Count > 0)
+            {
+                //input.Status.Contains throw an exception
+                //I need to go through the strings rather then the enum
+                var list = input.MissionStatus.Select(a => a.ToString()).ToList();
+                queryMission = queryMission.Where(a => list.Contains(a.CurrentStatusString));
+            }
             //////////////////////
 
             //Persons////////////
@@ -133,7 +156,8 @@ namespace Ermes.Dashboard
                 orgIdList = _session.LoggedUserPerson.OrganizationId.HasValue ? new int[] { _session.LoggedUserPerson.OrganizationId.Value } : null;
 
             string personName = _session.LoggedUserPerson.Username ?? _session.LoggedUserPerson.Email;
-            var items = _geoJsonBulkRepository.GetPersonActions(start, end, orgIdList, null, null, null, boundingBox, personName, null, _languageManager.CurrentLanguage.Name);
+            var teamIds = input.TeamIds?.ToArray();
+            var items = _geoJsonBulkRepository.GetPersonActions(start, end, orgIdList, input.ActionStatusTypes, null, teamIds, boundingBox, personName, null, _languageManager.CurrentLanguage.Name);
             var deserialized = JsonConvert.DeserializeObject<GetActionsOutput>(items);
             var actions = deserialized != null && deserialized.PersonActions != null ? deserialized.PersonActions : new List<PersonActionDto>();
             ////////////////////
@@ -147,15 +171,56 @@ namespace Ermes.Dashboard
                 if (_session.LoggedUserPerson.OrganizationId.HasValue)
                     queryMapRequests = queryMapRequests.DataOwnership(new List<int>() { _session.LoggedUserPerson.OrganizationId.Value });
             }
-            queryMapRequests = queryMapRequests.Where(x => x.StatusString != MapRequestStatusType.Canceled.ToString());
-            //////////////////////
 
-            //Alerts///////////
-            IQueryable<Alert> queryAlerts = boundingBox != null ? _geoJsonBulkRepository.GetAlerts(start, end, boundingBox) : _alertManager.GetAlerts(start, end);
+            if (input.MapRequestStatus != null && input.MapRequestStatus.Count > 0)
+            {
+                var list = input.MapRequestStatus.Select(a => a.ToString()).ToList();
+                queryMapRequests = queryMapRequests.Where(a => list.Contains(a.StatusString));
+            }
+            else
+                queryMapRequests = queryMapRequests.Where(a => a.StatusString != MapRequestStatusType.Canceled.ToString());
+
+            if (input.MapRequestTypes != null && input.MapRequestTypes.Count > 0)
+            {
+                var list = input.MapRequestTypes.Select(a => a.ToString()).ToList();
+                queryMapRequests = queryMapRequests.Where(a => list.Contains(a.TypeString));
+            }
             //////////////////////
 
             //Communications///////////
+            bool includeNone = false;
+            var roles = await _personManager.GetPersonRoleNamesAsync(person.Id);
             IQueryable<Communication> queryCommunications = boundingBox != null ? _geoJsonBulkRepository.GetCommunications(start, end, boundingBox) : _communicationManager.GetCommunications(start, end);
+            if (input.CommunicationScopes != null && input.CommunicationScopes.Count > 0)
+            {
+                var list = input.CommunicationScopes.Select(a => a.ToString()).ToList();
+                queryCommunications = queryCommunications.Where(a => list.Contains(a.ScopeString));
+                includeNone = input.CommunicationScopes.Contains(CommunicationScopeType.Public);
+
+            }
+            if (input.CommunicationRestrictions != null && input.CommunicationRestrictions.Count > 0)
+            {
+                if (includeNone)
+                    input.CommunicationRestrictions.Add(CommunicationRestrictionType.None);
+                if (roles.Any(r => r == AppRoles.CITIZEN))
+                    input.CommunicationRestrictions = new List<CommunicationRestrictionType> { CommunicationRestrictionType.None, CommunicationRestrictionType.Citizen };
+
+
+                var list = input.CommunicationRestrictions.Select(a => a.ToString()).ToList();
+                queryCommunications = queryCommunications.Where(a => list.Contains(a.RestrictionString));
+            }
+            else
+            {
+                input.CommunicationRestrictions = new List<CommunicationRestrictionType>() { CommunicationRestrictionType.None, CommunicationRestrictionType.Professional, CommunicationRestrictionType.Organization, CommunicationRestrictionType.Citizen };
+                if (roles.Any(r => r == AppRoles.CITIZEN))
+                    input.CommunicationRestrictions = input.CommunicationRestrictions.Where(a => a == CommunicationRestrictionType.None || a == CommunicationRestrictionType.Citizen).ToList();
+
+                if (input.CommunicationRestrictions.Count > 0)
+                {
+                    var list = input.CommunicationRestrictions.Select(a => a.ToString()).ToList();
+                    queryCommunications = queryCommunications.Where(a => list.Contains(a.RestrictionString));
+                }
+            }
 
             //Admin can see everything
             hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Communications.Communication_CanSeeCrossOrganization);
@@ -261,15 +326,6 @@ namespace Ermes.Dashboard
                                         Value = g.Count()
                                     })
                                     .ToList(),
-                AlertsByRestriction = queryAlerts
-                                        .GroupBy(a => a.Restriction)
-                                        .Select(g => new GroupDto()
-                                        {
-                                            Id = g.Key,
-                                            Label = g.Key,
-                                            Value = g.Count()
-                                        })
-                                        .ToList(),
                 Stations = stations
             };
         }
