@@ -14,7 +14,6 @@ namespace Ermes.Dashboard.Dto
         public Dictionary<ActionStatusType, List<ActivationDto>> ActivationsByDay { get; set; }
         public List<GroupDto> CommunicationsByRestriction { get; set; }
         public List<GroupDto> MapRequestByType { get; set; }
-        public List<GroupDto> AlertsByRestriction { get; set; }
         public List<StationDto> Stations { get; set; }
 
     }
