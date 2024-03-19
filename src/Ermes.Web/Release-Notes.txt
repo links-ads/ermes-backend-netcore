@@ -1,5 +1,9 @@
 Ver.
 --------------------------------
+
+
+Ver. 4.18.4 - 2024-03-19
+--------------------------------
 - Feature - Subfilters for GetStatistics API added (sdk to be updated)(#179)
 
 Ver. 4.18.3 - 2024-03-13
