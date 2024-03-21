@@ -128,7 +128,11 @@ namespace Ermes.Dashboard
 
             var hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Reports.Report_CanSeeCrossOrganization);
             if (!hasPermission)
-                queryReport = queryReport.DataOwnership(person.OrganizationId.HasValue ? new List<int>() { person.OrganizationId.Value } : null);
+            {
+                //Citizen can only see public reports
+                bool isCitizen = _session.Roles.Contains(AppRoles.CITIZEN);
+                queryReport = queryReport.DataOwnership(person.OrganizationId.HasValue ? new List<int>() { person.OrganizationId.Value } : null, null, isCitizen ? VisibilityType.Public : input.ReportVisibility);
+            }
             /////////////////////
 
             //Missions///////////
