@@ -112,10 +112,6 @@ namespace Ermes.Dashboard
             //Reports////////////
             IQueryable<Report> queryReport = boundingBox != null ? _geoJsonBulkRepository.GetReports(start, end, boundingBox) : _reportManager.GetReports(start, end);
 
-            var hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Reports.Report_CanSeeCrossOrganization);
-            if (!hasPermission)
-                queryReport = queryReport.DataOwnership(person.OrganizationId.HasValue ? new List<int>() { person.OrganizationId.Value } : null);
-
             if (input.ReportHazards != null && input.ReportHazards.Count > 0)
             {
                 var hazardList = input.ReportHazards.Select(a => a.ToString()).ToList();
@@ -129,14 +125,14 @@ namespace Ermes.Dashboard
                 else
                     queryReport = queryReport.Where(r => r.IsPublic);
             }
+
+            var hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Reports.Report_CanSeeCrossOrganization);
+            if (!hasPermission)
+                queryReport = queryReport.DataOwnership(person.OrganizationId.HasValue ? new List<int>() { person.OrganizationId.Value } : null);
             /////////////////////
 
             //Missions///////////
             IQueryable<Mission> queryMission = boundingBox != null ? _geoJsonBulkRepository.GetMissions(start, end, boundingBox) : _missionManager.GetMissions(start, end);
-
-            hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Missions.Mission_CanSeeCrossOrganization);
-            if (!hasPermission)
-                queryMission = queryMission.DataOwnership(person.OrganizationId.HasValue ? new List<int>() { person.OrganizationId.Value } : null);
 
             if (input.MissionStatus != null && input.MissionStatus.Count > 0)
             {
@@ -145,6 +141,10 @@ namespace Ermes.Dashboard
                 var list = input.MissionStatus.Select(a => a.ToString()).ToList();
                 queryMission = queryMission.Where(a => list.Contains(a.CurrentStatusString));
             }
+
+            hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.Missions.Mission_CanSeeCrossOrganization);
+            if (!hasPermission)
+                queryMission = queryMission.DataOwnership(person.OrganizationId.HasValue ? new List<int>() { person.OrganizationId.Value } : null);
             //////////////////////
 
             //Persons////////////
@@ -165,13 +165,6 @@ namespace Ermes.Dashboard
             //Map Requests///////////
             IQueryable<MapRequest> queryMapRequests = boundingBox != null ? _geoJsonBulkRepository.GetMapRequests(start, end, boundingBox) : _mapRequestManager.GetMapRequests(start, end);
 
-            hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.MapRequests.MapRequest_CanSeeCrossOrganization);
-            if (!hasPermission)
-            {
-                if (_session.LoggedUserPerson.OrganizationId.HasValue)
-                    queryMapRequests = queryMapRequests.DataOwnership(new List<int>() { _session.LoggedUserPerson.OrganizationId.Value });
-            }
-
             if (input.MapRequestStatus != null && input.MapRequestStatus.Count > 0)
             {
                 var list = input.MapRequestStatus.Select(a => a.ToString()).ToList();
@@ -184,6 +177,13 @@ namespace Ermes.Dashboard
             {
                 var list = input.MapRequestTypes.Select(a => a.ToString()).ToList();
                 queryMapRequests = queryMapRequests.Where(a => list.Contains(a.TypeString));
+            }
+
+            hasPermission = _permissionChecker.IsGranted(_session.Roles, AppPermissions.MapRequests.MapRequest_CanSeeCrossOrganization);
+            if (!hasPermission)
+            {
+                if (_session.LoggedUserPerson.OrganizationId.HasValue)
+                    queryMapRequests = queryMapRequests.DataOwnership(new List<int>() { _session.LoggedUserPerson.OrganizationId.Value });
             }
             //////////////////////
 
