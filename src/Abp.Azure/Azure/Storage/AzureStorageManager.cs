@@ -3,7 +3,6 @@ using Azure.Storage.Blobs.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Resources;
 using System.Threading.Tasks;
 
 namespace Abp.Azure.Storage
@@ -106,7 +105,14 @@ namespace Abp.Azure.Storage
                 return BlobContainer;
             BlobContainer = new BlobContainerClient(connectionString, containerName);
             await BlobContainer.CreateIfNotExistsAsync();
-
+            try
+            {
+                await BlobContainer.SetAccessPolicyAsync(PublicAccessType.Blob);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(string.Format("Cannot change access type for blob {0}: {1}", containerName, ex.Message));
+            }
             return BlobContainer;
         }
 

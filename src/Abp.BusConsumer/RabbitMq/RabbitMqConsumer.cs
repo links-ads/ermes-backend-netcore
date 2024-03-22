@@ -51,12 +51,15 @@ namespace Abp.BusConsumer.RabbitMq
             var q = _channel.QueueDeclarePassive(_busConfigurationProvider.GetQueue());
 
             //Create the binding if not present
-            _channel.QueueBind(q.QueueName, _busConfigurationProvider.GetExchange(), "status.brn.*.links.*");
-            _channel.QueueBind(q.QueueName, _busConfigurationProvider.GetExchange(), "status.propagator.*.links.#");
-            _channel.QueueBind(q.QueueName, _busConfigurationProvider.GetExchange(), "status.pwm.*.links.#");
+            if (_busConfigurationProvider.MustDeclareBindings())
+            {
+                _channel.QueueBind(q.QueueName, _busConfigurationProvider.GetExchange(), "status.brn.*.links.*");
+                _channel.QueueBind(q.QueueName, _busConfigurationProvider.GetExchange(), "status.propagator.*.links.#");
+                _channel.QueueBind(q.QueueName, _busConfigurationProvider.GetExchange(), "status.pwm.*.links.#");
 
-            _channel.QueueBind(q.QueueName, _busConfigurationProvider.GetExchange(), "notification.sem.astro");
-            _channel.QueueBind(q.QueueName, _busConfigurationProvider.GetExchange(), "event.camera.#");
+                _channel.QueueBind(q.QueueName, _busConfigurationProvider.GetExchange(), "notification.sem.astro");
+                _channel.QueueBind(q.QueueName, _busConfigurationProvider.GetExchange(), "event.camera.#");
+            }
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
