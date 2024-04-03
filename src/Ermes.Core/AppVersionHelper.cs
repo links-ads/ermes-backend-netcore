@@ -13,7 +13,7 @@ namespace Ermes
         /// All project's assembly versions are changed when this value is changed.
         /// It's also shown in the web page.
         /// </summary>
-        public const string Version = "4.19.2";
+        public const string Version = "4.19.3";
 
         /// <summary>
         /// Gets release (last build) date of the application.
