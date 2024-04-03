@@ -85,6 +85,7 @@
     "DoNotTakePartToGamification": "You do not take part to gamification",
     "InvalidEmail": "Invalid email address",
     "InvalidVolterTaxCode": "Invalid tax code",
-    "RequestedFileDoesNotExists": "Requested file does not exists"
+    "RequestedFileDoesNotExists": "Requested file does not exists",
+    "Trial_MapRequestLimit_Exceed": "Ha superado el número de solicitudes de mapas de tipo {0} esperadas para su organización"
   }
 }

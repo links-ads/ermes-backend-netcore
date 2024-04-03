@@ -101,6 +101,7 @@
     "InvalidVolterTaxCode": "Invalid tax code",
     "RequestedFileDoesNotExists": "Requested file does not exists",
     "InvalidReportVerifierOwner": "A user cannot validate his own report",
-    "InvalidReportVerifierDuplicate": "This report has already been validated by this user"
+    "InvalidReportVerifierDuplicate": "This report has already been validated by this user",
+    "Trial_MapRequestLimit_Exceed": "Vous avez dépassé le nombre de requêtes de carte de type {0} attendu pour votre organisation"
   }
 }

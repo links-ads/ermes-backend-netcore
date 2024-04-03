@@ -7,7 +7,6 @@ using NpgsqlTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Ermes.MapRequests
@@ -74,6 +73,13 @@ namespace Ermes.MapRequests
         {
             await MapRequestLayersRepository.DeleteAsync(ml => ml.CreatorUserId.HasValue && ml.CreatorUserId.Value == personId);
             await MapRequestRepository.DeleteAsync(mr => mr.CreatorUserId.HasValue && mr.CreatorUserId.Value == personId);
+        }
+
+        public int GetMapRequestsCountByType(string type, int organizationId)
+        {
+            return MapRequests
+                            .Where(mr => mr.TypeString == type && mr.Creator.OrganizationId.Value == organizationId)
+                            .Count();
         }
     }
 }

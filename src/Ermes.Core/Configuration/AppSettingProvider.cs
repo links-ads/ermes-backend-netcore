@@ -21,7 +21,8 @@ namespace Ermes.Configuration
                 new SettingDefinition(AppSettings.JobSettings.Station_JobEnabled, "true"),
                 new SettingDefinition(AppSettings.JobSettings.NotificationReceived_JobEnabled, "true"),
                 new SettingDefinition(AppSettings.JobSettings.Stations_DaysToBeKept, "7"),
-                new SettingDefinition(AppSettings.JobSettings.NotificationReceived_DaysToBeKept, "15")
+                new SettingDefinition(AppSettings.JobSettings.NotificationReceived_DaysToBeKept, "15"),
+                new SettingDefinition(AppSettings.TrialSettings.Trial_MapRequest_Limit, "50")
             };
         }
     }

@@ -1,6 +1,6 @@
 Ver.
 --------------------------------
-
+- Feature - Added map request count limit for trial period (#180)
 
 Ver. 4.19.2 - 2024-03-22
 --------------------------------

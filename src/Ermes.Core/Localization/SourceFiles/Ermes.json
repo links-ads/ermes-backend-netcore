@@ -107,6 +107,7 @@
     "RequestedFileDoesNotExists": "Requested file does not exists",
     "InvalidReportVerifierOwner": "A user cannot validate his own report",
     "InvalidReportVerifierDuplicate": "This report has already been validated by this user",
-    "TaxCodeAlreadyInUse":  "This tax code has already been associated to another account"
+    "TaxCodeAlreadyInUse": "This tax code has already been associated to another account",
+    "Trial_MapRequestLimit_Exceed": "You have exceeded the number of type {0} Map requests expected for your organization"
   }
 }
