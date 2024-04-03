@@ -103,6 +103,7 @@
     "RequestedFileDoesNotExists": "Il file richiesto non esiste",
     "InvalidReportVerifierOwner": "Un utente non può validare le proprie segnalazioni",
     "InvalidReportVerifierDuplicate": "Questa segnalazione è già stata validata da questo utente",
-    "TaxCodeAlreadyInUse": "Questo codice fiscale è già stato associato ad un altro utente"
+    "TaxCodeAlreadyInUse": "Questo codice fiscale è già stato associato ad un altro utente",
+    "Trial_MapRequestLimit_Exceed": "Hai superato il nuemro di map request di tipo {0} previste per la tua organizzazione"
   }
 }

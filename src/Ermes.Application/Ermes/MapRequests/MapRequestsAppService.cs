@@ -1,10 +1,12 @@
 ﻿using Abp.Application.Services.Dto;
 using Abp.BackgroundJobs;
+using Abp.Configuration;
 using Abp.Importer;
 using Abp.Linq.Extensions;
 using Abp.UI;
 using Ermes.Attributes;
 using Ermes.Authorization;
+using Ermes.Configuration;
 using Ermes.Dto;
 using Ermes.Dto.Datatable;
 using Ermes.Dto.Spatial;
@@ -151,9 +153,19 @@ namespace Ermes.MapRequests
             return result;
         }
 
+        private bool CheckMapRequestLimitsForTrial(MapRequest mr, int organizationId)
+        {
+            int count = _mapRequestManager.GetMapRequestsCountByType(mr.TypeString, organizationId);
+            return count > SettingManager.GetSettingValue<int>(AppSettings.TrialSettings.Trial_MapRequest_Limit);
+        }
+
         private async Task<MapRequest> CreateMapRequestAsync(FeatureDto<MapRequestDto> featureDto)
         {
             var newMR = ObjectMapper.Map<MapRequest>(featureDto.Properties);
+
+            if (CheckMapRequestLimitsForTrial(newMR, _session.LoggedUserPerson.OrganizationId.Value))
+                throw new UserFriendlyException(L("Trial_MapRequestLimit_Exceed", newMR.TypeString));
+
             if (featureDto.FullGeometry != null && featureDto.FullGeometry.IsValid)
                 newMR.AreaOfInterest = featureDto.FullGeometry;
             else

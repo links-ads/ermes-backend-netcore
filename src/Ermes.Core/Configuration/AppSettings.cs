@@ -23,5 +23,10 @@ namespace Ermes.Configuration
             public const string Station_JobEnabled = "App.JobSettings.Stations.JobEnabled";
             public const string Stations_DaysToBeKept = "App.JobSettings.Stations.DaysToBeKept";
         }
+
+        public static class TrialSettings
+        {
+            public const string Trial_MapRequest_Limit = "App.Trial.MapRequest.Limit";
+        }
     }
 }

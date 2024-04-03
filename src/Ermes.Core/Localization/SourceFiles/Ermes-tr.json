@@ -104,6 +104,7 @@
     "InvalidEmail": "Geçersiz e-posta adresi",
     "InvalidVolterTaxCode": "Geçersiz vergi kodu",
     "InvalidReportVerifierOwner": "A user cannot validate his own report",
-    "InvalidReportVerifierDuplicate": "This report has already been validated by this user"
+    "InvalidReportVerifierDuplicate": "This report has already been validated by this user",
+    "Trial_MapRequestLimit_Exceed": "You have exceeded the number of type {0} Map requests expected for your organization"
   }
 }
