@@ -1,4 +1,5 @@
-﻿using Ermes.Interfaces;
+﻿using Ermes.Configuration;
+using Ermes.Interfaces;
 using FusionAuthNetCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -11,10 +12,12 @@ namespace Ermes.Web.Controllers
     public class AuthController : ErmesControllerBase, IBackofficeApi
     {
         private readonly IOptions<FusionAuthSettings> _fusionAuthSettings;
+        private readonly IOptions<ErmesSettings> _ermesSettings;
 
-        public AuthController(IOptions<FusionAuthSettings> fusionAuthSettings)
+        public AuthController(IOptions<FusionAuthSettings> fusionAuthSettings, IOptions<ErmesSettings> ermesSettings)
         {
             _fusionAuthSettings = fusionAuthSettings;
+            _ermesSettings = ermesSettings;
         }
 
         /// <summary>
@@ -36,7 +39,8 @@ namespace Ermes.Web.Controllers
             if (isThereOriginHeader)
                 redirectUri = $"{source[0]}/login-callback";
             else
-                return BadRequest("Invalid Origin Header");
+                redirectUri = $"{_ermesSettings.Value.WebApp}/login-callback";
+                //return BadRequest("Invalid Origin Header");
 
             var tokenResponse = await client.ExchangeOAuthCodeForAccessTokenAsync(code, _fusionAuthSettings.Value.ClientId, _fusionAuthSettings.Value.ClientSecret, redirectUri);
             if (tokenResponse.WasSuccessful())
