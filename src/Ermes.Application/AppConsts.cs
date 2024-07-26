@@ -15,7 +15,7 @@ namespace Ermes
         /// <summary>
         /// Maximum allowed page size for paged requests.
         /// </summary>
-        public const int MaxPageSize = 1000;
+        public const int MaxPageSize = 5000;
 
         public const int Srid = 4326;
 
